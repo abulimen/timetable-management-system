@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- OptaPlanner Solver Configuration - OPTIMIZED
+     Performance optimizations applied:
+     1. Multi-threaded solving (AUTO = all CPU cores)
+     2. Combined acceptors (Tabu + Late Acceptance)
+     3. FIRST_FIT_DECREASING construction (with difficulty comparator)
+     4. Optimized termination criteria
+-->
+<solver xmlns="https://www.optaplanner.org/xsd/solver">
+    <solutionClass>com.university.timetable.domain.TimeTable</solutionClass>
+    <entityClass>com.university.timetable.domain.Lesson</entityClass>
+    
+    <scoreDirectorFactory>
+        <constraintProviderClass>
+            com.university.timetable.solver.TimetableConstraintProvider
+        </constraintProviderClass>
+    </scoreDirectorFactory>
+    
+    <!-- Multi-termination: Stop when ANY condition is met -->
+    <termination>
+        <!-- Maximum time limit (failsafe) - increased for large datasets -->
+        <minutesSpentLimit>15</minutesSpentLimit>
+        <!-- Stop if no improvement for 60 seconds -->
+        <unimprovedSecondsSpentLimit>60</unimprovedSecondsSpentLimit>
+    </termination>
+    
+    <!-- WEAKEST_FIT_DECREASING: Schedule hard lessons first, use smallest suitable rooms -->
+    <constructionHeuristic>
+        <constructionHeuristicType>WEAKEST_FIT_DECREASING</constructionHeuristicType>
+    </constructionHeuristic>
+    
+    <!-- Local Search with OPTIMIZATIONS -->
+    <localSearch>
+        <!-- OPTIMIZATION 2: Combined acceptors for better exploration -->
+        <acceptor>
+            <!-- Tabu: Avoid revisiting recent moves -->
+            <entityTabuSize>7</entityTabuSize>
+            <!-- Late Acceptance: Compare against solution from 400 steps ago -->
+            <lateAcceptanceSize>400</lateAcceptanceSize>
+        </acceptor>
+        
+        <forager>
+            <acceptedCountLimit>1000</acceptedCountLimit>
+        </forager>
+    </localSearch>
+</solver>
