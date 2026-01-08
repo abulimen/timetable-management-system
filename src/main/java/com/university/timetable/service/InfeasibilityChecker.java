@@ -35,120 +35,125 @@ public class InfeasibilityChecker {
     @Transactional
     public InfeasibilityReport checkFeasibility() {
         log.info("Running pre-solve feasibility checks...");
-        
+
         // Auto-regenerate timeslots from current settings
         log.info("Auto-regenerating timeslots from current settings before feasibility check...");
         List<Timeslot> regeneratedTimeslots = timeslotService.regenerateTimeslots();
-        
+
         List<Lesson> lessons = lessonRepository.findAll();
         List<Timeslot> timeslots = regeneratedTimeslots;
         List<Room> rooms = roomRepository.findAll();
         List<Course> courses = courseRepository.findAll();
-        
+
         InfeasibilityReport report = InfeasibilityReport.feasible(
-            lessons.size(), timeslots.size(), rooms.size()
-        );
-        
+                lessons.size(), timeslots.size(), rooms.size());
+
         // Run all checks
         checkRoomSlotCapacity(report, lessons, timeslots, rooms);
         checkLargestGroupFits(report, courses, rooms);
         checkFeatureAvailability(report, courses, rooms);
         checkLecturerOverload(report, lessons, timeslots);
         checkZoneCompatibility(report, courses, rooms);
-        
+
         log.info("Feasibility check complete: feasible={}, blocking={}, warnings={}",
-            report.isFeasible(), report.getBlockingCount(), report.getWarningCount());
-        
+                report.isFeasible(), report.getBlockingCount(), report.getWarningCount());
+
         return report;
     }
-
 
     /**
      * Check 1: Are there enough room-slots for all lessons?
      * If lessons > timeslots * rooms, it's mathematically impossible.
      */
-    private void checkRoomSlotCapacity(InfeasibilityReport report, 
+    private void checkRoomSlotCapacity(InfeasibilityReport report,
             List<Lesson> lessons, List<Timeslot> timeslots, List<Room> rooms) {
-        
+
         int totalLessons = lessons.size();
         int availableSlots = timeslots.size() * rooms.size();
-        
+
         if (totalLessons > availableSlots) {
             report.addIssue(InfeasibilityIssue.blocking(
-                "INSUFFICIENT_SLOTS",
-                String.format("%d lessons to schedule but only %d room-slots available (%d timeslots × %d rooms)",
-                    totalLessons, availableSlots, timeslots.size(), rooms.size()),
-                "Add more rooms, extend operating hours, or reduce lesson count"
-            ));
+                    "INSUFFICIENT_SLOTS",
+                    String.format("%d lessons to schedule but only %d room-slots available (%d timeslots × %d rooms)",
+                            totalLessons, availableSlots, timeslots.size(), rooms.size()),
+                    "Add more rooms, extend operating hours, or reduce lesson count"));
         } else if (totalLessons > availableSlots * 0.8) {
             // Warning if utilization > 80%
             report.addIssue(InfeasibilityIssue.warning(
-                "HIGH_UTILIZATION",
-                String.format("High utilization: %d lessons using %.0f%% of %d available slots",
-                    totalLessons, (totalLessons * 100.0 / availableSlots), availableSlots),
-                "Solution may be tight. Consider adding capacity buffers"
-            ));
+                    "HIGH_UTILIZATION",
+                    String.format("High utilization: %d lessons using %.0f%% of %d available slots",
+                            totalLessons, (totalLessons * 100.0 / availableSlots), availableSlots),
+                    "Solution may be tight. Consider adding capacity buffers"));
         }
     }
 
     /**
      * Check 2: Can the largest student group fit in at least one room?
+     * Skips online courses since they don't require physical rooms.
      */
     private void checkLargestGroupFits(InfeasibilityReport report,
             List<Course> courses, List<Room> rooms) {
-        
+
         int largestRoomCapacity = rooms.stream()
-            .mapToInt(Room::getCapacity)
-            .max()
-            .orElse(0);
-        
+                .mapToInt(Room::getCapacity)
+                .max()
+                .orElse(0);
+
         for (Course course : courses) {
+            // Skip online courses - they don't need physical rooms
+            if (course.isOnline()) {
+                continue;
+            }
+
             int totalStudents = course.getTotalStudentCount();
             if (totalStudents > largestRoomCapacity) {
                 String groupNames = course.getAllStudentGroups().stream()
-                    .map(StudentGroup::getName)
-                    .collect(Collectors.joining(" + "));
-                
+                        .map(StudentGroup::getName)
+                        .collect(Collectors.joining(" + "));
+
                 report.addIssue(InfeasibilityIssue.blocking(
-                    "CAPACITY_EXCEEDED",
-                    String.format("Course '%s' has %d students (%s) but largest room has capacity %d",
-                        course.getCode(), totalStudents, groupNames, largestRoomCapacity),
-                    "Split into smaller groups or add a larger room"
-                ));
+                        "CAPACITY_EXCEEDED",
+                        String.format("Course '%s' has %d students (%s) but largest room has capacity %d",
+                                course.getCode(), totalStudents, groupNames, largestRoomCapacity),
+                        "Split into smaller groups or add a larger room"));
             }
         }
     }
 
     /**
      * Check 3: For courses requiring specific features, do suitable rooms exist?
+     * Skips online courses since they don't require physical rooms.
      */
     private void checkFeatureAvailability(InfeasibilityReport report,
             List<Course> courses, List<Room> rooms) {
-        
+
         for (Course course : courses) {
+            // Skip online courses - they don't need physical rooms
+            if (course.isOnline()) {
+                continue;
+            }
+
             Set<Feature> required = course.getRequiredFeatures();
             if (required == null || required.isEmpty()) {
                 continue;
             }
-            
+
             // Find rooms that have ALL required features AND enough capacity
             int minCapacity = course.getTotalStudentCount();
             boolean foundSuitable = rooms.stream()
-                .anyMatch(room -> 
-                    room.getCapacity() >= minCapacity &&
-                    room.hasAllFeatures(required));
-            
+                    .anyMatch(room -> room.getCapacity() >= minCapacity &&
+                            room.hasAllFeatures(required));
+
             if (!foundSuitable) {
                 String featureNames = required.stream()
-                    .map(Feature::getName)
-                    .collect(Collectors.joining(", "));
-                
+                        .map(Feature::getName)
+                        .collect(Collectors.joining(", "));
+
                 report.addIssue(InfeasibilityIssue.blocking(
-                    "FEATURE_MISMATCH",
-                    String.format("Course '%s' requires [%s] with capacity ≥%d but no suitable room exists",
-                        course.getCode(), featureNames, minCapacity),
-                    "Add required features to a room or relax course requirements"
-                ));
+                        "FEATURE_MISMATCH",
+                        String.format("Course '%s' requires [%s] with capacity ≥%d but no suitable room exists",
+                                course.getCode(), featureNames, minCapacity),
+                        "Add required features to a room or relax course requirements"));
             }
         }
     }
@@ -158,81 +163,85 @@ public class InfeasibilityChecker {
      */
     private void checkLecturerOverload(InfeasibilityReport report,
             List<Lesson> lessons, List<Timeslot> timeslots) {
-        
-        // Calculate available teaching hours (timeslots count as 1 hour each, simplified)
+
+        // Calculate available teaching hours (timeslots count as 1 hour each,
+        // simplified)
         int maxHoursPerWeek = timeslots.size();
-        
+
         // Group lessons by lecturer and sum hours
         Map<Lecturer, Integer> lecturerHours = new HashMap<>();
         for (Lesson lesson : lessons) {
             if (lesson.getLecturer() != null) {
-                lecturerHours.merge(lesson.getLecturer(), 
-                    lesson.getDurationHours(), Integer::sum);
+                lecturerHours.merge(lesson.getLecturer(),
+                        lesson.getDurationHours(), Integer::sum);
             }
         }
-        
+
         for (Map.Entry<Lecturer, Integer> entry : lecturerHours.entrySet()) {
             Lecturer lecturer = entry.getKey();
             int assignedHours = entry.getValue();
-            
+
             // Calculate available hours (max - unavailability periods)
             int unavailableSlots = 0;
             if (lecturer.getUnavailabilities() != null) {
                 unavailableSlots = lecturer.getUnavailabilities().size();
             }
             int availableHours = maxHoursPerWeek - unavailableSlots;
-            
+
             if (assignedHours > availableHours) {
                 report.addIssue(InfeasibilityIssue.blocking(
-                    "LECTURER_OVERLOAD",
-                    String.format("Lecturer '%s' assigned %d hours but only %d slots available",
-                        lecturer.getName(), assignedHours, availableHours),
-                    "Reduce course load or assign additional lecturers"
-                ));
+                        "LECTURER_OVERLOAD",
+                        String.format("Lecturer '%s' assigned %d hours but only %d slots available",
+                                lecturer.getName(), assignedHours, availableHours),
+                        "Reduce course load or assign additional lecturers"));
             } else if (assignedHours > availableHours * 0.9) {
                 report.addIssue(InfeasibilityIssue.warning(
-                    "LECTURER_HIGH_LOAD",
-                    String.format("Lecturer '%s' at %.0f%% capacity (%d/%d hours)",
-                        lecturer.getName(), (assignedHours * 100.0 / availableHours),
-                        assignedHours, availableHours),
-                    "Consider load balancing across lecturers"
-                ));
+                        "LECTURER_HIGH_LOAD",
+                        String.format("Lecturer '%s' at %.0f%% capacity (%d/%d hours)",
+                                lecturer.getName(), (assignedHours * 100.0 / availableHours),
+                                assignedHours, availableHours),
+                        "Consider load balancing across lecturers"));
             }
         }
     }
 
     /**
      * Check 5: For courses with zone restrictions, do matching rooms exist?
+     * Skips online courses since they don't require physical rooms.
      */
     private void checkZoneCompatibility(InfeasibilityReport report,
             List<Course> courses, List<Room> rooms) {
-        
+
         for (Course course : courses) {
+            // Skip online courses - they don't need physical rooms
+            if (course.isOnline()) {
+                continue;
+            }
+
             Set<Zone> allowedZones = course.getAllowedZones();
             if (allowedZones == null || allowedZones.isEmpty()) {
                 continue; // No zone restriction
             }
-            
+
             int minCapacity = course.getTotalStudentCount();
-            
+
             // Check if any room matches zone AND capacity
             boolean foundSuitable = rooms.stream()
-                .anyMatch(room -> 
-                    room.getCapacity() >= minCapacity &&
-                    room.getZone() != null &&
-                    allowedZones.contains(room.getZone()));
-            
+                    .anyMatch(room -> room.getCapacity() >= minCapacity &&
+                            room.getZone() != null &&
+                            allowedZones.contains(room.getZone()));
+
             if (!foundSuitable) {
                 String zoneNames = allowedZones.stream()
-                    .map(Zone::getName)
-                    .collect(Collectors.joining(", "));
-                
+                        .map(Zone::getName)
+                        .collect(Collectors.joining(", "));
+
                 report.addIssue(InfeasibilityIssue.blocking(
-                    "ZONE_MISMATCH",
-                    String.format("Course '%s' restricted to zones [%s] with capacity ≥%d but no suitable room exists",
-                        course.getCode(), zoneNames, minCapacity),
-                    "Add rooms in allowed zones or relax zone restrictions"
-                ));
+                        "ZONE_MISMATCH",
+                        String.format(
+                                "Course '%s' restricted to zones [%s] with capacity ≥%d but no suitable room exists",
+                                course.getCode(), zoneNames, minCapacity),
+                        "Add rooms in allowed zones or relax zone restrictions"));
             }
         }
     }

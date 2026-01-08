@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService, SolverStatus, SolverAnalysis, FeasibilityCheck } from '../../core/services/api.service';
 
@@ -25,6 +25,7 @@ import { ApiService, SolverStatus, SolverAnalysis, FeasibilityCheck } from '../.
                 }">
               </span>
               <span class="text-lg font-medium">{{ status?.state || 'Unknown' }}</span>
+              <span *ngIf="isSolving" class="text-sm text-secondary-500">(polling every 3s)</span>
             </div>
             <p class="text-secondary-500 mt-1">Score: {{ status?.score || 'N/A' }}</p>
           </div>
@@ -105,20 +106,56 @@ import { ApiService, SolverStatus, SolverAnalysis, FeasibilityCheck } from '../.
     </div>
   `
 })
-export class SolverComponent implements OnInit {
+export class SolverComponent implements OnInit, OnDestroy {
   private api = inject(ApiService);
   status: SolverStatus | null = null;
   analysis: SolverAnalysis | null = null;
   feasibility: FeasibilityCheck | null = null;
-  pollInterval: any;
+  pollInterval: any = null;
 
   get isSolving() { return this.status?.state === 'SOLVING_ACTIVE' || this.status?.state === 'SOLVING'; }
 
-  ngOnInit() { this.loadStatus(); }
+  ngOnInit() {
+    this.loadStatus();
+  }
+
+  ngOnDestroy() {
+    this.stopPolling();
+  }
 
   loadStatus() {
-    this.api.getSolverStatus().subscribe({ next: (s) => this.status = s });
+    this.api.getSolverStatus().subscribe({
+      next: (s) => {
+        this.status = s;
+        // Start polling if solver is already active on page load
+        if (this.isSolving && !this.pollInterval) {
+          this.startPolling();
+        }
+      }
+    });
   }
+
+  private startPolling() {
+    this.stopPolling(); // Clear any existing interval
+    this.pollInterval = setInterval(() => {
+      this.api.getSolverStatus().subscribe({
+        next: (st) => {
+          this.status = st;
+          if (!this.isSolving) {
+            this.stopPolling();
+          }
+        }
+      });
+    }, 3000);
+  }
+
+  private stopPolling() {
+    if (this.pollInterval) {
+      clearInterval(this.pollInterval);
+      this.pollInterval = null;
+    }
+  }
+
 
   startSolver(mode: 'FULL_REPLAN' | 'STABILITY') {
     // Clear any previous feasibility results
@@ -127,14 +164,7 @@ export class SolverComponent implements OnInit {
     this.api.startSolver(mode).subscribe({
       next: (s) => {
         this.status = s;
-        this.pollInterval = setInterval(() => {
-          this.api.getSolverStatus().subscribe({
-            next: (st) => {
-              this.status = st;
-              if (!this.isSolving) clearInterval(this.pollInterval);
-            }
-          });
-        }, 3000);
+        this.startPolling();
       },
       error: (err) => {
         // Handle feasibility failure response
@@ -163,9 +193,13 @@ export class SolverComponent implements OnInit {
 
   terminateSolver() {
     this.api.terminateSolver().subscribe({
-      next: (s) => { this.status = s; clearInterval(this.pollInterval); }
+      next: (s) => {
+        this.status = s;
+        this.stopPolling();
+      }
     });
   }
+
 
   checkFeasibility() {
     this.api.getFeasibility().subscribe({ next: (f) => this.feasibility = f });

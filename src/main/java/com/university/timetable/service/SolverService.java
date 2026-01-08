@@ -15,7 +15,8 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * SolverService - manages asynchronous solving with OptaPlanner's SolverManager.
+ * SolverService - manages asynchronous solving with OptaPlanner's
+ * SolverManager.
  */
 @Service
 @RequiredArgsConstructor
@@ -28,6 +29,7 @@ public class SolverService {
     private final RoomRepository roomRepository;
     private final LecturerRepository lecturerRepository;
     private final StudentGroupRepository studentGroupRepository;
+    private final SpecialEventRepository specialEventRepository;
     private final TimeslotService timeslotService;
     private final SolutionSaver solutionSaver;
 
@@ -44,20 +46,20 @@ public class SolverService {
      */
     public SolverStatusDTO startSolving(String mode) {
         log.info("Starting solver in {} mode", mode);
-        
+
         // Ensure timeslots exist
         if (!timeslotService.hasTimeslots()) {
             timeslotService.generateTimeslots();
         }
-        
+
         // Load the problem
         TimeTable problem = loadProblem();
-        
+
         log.info("Loaded problem: {} lessons, {} timeslots, {} rooms",
-            problem.getLessons().size(),
-            problem.getTimeslots().size(),
-            problem.getRooms().size());
-        
+                problem.getLessons().size(),
+                problem.getTimeslots().size(),
+                problem.getRooms().size());
+
         if (problem.getLessons().isEmpty()) {
             throw new IllegalStateException("No lessons to schedule. Import data first.");
         }
@@ -67,33 +69,33 @@ public class SolverService {
         if (problem.getRooms().isEmpty()) {
             throw new IllegalStateException("No rooms available.");
         }
-        
+
         // Apply stability mode if requested
         if ("STABILITY".equalsIgnoreCase(mode)) {
             prepareStabilityMode(problem);
         }
-        
+
         currentJobId = UUID.randomUUID().toString();
-        
+
         // Start async solving with consumer callback
         log.info("Starting async solver with problem ID: {}", PROBLEM_ID);
         solverManager.solveAndListen(PROBLEM_ID,
-            id -> {
-                log.info("Problem factory called for ID: {}", id);
-                return problem;
-            },
-            bestSolution -> {
-                log.info("New best solution found with score: {}", bestSolution.getScore());
-                try {
-                    solutionSaver.saveSolution(bestSolution);
-                } catch (Exception e) {
-                    log.error("Failed to save solution: {}", e.getMessage(), e);
-                }
-            },
-            (problemId, exception) -> {
-                log.error("Solver exception for problem {}: {}", problemId, exception.getMessage(), exception);
-            });
-        
+                id -> {
+                    log.info("Problem factory called for ID: {}", id);
+                    return problem;
+                },
+                bestSolution -> {
+                    log.info("New best solution found with score: {}", bestSolution.getScore());
+                    try {
+                        solutionSaver.saveSolution(bestSolution);
+                    } catch (Exception e) {
+                        log.error("Failed to save solution: {}", e.getMessage(), e);
+                    }
+                },
+                (problemId, exception) -> {
+                    log.error("Solver exception for problem {}: {}", problemId, exception.getMessage(), exception);
+                });
+
         log.info("Solver started with job ID: {}", currentJobId);
         return new SolverStatusDTO(currentJobId, "SOLVING", "N/A");
     }
@@ -125,11 +127,13 @@ public class SolverService {
         List<Room> rooms = roomRepository.findAll();
         List<Lecturer> lecturers = lecturerRepository.findAll();
         List<StudentGroup> studentGroups = studentGroupRepository.findAll();
-        
-        log.info("Loaded: {} lessons, {} timeslots, {} rooms, {} lecturers, {} groups",
-            lessons.size(), timeslots.size(), rooms.size(), lecturers.size(), studentGroups.size());
-        
-        return new TimeTable(lessons, timeslots, rooms, lecturers, studentGroups);
+        List<SpecialEvent> specialEvents = specialEventRepository.findByActiveTrue();
+
+        log.info("Loaded: {} lessons, {} timeslots, {} rooms, {} lecturers, {} groups, {} special events",
+                lessons.size(), timeslots.size(), rooms.size(), lecturers.size(), studentGroups.size(),
+                specialEvents.size());
+
+        return new TimeTable(lessons, timeslots, rooms, lecturers, studentGroups, specialEvents);
     }
 
     /**

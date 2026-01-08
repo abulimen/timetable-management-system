@@ -2,12 +2,12 @@ package com.university.timetable.controller;
 
 import com.university.timetable.domain.Room;
 import com.university.timetable.domain.Feature;
-import com.university.timetable.domain.Zone;
 import com.university.timetable.repository.RoomRepository;
 import com.university.timetable.repository.FeatureRepository;
 import com.university.timetable.repository.ZoneRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +25,7 @@ public class RoomController {
     private final FeatureRepository featureRepository;
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public List<RoomDTO> getAll() {
         return roomRepository.findAll().stream()
                 .map(this::toDTO)
@@ -32,6 +33,7 @@ public class RoomController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<RoomDTO> getById(@PathVariable Long id) {
         return roomRepository.findById(id)
                 .map(r -> ResponseEntity.ok(toDTO(r)))
@@ -39,15 +41,16 @@ public class RoomController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
     public ResponseEntity<RoomDTO> create(@RequestBody RoomCreateDTO dto) {
         Room room = new Room();
         room.setName(dto.name);
         room.setCapacity(dto.capacity);
-        
+
         if (dto.zoneId != null) {
             zoneRepository.findById(dto.zoneId).ifPresent(room::setZone);
         }
-        
+
         if (dto.featureIds != null && !dto.featureIds.isEmpty()) {
             Set<Feature> features = dto.featureIds.stream()
                     .map(featureRepository::findById)
@@ -56,21 +59,22 @@ public class RoomController {
                     .collect(Collectors.toSet());
             room.setFeatures(features);
         }
-        
+
         return ResponseEntity.ok(toDTO(roomRepository.save(room)));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
     public ResponseEntity<RoomDTO> update(@PathVariable Long id, @RequestBody RoomCreateDTO dto) {
         return roomRepository.findById(id)
                 .map(room -> {
                     room.setName(dto.name);
                     room.setCapacity(dto.capacity);
-                    
+
                     if (dto.zoneId != null) {
                         zoneRepository.findById(dto.zoneId).ifPresent(room::setZone);
                     }
-                    
+
                     if (dto.featureIds != null) {
                         Set<Feature> features = dto.featureIds.stream()
                                 .map(featureRepository::findById)
@@ -79,13 +83,14 @@ public class RoomController {
                                 .collect(Collectors.toSet());
                         room.setFeatures(features);
                     }
-                    
+
                     return ResponseEntity.ok(toDTO(roomRepository.save(room)));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (!roomRepository.existsById(id)) {
             return ResponseEntity.notFound().build();

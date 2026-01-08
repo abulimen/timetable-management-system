@@ -44,271 +44,334 @@ public class BulkImportService {
     public String getTemplate(String entityType) {
         return switch (entityType.toLowerCase()) {
             case "lecturers" -> "name,email\nJohn Smith,john.smith@university.edu\nJane Doe,jane.doe@university.edu";
-            case "rooms" -> "name,capacity,zone_name\nRoom A101,50,Building A\nRoom B202,100,Building B\nLab C301,30,Building C";
-            case "student-groups", "studentgroups" -> "name,size,parent_group_name\nCOSC_Year1,120,\nCOSC_1A,40,COSC_Year1\nCOSC_1B,40,COSC_Year1\nCOSC_1C,40,COSC_Year1";
+            case "rooms" ->
+                "name,capacity,zone_name,features\nRoom A101,50,Building A,Projector|Whiteboard\nRoom B202,100,Building B,Projector\nLab C301,30,Building C,Computers|Lab Equipment";
+            case "student-groups", "studentgroups" ->
+                "name,size,parent_group_name\nComputer Science Year 1,,\nCSC 1A,40,Computer Science Year 1\nCSC 1B,40,Computer Science Year 1\nCSC 1C,40,Computer Science Year 1";
             case "zones" -> "name\nBuilding A\nBuilding B\nLaboratory Wing\nScience Complex";
             case "features" -> "name\nProjector\nWhiteboard\nComputers\nLab Equipment\nWet Lab";
-            case "courses" -> "code,name,weekly_hours,lecturer_email,student_group_name,is_online\nCOSC101,Introduction to Programming,3,john.smith@university.edu,COSC_1A,false\nCOSC102,Data Structures,2,jane.doe@university.edu,COSC_1B,false\nONL101,Introduction to Online Learning,2,john.smith@university.edu,COSC_1A,true";
+            case "courses" ->
+                "code,name,weekly_hours,lecturer_email,student_group_names,is_online\nCOSC101,Introduction to Programming,3,john.smith@university.edu,COSC_1A,false\nCOSC102,Data Structures,2,jane.doe@university.edu,COSC_1B,false\nONL101,Introduction to Online Learning,2,john.smith@university.edu,COSC_1A,true\nSEM200,Interdisciplinary Seminar,2,jane.doe@university.edu,CS_200|IT_200|SE_200,false";
             default -> throw new IllegalArgumentException("Unknown entity type: " + entityType);
         };
     }
 
     /**
-     * Import lecturers from CSV with validation.
+     * Exception thrown when bulk import validation fails.
+     * Triggers transaction rollback.
      */
-    @Transactional
+    public static class BulkImportException extends RuntimeException {
+        private final List<String> errors;
+
+        public BulkImportException(List<String> errors) {
+            super("Import validation failed with " + errors.size() + " error(s)");
+            this.errors = errors;
+        }
+
+        public List<String> getErrors() {
+            return errors;
+        }
+    }
+
+    /**
+     * Import lecturers from CSV with validation.
+     * Uses atomic transactions - ALL rows must be valid or entire import fails.
+     */
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> importLecturers(MultipartFile file) throws Exception {
         validateFile(file);
         List<String[]> rows = parseCsv(file);
-        int created = 0, skipped = 0;
         List<String> errors = new ArrayList<>();
         Set<String> seenNames = new HashSet<>();
         Set<String> seenEmails = new HashSet<>();
+        List<Lecturer> validLecturers = new ArrayList<>();
 
+        // PHASE 1: Validate ALL rows first
         for (int i = 0; i < rows.size(); i++) {
             String[] row = rows.get(i);
             int rowNum = i + 2; // +2 for header and 0-index
-            try {
-                // Validate required fields
-                if (row.length < 1 || row[0].trim().isEmpty()) {
-                    errors.add("Row " + rowNum + ": Name is required");
-                    skipped++;
-                    continue;
-                }
-                
-                String name = sanitize(row[0].trim());
-                String email = row.length > 1 ? sanitize(row[1].trim()) : null;
 
-                // Validate name
-                if (name.length() > MAX_NAME_LENGTH) {
-                    errors.add("Row " + rowNum + ": Name exceeds " + MAX_NAME_LENGTH + " characters");
-                    skipped++;
-                    continue;
-                }
-                if (!ALPHANUMERIC_PATTERN.matcher(name.replaceAll("[.,']", "")).matches()) {
-                    errors.add("Row " + rowNum + ": Name contains invalid characters");
-                    skipped++;
-                    continue;
-                }
-
-                // Validate email if provided
-                if (email != null && !email.isEmpty()) {
-                    if (!EMAIL_PATTERN.matcher(email).matches()) {
-                        errors.add("Row " + rowNum + ": Invalid email format '" + email + "'");
-                        skipped++;
-                        continue;
-                    }
-                    if (seenEmails.contains(email.toLowerCase())) {
-                        errors.add("Row " + rowNum + ": Duplicate email in CSV '" + email + "'");
-                        skipped++;
-                        continue;
-                    }
-                    if (lecturerRepository.findByEmail(email).isPresent()) {
-                        errors.add("Row " + rowNum + ": Email already exists '" + email + "'");
-                        skipped++;
-                        continue;
-                    }
-                    seenEmails.add(email.toLowerCase());
-                }
-
-                // Check duplicate name in CSV
-                if (seenNames.contains(name.toLowerCase())) {
-                    errors.add("Row " + rowNum + ": Duplicate name in CSV '" + name + "'");
-                    skipped++;
-                    continue;
-                }
-                seenNames.add(name.toLowerCase());
-
-                // Check if already exists in DB
-                if (lecturerRepository.findByName(name).isPresent()) {
-                    skipped++;
-                    continue;
-                }
-
-                Lecturer lecturer = new Lecturer();
-                lecturer.setName(name);
-                lecturer.setEmail(email);
-                lecturerRepository.save(lecturer);
-                created++;
-            } catch (Exception e) {
-                errors.add("Row " + rowNum + ": " + e.getMessage());
-                skipped++;
+            // Validate required fields
+            if (row.length < 1 || row[0].trim().isEmpty()) {
+                errors.add("Row " + rowNum + ": Name is required");
+                continue;
             }
+
+            String name = sanitize(row[0].trim());
+            String email = row.length > 1 ? sanitize(row[1].trim()) : null;
+
+            // Validate name
+            if (name.length() > MAX_NAME_LENGTH) {
+                errors.add("Row " + rowNum + ": Name exceeds " + MAX_NAME_LENGTH + " characters");
+                continue;
+            }
+            if (!ALPHANUMERIC_PATTERN.matcher(name.replaceAll("[.,']", "")).matches()) {
+                errors.add("Row " + rowNum + ": Name contains invalid characters");
+                continue;
+            }
+
+            // Validate email if provided
+            if (email != null && !email.isEmpty()) {
+                if (!EMAIL_PATTERN.matcher(email).matches()) {
+                    errors.add("Row " + rowNum + ": Invalid email format '" + email + "'");
+                    continue;
+                }
+                if (seenEmails.contains(email.toLowerCase())) {
+                    errors.add("Row " + rowNum + ": Duplicate email in CSV '" + email + "'");
+                    continue;
+                }
+                if (lecturerRepository.findByEmail(email).isPresent()) {
+                    errors.add("Row " + rowNum + ": Email already exists '" + email + "'");
+                    continue;
+                }
+                seenEmails.add(email.toLowerCase());
+            }
+
+            // Check duplicate name in CSV
+            if (seenNames.contains(name.toLowerCase())) {
+                errors.add("Row " + rowNum + ": Duplicate name in CSV '" + name + "'");
+                continue;
+            }
+            seenNames.add(name.toLowerCase());
+
+            // Strict mode: existing records are errors, not skips
+            if (lecturerRepository.findByName(name).isPresent()) {
+                errors.add("Row " + rowNum + ": Lecturer '" + name + "' already exists in database");
+                continue;
+            }
+
+            // Build valid lecturer for later save
+            Lecturer lecturer = new Lecturer();
+            lecturer.setName(name);
+            lecturer.setEmail(email);
+            validLecturers.add(lecturer);
         }
 
-        log.info("Imported {} lecturers, skipped {}, errors {}", created, skipped, errors.size());
-        return Map.of("created", created, "skipped", skipped, "errors", errors);
+        // PHASE 2: If ANY errors, reject the entire import
+        if (!errors.isEmpty()) {
+            log.error("Bulk import validation failed with {} errors", errors.size());
+            throw new BulkImportException(errors);
+        }
+
+        // PHASE 3: Save all valid entries atomically
+        for (Lecturer lecturer : validLecturers) {
+            lecturerRepository.save(lecturer);
+        }
+
+        log.info("Imported {} lecturers atomically", validLecturers.size());
+        return Map.of("created", validLecturers.size(), "skipped", 0, "errors", List.of());
     }
 
     /**
      * Import rooms from CSV with validation.
+     * Uses atomic transactions - ALL rows must be valid or entire import fails.
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> importRooms(MultipartFile file) throws Exception {
         validateFile(file);
         List<String[]> rows = parseCsv(file);
-        int created = 0, skipped = 0;
         List<String> errors = new ArrayList<>();
         Set<String> seenNames = new HashSet<>();
+        List<Room> validRooms = new ArrayList<>();
 
+        // PHASE 1: Validate ALL rows first
         for (int i = 0; i < rows.size(); i++) {
             String[] row = rows.get(i);
             int rowNum = i + 2;
-            try {
-                if (row.length < 2 || row[0].trim().isEmpty()) {
-                    errors.add("Row " + rowNum + ": Name and capacity are required");
-                    skipped++;
-                    continue;
-                }
-                
-                String name = sanitize(row[0].trim());
-                String capacityStr = row[1].trim();
-                String zoneName = row.length > 2 ? sanitize(row[2].trim()) : null;
 
-                // Validate name
-                if (name.length() > MAX_NAME_LENGTH) {
-                    errors.add("Row " + rowNum + ": Name exceeds " + MAX_NAME_LENGTH + " characters");
-                    skipped++;
-                    continue;
-                }
-
-                // Validate capacity
-                int capacity;
-                try {
-                    capacity = Integer.parseInt(capacityStr);
-                } catch (NumberFormatException e) {
-                    errors.add("Row " + rowNum + ": Capacity must be a number, got '" + capacityStr + "'");
-                    skipped++;
-                    continue;
-                }
-                if (capacity <= 0 || capacity > MAX_CAPACITY) {
-                    errors.add("Row " + rowNum + ": Capacity must be between 1 and " + MAX_CAPACITY);
-                    skipped++;
-                    continue;
-                }
-
-                // Check zone exists if specified
-                Zone zone = null;
-                if (zoneName != null && !zoneName.isEmpty()) {
-                    Optional<Zone> zoneOpt = zoneRepository.findByName(zoneName);
-                    if (zoneOpt.isEmpty()) {
-                        errors.add("Row " + rowNum + ": Zone '" + zoneName + "' not found - import zones first");
-                        skipped++;
-                        continue;
-                    }
-                    zone = zoneOpt.get();
-                }
-
-                // Check duplicates
-                if (seenNames.contains(name.toLowerCase())) {
-                    errors.add("Row " + rowNum + ": Duplicate room name in CSV '" + name + "'");
-                    skipped++;
-                    continue;
-                }
-                seenNames.add(name.toLowerCase());
-
-                if (roomRepository.findByName(name).isPresent()) {
-                    skipped++;
-                    continue;
-                }
-
-                Room room = new Room();
-                room.setName(name);
-                room.setCapacity(capacity);
-                room.setZone(zone);
-                roomRepository.save(room);
-                created++;
-            } catch (Exception e) {
-                errors.add("Row " + rowNum + ": " + e.getMessage());
-                skipped++;
+            if (row.length < 2 || row[0].trim().isEmpty()) {
+                errors.add("Row " + rowNum + ": Name and capacity are required");
+                continue;
             }
+
+            String name = sanitize(row[0].trim());
+            String capacityStr = row[1].trim();
+            String zoneName = row.length > 2 ? sanitize(row[2].trim()) : null;
+            String featuresStr = row.length > 3 ? row[3].trim() : null;
+
+            // Validate name
+            if (name.length() > MAX_NAME_LENGTH) {
+                errors.add("Row " + rowNum + ": Name exceeds " + MAX_NAME_LENGTH + " characters");
+                continue;
+            }
+
+            // Validate capacity
+            int capacity;
+            try {
+                capacity = Integer.parseInt(capacityStr);
+            } catch (NumberFormatException e) {
+                errors.add("Row " + rowNum + ": Capacity must be a number, got '" + capacityStr + "'");
+                continue;
+            }
+            if (capacity <= 0 || capacity > MAX_CAPACITY) {
+                errors.add("Row " + rowNum + ": Capacity must be between 1 and " + MAX_CAPACITY);
+                continue;
+            }
+
+            // Check zone exists if specified
+            Zone zone = null;
+            if (zoneName != null && !zoneName.isEmpty()) {
+                Optional<Zone> zoneOpt = zoneRepository.findByName(zoneName);
+                if (zoneOpt.isEmpty()) {
+                    errors.add("Row " + rowNum + ": Zone '" + zoneName + "' not found - import zones first");
+                    continue;
+                }
+                zone = zoneOpt.get();
+            }
+
+            // Check duplicates
+            if (seenNames.contains(name.toLowerCase())) {
+                errors.add("Row " + rowNum + ": Duplicate room name in CSV '" + name + "'");
+                continue;
+            }
+            seenNames.add(name.toLowerCase());
+
+            // Strict mode: existing records are errors, not skips
+            if (roomRepository.findByName(name).isPresent()) {
+                errors.add("Row " + rowNum + ": Room '" + name + "' already exists in database");
+                continue;
+            }
+
+            // Build valid room for later save
+            Room room = new Room();
+            room.setName(name);
+            room.setCapacity(capacity);
+            room.setZone(zone);
+
+            // Parse and assign features (pipe-separated)
+            if (featuresStr != null && !featuresStr.isEmpty()) {
+                Set<Feature> roomFeatures = new HashSet<>();
+                String[] featureNames = featuresStr.split("\\|");
+                for (String featureName : featureNames) {
+                    String trimmedName = featureName.trim();
+                    if (!trimmedName.isEmpty()) {
+                        Optional<Feature> featureOpt = featureRepository.findByName(trimmedName);
+                        if (featureOpt.isPresent()) {
+                            roomFeatures.add(featureOpt.get());
+                        } else {
+                            errors.add("Row " + rowNum + ": Feature '" + trimmedName
+                                    + "' not found - import features first");
+                        }
+                    }
+                }
+                room.setFeatures(roomFeatures);
+            }
+            validRooms.add(room);
         }
 
-        log.info("Imported {} rooms, skipped {}, errors {}", created, skipped, errors.size());
-        return Map.of("created", created, "skipped", skipped, "errors", errors);
+        // PHASE 2: If ANY errors, reject the entire import
+        if (!errors.isEmpty()) {
+            log.error("Bulk import validation failed with {} errors", errors.size());
+            throw new BulkImportException(errors);
+        }
+
+        // PHASE 3: Save all valid entries atomically
+        for (Room room : validRooms) {
+            roomRepository.save(room);
+        }
+
+        log.info("Imported {} rooms atomically", validRooms.size());
+        return Map.of("created", validRooms.size(), "skipped", 0, "errors", List.of());
     }
 
     /**
      * Import student groups from CSV with validation.
+     * Uses atomic transactions - ALL rows must be valid or entire import fails.
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> importStudentGroups(MultipartFile file) throws Exception {
         validateFile(file);
         List<String[]> rows = parseCsv(file);
-        int created = 0, skipped = 0;
         List<String> errors = new ArrayList<>();
         Set<String> seenNames = new HashSet<>();
+        Map<String, Integer> validGroups = new LinkedHashMap<>(); // name -> size
+        Map<String, String> parentRelations = new LinkedHashMap<>(); // child -> parent
 
-        // First pass: create groups without parents
-        Map<String, String> pendingParents = new LinkedHashMap<>();
-        
+        // PHASE 1: Validate ALL rows first
         for (int i = 0; i < rows.size(); i++) {
             String[] row = rows.get(i);
             int rowNum = i + 2;
-            try {
-                if (row.length < 2 || row[0].trim().isEmpty()) {
-                    errors.add("Row " + rowNum + ": Name and size are required");
-                    skipped++;
-                    continue;
-                }
-                
-                String name = sanitize(row[0].trim());
-                String sizeStr = row[1].trim();
-                String parentName = row.length > 2 ? sanitize(row[2].trim()) : null;
 
-                // Validate name
-                if (name.length() > MAX_NAME_LENGTH) {
-                    errors.add("Row " + rowNum + ": Name exceeds " + MAX_NAME_LENGTH + " characters");
-                    skipped++;
-                    continue;
-                }
+            if (row.length < 1 || row[0].trim().isEmpty()) {
+                errors.add("Row " + rowNum + ": Name is required");
+                continue;
+            }
 
-                // Validate size
-                int size;
+            String name = sanitize(row[0].trim());
+            String sizeStr = row.length > 1 ? row[1].trim() : "";
+            String parentName = row.length > 2 ? sanitize(row[2].trim()) : null;
+
+            // Validate name
+            if (name.length() > MAX_NAME_LENGTH) {
+                errors.add("Row " + rowNum + ": Name exceeds " + MAX_NAME_LENGTH + " characters");
+                continue;
+            }
+
+            // Parse size - allow empty for parent groups (size will be 0)
+            int size = 0;
+            if (!sizeStr.isEmpty()) {
                 try {
                     size = Integer.parseInt(sizeStr);
                 } catch (NumberFormatException e) {
-                    errors.add("Row " + rowNum + ": Size must be a number, got '" + sizeStr + "'");
-                    skipped++;
+                    errors.add("Row " + rowNum + ": Size must be a number or empty, got '" + sizeStr + "'");
                     continue;
                 }
-                if (size <= 0 || size > MAX_GROUP_SIZE) {
-                    errors.add("Row " + rowNum + ": Size must be between 1 and " + MAX_GROUP_SIZE);
-                    skipped++;
+                if (size < 0 || size > MAX_GROUP_SIZE) {
+                    errors.add("Row " + rowNum + ": Size must be between 0 and " + MAX_GROUP_SIZE);
                     continue;
                 }
+            }
 
-                // Check duplicates
-                if (seenNames.contains(name.toLowerCase())) {
-                    errors.add("Row " + rowNum + ": Duplicate group name in CSV '" + name + "'");
-                    skipped++;
-                    continue;
-                }
-                seenNames.add(name.toLowerCase());
+            // Check duplicates in CSV
+            if (seenNames.contains(name.toLowerCase())) {
+                errors.add("Row " + rowNum + ": Duplicate group name in CSV '" + name + "'");
+                continue;
+            }
+            seenNames.add(name.toLowerCase());
 
-                if (studentGroupRepository.findByName(name).isPresent()) {
-                    skipped++;
-                    continue;
-                }
+            // Strict mode: existing records are errors, not skips
+            if (studentGroupRepository.findByName(name).isPresent()) {
+                errors.add("Row " + rowNum + ": Student group '" + name + "' already exists in database");
+                continue;
+            }
 
-                StudentGroup group = new StudentGroup();
-                group.setName(name);
-                group.setSize(size);
-                studentGroupRepository.save(group);
-                created++;
-                
-                // Remember parent for second pass
-                if (parentName != null && !parentName.isEmpty()) {
-                    pendingParents.put(name, parentName);
-                }
-            } catch (Exception e) {
-                errors.add("Row " + rowNum + ": " + e.getMessage());
-                skipped++;
+            validGroups.put(name, size);
+
+            // Store parent relation for validation
+            if (parentName != null && !parentName.isEmpty()) {
+                parentRelations.put(name, parentName);
             }
         }
 
-        // Second pass: set parent relationships
-        for (Map.Entry<String, String> entry : pendingParents.entrySet()) {
+        // Validate all parent references exist (either in CSV or DB)
+        for (Map.Entry<String, String> entry : parentRelations.entrySet()) {
+            String childName = entry.getKey();
+            String parentName = entry.getValue();
+            boolean parentInCSV = seenNames.contains(parentName.toLowerCase());
+            boolean parentInDB = studentGroupRepository.findByName(parentName).isPresent();
+            if (!parentInCSV && !parentInDB) {
+                errors.add("Parent group '" + parentName + "' not found for '" + childName + "'");
+            }
+        }
+
+        // PHASE 2: If ANY errors, reject the entire import
+        if (!errors.isEmpty()) {
+            log.error("Bulk import validation failed with {} errors", errors.size());
+            throw new BulkImportException(errors);
+        }
+
+        // PHASE 3: Save all valid entries atomically (parents first by ordering)
+        for (Map.Entry<String, Integer> entry : validGroups.entrySet()) {
+            String name = entry.getKey();
+            int size = entry.getValue();
+            StudentGroup group = new StudentGroup();
+            group.setName(name);
+            group.setSize(size);
+            studentGroupRepository.save(group);
+        }
+
+        // Set parent relationships
+        for (Map.Entry<String, String> entry : parentRelations.entrySet()) {
             String childName = entry.getKey();
             String parentName = entry.getValue();
             Optional<StudentGroup> childOpt = studentGroupRepository.findByName(childName);
@@ -317,249 +380,277 @@ public class BulkImportService {
                 StudentGroup child = childOpt.get();
                 child.setParentGroup(parentOpt.get());
                 studentGroupRepository.save(child);
-            } else if (parentOpt.isEmpty()) {
-                errors.add("Warning: Parent group '" + parentName + "' not found for '" + childName + "'");
             }
         }
 
-        log.info("Imported {} student groups, skipped {}, errors {}", created, skipped, errors.size());
-        return Map.of("created", created, "skipped", skipped, "errors", errors);
+        log.info("Imported {} student groups atomically", validGroups.size());
+        return Map.of("created", validGroups.size(), "skipped", 0, "errors", List.of());
     }
 
     /**
      * Import zones from CSV with validation.
+     * Uses atomic transactions - ALL rows must be valid or entire import fails.
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> importZones(MultipartFile file) throws Exception {
         validateFile(file);
         List<String[]> rows = parseCsv(file);
-        int created = 0, skipped = 0;
         List<String> errors = new ArrayList<>();
         Set<String> seenNames = new HashSet<>();
+        List<String> validZoneNames = new ArrayList<>();
 
+        // PHASE 1: Validate ALL rows first
         for (int i = 0; i < rows.size(); i++) {
             String[] row = rows.get(i);
             int rowNum = i + 2;
-            try {
-                if (row.length < 1 || row[0].trim().isEmpty()) {
-                    errors.add("Row " + rowNum + ": Name is required");
-                    skipped++;
-                    continue;
-                }
-                
-                String name = sanitize(row[0].trim());
 
-                // Validate name
-                if (name.length() > MAX_NAME_LENGTH) {
-                    errors.add("Row " + rowNum + ": Name exceeds " + MAX_NAME_LENGTH + " characters");
-                    skipped++;
-                    continue;
-                }
-
-                // Check duplicates
-                if (seenNames.contains(name.toLowerCase())) {
-                    errors.add("Row " + rowNum + ": Duplicate zone name in CSV '" + name + "'");
-                    skipped++;
-                    continue;
-                }
-                seenNames.add(name.toLowerCase());
-
-                if (zoneRepository.findByName(name).isPresent()) {
-                    skipped++;
-                    continue;
-                }
-
-                Zone zone = new Zone();
-                zone.setName(name);
-                zoneRepository.save(zone);
-                created++;
-            } catch (Exception e) {
-                errors.add("Row " + rowNum + ": " + e.getMessage());
-                skipped++;
+            if (row.length < 1 || row[0].trim().isEmpty()) {
+                errors.add("Row " + rowNum + ": Name is required");
+                continue;
             }
+
+            String name = sanitize(row[0].trim());
+
+            // Validate name
+            if (name.length() > MAX_NAME_LENGTH) {
+                errors.add("Row " + rowNum + ": Name exceeds " + MAX_NAME_LENGTH + " characters");
+                continue;
+            }
+
+            // Check duplicates
+            if (seenNames.contains(name.toLowerCase())) {
+                errors.add("Row " + rowNum + ": Duplicate zone name in CSV '" + name + "'");
+                continue;
+            }
+            seenNames.add(name.toLowerCase());
+
+            // Strict mode: existing records are errors, not skips
+            if (zoneRepository.findByName(name).isPresent()) {
+                errors.add("Row " + rowNum + ": Zone '" + name + "' already exists in database");
+                continue;
+            }
+
+            validZoneNames.add(name);
         }
 
-        log.info("Imported {} zones, skipped {}, errors {}", created, skipped, errors.size());
-        return Map.of("created", created, "skipped", skipped, "errors", errors);
+        // PHASE 2: If ANY errors, reject the entire import
+        if (!errors.isEmpty()) {
+            log.error("Bulk import validation failed with {} errors", errors.size());
+            throw new BulkImportException(errors);
+        }
+
+        // PHASE 3: Save all valid entries atomically
+        for (String name : validZoneNames) {
+            Zone zone = new Zone();
+            zone.setName(name);
+            zoneRepository.save(zone);
+        }
+
+        log.info("Imported {} zones atomically", validZoneNames.size());
+        return Map.of("created", validZoneNames.size(), "skipped", 0, "errors", List.of());
     }
 
     /**
      * Import features from CSV with validation.
-     * Format: name
+     * Uses atomic transactions - ALL rows must be valid or entire import fails.
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> importFeatures(MultipartFile file) throws Exception {
         validateFile(file);
         List<String[]> rows = parseCsv(file);
-        int created = 0, skipped = 0;
         List<String> errors = new ArrayList<>();
         Set<String> seenNames = new HashSet<>();
+        List<String> validFeatureNames = new ArrayList<>();
 
+        // PHASE 1: Validate ALL rows first
         for (int i = 0; i < rows.size(); i++) {
             String[] row = rows.get(i);
             int rowNum = i + 2;
-            try {
-                if (row.length < 1 || row[0].trim().isEmpty()) {
-                    errors.add("Row " + rowNum + ": Name is required");
-                    skipped++;
-                    continue;
-                }
-                
-                String name = sanitize(row[0].trim());
 
-                // Validate name
-                if (name.length() > MAX_NAME_LENGTH) {
-                    errors.add("Row " + rowNum + ": Name exceeds " + MAX_NAME_LENGTH + " characters");
-                    skipped++;
-                    continue;
-                }
-
-                // Check duplicates
-                if (seenNames.contains(name.toLowerCase())) {
-                    errors.add("Row " + rowNum + ": Duplicate feature name in CSV '" + name + "'");
-                    skipped++;
-                    continue;
-                }
-                seenNames.add(name.toLowerCase());
-
-                if (featureRepository.findByName(name).isPresent()) {
-                    skipped++;
-                    continue;
-                }
-
-                Feature feature = new Feature();
-                feature.setName(name);
-                featureRepository.save(feature);
-                created++;
-            } catch (Exception e) {
-                errors.add("Row " + rowNum + ": " + e.getMessage());
-                skipped++;
+            if (row.length < 1 || row[0].trim().isEmpty()) {
+                errors.add("Row " + rowNum + ": Name is required");
+                continue;
             }
+
+            String name = sanitize(row[0].trim());
+
+            // Validate name
+            if (name.length() > MAX_NAME_LENGTH) {
+                errors.add("Row " + rowNum + ": Name exceeds " + MAX_NAME_LENGTH + " characters");
+                continue;
+            }
+
+            // Check duplicates
+            if (seenNames.contains(name.toLowerCase())) {
+                errors.add("Row " + rowNum + ": Duplicate feature name in CSV '" + name + "'");
+                continue;
+            }
+            seenNames.add(name.toLowerCase());
+
+            // Strict mode: existing records are errors, not skips
+            if (featureRepository.findByName(name).isPresent()) {
+                errors.add("Row " + rowNum + ": Feature '" + name + "' already exists in database");
+                continue;
+            }
+
+            validFeatureNames.add(name);
         }
 
-        log.info("Imported {} features, skipped {}, errors {}", created, skipped, errors.size());
-        return Map.of("created", created, "skipped", skipped, "errors", errors);
+        // PHASE 2: If ANY errors, reject the entire import
+        if (!errors.isEmpty()) {
+            log.error("Bulk import validation failed with {} errors", errors.size());
+            throw new BulkImportException(errors);
+        }
+
+        // PHASE 3: Save all valid entries atomically
+        for (String name : validFeatureNames) {
+            Feature feature = new Feature();
+            feature.setName(name);
+            featureRepository.save(feature);
+        }
+
+        log.info("Imported {} features atomically", validFeatureNames.size());
+        return Map.of("created", validFeatureNames.size(), "skipped", 0, "errors", List.of());
     }
 
     /**
      * Import courses from CSV with validation.
+     * Uses atomic transactions - ALL rows must be valid or entire import fails.
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> importCourses(MultipartFile file) throws Exception {
         validateFile(file);
         List<String[]> rows = parseCsv(file);
-        int created = 0, skipped = 0;
         List<String> errors = new ArrayList<>();
         Set<String> seenCodes = new HashSet<>();
+        List<Course> validCourses = new ArrayList<>();
 
+        // PHASE 1: Validate ALL rows first
         for (int i = 0; i < rows.size(); i++) {
             String[] row = rows.get(i);
             int rowNum = i + 2;
-            try {
-                if (row.length < 3 || row[0].trim().isEmpty()) {
-                    errors.add("Row " + rowNum + ": Code, name, and weekly hours are required");
-                    skipped++;
-                    continue;
-                }
-                
-                String code = sanitize(row[0].trim()).toUpperCase();
-                String name = sanitize(row[1].trim());
-                String hoursStr = row[2].trim();
-                String lecturerEmail = row.length > 3 ? sanitize(row[3].trim()) : null;
-                String studentGroupName = row.length > 4 ? sanitize(row[4].trim()) : null;
-                String isOnlineStr = row.length > 5 ? row[5].trim().toLowerCase() : "false";
 
-                // Validate code
-                if (code.length() > MAX_CODE_LENGTH) {
-                    errors.add("Row " + rowNum + ": Code exceeds " + MAX_CODE_LENGTH + " characters");
-                    skipped++;
-                    continue;
-                }
-                if (!code.matches("^[A-Z0-9_\\-]+$")) {
-                    errors.add("Row " + rowNum + ": Code must be alphanumeric (uppercase)");
-                    skipped++;
-                    continue;
-                }
-
-                // Validate name
-                if (name.length() > MAX_NAME_LENGTH) {
-                    errors.add("Row " + rowNum + ": Name exceeds " + MAX_NAME_LENGTH + " characters");
-                    skipped++;
-                    continue;
-                }
-
-                // Validate weekly hours
-                int weeklyHours;
-                try {
-                    weeklyHours = Integer.parseInt(hoursStr);
-                } catch (NumberFormatException e) {
-                    errors.add("Row " + rowNum + ": Weekly hours must be a number, got '" + hoursStr + "'");
-                    skipped++;
-                    continue;
-                }
-                if (weeklyHours <= 0 || weeklyHours > MAX_WEEKLY_HOURS) {
-                    errors.add("Row " + rowNum + ": Weekly hours must be between 1 and " + MAX_WEEKLY_HOURS);
-                    skipped++;
-                    continue;
-                }
-
-                // Parse is_online flag
-                boolean isOnline = "true".equals(isOnlineStr) || "yes".equals(isOnlineStr) || "1".equals(isOnlineStr);
-
-                // Validate lecturer exists if specified
-                Lecturer lecturer = null;
-                if (lecturerEmail != null && !lecturerEmail.isEmpty()) {
-                    Optional<Lecturer> lecturerOpt = lecturerRepository.findByEmail(lecturerEmail);
-                    if (lecturerOpt.isEmpty()) {
-                        errors.add("Row " + rowNum + ": Lecturer with email '" + lecturerEmail + "' not found - import lecturers first");
-                        skipped++;
-                        continue;
-                    }
-                    lecturer = lecturerOpt.get();
-                }
-
-                // Validate student group exists if specified
-                StudentGroup studentGroup = null;
-                if (studentGroupName != null && !studentGroupName.isEmpty()) {
-                    Optional<StudentGroup> groupOpt = studentGroupRepository.findByName(studentGroupName);
-                    if (groupOpt.isEmpty()) {
-                        errors.add("Row " + rowNum + ": Student group '" + studentGroupName + "' not found - import student groups first");
-                        skipped++;
-                        continue;
-                    }
-                    studentGroup = groupOpt.get();
-                }
-
-                // Check duplicates
-                if (seenCodes.contains(code)) {
-                    errors.add("Row " + rowNum + ": Duplicate course code in CSV '" + code + "'");
-                    skipped++;
-                    continue;
-                }
-                seenCodes.add(code);
-
-                if (courseRepository.findByCode(code).isPresent()) {
-                    skipped++;
-                    continue;
-                }
-
-                Course course = new Course();
-                course.setCode(code);
-                course.setName(name);
-                course.setTotalWeeklyHours(weeklyHours);
-                course.setLecturer(lecturer);
-                course.setStudentGroup(studentGroup);
-                course.setOnline(isOnline);
-                courseRepository.save(course);
-                created++;
-            } catch (Exception e) {
-                errors.add("Row " + rowNum + ": " + e.getMessage());
-                skipped++;
+            if (row.length < 3 || row[0].trim().isEmpty()) {
+                errors.add("Row " + rowNum + ": Code, name, and weekly hours are required");
+                continue;
             }
+
+            String code = sanitize(row[0].trim()).toUpperCase();
+            String name = sanitize(row[1].trim());
+            String hoursStr = row[2].trim();
+            String lecturerEmail = row.length > 3 ? sanitize(row[3].trim()) : null;
+            String isOnlineStr = row.length > 5 ? row[5].trim().toLowerCase() : "false";
+
+            // Validate code
+            if (code.length() > MAX_CODE_LENGTH) {
+                errors.add("Row " + rowNum + ": Code exceeds " + MAX_CODE_LENGTH + " characters");
+                continue;
+            }
+            if (!code.matches("^[A-Z0-9_\\-]+$")) {
+                errors.add("Row " + rowNum + ": Code must be alphanumeric (uppercase)");
+                continue;
+            }
+
+            // Validate name
+            if (name.length() > MAX_NAME_LENGTH) {
+                errors.add("Row " + rowNum + ": Name exceeds " + MAX_NAME_LENGTH + " characters");
+                continue;
+            }
+
+            // Validate weekly hours
+            int weeklyHours;
+            try {
+                weeklyHours = Integer.parseInt(hoursStr);
+            } catch (NumberFormatException e) {
+                errors.add("Row " + rowNum + ": Weekly hours must be a number, got '" + hoursStr + "'");
+                continue;
+            }
+            if (weeklyHours <= 0 || weeklyHours > MAX_WEEKLY_HOURS) {
+                errors.add("Row " + rowNum + ": Weekly hours must be between 1 and " + MAX_WEEKLY_HOURS);
+                continue;
+            }
+
+            // Parse is_online flag
+            boolean isOnline = "true".equals(isOnlineStr) || "yes".equals(isOnlineStr) || "1".equals(isOnlineStr);
+
+            // Validate lecturer exists if specified
+            Lecturer lecturer = null;
+            if (lecturerEmail != null && !lecturerEmail.isEmpty()) {
+                Optional<Lecturer> lecturerOpt = lecturerRepository.findByEmail(lecturerEmail);
+                if (lecturerOpt.isEmpty()) {
+                    errors.add("Row " + rowNum + ": Lecturer email '" + lecturerEmail
+                            + "' not found in database. Please check for typos and ensure this email exists in the lecturers list before importing courses.");
+                    continue;
+                }
+                lecturer = lecturerOpt.get();
+            }
+
+            // Validate student groups exist if specified (pipe-separated for multiple)
+            Set<StudentGroup> studentGroups = new HashSet<>();
+            String studentGroupNamesStr = row.length > 4 ? sanitize(row[4].trim()) : null;
+            if (studentGroupNamesStr != null && !studentGroupNamesStr.isEmpty()) {
+                String[] groupNames = studentGroupNamesStr.split("\\|");
+                boolean allGroupsFound = true;
+                for (String groupName : groupNames) {
+                    String trimmedGroupName = groupName.trim();
+                    if (!trimmedGroupName.isEmpty()) {
+                        Optional<StudentGroup> groupOpt = studentGroupRepository.findByName(trimmedGroupName);
+                        if (groupOpt.isEmpty()) {
+                            errors.add("Row " + rowNum + ": Student group '" + trimmedGroupName
+                                    + "' not found - import student groups first");
+                            allGroupsFound = false;
+                        } else {
+                            studentGroups.add(groupOpt.get());
+                        }
+                    }
+                }
+                if (!allGroupsFound) {
+                    continue;
+                }
+            }
+
+            // Check duplicates in CSV
+            if (seenCodes.contains(code)) {
+                errors.add("Row " + rowNum + ": Duplicate course code in CSV '" + code + "'");
+                continue;
+            }
+            seenCodes.add(code);
+
+            // Strict mode: existing records are errors, not skips
+            if (courseRepository.findByCode(code).isPresent()) {
+                errors.add("Row " + rowNum + ": Course with code '" + code + "' already exists in database");
+                continue;
+            }
+
+            // Build valid course for later save
+            Course course = new Course();
+            course.setCode(code);
+            course.setName(name);
+            course.setTotalWeeklyHours(weeklyHours);
+            course.setLecturer(lecturer);
+            course.setOnline(isOnline);
+
+            // Set student groups
+            if (!studentGroups.isEmpty()) {
+                course.setStudentGroups(studentGroups);
+                course.setStudentGroup(studentGroups.iterator().next());
+            }
+            validCourses.add(course);
         }
 
-        log.info("Imported {} courses, skipped {}, errors {}", created, skipped, errors.size());
-        return Map.of("created", created, "skipped", skipped, "errors", errors);
+        // PHASE 2: If ANY errors, reject the entire import
+        if (!errors.isEmpty()) {
+            log.error("Bulk import validation failed with {} errors", errors.size());
+            throw new BulkImportException(errors);
+        }
+
+        // PHASE 3: Save all valid entries atomically
+        for (Course course : validCourses) {
+            courseRepository.save(course);
+        }
+
+        log.info("Imported {} courses atomically", validCourses.size());
+        return Map.of("created", validCourses.size(), "skipped", 0, "errors", List.of());
     }
 
     /**
@@ -582,12 +673,13 @@ public class BulkImportService {
      * Sanitize input to prevent XSS/injection.
      */
     private String sanitize(String input) {
-        if (input == null) return null;
+        if (input == null)
+            return null;
         // Remove potentially dangerous characters
         return input
-            .replaceAll("[<>\"'`;]", "")
-            .replaceAll("[\r\n]", " ")
-            .trim();
+                .replaceAll("[<>\"'`;]", "")
+                .replaceAll("[\r\n]", " ")
+                .trim();
     }
 
     /**

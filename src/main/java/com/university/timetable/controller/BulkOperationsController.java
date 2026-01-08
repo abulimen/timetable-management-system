@@ -5,6 +5,7 @@ import com.university.timetable.service.DataWipeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,30 +27,30 @@ public class BulkOperationsController {
     /**
      * DELETE /api/v1/bulk/system-wipe
      * Wipe ALL data from the system (requires confirmation token).
+     * CRITICAL: Only SUPER_ADMIN can perform this operation.
      */
     @DeleteMapping("/system-wipe")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<?> systemWipe(@RequestBody Map<String, String> body) {
         String token = body.get("confirmationToken");
-        
+
         if (!"DELETE".equals(token)) {
             log.warn("System wipe rejected - invalid confirmation token");
             return ResponseEntity.badRequest().body(Map.of(
-                "error", "CONFIRMATION_REQUIRED",
-                "message", "You must provide confirmationToken: 'DELETE' to proceed"
-            ));
+                    "error", "CONFIRMATION_REQUIRED",
+                    "message", "You must provide confirmationToken: 'DELETE' to proceed"));
         }
-        
+
         log.warn("SYSTEM WIPE AUTHORIZED - Proceeding with data deletion");
         Map<String, Long> deletedCounts = dataWipeService.wipeAllData();
-        
+
         long totalDeleted = deletedCounts.values().stream().mapToLong(Long::longValue).sum();
-        
+
         return ResponseEntity.ok(Map.of(
-            "status", "WIPED",
-            "message", "All data has been deleted",
-            "totalDeleted", totalDeleted,
-            "breakdown", deletedCounts
-        ));
+                "status", "WIPED",
+                "message", "All data has been deleted",
+                "totalDeleted", totalDeleted,
+                "breakdown", deletedCounts));
     }
 
     /**
@@ -57,31 +58,29 @@ public class BulkOperationsController {
      * Delete all records of a specific entity type.
      */
     @DeleteMapping("/{entity}/all")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<?> deleteAllOfEntity(
             @PathVariable String entity,
             @RequestBody Map<String, Object> body) {
-        
+
         Boolean confirm = (Boolean) body.get("confirm");
         if (!Boolean.TRUE.equals(confirm)) {
             return ResponseEntity.badRequest().body(Map.of(
-                "error", "CONFIRMATION_REQUIRED",
-                "message", "You must provide confirm: true to proceed"
-            ));
+                    "error", "CONFIRMATION_REQUIRED",
+                    "message", "You must provide confirm: true to proceed"));
         }
-        
+
         try {
             long deleted = dataWipeService.deleteAllOfType(entity);
             return ResponseEntity.ok(Map.of(
-                "status", "DELETED",
-                "entity", entity,
-                "deleted", deleted,
-                "message", String.format("Deleted %d %s records", deleted, entity)
-            ));
+                    "status", "DELETED",
+                    "entity", entity,
+                    "deleted", deleted,
+                    "message", String.format("Deleted %d %s records", deleted, entity)));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of(
-                "error", "INVALID_ENTITY",
-                "message", e.getMessage()
-            ));
+                    "error", "INVALID_ENTITY",
+                    "message", e.getMessage()));
         }
     }
 
@@ -97,19 +96,19 @@ public class BulkOperationsController {
      * - courses: code,name,weeklyHours,lecturerEmail,studentGroupName
      */
     @PostMapping("/{entity}/import")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
     public ResponseEntity<?> importFromCsv(
             @PathVariable String entity,
             @RequestParam("file") MultipartFile file) {
-        
+
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of(
-                "error", "EMPTY_FILE",
-                "message", "Please upload a CSV file"
-            ));
+                    "error", "EMPTY_FILE",
+                    "message", "Please upload a CSV file"));
         }
-        
+
         log.info("Importing {} from CSV file: {}", entity, file.getOriginalFilename());
-        
+
         try {
             Map<String, Object> result = switch (entity.toLowerCase()) {
                 case "lecturers" -> bulkImportService.importLecturers(file);
@@ -120,25 +119,31 @@ public class BulkOperationsController {
                 case "courses" -> bulkImportService.importCourses(file);
                 default -> throw new IllegalArgumentException("Unknown entity type: " + entity);
             };
-            
+
             return ResponseEntity.ok(Map.of(
-                "status", "IMPORTED",
-                "entity", entity,
-                "created", result.get("created"),
-                "skipped", result.get("skipped"),
-                "errors", result.get("errors")
-            ));
+                    "status", "IMPORTED",
+                    "entity", entity,
+                    "created", result.get("created"),
+                    "skipped", result.get("skipped"),
+                    "errors", result.get("errors")));
+        } catch (BulkImportService.BulkImportException e) {
+            // Atomic import validation failed - return all errors
+            log.warn("Bulk import validation failed for {} with {} errors", entity, e.getErrors().size());
+            return ResponseEntity.unprocessableEntity().body(Map.of(
+                    "error", "VALIDATION_FAILED",
+                    "message", "Import rejected - validation errors found. No data was imported.",
+                    "entity", entity,
+                    "errorCount", e.getErrors().size(),
+                    "errors", e.getErrors()));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of(
-                "error", "INVALID_ENTITY",
-                "message", e.getMessage()
-            ));
+                    "error", "INVALID_ENTITY",
+                    "message", e.getMessage()));
         } catch (Exception e) {
             log.error("Import failed", e);
             return ResponseEntity.badRequest().body(Map.of(
-                "error", "IMPORT_FAILED",
-                "message", "Import failed: " + e.getMessage()
-            ));
+                    "error", "IMPORT_FAILED",
+                    "message", "Import failed: " + e.getMessage()));
         }
     }
 
@@ -147,14 +152,15 @@ public class BulkOperationsController {
      * Download CSV template for the specified entity type.
      */
     @GetMapping(value = "/{entity}/template", produces = "text/csv")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
     public ResponseEntity<String> downloadTemplate(@PathVariable String entity) {
         try {
             String template = bulkImportService.getTemplate(entity);
             String filename = entity.toLowerCase() + "_template.csv";
             return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
-                .header("Content-Type", "text/csv; charset=UTF-8")
-                .body(template);
+                    .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
+                    .header("Content-Type", "text/csv; charset=UTF-8")
+                    .body(template);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("Unknown entity type: " + entity);
         }
@@ -165,14 +171,16 @@ public class BulkOperationsController {
      * Get expected CSV formats for each entity type.
      */
     @GetMapping("/import-formats")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
     public ResponseEntity<Map<String, Object>> getImportFormats() {
         return ResponseEntity.ok(Map.of(
-            "lecturers", Map.of("format", "name,email", "example", "John Smith,john@uni.edu"),
-            "rooms", Map.of("format", "name,capacity,zone_name", "example", "Room A101,50,Building A"),
-            "student-groups", Map.of("format", "name,size,parent_group_name", "example", "COSC_1A,40,COSC_Year1"),
-            "zones", Map.of("format", "name", "example", "Building A"),
-            "courses", Map.of("format", "code,name,weekly_hours,lecturer_email,student_group_name", "example", "COSC101,Intro to Programming,3,john@uni.edu,COSC_1A"),
-            "importOrder", "1. Zones → 2. Lecturers → 3. Student Groups → 4. Rooms → 5. Courses"
-        ));
+                "lecturers", Map.of("format", "name,email", "example", "John Smith,john@uni.edu"),
+                "rooms", Map.of("format", "name,capacity,zone_name", "example", "Room A101,50,Building A"),
+                "student-groups", Map.of("format", "name,size,parent_group_name", "example", "COSC_1A,40,COSC_Year1"),
+                "zones", Map.of("format", "name", "example", "Building A"),
+                "courses",
+                Map.of("format", "code,name,weekly_hours,lecturer_email,student_group_name", "example",
+                        "COSC101,Intro to Programming,3,john@uni.edu,COSC_1A"),
+                "importOrder", "1. Zones → 2. Lecturers → 3. Student Groups → 4. Rooms → 5. Courses"));
     }
 }

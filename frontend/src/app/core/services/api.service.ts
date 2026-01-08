@@ -232,8 +232,10 @@ export interface Course {
     totalWeeklyHours: number;
     lecturerId: number | null;
     lecturerName: string | null;
-    studentGroupId: number | null;
-    studentGroupName: string | null;
+    studentGroupId: number | null;  // Legacy single group
+    studentGroupName: string | null;  // Legacy single group name
+    studentGroupIds: number[];  // Multi-group support
+    studentGroupNames: string[];  // Multi-group names
     requiredFeatures: string[];
     allowedZones: string[];
     online: boolean;
@@ -256,6 +258,9 @@ export interface TimetableEntry {
     studentGroupId: number;
     studentGroupName: string;
     studentGroupSize: number;
+    combined: boolean;
+    combinedGroupNames: string[];
+    totalStudentCount: number;
     pinned: boolean;
     scheduled: boolean;
     online: boolean;

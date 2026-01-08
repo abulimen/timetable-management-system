@@ -1,13 +1,13 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ApiService, Stats, SolverStatus } from '../../core/services/api.service';
 
 @Component({
-    selector: 'app-dashboard',
-    standalone: true,
-    imports: [CommonModule, RouterModule],
-    template: `
+  selector: 'app-dashboard',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
+  template: `
     <div class="space-y-6">
       <h1 class="text-2xl font-bold text-secondary-900 dark:text-white">Dashboard</h1>
 
@@ -90,6 +90,7 @@ import { ApiService, Stats, SolverStatus } from '../../core/services/api.service
                 <span class="font-medium text-secondary-900 dark:text-white">
                   {{ solverStatus?.state || 'Not Running' }}
                 </span>
+                <span *ngIf="isSolving" class="text-xs text-secondary-500">(polling)</span>
               </div>
               <p class="text-sm text-secondary-500 dark:text-secondary-400">
                 Score: {{ solverStatus?.score || 'N/A' }}
@@ -97,7 +98,7 @@ import { ApiService, Stats, SolverStatus } from '../../core/services/api.service
             </div>
             <button 
               (click)="startSolver()"
-              [disabled]="solverStatus?.state === 'SOLVING_ACTIVE' || solverStatus?.state === 'SOLVING'"
+              [disabled]="isSolving"
               class="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
               Start Solver
             </button>
@@ -133,50 +134,79 @@ import { ApiService, Stats, SolverStatus } from '../../core/services/api.service
       </div>
     </div>
   `,
-    styles: []
+  styles: []
 })
-export class DashboardComponent implements OnInit {
-    private api = inject(ApiService);
+export class DashboardComponent implements OnInit, OnDestroy {
+  private api = inject(ApiService);
 
-    stats: Stats | null = null;
-    solverStatus: SolverStatus | null = null;
+  stats: Stats | null = null;
+  solverStatus: SolverStatus | null = null;
+  private pollInterval: any = null;
 
-    ngOnInit() {
-        this.loadStats();
-        this.loadSolverStatus();
+  get isSolving() {
+    return this.solverStatus?.state === 'SOLVING_ACTIVE' || this.solverStatus?.state === 'SOLVING';
+  }
+
+  ngOnInit() {
+    this.loadStats();
+    this.loadSolverStatus();
+  }
+
+  ngOnDestroy() {
+    this.stopPolling();
+  }
+
+  loadStats() {
+    this.api.getStats().subscribe({
+      next: (stats) => this.stats = stats,
+      error: (err) => console.error('Failed to load stats', err)
+    });
+  }
+
+  loadSolverStatus() {
+    this.api.getSolverStatus().subscribe({
+      next: (status) => {
+        this.solverStatus = status;
+        // Start polling if solver is already active on page load
+        if (this.isSolving && !this.pollInterval) {
+          this.startPolling();
+        }
+      },
+      error: (err) => console.error('Failed to load solver status', err)
+    });
+  }
+
+  private startPolling() {
+    this.stopPolling(); // Clear any existing interval
+    this.pollInterval = setInterval(() => {
+      this.api.getSolverStatus().subscribe({
+        next: (s) => {
+          this.solverStatus = s;
+          if (!this.isSolving) {
+            this.stopPolling();
+            // Refresh stats when solver completes
+            this.loadStats();
+          }
+        }
+      });
+    }, 3000);
+  }
+
+  private stopPolling() {
+    if (this.pollInterval) {
+      clearInterval(this.pollInterval);
+      this.pollInterval = null;
     }
+  }
 
-    loadStats() {
-        this.api.getStats().subscribe({
-            next: (stats) => this.stats = stats,
-            error: (err) => console.error('Failed to load stats', err)
-        });
-    }
-
-    loadSolverStatus() {
-        this.api.getSolverStatus().subscribe({
-            next: (status) => this.solverStatus = status,
-            error: (err) => console.error('Failed to load solver status', err)
-        });
-    }
-
-    startSolver() {
-        this.api.startSolver('FULL_REPLAN').subscribe({
-            next: (status) => {
-                this.solverStatus = status;
-                // Poll for status updates
-                const interval = setInterval(() => {
-                    this.api.getSolverStatus().subscribe({
-                        next: (s) => {
-                            this.solverStatus = s;
-                            if (s.state !== 'SOLVING_ACTIVE' && s.state !== 'SOLVING') {
-                                clearInterval(interval);
-                            }
-                        }
-                    });
-                }, 3000);
-            },
-            error: (err) => console.error('Failed to start solver', err)
-        });
-    }
+  startSolver() {
+    this.api.startSolver('FULL_REPLAN').subscribe({
+      next: (status) => {
+        this.solverStatus = status;
+        this.startPolling();
+      },
+      error: (err) => console.error('Failed to start solver', err)
+    });
+  }
 }
+

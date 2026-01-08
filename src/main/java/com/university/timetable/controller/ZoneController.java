@@ -4,6 +4,7 @@ import com.university.timetable.domain.Zone;
 import com.university.timetable.repository.ZoneRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class ZoneController {
     private final ZoneRepository zoneRepository;
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public List<ZoneDTO> getAll() {
         return zoneRepository.findAll().stream()
                 .map(this::toDTO)
@@ -25,6 +27,7 @@ public class ZoneController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ZoneDTO> getById(@PathVariable Long id) {
         return zoneRepository.findById(id)
                 .map(z -> ResponseEntity.ok(toDTO(z)))
@@ -32,6 +35,7 @@ public class ZoneController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
     public ZoneDTO create(@RequestBody ZoneCreateDTO dto) {
         Zone zone = new Zone();
         zone.setName(dto.name);
@@ -39,6 +43,7 @@ public class ZoneController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
     public ResponseEntity<ZoneDTO> update(@PathVariable Long id, @RequestBody ZoneCreateDTO dto) {
         return zoneRepository.findById(id)
                 .map(zone -> {
@@ -49,6 +54,7 @@ public class ZoneController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (!zoneRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
@@ -73,5 +79,3 @@ public class ZoneController {
         public String name;
     }
 }
-
-

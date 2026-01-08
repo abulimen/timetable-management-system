@@ -67,3 +67,9 @@ logging:
     org.optaplanner.core.impl.localsearch: INFO
     com.university.timetable: INFO
     org.hibernate.SQL: WARN
+
+# JWT Configuration
+jwt:
+  secret: babcock-timetable-jwt-secret-key-256-bits-minimum-length-for-security
+  access-token-expiration: 900000      # 15 minutes in milliseconds
+  refresh-token-expiration: 604800000  # 7 days in milliseconds

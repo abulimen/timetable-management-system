@@ -33,20 +33,41 @@ import { ApiService, StudentGroup } from '../../core/services/api.service';
       <div *ngIf="showAddForm" class="card p-6">
         <h2 class="text-lg font-semibold mb-4">{{ editingGroup ? 'Edit' : 'Add' }} Student Group</h2>
         <form (ngSubmit)="saveGroup()" class="space-y-4">
+          <!-- Group Type Selection -->
+          <div>
+            <label class="label mb-2">Group Type</label>
+            <div class="flex gap-4">
+              <label class="inline-flex items-center cursor-pointer">
+                <input type="radio" name="groupType" [value]="true" [(ngModel)]="formData.isParent" class="w-4 h-4 text-primary-600">
+                <span class="ml-2 text-sm">📁 Parent Group</span>
+              </label>
+              <label class="inline-flex items-center cursor-pointer">
+                <input type="radio" name="groupType" [value]="false" [(ngModel)]="formData.isParent" class="w-4 h-4 text-primary-600">
+                <span class="ml-2 text-sm">👥 Child Group (has students)</span>
+              </label>
+            </div>
+            <p class="text-xs text-secondary-500 mt-1">
+              {{ formData.isParent ? 'Parent group size is calculated from children' : 'Child groups have actual students enrolled' }}
+            </p>
+          </div>
+
           <div class="grid grid-cols-3 gap-4">
             <div>
-              <label class="label">Name (e.g., COSC_1_A)</label>
-              <input type="text" [(ngModel)]="formData.name" name="name" class="input" required>
+              <label class="label">Name</label>
+              <input type="text" [(ngModel)]="formData.name" name="name" class="input" required 
+                     placeholder="e.g., Computer Science Year 1">
             </div>
-            <div>
-              <label class="label">Size</label>
-              <input type="number" [(ngModel)]="formData.size" name="size" class="input" required>
+            <!-- Only show size for child groups -->
+            <div *ngIf="!formData.isParent">
+              <label class="label">Size (number of students)</label>
+              <input type="number" [(ngModel)]="formData.size" name="size" class="input" [required]="!formData.isParent" min="1">
             </div>
-            <div>
+            <!-- Only show parent selection for child groups -->
+            <div *ngIf="!formData.isParent">
               <label class="label">Parent Group</label>
               <select [(ngModel)]="formData.parentGroupId" name="parentGroupId" class="input">
-                <option [ngValue]="null">None</option>
-                <option *ngFor="let g of groups" [ngValue]="g.id">{{ g.name }}</option>
+                <option [ngValue]="null">None (top-level child)</option>
+                <option *ngFor="let g of parentGroups" [ngValue]="g.id">{{ g.name }}</option>
               </select>
             </div>
           </div>
@@ -92,24 +113,42 @@ export class StudentGroupsComponent implements OnInit {
   groups: StudentGroup[] = [];
   showAddForm = false;
   editingGroup: StudentGroup | null = null;
-  formData = { name: '', size: 50, parentGroupId: null as number | null };
+  formData = { name: '', size: 50, parentGroupId: null as number | null, isParent: false };
   showDeleteAllConfirm = false;
   deleting = false;
   importing = false;
+
+  // Only show groups that ARE parents (have children or no parent themselves)
+  get parentGroups(): StudentGroup[] {
+    return this.groups.filter(g => g.childCount > 0 || (g.parentGroupId === null && this.groups.some(c => c.parentGroupId === g.id)));
+  }
 
   ngOnInit() { this.loadGroups(); }
   loadGroups() { this.api.getStudentGroups().subscribe({ next: (g) => this.groups = g }); }
 
   saveGroup() {
+    // For parent groups, set size to 0 (will be calculated from children)
+    const data = {
+      name: this.formData.name,
+      size: this.formData.isParent ? 0 : this.formData.size,
+      parentGroupId: this.formData.isParent ? null : this.formData.parentGroupId
+    };
     const obs = this.editingGroup
-      ? this.api.updateStudentGroup(this.editingGroup.id, this.formData)
-      : this.api.createStudentGroup(this.formData);
+      ? this.api.updateStudentGroup(this.editingGroup.id, data)
+      : this.api.createStudentGroup(data);
     obs.subscribe({ next: () => { this.loadGroups(); this.cancelEdit(); } });
   }
 
   editGroup(g: StudentGroup) {
     this.editingGroup = g;
-    this.formData = { name: g.name, size: g.size, parentGroupId: g.parentGroupId };
+    // Determine if this is a parent group (has children or no parent and size could be 0)
+    const isParent = g.childCount > 0 || (g.parentGroupId === null && g.size === 0);
+    this.formData = {
+      name: g.name,
+      size: g.size || 50,
+      parentGroupId: g.parentGroupId,
+      isParent: isParent
+    };
     this.showAddForm = true;
   }
 
@@ -117,7 +156,11 @@ export class StudentGroupsComponent implements OnInit {
     if (confirm('Delete?')) this.api.deleteStudentGroup(id).subscribe({ next: () => this.loadGroups() });
   }
 
-  cancelEdit() { this.showAddForm = false; this.editingGroup = null; this.formData = { name: '', size: 50, parentGroupId: null }; }
+  cancelEdit() {
+    this.showAddForm = false;
+    this.editingGroup = null;
+    this.formData = { name: '', size: 50, parentGroupId: null, isParent: false };
+  }
 
   confirmDeleteAll() { this.showDeleteAllConfirm = true; }
 
@@ -141,5 +184,6 @@ export class StudentGroupsComponent implements OnInit {
     });
   }
 }
+
 
 

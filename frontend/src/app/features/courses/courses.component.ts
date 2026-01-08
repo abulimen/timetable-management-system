@@ -54,23 +54,38 @@ import { ApiService, Course, Lecturer, StudentGroup } from '../../core/services/
                 <option *ngFor="let l of lecturers" [ngValue]="l.id">{{ l.name }}</option>
               </select>
             </div>
-            <div>
-              <label class="label">Student Group</label>
-              <select [(ngModel)]="formData.studentGroupId" name="studentGroupId" class="input">
-                <option [ngValue]="null">Select Group</option>
-                <option *ngFor="let g of studentGroups" [ngValue]="g.id">{{ g.name }}</option>
-              </select>
-            </div>
-            <div class="flex items-end gap-4">
-              <label class="flex items-center gap-2">
-                <input type="checkbox" [(ngModel)]="formData.online" name="online" class="w-4 h-4">
-                <span class="text-sm">🌐 Online Course</span>
+          </div>
+          
+          <!-- Multi-Group Selection -->
+          <div>
+            <label class="label mb-2">Student Groups (select one or more)</label>
+            <div class="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 border border-secondary-300 dark:border-secondary-600 rounded-lg">
+              <label *ngFor="let g of studentGroups" 
+                     class="inline-flex items-center px-3 py-2 rounded-lg border cursor-pointer transition-all"
+                     [class.bg-primary-100]="isGroupSelected(g.id)"
+                     [class.border-primary-500]="isGroupSelected(g.id)"
+                     [class.dark:bg-primary-900]="isGroupSelected(g.id)"
+                     [class.border-secondary-300]="!isGroupSelected(g.id)"
+                     [class.dark:border-secondary-600]="!isGroupSelected(g.id)">
+                <input type="checkbox" 
+                       [checked]="isGroupSelected(g.id)"
+                       (change)="toggleGroup(g.id)"
+                       class="mr-2">
+                <span class="text-sm">{{ g.name }} ({{ g.size }})</span>
               </label>
-              <label class="flex items-center gap-2">
-                <input type="checkbox" [(ngModel)]="formData.generateLessons" name="generateLessons">
-                <span class="text-sm">Generate lessons on save</span>
-              </label>
             </div>
+            <p class="text-xs text-secondary-500 mt-1">Select multiple groups for combined lectures (e.g., CS-200 + IT-200)</p>
+          </div>
+          
+          <div class="flex items-center gap-4">
+            <label class="flex items-center gap-2">
+              <input type="checkbox" [(ngModel)]="formData.online" name="online" class="w-4 h-4">
+              <span class="text-sm">🌐 Online Course</span>
+            </label>
+            <label class="flex items-center gap-2">
+              <input type="checkbox" [(ngModel)]="formData.generateLessons" name="generateLessons">
+              <span class="text-sm">Generate lessons on save</span>
+            </label>
           </div>
           <div class="flex gap-2">
             <button type="submit" class="btn btn-primary">Save</button>
@@ -88,7 +103,7 @@ import { ApiService, Course, Lecturer, StudentGroup } from '../../core/services/
               <th class="text-left px-6 py-3 text-sm font-medium">Type</th>
               <th class="text-left px-6 py-3 text-sm font-medium">Hours/Week</th>
               <th class="text-left px-6 py-3 text-sm font-medium">Lecturer</th>
-              <th class="text-left px-6 py-3 text-sm font-medium">Group</th>
+              <th class="text-left px-6 py-3 text-sm font-medium">Groups</th>
               <th class="text-right px-6 py-3 text-sm font-medium">Actions</th>
             </tr>
           </thead>
@@ -102,7 +117,12 @@ import { ApiService, Course, Lecturer, StudentGroup } from '../../core/services/
               </td>
               <td class="px-6 py-4">{{ course.totalWeeklyHours }}</td>
               <td class="px-6 py-4">{{ course.lecturerName || '-' }}</td>
-              <td class="px-6 py-4">{{ course.studentGroupName || '-' }}</td>
+              <td class="px-6 py-4">
+                <span *ngIf="course.studentGroupNames && course.studentGroupNames.length > 0">
+                  <span *ngFor="let gn of course.studentGroupNames" class="inline-block px-2 py-0.5 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs rounded-full mr-1">{{ gn }}</span>
+                </span>
+                <span *ngIf="!course.studentGroupNames || course.studentGroupNames.length === 0">{{ course.studentGroupName || '-' }}</span>
+              </td>
               <td class="px-6 py-4 text-right">
                 <button (click)="editCourse(course)" class="text-blue-600 hover:underline mr-4">Edit</button>
                 <button (click)="deleteCourse(course.id)" class="text-red-600 hover:underline">Delete</button>
@@ -123,7 +143,15 @@ export class CoursesComponent implements OnInit {
   studentGroups: StudentGroup[] = [];
   showAddForm = false;
   editingCourse: Course | null = null;
-  formData = { code: '', name: '', totalWeeklyHours: 2, lecturerId: null as number | null, studentGroupId: null as number | null, generateLessons: true, online: false };
+  formData = {
+    code: '',
+    name: '',
+    totalWeeklyHours: 2,
+    lecturerId: null as number | null,
+    studentGroupIds: [] as number[],
+    generateLessons: true,
+    online: false
+  };
   showDeleteAllConfirm = false;
   deleting = false;
   importing = false;
@@ -136,6 +164,19 @@ export class CoursesComponent implements OnInit {
 
   loadCourses() { this.api.getCourses().subscribe({ next: (c) => this.courses = c }); }
 
+  isGroupSelected(groupId: number): boolean {
+    return this.formData.studentGroupIds.includes(groupId);
+  }
+
+  toggleGroup(groupId: number) {
+    const index = this.formData.studentGroupIds.indexOf(groupId);
+    if (index > -1) {
+      this.formData.studentGroupIds.splice(index, 1);
+    } else {
+      this.formData.studentGroupIds.push(groupId);
+    }
+  }
+
   saveCourse() {
     const obs = this.editingCourse
       ? this.api.updateCourse(this.editingCourse.id, this.formData)
@@ -145,7 +186,19 @@ export class CoursesComponent implements OnInit {
 
   editCourse(c: Course) {
     this.editingCourse = c;
-    this.formData = { code: c.code, name: c.name, totalWeeklyHours: c.totalWeeklyHours, lecturerId: c.lecturerId, studentGroupId: c.studentGroupId, generateLessons: false, online: c.online || false };
+    // Use studentGroupIds if available, fall back to legacy studentGroupId
+    const groupIds = (c as any).studentGroupIds?.length > 0
+      ? [...(c as any).studentGroupIds]
+      : (c.studentGroupId ? [c.studentGroupId] : []);
+    this.formData = {
+      code: c.code,
+      name: c.name,
+      totalWeeklyHours: c.totalWeeklyHours,
+      lecturerId: c.lecturerId,
+      studentGroupIds: groupIds,
+      generateLessons: false,
+      online: c.online || false
+    };
     this.showAddForm = true;
   }
 
@@ -153,7 +206,11 @@ export class CoursesComponent implements OnInit {
     if (confirm('Delete?')) this.api.deleteCourse(id).subscribe({ next: () => this.loadCourses() });
   }
 
-  cancelEdit() { this.showAddForm = false; this.editingCourse = null; this.formData = { code: '', name: '', totalWeeklyHours: 2, lecturerId: null, studentGroupId: null, generateLessons: true, online: false }; }
+  cancelEdit() {
+    this.showAddForm = false;
+    this.editingCourse = null;
+    this.formData = { code: '', name: '', totalWeeklyHours: 2, lecturerId: null, studentGroupIds: [], generateLessons: true, online: false };
+  }
 
   confirmDeleteAll() { this.showDeleteAllConfirm = true; }
 
@@ -177,3 +234,4 @@ export class CoursesComponent implements OnInit {
     });
   }
 }
+

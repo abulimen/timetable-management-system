@@ -1,0 +1,168 @@
+name,capacity,zone_name,features
+SAT-CL-101,45,SAT Computer Labs,Computer Lab|Projector|Air Conditioning
+SAT-CL-102,45,SAT Computer Labs,Computer Lab|Projector|Air Conditioning
+SAT-CL-103,40,SAT Computer Labs,Computer Lab|Projector|Air Conditioning
+SAT-CL-104,40,SAT Computer Labs,Computer Lab|Projector|Air Conditioning
+SAT-CL-105,50,SAT Computer Labs,Computer Lab|Projector|Air Conditioning|CAD Workstations
+SAT-CL-106,50,SAT Computer Labs,Computer Lab|Projector|Air Conditioning
+SAT-CL-201,45,SAT Computer Labs,Computer Lab|Projector|Air Conditioning
+SAT-CL-202,45,SAT Computer Labs,Computer Lab|Projector|Air Conditioning
+SAT-NC-101,60,SAT Normal Classes,Projector|Whiteboard|Air Conditioning
+SAT-NC-102,60,SAT Normal Classes,Projector|Whiteboard|Air Conditioning
+SAT-NC-103,55,SAT Normal Classes,Projector|Whiteboard|Air Conditioning
+SAT-NC-104,55,SAT Normal Classes,Projector|Whiteboard|Air Conditioning
+SAT-NC-105,50,SAT Normal Classes,Projector|Whiteboard|Air Conditioning
+SAT-NC-106,50,SAT Normal Classes,Projector|Whiteboard|Air Conditioning
+SAT-NC-201,65,SAT Normal Classes,Projector|Whiteboard|Air Conditioning
+SAT-NC-202,65,SAT Normal Classes,Projector|Whiteboard|Air Conditioning
+SAT-NC-203,60,SAT Normal Classes,Projector|Whiteboard|Air Conditioning
+SAT-NC-204,60,SAT Normal Classes,Projector|Whiteboard|Air Conditioning
+SAT-LT-A,250,SAT Lecture Theatres,Projector|Microphone System|Auditorium Seating|Air Conditioning
+SAT-LT-B,200,SAT Lecture Theatres,Projector|Microphone System|Auditorium Seating|Air Conditioning
+SAT-LT-C,180,SAT Lecture Theatres,Projector|Microphone System|Auditorium Seating|Air Conditioning
+SAT-LT-D,150,SAT Lecture Theatres,Projector|Microphone System|Auditorium Seating|Air Conditioning
+NH-101,55,NH Normal Classes,Projector|Whiteboard|Air Conditioning
+NH-102,55,NH Normal Classes,Projector|Whiteboard|Air Conditioning
+NH-103,50,NH Normal Classes,Projector|Whiteboard|Air Conditioning
+NH-104,50,NH Normal Classes,Projector|Whiteboard|Air Conditioning
+NH-105,60,NH Normal Classes,Projector|Whiteboard|Air Conditioning
+NH-106,60,NH Normal Classes,Projector|Whiteboard|Air Conditioning
+NH-201,55,NH Normal Classes,Projector|Whiteboard|Air Conditioning
+NH-202,55,NH Normal Classes,Projector|Whiteboard|Air Conditioning
+NH-203,50,NH Normal Classes,Projector|Whiteboard|Air Conditioning
+NH-204,50,NH Normal Classes,Projector|Whiteboard|Air Conditioning
+NH-CL-101,40,NH Computer Labs,Computer Lab|Projector|Air Conditioning
+NH-CL-102,40,NH Computer Labs,Computer Lab|Projector|Air Conditioning
+NH-CL-103,35,NH Computer Labs,Computer Lab|Projector|Air Conditioning
+NH-CL-104,35,NH Computer Labs,Computer Lab|Projector|Air Conditioning
+BBS-LT-1,300,BBS Lecture Theatres,Projector|Microphone System|Auditorium Seating|Air Conditioning|Video Conferencing
+BBS-LT-2,280,BBS Lecture Theatres,Projector|Microphone System|Auditorium Seating|Air Conditioning|Video Conferencing
+BBS-LT-3,250,BBS Lecture Theatres,Projector|Microphone System|Auditorium Seating|Air Conditioning
+BBS-LT-4,200,BBS Lecture Theatres,Projector|Microphone System|Auditorium Seating|Air Conditioning
+BBS-101,70,BBS Normal Classes,Projector|Whiteboard|Air Conditioning
+BBS-102,70,BBS Normal Classes,Projector|Whiteboard|Air Conditioning
+BBS-103,65,BBS Normal Classes,Projector|Whiteboard|Air Conditioning
+BBS-104,65,BBS Normal Classes,Projector|Whiteboard|Air Conditioning
+BBS-201,60,BBS Normal Classes,Projector|Whiteboard|Air Conditioning
+BBS-202,60,BBS Normal Classes,Projector|Whiteboard|Air Conditioning
+BBS-203,55,BBS Normal Classes,Projector|Whiteboard|Air Conditioning
+BBS-204,55,BBS Normal Classes,Projector|Whiteboard|Air Conditioning
+AMPH-Main,500,Amphitheatre,Microphone System|Auditorium Seating|Video Conferencing
+AMPH-Mini,150,Amphitheatre,Microphone System|Auditorium Seating
+AH-Main,400,Activity Halls,Microphone System|Air Conditioning
+AH-East,200,Activity Halls,Microphone System|Air Conditioning
+AH-West,200,Activity Halls,Microphone System|Air Conditioning
+BDL-Lab1,35,BucoDEL Labs,Computer Lab|Projector|Air Conditioning|Network Lab
+BDL-Lab2,35,BucoDEL Labs,Computer Lab|Projector|Air Conditioning|Network Lab
+BDL-Lab3,30,BucoDEL Labs,Computer Lab|Projector|Air Conditioning|Server Room
+BDL-Lab4,30,BucoDEL Labs,Computer Lab|Projector|Air Conditioning
+BDL-Lab5,40,BucoDEL Labs,Computer Lab|Projector|Air Conditioning|3D Printers
+BDL-101,45,BucoDEL Rooms,Projector|Whiteboard|Air Conditioning
+BDL-102,45,BucoDEL Rooms,Projector|Whiteboard|Air Conditioning
+BDL-103,40,BucoDEL Rooms,Projector|Whiteboard|Air Conditioning
+BDL-104,40,BucoDEL Rooms,Projector|Whiteboard|Air Conditioning
+ENG-101,65,Engineering Complex,Projector|Whiteboard|Air Conditioning
+ENG-102,65,Engineering Complex,Projector|Whiteboard|Air Conditioning
+ENG-103,60,Engineering Complex,Projector|Whiteboard|Air Conditioning
+ENG-104,60,Engineering Complex,Projector|Whiteboard|Air Conditioning
+ENG-201,55,Engineering Complex,Projector|Whiteboard|Air Conditioning
+ENG-202,55,Engineering Complex,Projector|Whiteboard|Air Conditioning
+ENG-WS-1,40,Engineering Complex,Workshop Equipment|Projector|Air Conditioning
+ENG-WS-2,40,Engineering Complex,Workshop Equipment|Projector|Air Conditioning
+ENG-CAD-1,35,Engineering Complex,Computer Lab|CAD Workstations|Projector|Air Conditioning
+ENG-CAD-2,35,Engineering Complex,Computer Lab|CAD Workstations|Projector|Air Conditioning
+ENG-LT,200,Engineering Complex,Projector|Microphone System|Auditorium Seating|Air Conditioning
+SCI-101,60,Science Tower,Projector|Whiteboard|Air Conditioning
+SCI-102,60,Science Tower,Projector|Whiteboard|Air Conditioning
+SCI-103,55,Science Tower,Projector|Whiteboard|Air Conditioning
+SCI-104,55,Science Tower,Projector|Whiteboard|Air Conditioning
+SCI-CHEM-1,35,Science Tower,Chemistry Lab|Wet Lab|Air Conditioning
+SCI-CHEM-2,35,Science Tower,Chemistry Lab|Wet Lab|Air Conditioning
+SCI-CHEM-3,30,Science Tower,Chemistry Lab|Wet Lab|Air Conditioning
+SCI-PHY-1,35,Science Tower,Physics Lab|Air Conditioning
+SCI-PHY-2,35,Science Tower,Physics Lab|Air Conditioning
+SCI-BIO-1,35,Science Tower,Biology Lab|Wet Lab|Air Conditioning
+SCI-BIO-2,35,Science Tower,Biology Lab|Wet Lab|Air Conditioning
+SCI-LT,180,Science Tower,Projector|Microphone System|Auditorium Seating|Air Conditioning
+MED-101,70,Medical Sciences Building,Projector|Whiteboard|Air Conditioning
+MED-102,70,Medical Sciences Building,Projector|Whiteboard|Air Conditioning
+MED-103,60,Medical Sciences Building,Projector|Whiteboard|Air Conditioning
+MED-104,60,Medical Sciences Building,Projector|Whiteboard|Air Conditioning
+MED-LAB-1,40,Medical Sciences Building,Medical Equipment|Wet Lab|Air Conditioning
+MED-LAB-2,40,Medical Sciences Building,Medical Equipment|Wet Lab|Air Conditioning
+MED-LAB-3,35,Medical Sciences Building,Medical Equipment|Wet Lab|Air Conditioning
+MED-LAB-4,35,Medical Sciences Building,Medical Equipment|Air Conditioning
+MED-ANAT,60,Medical Sciences Building,Medical Equipment|Projector|Air Conditioning
+MED-LT,250,Medical Sciences Building,Projector|Microphone System|Auditorium Seating|Air Conditioning
+LAW-101,80,Law Building,Projector|Whiteboard|Air Conditioning
+LAW-102,80,Law Building,Projector|Whiteboard|Air Conditioning
+LAW-103,70,Law Building,Projector|Whiteboard|Air Conditioning
+LAW-104,70,Law Building,Projector|Whiteboard|Air Conditioning
+LAW-MC-1,50,Law Building,Legal Research Station|Projector|Air Conditioning
+LAW-MC-2,50,Law Building,Legal Research Station|Projector|Air Conditioning
+LAW-LT,200,Law Building,Projector|Microphone System|Auditorium Seating|Air Conditioning
+BIZ-101,75,Business School,Projector|Whiteboard|Air Conditioning|Smart Board
+BIZ-102,75,Business School,Projector|Whiteboard|Air Conditioning|Smart Board
+BIZ-103,65,Business School,Projector|Whiteboard|Air Conditioning
+BIZ-104,65,Business School,Projector|Whiteboard|Air Conditioning
+BIZ-105,60,Business School,Projector|Whiteboard|Air Conditioning
+BIZ-106,60,Business School,Projector|Whiteboard|Air Conditioning
+BIZ-CL-1,40,Business School,Computer Lab|Projector|Air Conditioning
+BIZ-CL-2,40,Business School,Computer Lab|Projector|Air Conditioning
+BIZ-LT-1,250,Business School,Projector|Microphone System|Auditorium Seating|Air Conditioning|Video Conferencing
+BIZ-LT-2,180,Business School,Projector|Microphone System|Auditorium Seating|Air Conditioning
+ARTS-101,55,Arts and Humanities,Projector|Whiteboard|Air Conditioning
+ARTS-102,55,Arts and Humanities,Projector|Whiteboard|Air Conditioning
+ARTS-103,50,Arts and Humanities,Projector|Whiteboard|Air Conditioning
+ARTS-104,50,Arts and Humanities,Projector|Whiteboard|Air Conditioning
+ARTS-105,45,Arts and Humanities,Projector|Whiteboard|Air Conditioning
+ARTS-STUDIO-1,30,Arts and Humanities,Art Studio|Air Conditioning
+ARTS-STUDIO-2,30,Arts and Humanities,Art Studio|Air Conditioning
+ARTS-MUSIC-1,25,Arts and Humanities,Music Studio|Recording Studio|Air Conditioning
+ARTS-MUSIC-2,25,Arts and Humanities,Music Studio|Recording Studio|Air Conditioning
+ARTS-LANG-1,35,Arts and Humanities,Language Lab|Projector|Air Conditioning
+ARTS-LANG-2,35,Arts and Humanities,Language Lab|Projector|Air Conditioning
+SOC-101,60,Social Sciences Wing,Projector|Whiteboard|Air Conditioning
+SOC-102,60,Social Sciences Wing,Projector|Whiteboard|Air Conditioning
+SOC-103,55,Social Sciences Wing,Projector|Whiteboard|Air Conditioning
+SOC-104,55,Social Sciences Wing,Projector|Whiteboard|Air Conditioning
+SOC-105,50,Social Sciences Wing,Projector|Whiteboard|Air Conditioning
+SOC-106,50,Social Sciences Wing,Projector|Whiteboard|Air Conditioning
+SOC-LT,150,Social Sciences Wing,Projector|Microphone System|Auditorium Seating|Air Conditioning
+EDU-101,65,Education Block,Projector|Whiteboard|Air Conditioning|Smart Board
+EDU-102,65,Education Block,Projector|Whiteboard|Air Conditioning|Smart Board
+EDU-103,60,Education Block,Projector|Whiteboard|Air Conditioning
+EDU-104,60,Education Block,Projector|Whiteboard|Air Conditioning
+EDU-105,55,Education Block,Projector|Whiteboard|Air Conditioning
+EDU-106,55,Education Block,Projector|Whiteboard|Air Conditioning
+EDU-MC-1,40,Education Block,Projector|Air Conditioning|Video Conferencing
+EDU-MC-2,40,Education Block,Projector|Air Conditioning|Video Conferencing
+EDU-LT,180,Education Block,Projector|Microphone System|Auditorium Seating|Air Conditioning
+AGRIC-101,55,Agriculture Building,Projector|Whiteboard|Air Conditioning
+AGRIC-102,55,Agriculture Building,Projector|Whiteboard|Air Conditioning
+AGRIC-103,50,Agriculture Building,Projector|Whiteboard|Air Conditioning
+AGRIC-104,50,Agriculture Building,Projector|Whiteboard|Air Conditioning
+AGRIC-LAB-1,30,Agriculture Building,Biology Lab|Wet Lab|Air Conditioning
+AGRIC-LAB-2,30,Agriculture Building,Biology Lab|Wet Lab|Air Conditioning
+AGRIC-WS,40,Agriculture Building,Workshop Equipment|Air Conditioning
+AGRIC-LT,150,Agriculture Building,Projector|Microphone System|Auditorium Seating|Air Conditioning
+ICT-101,50,ICT Center,Computer Lab|Projector|Air Conditioning
+ICT-102,50,ICT Center,Computer Lab|Projector|Air Conditioning
+ICT-103,45,ICT Center,Computer Lab|Projector|Air Conditioning
+ICT-104,45,ICT Center,Computer Lab|Projector|Air Conditioning
+ICT-NET-1,35,ICT Center,Computer Lab|Network Lab|Projector|Air Conditioning
+ICT-NET-2,35,ICT Center,Computer Lab|Network Lab|Projector|Air Conditioning
+ICT-SERVER,20,ICT Center,Server Room|Air Conditioning
+ICT-LT,120,ICT Center,Projector|Microphone System|Auditorium Seating|Air Conditioning
+LIB-STUDY-1,80,Library Complex,Whiteboard|Air Conditioning
+LIB-STUDY-2,80,Library Complex,Whiteboard|Air Conditioning
+LIB-STUDY-3,60,Library Complex,Whiteboard|Air Conditioning
+LIB-COMP,50,Library Complex,Computer Lab|Air Conditioning
+LIB-SEMINAR,40,Library Complex,Projector|Whiteboard|Air Conditioning
+SPORT-GYM,100,Sports Complex,Gym Equipment|Air Conditioning
+SPORT-DANCE,50,Sports Complex,Dance Floor|Microphone System|Air Conditioning
+SPORT-HALL,200,Sports Complex,Microphone System
+SUB-CONF-A,100,Student Union Building,Projector|Microphone System|Air Conditioning
+SUB-CONF-B,80,Student Union Building,Projector|Microphone System|Air Conditioning
+SUB-MEET-1,30,Student Union Building,Projector|Whiteboard|Air Conditioning
+SUB-MEET-2,30,Student Union Building,Projector|Whiteboard|Air Conditioning

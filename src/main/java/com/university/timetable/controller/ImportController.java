@@ -5,6 +5,7 @@ import com.university.timetable.service.IngestionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,16 +29,17 @@ public class ImportController {
      * Action: Parses, validates, persists data, generates lessons.
      */
     @PostMapping("/upload")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
     public ResponseEntity<ImportResultDTO> uploadExcel(
             @RequestParam("file") MultipartFile file) {
-        
+
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
-        
-        log.info("Received file: {}, size: {} bytes", 
-            file.getOriginalFilename(), file.getSize());
-        
+
+        log.info("Received file: {}, size: {} bytes",
+                file.getOriginalFilename(), file.getSize());
+
         try {
             ImportResultDTO result = ingestionService.importExcel(file);
             return ResponseEntity.ok(result);

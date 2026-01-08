@@ -1,0 +1,340 @@
+name,size,parent_group_name
+Computer Science Year 1,200,
+COSC-1A,50,Computer Science Year 1
+COSC-1B,50,Computer Science Year 1
+COSC-1C,50,Computer Science Year 1
+COSC-1D,50,Computer Science Year 1
+Computer Science Year 2,180,
+COSC-2A,45,Computer Science Year 2
+COSC-2B,45,Computer Science Year 2
+COSC-2C,45,Computer Science Year 2
+COSC-2D,45,Computer Science Year 2
+Computer Science Year 3,140,
+COSC-3A,35,Computer Science Year 3
+COSC-3B,35,Computer Science Year 3
+COSC-3C,35,Computer Science Year 3
+COSC-3D,35,Computer Science Year 3
+Computer Science Year 4,80,
+COSC-4A,40,Computer Science Year 4
+COSC-4B,40,Computer Science Year 4
+Software Engineering Year 1,160,
+SENG-1A,40,Software Engineering Year 1
+SENG-1B,40,Software Engineering Year 1
+SENG-1C,40,Software Engineering Year 1
+SENG-1D,40,Software Engineering Year 1
+Software Engineering Year 2,140,
+SENG-2A,35,Software Engineering Year 2
+SENG-2B,35,Software Engineering Year 2
+SENG-2C,35,Software Engineering Year 2
+SENG-2D,35,Software Engineering Year 2
+Software Engineering Year 3,120,
+SENG-3A,30,Software Engineering Year 3
+SENG-3B,30,Software Engineering Year 3
+SENG-3C,30,Software Engineering Year 3
+SENG-3D,30,Software Engineering Year 3
+Software Engineering Year 4,80,
+SENG-4A,40,Software Engineering Year 4
+SENG-4B,40,Software Engineering Year 4
+Information Technology Year 1,150,
+INFT-1A,50,Information Technology Year 1
+INFT-1B,50,Information Technology Year 1
+INFT-1C,50,Information Technology Year 1
+Information Technology Year 2,130,
+INFT-2A,43,Information Technology Year 2
+INFT-2B,43,Information Technology Year 2
+INFT-2C,44,Information Technology Year 2
+Information Technology Year 3,100,
+INFT-3A,34,Information Technology Year 3
+INFT-3B,33,Information Technology Year 3
+INFT-3C,33,Information Technology Year 3
+Information Technology Year 4,70,
+INFT-4A,35,Information Technology Year 4
+INFT-4B,35,Information Technology Year 4
+Cybersecurity Year 1,100,
+CYBS-1A,50,Cybersecurity Year 1
+CYBS-1B,50,Cybersecurity Year 1
+Cybersecurity Year 2,90,
+CYBS-2A,45,Cybersecurity Year 2
+CYBS-2B,45,Cybersecurity Year 2
+Cybersecurity Year 3,70,
+CYBS-3A,35,Cybersecurity Year 3
+CYBS-3B,35,Cybersecurity Year 3
+Cybersecurity Year 4,60,
+CYBS-4A,30,Cybersecurity Year 4
+CYBS-4B,30,Cybersecurity Year 4
+Electrical Engineering Year 1,180,
+EENG-1A,45,Electrical Engineering Year 1
+EENG-1B,45,Electrical Engineering Year 1
+EENG-1C,45,Electrical Engineering Year 1
+EENG-1D,45,Electrical Engineering Year 1
+Electrical Engineering Year 2,160,
+EENG-2A,40,Electrical Engineering Year 2
+EENG-2B,40,Electrical Engineering Year 2
+EENG-2C,40,Electrical Engineering Year 2
+EENG-2D,40,Electrical Engineering Year 2
+Electrical Engineering Year 3,120,
+EENG-3A,40,Electrical Engineering Year 3
+EENG-3B,40,Electrical Engineering Year 3
+EENG-3C,40,Electrical Engineering Year 3
+Electrical Engineering Year 4,90,
+EENG-4A,45,Electrical Engineering Year 4
+EENG-4B,45,Electrical Engineering Year 4
+Mechanical Engineering Year 1,170,
+MENG-1A,43,Mechanical Engineering Year 1
+MENG-1B,43,Mechanical Engineering Year 1
+MENG-1C,42,Mechanical Engineering Year 1
+MENG-1D,42,Mechanical Engineering Year 1
+Mechanical Engineering Year 2,150,
+MENG-2A,38,Mechanical Engineering Year 2
+MENG-2B,38,Mechanical Engineering Year 2
+MENG-2C,37,Mechanical Engineering Year 2
+MENG-2D,37,Mechanical Engineering Year 2
+Mechanical Engineering Year 3,110,
+MENG-3A,37,Mechanical Engineering Year 3
+MENG-3B,37,Mechanical Engineering Year 3
+MENG-3C,36,Mechanical Engineering Year 3
+Mechanical Engineering Year 4,90,
+MENG-4A,45,Mechanical Engineering Year 4
+MENG-4B,45,Mechanical Engineering Year 4
+Civil Engineering Year 1,160,
+CENG-1A,40,Civil Engineering Year 1
+CENG-1B,40,Civil Engineering Year 1
+CENG-1C,40,Civil Engineering Year 1
+CENG-1D,40,Civil Engineering Year 1
+Civil Engineering Year 2,140,
+CENG-2A,35,Civil Engineering Year 2
+CENG-2B,35,Civil Engineering Year 2
+CENG-2C,35,Civil Engineering Year 2
+CENG-2D,35,Civil Engineering Year 2
+Civil Engineering Year 3,100,
+CENG-3A,34,Civil Engineering Year 3
+CENG-3B,33,Civil Engineering Year 3
+CENG-3C,33,Civil Engineering Year 3
+Civil Engineering Year 4,80,
+CENG-4A,40,Civil Engineering Year 4
+CENG-4B,40,Civil Engineering Year 4
+Medicine Year 1,150,
+MED-1A,50,Medicine Year 1
+MED-1B,50,Medicine Year 1
+MED-1C,50,Medicine Year 1
+Medicine Year 2,140,
+MED-2A,47,Medicine Year 2
+MED-2B,47,Medicine Year 2
+MED-2C,46,Medicine Year 2
+Medicine Year 3,130,
+MED-3A,44,Medicine Year 3
+MED-3B,43,Medicine Year 3
+MED-3C,43,Medicine Year 3
+Medicine Year 4,120,
+MED-4A,40,Medicine Year 4
+MED-4B,40,Medicine Year 4
+MED-4C,40,Medicine Year 4
+Medicine Year 5,90,
+MED-5A,45,Medicine Year 5
+MED-5B,45,Medicine Year 5
+Medicine Year 6,70,
+MED-6A,35,Medicine Year 6
+MED-6B,35,Medicine Year 6
+Pharmacy Year 1,100,
+PHAR-1A,50,Pharmacy Year 1
+PHAR-1B,50,Pharmacy Year 1
+Pharmacy Year 2,90,
+PHAR-2A,45,Pharmacy Year 2
+PHAR-2B,45,Pharmacy Year 2
+Pharmacy Year 3,80,
+PHAR-3A,40,Pharmacy Year 3
+PHAR-3B,40,Pharmacy Year 3
+Pharmacy Year 4,80,
+PHAR-4A,40,Pharmacy Year 4
+PHAR-4B,40,Pharmacy Year 4
+Nursing Year 1,120,
+NURS-1A,40,Nursing Year 1
+NURS-1B,40,Nursing Year 1
+NURS-1C,40,Nursing Year 1
+Nursing Year 2,110,
+NURS-2A,37,Nursing Year 2
+NURS-2B,37,Nursing Year 2
+NURS-2C,36,Nursing Year 2
+Nursing Year 3,90,
+NURS-3A,45,Nursing Year 3
+NURS-3B,45,Nursing Year 3
+Nursing Year 4,80,
+NURS-4A,40,Nursing Year 4
+NURS-4B,40,Nursing Year 4
+Law Year 1,150,
+LAW-1A,50,Law Year 1
+LAW-1B,50,Law Year 1
+LAW-1C,50,Law Year 1
+Law Year 2,130,
+LAW-2A,44,Law Year 2
+LAW-2B,43,Law Year 2
+LAW-2C,43,Law Year 2
+Law Year 3,110,
+LAW-3A,37,Law Year 3
+LAW-3B,37,Law Year 3
+LAW-3C,36,Law Year 3
+Law Year 4,110,
+LAW-4A,37,Law Year 4
+LAW-4B,37,Law Year 4
+LAW-4C,36,Law Year 4
+Accounting Year 1,150,
+ACCT-1A,50,Accounting Year 1
+ACCT-1B,50,Accounting Year 1
+ACCT-1C,50,Accounting Year 1
+Accounting Year 2,130,
+ACCT-2A,44,Accounting Year 2
+ACCT-2B,43,Accounting Year 2
+ACCT-2C,43,Accounting Year 2
+Accounting Year 3,110,
+ACCT-3A,37,Accounting Year 3
+ACCT-3B,37,Accounting Year 3
+ACCT-3C,36,Accounting Year 3
+Accounting Year 4,90,
+ACCT-4A,45,Accounting Year 4
+ACCT-4B,45,Accounting Year 4
+Business Administration Year 1,170,
+BADM-1A,43,Business Administration Year 1
+BADM-1B,43,Business Administration Year 1
+BADM-1C,42,Business Administration Year 1
+BADM-1D,42,Business Administration Year 1
+Business Administration Year 2,150,
+BADM-2A,38,Business Administration Year 2
+BADM-2B,38,Business Administration Year 2
+BADM-2C,37,Business Administration Year 2
+BADM-2D,37,Business Administration Year 2
+Business Administration Year 3,120,
+BADM-3A,40,Business Administration Year 3
+BADM-3B,40,Business Administration Year 3
+BADM-3C,40,Business Administration Year 3
+Business Administration Year 4,110,
+BADM-4A,37,Business Administration Year 4
+BADM-4B,37,Business Administration Year 4
+BADM-4C,36,Business Administration Year 4
+Economics Year 1,130,
+ECON-1A,44,Economics Year 1
+ECON-1B,43,Economics Year 1
+ECON-1C,43,Economics Year 1
+Economics Year 2,120,
+ECON-2A,40,Economics Year 2
+ECON-2B,40,Economics Year 2
+ECON-2C,40,Economics Year 2
+Economics Year 3,95,
+ECON-3A,48,Economics Year 3
+ECON-3B,47,Economics Year 3
+Economics Year 4,75,
+ECON-4A,38,Economics Year 4
+ECON-4B,37,Economics Year 4
+Mass Communication Year 1,120,
+MCOM-1A,40,Mass Communication Year 1
+MCOM-1B,40,Mass Communication Year 1
+MCOM-1C,40,Mass Communication Year 1
+Mass Communication Year 2,100,
+MCOM-2A,34,Mass Communication Year 2
+MCOM-2B,33,Mass Communication Year 2
+MCOM-2C,33,Mass Communication Year 2
+Mass Communication Year 3,85,
+MCOM-3A,43,Mass Communication Year 3
+MCOM-3B,42,Mass Communication Year 3
+Mass Communication Year 4,75,
+MCOM-4A,38,Mass Communication Year 4
+MCOM-4B,37,Mass Communication Year 4
+Political Science Year 1,110,
+POLS-1A,37,Political Science Year 1
+POLS-1B,37,Political Science Year 1
+POLS-1C,36,Political Science Year 1
+Political Science Year 2,95,
+POLS-2A,48,Political Science Year 2
+POLS-2B,47,Political Science Year 2
+Political Science Year 3,80,
+POLS-3A,40,Political Science Year 3
+POLS-3B,40,Political Science Year 3
+Political Science Year 4,65,
+POLS-4A,33,Political Science Year 4
+POLS-4B,32,Political Science Year 4
+Psychology Year 1,100,
+PSYC-1A,50,Psychology Year 1
+PSYC-1B,50,Psychology Year 1
+Psychology Year 2,90,
+PSYC-2A,45,Psychology Year 2
+PSYC-2B,45,Psychology Year 2
+Psychology Year 3,70,
+PSYC-3A,35,Psychology Year 3
+PSYC-3B,35,Psychology Year 3
+Psychology Year 4,60,
+PSYC-4A,30,Psychology Year 4
+PSYC-4B,30,Psychology Year 4
+Education Year 1,120,
+EDUC-1A,40,Education Year 1
+EDUC-1B,40,Education Year 1
+EDUC-1C,40,Education Year 1
+Education Year 2,110,
+EDUC-2A,37,Education Year 2
+EDUC-2B,37,Education Year 2
+EDUC-2C,36,Education Year 2
+Education Year 3,90,
+EDUC-3A,45,Education Year 3
+EDUC-3B,45,Education Year 3
+Education Year 4,80,
+EDUC-4A,40,Education Year 4
+EDUC-4B,40,Education Year 4
+Agriculture Year 1,110,
+AGRI-1A,37,Agriculture Year 1
+AGRI-1B,37,Agriculture Year 1
+AGRI-1C,36,Agriculture Year 1
+Agriculture Year 2,95,
+AGRI-2A,48,Agriculture Year 2
+AGRI-2B,47,Agriculture Year 2
+Agriculture Year 3,80,
+AGRI-3A,40,Agriculture Year 3
+AGRI-3B,40,Agriculture Year 3
+Agriculture Year 4,65,
+AGRI-4A,33,Agriculture Year 4
+AGRI-4B,32,Agriculture Year 4
+Chemistry Year 1,90,
+CHEM-1A,45,Chemistry Year 1
+CHEM-1B,45,Chemistry Year 1
+Chemistry Year 2,80,
+CHEM-2A,40,Chemistry Year 2
+CHEM-2B,40,Chemistry Year 2
+Chemistry Year 3,60,
+CHEM-3A,30,Chemistry Year 3
+CHEM-3B,30,Chemistry Year 3
+Chemistry Year 4,50,
+CHEM-4A,25,Chemistry Year 4
+CHEM-4B,25,Chemistry Year 4
+Physics Year 1,85,
+PHYS-1A,43,Physics Year 1
+PHYS-1B,42,Physics Year 1
+Physics Year 2,75,
+PHYS-2A,38,Physics Year 2
+PHYS-2B,37,Physics Year 2
+Physics Year 3,55,
+PHYS-3A,28,Physics Year 3
+PHYS-3B,27,Physics Year 3
+Physics Year 4,45,
+PHYS-4A,23,Physics Year 4
+PHYS-4B,22,Physics Year 4
+Mathematics Year 1,80,
+MATH-1A,40,Mathematics Year 1
+MATH-1B,40,Mathematics Year 1
+Mathematics Year 2,70,
+MATH-2A,35,Mathematics Year 2
+MATH-2B,35,Mathematics Year 2
+Mathematics Year 3,55,
+MATH-3A,28,Mathematics Year 3
+MATH-3B,27,Mathematics Year 3
+Mathematics Year 4,45,
+MATH-4A,23,Mathematics Year 4
+MATH-4B,22,Mathematics Year 4
+English Language Year 1,95,
+ENGL-1A,48,English Language Year 1
+ENGL-1B,47,English Language Year 1
+English Language Year 2,85,
+ENGL-2A,43,English Language Year 2
+ENGL-2B,42,English Language Year 2
+English Language Year 3,65,
+ENGL-3A,33,English Language Year 3
+ENGL-3B,32,English Language Year 3
+English Language Year 4,55,
+ENGL-4A,28,English Language Year 4
+ENGL-4B,27,English Language Year 4

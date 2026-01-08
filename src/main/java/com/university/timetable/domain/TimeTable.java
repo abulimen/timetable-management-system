@@ -72,7 +72,7 @@ public class TimeTable {
     private HardSoftScore score;
 
     public TimeTable(List<Lesson> lessons, List<Timeslot> timeslots, List<Room> rooms,
-                     List<Lecturer> lecturers, List<StudentGroup> studentGroups) {
+            List<Lecturer> lecturers, List<StudentGroup> studentGroups) {
         this.lessons = lessons;
         this.timeslots = timeslots;
         this.rooms = rooms;
@@ -80,13 +80,32 @@ public class TimeTable {
         this.studentGroups = studentGroups;
     }
 
+    /**
+     * Problem facts - special events for constraint checking.
+     * Special events block timeslots for affected student groups.
+     */
+    @ProblemFactCollectionProperty
+    private List<SpecialEvent> specialEvents = new ArrayList<>();
+
+    public TimeTable(List<Lesson> lessons, List<Timeslot> timeslots, List<Room> rooms,
+            List<Lecturer> lecturers, List<StudentGroup> studentGroups,
+            List<SpecialEvent> specialEvents) {
+        this.lessons = lessons;
+        this.timeslots = timeslots;
+        this.rooms = rooms;
+        this.lecturers = lecturers;
+        this.studentGroups = studentGroups;
+        this.specialEvents = specialEvents != null ? specialEvents : new ArrayList<>();
+    }
+
     @Override
     public String toString() {
         return "TimeTable{" +
-            "lessons=" + lessons.size() +
-            ", timeslots=" + timeslots.size() +
-            ", rooms=" + rooms.size() +
-            ", score=" + score +
-            '}';
+                "lessons=" + lessons.size() +
+                ", timeslots=" + timeslots.size() +
+                ", rooms=" + rooms.size() +
+                ", specialEvents=" + specialEvents.size() +
+                ", score=" + score +
+                '}';
     }
 }

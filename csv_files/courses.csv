@@ -1,0 +1,302 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online
+COSC101,Introduction to Computer Science,3,o.adeyemi@stateuniv.edu,COSC-1A|COSC-1B|COSC-1C|COSC-1D,false
+COSC102A,Programming Fundamentals (Section A),4,c.okonkwo@stateuniv.edu,COSC-1A|COSC-1B,false
+COSC102B,Programming Fundamentals (Section B),4,s.igwe@stateuniv.edu,COSC-1C|COSC-1D,false
+COSC103A,Discrete Mathematics (Section A),3,e.nwachukwu@stateuniv.edu,COSC-1A|COSC-1B,false
+COSC103B,Discrete Mathematics (Section B),3,a.mohammed@stateuniv.edu,COSC-1C|COSC-1D,false
+COSC104,Digital Logic Design,2,a.mohammed@stateuniv.edu,COSC-1A|COSC-1B|COSC-1C|COSC-1D,false
+COSC201A,Data Structures and Algorithms (Section A),4,t.bakare@stateuniv.edu,COSC-2A|COSC-2B,false
+COSC201B,Data Structures and Algorithms (Section B),4,g.obi@stateuniv.edu,COSC-2C|COSC-2D,false
+COSC202A,Object Oriented Programming (Group A),3,n.eze@stateuniv.edu,COSC-2A,false
+COSC202B,Object Oriented Programming (Group B),3,b.oyelaran@stateuniv.edu,COSC-2B,false
+COSC202C,Object Oriented Programming (Group C),3,f.adebayo@stateuniv.edu,COSC-2C,false
+COSC202D,Object Oriented Programming (Group D),3,k.ogundimu@stateuniv.edu,COSC-2D,false
+COSC203,Computer Architecture,3,b.oyelaran@stateuniv.edu,COSC-2A|COSC-2B|COSC-2C|COSC-2D,false
+COSC204A,Database Management Systems (Lab A),3,f.adebayo@stateuniv.edu,COSC-2A|COSC-2B,false
+COSC204B,Database Management Systems (Lab B),3,b.nwosu@stateuniv.edu,COSC-2C|COSC-2D,false
+COSC301,Operating Systems,3,c.okoro@stateuniv.edu,COSC-3A|COSC-3B|COSC-3C|COSC-3D,false
+COSC302,Software Engineering,3,y.adeleke@stateuniv.edu,COSC-3A|COSC-3B|COSC-3C|COSC-3D,false
+COSC303,Computer Networks,3,i.musa@stateuniv.edu,COSC-3A|COSC-3B|COSC-3C|COSC-3D,false
+COSC304,Artificial Intelligence,3,g.obi@stateuniv.edu,COSC-3A|COSC-3B|COSC-3C|COSC-3D,false
+COSC401,Machine Learning,3,k.ogundimu@stateuniv.edu,COSC-4A|COSC-4B,false
+COSC402,Cloud Computing,3,b.nwosu@stateuniv.edu,COSC-4A|COSC-4B,false
+COSC403,Final Year Project I,4,a.bello@stateuniv.edu,COSC-4A|COSC-4B,false
+COSC404,Final Year Project II,4,o.fashola@stateuniv.edu,COSC-4A|COSC-4B,false
+SENG101,Introduction to Software Engineering,3,u.okafor@stateuniv.edu,SENG-1A|SENG-1B|SENG-1C|SENG-1D,false
+SENG102A,Programming in Python (Lab A),4,d.ojo@stateuniv.edu,SENG-1A,false
+SENG102B,Programming in Python (Lab B),4,h.abdullahi@stateuniv.edu,SENG-1B,false
+SENG102C,Programming in Python (Lab C),4,j.okoye@stateuniv.edu,SENG-1C,false
+SENG102D,Programming in Python (Lab D),4,t.akinwale@stateuniv.edu,SENG-1D,false
+SENG103,Software Development Tools,2,d.ojo@stateuniv.edu,SENG-1A|SENG-1B|SENG-1C|SENG-1D,false
+SENG104,Logic and Problem Solving,3,h.abdullahi@stateuniv.edu,SENG-1A|SENG-1B|SENG-1C|SENG-1D,false
+SENG201,Software Design Patterns,3,j.okoye@stateuniv.edu,SENG-2A|SENG-2B|SENG-2C|SENG-2D,false
+SENG202A,Web Development (Section A),4,t.akinwale@stateuniv.edu,SENG-2A|SENG-2B,false
+SENG202B,Web Development (Section B),4,i.chukwu@stateuniv.edu,SENG-2C|SENG-2D,false
+SENG203A,Mobile App Dev (Android),3,i.chukwu@stateuniv.edu,SENG-2A|SENG-2C,false
+SENG203B,Mobile App Dev (iOS),3,m.gambo@stateuniv.edu,SENG-2B|SENG-2D,false
+SENG204,Software Testing,3,m.gambo@stateuniv.edu,SENG-2A|SENG-2B|SENG-2C|SENG-2D,false
+SENG301,Agile Methodologies,3,a.lawal@stateuniv.edu,SENG-3A|SENG-3B|SENG-3C|SENG-3D,false
+SENG302,DevOps and CI/CD,3,c.umeh@stateuniv.edu,SENG-3A|SENG-3B|SENG-3C|SENG-3D,false
+SENG303,Software Architecture,3,o.oni@stateuniv.edu,SENG-3A|SENG-3B|SENG-3C|SENG-3D,false
+SENG304,Human Computer Interaction,2,b.suleiman@stateuniv.edu,SENG-3A|SENG-3B|SENG-3C|SENG-3D,false
+SENG401,Capstone Project I,4,f.adegoke@stateuniv.edu,SENG-4A|SENG-4B,false
+SENG402,Capstone Project II,4,v.anyaegbu@stateuniv.edu,SENG-4A|SENG-4B,false
+SENG403,Enterprise Software Development,3,s.owolabi@stateuniv.edu,SENG-4A|SENG-4B,false
+INFT101,Fundamentals of IT,3,a.yusuf@stateuniv.edu,INFT-1A|INFT-1B|INFT-1C,false
+INFT102,PC Hardware and Maintenance,3,o.akinyemi@stateuniv.edu,INFT-1A|INFT-1B|INFT-1C,false
+INFT103,Introduction to Networking,3,c.nnamdi@stateuniv.edu,INFT-1A|INFT-1B|INFT-1C,false
+INFT104,Office Productivity Tools,2,s.garba@stateuniv.edu,INFT-1A|INFT-1B|INFT-1C,false
+INFT201,Network Administration,3,a.igbo@stateuniv.edu,INFT-2A|INFT-2B|INFT-2C,false
+INFT202,System Administration,3,k.adewole@stateuniv.edu,INFT-2A|INFT-2B|INFT-2C,false
+INFT203,Database Administration,3,f.ogunleye@stateuniv.edu,INFT-2A|INFT-2B|INFT-2C,false
+INFT204,IT Service Management,2,o.agu@stateuniv.edu,INFT-2A|INFT-2B|INFT-2C,false
+INFT301,Cloud Infrastructure,3,r.abubakar@stateuniv.edu,INFT-3A|INFT-3B|INFT-3C,false
+INFT302,IT Security Fundamentals,3,t.olorunfemi@stateuniv.edu,INFT-3A|INFT-3B|INFT-3C,false
+INFT303,Virtualization Technologies,3,n.ani@stateuniv.edu,INFT-3A|INFT-3B|INFT-3C,false
+INFT401,IT Project Management,3,a.ogundipe@stateuniv.edu,INFT-4A|INFT-4B,false
+INFT402,IT Governance,2,f.dikko@stateuniv.edu,INFT-4A|INFT-4B,false
+CYBS101,Introduction to Cybersecurity,3,c.obiora@stateuniv.edu,CYBS-1A|CYBS-1B,false
+CYBS102,Network Security Basics,3,b.sowemimo@stateuniv.edu,CYBS-1A|CYBS-1B,false
+CYBS103,Security Fundamentals,3,m.hassan@stateuniv.edu,CYBS-1A|CYBS-1B,false
+CYBS104,Linux Administration,3,i.ezeh@stateuniv.edu,CYBS-1A|CYBS-1B,false
+CYBS201,Ethical Hacking,4,a.odunsi@stateuniv.edu,CYBS-2A|CYBS-2B,false
+CYBS202,Cryptography,3,s.aliyu@stateuniv.edu,CYBS-2A|CYBS-2B,false
+CYBS203,Security Policies,2,n.achebe@stateuniv.edu,CYBS-2A|CYBS-2B,false
+CYBS301,Penetration Testing,4,o.falade@stateuniv.edu,CYBS-3A|CYBS-3B,false
+CYBS302,Digital Forensics,3,z.ibrahim@stateuniv.edu,CYBS-3A|CYBS-3B,false
+CYBS303,Incident Response,3,e.okafor@stateuniv.edu,CYBS-3A|CYBS-3B,false
+CYBS401,Advanced Threat Analysis,3,d.ajayi@stateuniv.edu,CYBS-4A|CYBS-4B,false
+CYBS402,Security Research Project,4,h.shehu@stateuniv.edu,CYBS-4A|CYBS-4B,false
+EENG101A,Engineering Mathematics I (Section A),4,o.okeke@stateuniv.edu,EENG-1A|EENG-1B,false
+EENG101B,Engineering Mathematics I (Section B),4,s.adeyinka@stateuniv.edu,EENG-1C|EENG-1D,false
+EENG102,Basic Electronics,3,s.adeyinka@stateuniv.edu,EENG-1A|EENG-1B|EENG-1C|EENG-1D,false
+EENG103A,Engineering Drawing (Studio A),3,c.udo@stateuniv.edu,EENG-1A|EENG-1B,false
+EENG103B,Engineering Drawing (Studio B),3,a.tanko@stateuniv.edu,EENG-1C|EENG-1D,false
+EENG104A,Workshop Practice (Group A),2,a.tanko@stateuniv.edu,EENG-1A,false
+EENG104B,Workshop Practice (Group B),2,y.oladimmeji@stateuniv.edu,EENG-1B,false
+EENG104C,Workshop Practice (Group C),2,e.onwu@stateuniv.edu,EENG-1C,false
+EENG104D,Workshop Practice (Group D),2,j.akindele@stateuniv.edu,EENG-1D,false
+EENG201,Circuit Theory,4,y.oladimmeji@stateuniv.edu,EENG-2A|EENG-2B|EENG-2C|EENG-2D,false
+EENG202,Electromagnetic Fields,3,e.onwu@stateuniv.edu,EENG-2A|EENG-2B|EENG-2C|EENG-2D,false
+EENG203,Electronic Devices,3,j.akindele@stateuniv.edu,EENG-2A|EENG-2B|EENG-2C|EENG-2D,false
+EENG204,Signal Analysis,3,h.audu@stateuniv.edu,EENG-2A|EENG-2B|EENG-2C|EENG-2D,false
+EENG301,Power Systems,3,t.ibe@stateuniv.edu,EENG-3A|EENG-3B|EENG-3C,false
+EENG302,Control Systems,3,m.afolabi@stateuniv.edu,EENG-3A|EENG-3B|EENG-3C,false
+EENG303,Microprocessors,3,s.danjuma@stateuniv.edu,EENG-3A|EENG-3B|EENG-3C,false
+EENG401,Power Electronics,3,n.azuka@stateuniv.edu,EENG-4A|EENG-4B,false
+EENG402,Energy Systems,3,f.ogunnaike@stateuniv.edu,EENG-4A|EENG-4B,false
+EENG403,Design Project,4,a.sadiq@stateuniv.edu,EENG-4A|EENG-4B,false
+MENG101,Engineering Mechanics,4,a.ejiofor@stateuniv.edu,MENG-1A|MENG-1B|MENG-1C|MENG-1D,false
+MENG102,Materials Science,3,o.adeniyi@stateuniv.edu,MENG-1A|MENG-1B|MENG-1C|MENG-1D,false
+MENG103,Technical Drawing,3,r.danladi@stateuniv.edu,MENG-1A|MENG-1B|MENG-1C|MENG-1D,false
+MENG104,Manufacturing Processes,2,u.nweke@stateuniv.edu,MENG-1A|MENG-1B|MENG-1C|MENG-1D,false
+MENG201,Thermodynamics,4,t.oyeleke@stateuniv.edu,MENG-2A|MENG-2B|MENG-2C|MENG-2D,false
+MENG202,Fluid Mechanics,3,a.garba@stateuniv.edu,MENG-2A|MENG-2B|MENG-2C|MENG-2D,false
+MENG203,Strength of Materials,3,k.onyema@stateuniv.edu,MENG-2A|MENG-2B|MENG-2C|MENG-2D,false
+MENG204,Machine Elements,3,l.kwankwaso@stateuniv.edu,MENG-2A|MENG-2B|MENG-2C|MENG-2D,false
+MENG301,Heat Transfer,3,y.ogunyemi@stateuniv.edu,MENG-3A|MENG-3B|MENG-3C,false
+MENG302,Dynamics,3,c.nwankwo@stateuniv.edu,MENG-3A|MENG-3B|MENG-3C,false
+MENG303,CAD/CAM,3,t.adesanya@stateuniv.edu,MENG-3A|MENG-3B|MENG-3C,false
+MENG401,Robotics,3,n.jibril@stateuniv.edu,MENG-4A|MENG-4B,false
+MENG402,Automotive Engineering,3,i.ugwu@stateuniv.edu,MENG-4A|MENG-4B,false
+MENG403,Design Project,4,r.fagbenle@stateuniv.edu,MENG-4A|MENG-4B,false
+CENG101,Surveying,3,m.yaro@stateuniv.edu,CENG-1A|CENG-1B|CENG-1C|CENG-1D,false
+CENG102,Engineering Geology,3,o.awolowo@stateuniv.edu,CENG-1A|CENG-1B|CENG-1C|CENG-1D,false
+CENG103,Construction Materials,3,c.ike@stateuniv.edu,CENG-1A|CENG-1B|CENG-1C|CENG-1D,false
+CENG104,Basic Structural Analysis,3,k.yaradua@stateuniv.edu,CENG-1A|CENG-1B|CENG-1C|CENG-1D,false
+CENG201,Structural Engineering,4,c.oforma@stateuniv.edu,CENG-2A|CENG-2B|CENG-2C|CENG-2D,false
+CENG202,Soil Mechanics,3,g.sobamowo@stateuniv.edu,CENG-2A|CENG-2B|CENG-2C|CENG-2D,false
+CENG203,Hydraulics,3,h.musa@stateuniv.edu,CENG-2A|CENG-2B|CENG-2C|CENG-2D,false
+CENG204,Construction Management,2,u.anyanwu@stateuniv.edu,CENG-2A|CENG-2B|CENG-2C|CENG-2D,false
+CENG301,Reinforced Concrete Design,3,w.babalakin@stateuniv.edu,CENG-3A|CENG-3B|CENG-3C,false
+CENG302,Steel Structures,3,l.shittu@stateuniv.edu,CENG-3A|CENG-3B|CENG-3C,false
+CENG303,Foundation Engineering,3,e.igbokwe@stateuniv.edu,CENG-3A|CENG-3B|CENG-3C,false
+CENG401,Highway Engineering,3,b.osinbajo@stateuniv.edu,CENG-4A|CENG-4B,false
+CENG402,Design Project,4,z.abubakar@stateuniv.edu,CENG-4A|CENG-4B,false
+MED101,Human Anatomy I,4,g.emefiele@stateuniv.edu,MED-1A|MED-1B|MED-1C,false
+MED102,Biochemistry I,3,a.okezie@stateuniv.edu,MED-1A|MED-1B|MED-1C,false
+MED103,Physiology I,3,n.ribadu@stateuniv.edu,MED-1A|MED-1B|MED-1C,false
+MED104,Introduction to Medicine,2,i.eze@stateuniv.edu,MED-1A|MED-1B|MED-1C,false
+MED201,Human Anatomy II,4,s.awoyemi@stateuniv.edu,MED-2A|MED-2B|MED-2C,false
+MED202,Physiology II,3,a.danbatta@stateuniv.edu,MED-2A|MED-2B|MED-2C,false
+MED203,Pharmacology I,3,o.nwodo@stateuniv.edu,MED-2A|MED-2B|MED-2C,false
+MED204,Pathology I,3,f.otedola@stateuniv.edu,MED-2A|MED-2B|MED-2C,false
+MED301,Pharmacology II,3,k.saidu@stateuniv.edu,MED-3A|MED-3B|MED-3C,false
+MED302,Pathology II,3,c.okwo@stateuniv.edu,MED-3A|MED-3B|MED-3C,false
+MED303,Clinical Medicine I,4,b.ogunkelu@stateuniv.edu,MED-3A|MED-3B|MED-3C,false
+MED401,Surgery,4,f.abubakar@stateuniv.edu,MED-4A|MED-4B|MED-4C,false
+MED402,Internal Medicine,4,n.okonjo@stateuniv.edu,MED-4A|MED-4B|MED-4C,false
+MED403,Pediatrics,3,o.madueke@stateuniv.edu,MED-4A|MED-4B|MED-4C,false
+MED501,Obstetrics and Gynecology,4,r.sambo@stateuniv.edu,MED-5A|MED-5B,false
+MED502,Community Medicine,3,o.enwezor@stateuniv.edu,MED-5A|MED-5B,false
+MED601,Clinical Clerkship,8,a.grange@stateuniv.edu,MED-6A|MED-6B,false
+PHAR101,Pharmaceutical Chemistry,3,i.modibbo@stateuniv.edu,PHAR-1A|PHAR-1B,false
+PHAR102,Pharmacognosy I,3,c.ohajuruka@stateuniv.edu,PHAR-1A|PHAR-1B,false
+PHAR103,Pharmaceutics I,3,k.fayemi@stateuniv.edu,PHAR-1A|PHAR-1B,false
+PHAR104,Pharmaceutical Microbiology,2,b.yusuf@stateuniv.edu,PHAR-1A|PHAR-1B,false
+PHAR201,Pharmaceutics II,3,i.ekweremadu@stateuniv.edu,PHAR-2A|PHAR-2B,false
+PHAR202,Pharmacognosy II,3,n.akanbi@stateuniv.edu,PHAR-2A|PHAR-2B,false
+PHAR203,Pharmaceutical Analysis,3,u.baba@stateuniv.edu,PHAR-2A|PHAR-2B,false
+PHAR301,Clinical Pharmacy,4,o.nwankwo@stateuniv.edu,PHAR-3A|PHAR-3B,false
+PHAR302,Biopharmaceutics,3,d.adeyanju@stateuniv.edu,PHAR-3A|PHAR-3B,false
+PHAR401,Hospital Pharmacy Practice,4,am.bello@stateuniv.edu,PHAR-4A|PHAR-4B,false
+PHAR402,Pharmaceutical Technology,3,c.ojukwu@stateuniv.edu,PHAR-4A|PHAR-4B,false
+NURS101,Fundamentals of Nursing,3,l.tejuosho@stateuniv.edu,NURS-1A|NURS-1B|NURS-1C,false
+NURS102,Anatomy and Physiology,4,s.abba@stateuniv.edu,NURS-1A|NURS-1B|NURS-1C,false
+NURS103,Nursing Ethics,2,i.nwobi@stateuniv.edu,NURS-1A|NURS-1B|NURS-1C,false
+NURS104,Health Assessment,3,r.tinubu@stateuniv.edu,NURS-1A|NURS-1B|NURS-1C,false
+NURS201,Medical Surgical Nursing,4,j.gwandu@stateuniv.edu,NURS-2A|NURS-2B|NURS-2C,false
+NURS202,Pharmacology for Nurses,3,a.tricia@stateuniv.edu,NURS-2A|NURS-2B|NURS-2C,false
+NURS203,Community Health Nursing,3,k.egbetokun@stateuniv.edu,NURS-2A|NURS-2B|NURS-2C,false
+NURS301,Maternal Child Health,4,s.dangote@stateuniv.edu,NURS-3A|NURS-3B,false
+NURS302,Mental Health Nursing,3,o.wabara@stateuniv.edu,NURS-3A|NURS-3B,false
+NURS401,Nursing Leadership,3,s.makinde@stateuniv.edu,NURS-4A|NURS-4B,false
+NURS402,Clinical Practicum,6,hs.saidu@stateuniv.edu,NURS-4A|NURS-4B,false
+LAW101,Introduction to Law,3,n.a.achebe@stateuniv.edu,LAW-1A|LAW-1B|LAW-1C,false
+LAW102,Constitutional Law I,4,t.ajayi@stateuniv.edu,LAW-1A|LAW-1B|LAW-1C,false
+LAW103,Legal Methods,3,m.sanusi@stateuniv.edu,LAW-1A|LAW-1B|LAW-1C,false
+LAW104,Nigerian Legal System,2,u.mba@stateuniv.edu,LAW-1A|LAW-1B|LAW-1C,false
+LAW201,Constitutional Law II,4,w.soyinka@stateuniv.edu,LAW-2A|LAW-2B|LAW-2C,false
+LAW202,Criminal Law,3,a.indimi@stateuniv.edu,LAW-2A|LAW-2B|LAW-2C,false
+LAW203,Law of Contract I,3,i.ubah@stateuniv.edu,LAW-2A|LAW-2B|LAW-2C,false
+LAW204,Law of Torts,3,m.bello@stateuniv.edu,LAW-2A|LAW-2B|LAW-2C,false
+LAW301,Company Law,3,s.umar@stateuniv.edu,LAW-3A|LAW-3B|LAW-3C,false
+LAW302,Land Law,3,e.onwudiwe@stateuniv.edu,LAW-3A|LAW-3B|LAW-3C,false
+LAW303,Evidence,3,d.alake@stateuniv.edu,LAW-3A|LAW-3B|LAW-3C,false
+LAW401,Equity and Trusts,3,a.bagudu@stateuniv.edu,LAW-4A|LAW-4B|LAW-4C,false
+LAW402,Civil Procedure,3,i.ihejirika@stateuniv.edu,LAW-4A|LAW-4B|LAW-4C,false
+LAW403,Moot Court,2,p.akande@stateuniv.edu,LAW-4A|LAW-4B|LAW-4C,false
+ACCT101,Principles of Accounting I,3,y.abubakar@stateuniv.edu,ACCT-1A|ACCT-1B|ACCT-1C,false
+ACCT102,Business Mathematics,3,c.aneke@stateuniv.edu,ACCT-1A|ACCT-1B|ACCT-1C,false
+ACCT103,Introduction to Business,2,bi.adesanya@stateuniv.edu,ACCT-1A|ACCT-1B|ACCT-1C,false
+ACCT104,Financial Accounting I,3,h.sadiya@stateuniv.edu,ACCT-1A|ACCT-1B|ACCT-1C,false
+ACCT201,Financial Accounting II,4,og.okonkwo@stateuniv.edu,ACCT-2A|ACCT-2B|ACCT-2C,false
+ACCT202,Cost Accounting,3,g.ashafa@stateuniv.edu,ACCT-2A|ACCT-2B|ACCT-2C,false
+ACCT203,Taxation I,3,m.m.yaro@stateuniv.edu,ACCT-2A|ACCT-2B|ACCT-2C,false
+ACCT301,Auditing,3,u.abonta@stateuniv.edu,ACCT-3A|ACCT-3B|ACCT-3C,false
+ACCT302,Management Accounting,3,f.durotoye@stateuniv.edu,ACCT-3A|ACCT-3B|ACCT-3C,false
+ACCT303,Taxation II,3,s.mohammed@stateuniv.edu,ACCT-3A|ACCT-3B|ACCT-3C,false
+ACCT401,Advanced Auditing,3,n.odigwe@stateuniv.edu,ACCT-4A|ACCT-4B,false
+ACCT402,Public Sector Accounting,3,s.igboho@stateuniv.edu,ACCT-4A|ACCT-4B,false
+BADM101,Principles of Management,3,r.ajia@stateuniv.edu,BADM-1A|BADM-1B|BADM-1C|BADM-1D,false
+BADM102,Business Communication,2,e.isong@stateuniv.edu,BADM-1A|BADM-1B|BADM-1C|BADM-1D,false
+BADM103,Organizational Behavior,3,b.sanwoolu@stateuniv.edu,BADM-1A|BADM-1B|BADM-1C|BADM-1D,false
+BADM104,Principles of Marketing,3,m.uwais@stateuniv.edu,BADM-1A|BADM-1B|BADM-1C|BADM-1D,false
+BADM201,Human Resource Management,3,o.ezekwesili@stateuniv.edu,BADM-2A|BADM-2B|BADM-2C|BADM-2D,false
+BADM202,Operations Management,3,d.olorunyomi@stateuniv.edu,BADM-2A|BADM-2B|BADM-2C|BADM-2D,false
+BADM203,Business Law,3,a.joda@stateuniv.edu,BADM-2A|BADM-2B|BADM-2C|BADM-2D,false
+BADM204,Financial Management,3,c.amaechi@stateuniv.edu,BADM-2A|BADM-2B|BADM-2C|BADM-2D,false
+BADM301,Strategic Management,3,o.sonaiya@stateuniv.edu,BADM-3A|BADM-3B|BADM-3C,false
+BADM302,Entrepreneurship,3,t.usman@stateuniv.edu,BADM-3A|BADM-3B|BADM-3C,false
+BADM303,International Business,3,o.enelamah@stateuniv.edu,BADM-3A|BADM-3B|BADM-3C,false
+BADM401,Business Policy,3,m.sarafa@stateuniv.edu,BADM-4A|BADM-4B|BADM-4C,false
+BADM402,Research Project,4,b.aliyu@stateuniv.edu,BADM-4A|BADM-4B|BADM-4C,false
+ECON101,Principles of Economics I,3,c.soludo@stateuniv.edu,ECON-1A|ECON-1B|ECON-1C,false
+ECON102,Principles of Economics II,3,j.orelope@stateuniv.edu,ECON-1A|ECON-1B|ECON-1C,false
+ECON103,Mathematics for Economics,3,h.usman@stateuniv.edu,ECON-1A|ECON-1B|ECON-1C,false
+ECON104,Statistics for Economics,3,am.okafor@stateuniv.edu,ECON-1A|ECON-1B|ECON-1C,false
+ECON201,Microeconomic Theory,3,ka.ibrahim@stateuniv.edu,ECON-2A|ECON-2B|ECON-2C,false
+ECON202,Macroeconomic Theory,3,p.ozokwor@stateuniv.edu,ECON-2A|ECON-2B|ECON-2C,false
+ECON203,Econometrics I,3,k.moghalu@stateuniv.edu,ECON-2A|ECON-2B|ECON-2C,false
+ECON301,Development Economics,3,t.falola@stateuniv.edu,ECON-3A|ECON-3B,false
+ECON302,International Trade,3,h.faruk@stateuniv.edu,ECON-3A|ECON-3B,false
+ECON401,Public Finance,3,a.ogujiuba@stateuniv.edu,ECON-4A|ECON-4B,false
+ECON402,Monetary Economics,3,n.osundare@stateuniv.edu,ECON-4A|ECON-4B,false
+MCOM101,Introduction to Mass Communication,3,s.abdullahi@stateuniv.edu,MCOM-1A|MCOM-1B|MCOM-1C,false
+MCOM102,Writing for Media,3,k.awani@stateuniv.edu,MCOM-1A|MCOM-1B|MCOM-1C,false
+MCOM103,History of Mass Media,2,a.oritsejafor@stateuniv.edu,MCOM-1A|MCOM-1B|MCOM-1C,false
+MCOM104,Media Ethics,2,l.ahmad@stateuniv.edu,MCOM-1A|MCOM-1B|MCOM-1C,false
+MCOM201,Broadcast Journalism,3,ob.okonkwo@stateuniv.edu,MCOM-2A|MCOM-2B|MCOM-2C,false
+MCOM202,Print Journalism,3,f.williams@stateuniv.edu,MCOM-2A|MCOM-2B|MCOM-2C,false
+MCOM203,Public Relations,3,z.audu@stateuniv.edu,MCOM-2A|MCOM-2B|MCOM-2C,false
+MCOM301,Advertising,3,n.wazobia@stateuniv.edu,MCOM-3A|MCOM-3B,false
+MCOM302,Digital Media,3,t.akerele@stateuniv.edu,MCOM-3A|MCOM-3B,false
+MCOM401,Media Management,3,f.waziri@stateuniv.edu,MCOM-4A|MCOM-4B,false
+MCOM402,Media Research,3,e.onyekpere@stateuniv.edu,MCOM-4A|MCOM-4B,false
+POLS101,Introduction to Political Science,3,o.adeyemi@stateuniv.edu,POLS-1A|POLS-1B|POLS-1C,false
+POLS102,Nigerian Government and Politics,3,c.okonkwo@stateuniv.edu,POLS-1A|POLS-1B|POLS-1C,false
+POLS103,Comparative Politics,3,e.nwachukwu@stateuniv.edu,POLS-1A|POLS-1B|POLS-1C,false
+POLS201,Political Theory,3,a.mohammed@stateuniv.edu,POLS-2A|POLS-2B,false
+POLS202,Public Administration,3,t.bakare@stateuniv.edu,POLS-2A|POLS-2B,false
+POLS203,International Relations,3,n.eze@stateuniv.edu,POLS-2A|POLS-2B,false
+POLS301,African Politics,3,b.oyelaran@stateuniv.edu,POLS-3A|POLS-3B,false
+POLS302,Political Economy,3,f.adebayo@stateuniv.edu,POLS-3A|POLS-3B,false
+POLS401,Diplomacy,3,c.okoro@stateuniv.edu,POLS-4A|POLS-4B,false
+POLS402,Research Methods,3,y.adeleke@stateuniv.edu,POLS-4A|POLS-4B,false
+PSYC101,Introduction to Psychology,3,i.musa@stateuniv.edu,PSYC-1A|PSYC-1B,false
+PSYC102,Developmental Psychology,3,g.obi@stateuniv.edu,PSYC-1A|PSYC-1B,false
+PSYC103,Biological Psychology,3,k.ogundimu@stateuniv.edu,PSYC-1A|PSYC-1B,false
+PSYC201,Social Psychology,3,b.nwosu@stateuniv.edu,PSYC-2A|PSYC-2B,false
+PSYC202,Cognitive Psychology,3,a.bello@stateuniv.edu,PSYC-2A|PSYC-2B,false
+PSYC203,Abnormal Psychology,3,o.fashola@stateuniv.edu,PSYC-2A|PSYC-2B,false
+PSYC301,Clinical Psychology,3,s.igwe@stateuniv.edu,PSYC-3A|PSYC-3B,false
+PSYC302,Research Methods,3,u.okafor@stateuniv.edu,PSYC-3A|PSYC-3B,false
+PSYC401,Counseling,3,d.ojo@stateuniv.edu,PSYC-4A|PSYC-4B,false
+PSYC402,Industrial Psychology,3,h.abdullahi@stateuniv.edu,PSYC-4A|PSYC-4B,false
+EDUC101,Foundations of Education,3,j.okoye@stateuniv.edu,EDUC-1A|EDUC-1B|EDUC-1C,false
+EDUC102,Philosophy of Education,2,t.akinwale@stateuniv.edu,EDUC-1A|EDUC-1B|EDUC-1C,false
+EDUC103,Educational Psychology,3,i.chukwu@stateuniv.edu,EDUC-1A|EDUC-1B|EDUC-1C,false
+EDUC104,Sociology of Education,3,m.gambo@stateuniv.edu,EDUC-1A|EDUC-1B|EDUC-1C,false
+EDUC201,Curriculum Development,3,a.lawal@stateuniv.edu,EDUC-2A|EDUC-2B|EDUC-2C,false
+EDUC202,Educational Technology,3,c.umeh@stateuniv.edu,EDUC-2A|EDUC-2B|EDUC-2C,false
+EDUC203,Measurement and Evaluation,3,o.oni@stateuniv.edu,EDUC-2A|EDUC-2B|EDUC-2C,false
+EDUC301,Special Education,3,b.suleiman@stateuniv.edu,EDUC-3A|EDUC-3B,false
+EDUC302,Guidance and Counseling,3,f.adegoke@stateuniv.edu,EDUC-3A|EDUC-3B,false
+EDUC401,Teaching Practice,6,v.anyaegbu@stateuniv.edu,EDUC-4A|EDUC-4B,false
+EDUC402,Research Project,4,s.owolabi@stateuniv.edu,EDUC-4A|EDUC-4B,false
+AGRI101,Principles of Agriculture,3,a.yusuf@stateuniv.edu,AGRI-1A|AGRI-1B|AGRI-1C,false
+AGRI102,Crop Science,3,o.akinyemi@stateuniv.edu,AGRI-1A|AGRI-1B|AGRI-1C,false
+AGRI103,Animal Science,3,c.nnamdi@stateuniv.edu,AGRI-1A|AGRI-1B|AGRI-1C,false
+AGRI104,Agricultural Economics,3,s.garba@stateuniv.edu,AGRI-1A|AGRI-1B|AGRI-1C,false
+AGRI201,Soil Science,3,a.igbo@stateuniv.edu,AGRI-2A|AGRI-2B,false
+AGRI202,Farm Management,3,k.adewole@stateuniv.edu,AGRI-2A|AGRI-2B,false
+AGRI203,Agricultural Extension,3,f.ogunleye@stateuniv.edu,AGRI-2A|AGRI-2B,false
+AGRI301,Plant Pathology,3,o.agu@stateuniv.edu,AGRI-3A|AGRI-3B,false
+AGRI302,Livestock Production,3,r.abubakar@stateuniv.edu,AGRI-3A|AGRI-3B,false
+AGRI401,Agribusiness,3,t.olorunfemi@stateuniv.edu,AGRI-4A|AGRI-4B,false
+AGRI402,Research Project,4,n.ani@stateuniv.edu,AGRI-4A|AGRI-4B,false
+CHEM101,General Chemistry I,4,a.ogundipe@stateuniv.edu,CHEM-1A|CHEM-1B,false
+CHEM102,General Chemistry II,4,f.dikko@stateuniv.edu,CHEM-1A|CHEM-1B,false
+CHEM103,Analytical Chemistry,3,c.obiora@stateuniv.edu,CHEM-1A|CHEM-1B,false
+CHEM201,Organic Chemistry I,4,b.sowemimo@stateuniv.edu,CHEM-2A|CHEM-2B,false
+CHEM202,Inorganic Chemistry,3,m.hassan@stateuniv.edu,CHEM-2A|CHEM-2B,false
+CHEM203,Physical Chemistry I,3,i.ezeh@stateuniv.edu,CHEM-2A|CHEM-2B,false
+CHEM301,Organic Chemistry II,3,a.odunsi@stateuniv.edu,CHEM-3A|CHEM-3B,false
+CHEM302,Physical Chemistry II,3,s.aliyu@stateuniv.edu,CHEM-3A|CHEM-3B,false
+CHEM401,Industrial Chemistry,3,n.achebe@stateuniv.edu,CHEM-4A|CHEM-4B,false
+CHEM402,Research Project,4,o.falade@stateuniv.edu,CHEM-4A|CHEM-4B,false
+PHYS101,General Physics I,4,z.ibrahim@stateuniv.edu,PHYS-1A|PHYS-1B,false
+PHYS102,General Physics II,4,e.okafor@stateuniv.edu,PHYS-1A|PHYS-1B,false
+PHYS103,Mechanics,3,d.ajayi@stateuniv.edu,PHYS-1A|PHYS-1B,false
+PHYS201,Electromagnetism,4,h.shehu@stateuniv.edu,PHYS-2A|PHYS-2B,false
+PHYS202,Optics,3,o.okeke@stateuniv.edu,PHYS-2A|PHYS-2B,false
+PHYS203,Thermodynamics,3,s.adeyinka@stateuniv.edu,PHYS-2A|PHYS-2B,false
+PHYS301,Quantum Mechanics,4,c.udo@stateuniv.edu,PHYS-3A|PHYS-3B,false
+PHYS302,Nuclear Physics,3,a.tanko@stateuniv.edu,PHYS-3A|PHYS-3B,false
+PHYS401,Solid State Physics,3,y.oladimmeji@stateuniv.edu,PHYS-4A|PHYS-4B,false
+PHYS402,Research Project,4,e.onwu@stateuniv.edu,PHYS-4A|PHYS-4B,false
+MATH101,Calculus I,4,j.akindele@stateuniv.edu,MATH-1A|MATH-1B,false
+MATH102,Calculus II,4,h.audu@stateuniv.edu,MATH-1A|MATH-1B,false
+MATH103,Linear Algebra,3,t.ibe@stateuniv.edu,MATH-1A|MATH-1B,false
+MATH201,Advanced Calculus,4,m.afolabi@stateuniv.edu,MATH-2A|MATH-2B,false
+MATH202,Differential Equations,3,s.danjuma@stateuniv.edu,MATH-2A|MATH-2B,false
+MATH203,Abstract Algebra,3,n.azuka@stateuniv.edu,MATH-2A|MATH-2B,false
+MATH301,Real Analysis,4,f.ogunnaike@stateuniv.edu,MATH-3A|MATH-3B,false
+MATH302,Complex Analysis,3,a.sadiq@stateuniv.edu,MATH-3A|MATH-3B,false
+MATH401,Numerical Analysis,3,a.ejiofor@stateuniv.edu,MATH-4A|MATH-4B,false
+MATH402,Research Project,4,o.adeniyi@stateuniv.edu,MATH-4A|MATH-4B,false
+ENGL101,Introduction to Literature,3,r.danladi@stateuniv.edu,ENGL-1A|ENGL-1B,false
+ENGL102,English Grammar,3,u.nweke@stateuniv.edu,ENGL-1A|ENGL-1B,false
+ENGL103,Creative Writing,2,t.oyeleke@stateuniv.edu,ENGL-1A|ENGL-1B,false
+ENGL201,African Literature,3,a.garba@stateuniv.edu,ENGL-2A|ENGL-2B,false
+ENGL202,Drama,3,k.onyema@stateuniv.edu,ENGL-2A|ENGL-2B,false
+ENGL203,Poetry,3,l.kwankwaso@stateuniv.edu,ENGL-2A|ENGL-2B,false
+ENGL301,Literary Criticism,3,y.ogunyemi@stateuniv.edu,ENGL-3A|ENGL-3B,false
+ENGL302,Linguistics,3,c.nwankwo@stateuniv.edu,ENGL-3A|ENGL-3B,false
+ENGL401,Shakespeare,3,t.adesanya@stateuniv.edu,ENGL-4A|ENGL-4B,false
+ENGL402,Research Project,4,n.jibril@stateuniv.edu,ENGL-4A|ENGL-4B,false
+GNS101,Use of English I,2,i.ugwu@stateuniv.edu,COSC-1A|COSC-1B|COSC-1C|COSC-1D|SENG-1A|SENG-1B|SENG-1C|SENG-1D|INFT-1A|INFT-1B|INFT-1C|EENG-1A|EENG-1B|EENG-1C|EENG-1D|MENG-1A|MENG-1B|MENG-1C|MENG-1D,true
+GNS102,Use of English II,2,r.fagbenle@stateuniv.edu,COSC-1A|COSC-1B|COSC-1C|COSC-1D|SENG-1A|SENG-1B|SENG-1C|SENG-1D|INFT-1A|INFT-1B|INFT-1C|EENG-1A|EENG-1B|EENG-1C|EENG-1D|MENG-1A|MENG-1B|MENG-1C|MENG-1D,true
+GNS103,Citizenship Education,2,m.yaro@stateuniv.edu,COSC-1A|COSC-1B|COSC-1C|COSC-1D|SENG-1A|SENG-1B|SENG-1C|SENG-1D|INFT-1A|INFT-1B|INFT-1C|CENG-1A|CENG-1B|CENG-1C|CENG-1D|MED-1A|MED-1B|MED-1C,true
+GNS201,Nigerian History,2,o.awolowo@stateuniv.edu,COSC-2A|COSC-2B|COSC-2C|COSC-2D|SENG-2A|SENG-2B|SENG-2C|SENG-2D|INFT-2A|INFT-2B|INFT-2C|LAW-2A|LAW-2B|LAW-2C|ACCT-2A|ACCT-2B|ACCT-2C,true
+GNS202,Philosophy and Logic,2,c.ike@stateuniv.edu,COSC-2A|COSC-2B|COSC-2C|COSC-2D|SENG-2A|SENG-2B|SENG-2C|SENG-2D|BADM-2A|BADM-2B|BADM-2C|BADM-2D|ECON-2A|ECON-2B|ECON-2C,true

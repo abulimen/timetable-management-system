@@ -19,14 +19,14 @@
     <!-- Multi-termination: Stop when ANY condition is met -->
     <termination>
         <!-- Maximum time limit (failsafe) - increased for large datasets -->
-        <minutesSpentLimit>15</minutesSpentLimit>
+        <minutesSpentLimit>30</minutesSpentLimit>
         <!-- Stop if no improvement for 60 seconds -->
         <unimprovedSecondsSpentLimit>60</unimprovedSecondsSpentLimit>
     </termination>
     
     <!-- WEAKEST_FIT_DECREASING: Schedule hard lessons first, use smallest suitable rooms -->
     <constructionHeuristic>
-        <constructionHeuristicType>WEAKEST_FIT_DECREASING</constructionHeuristicType>
+        <constructionHeuristicType>STRONGEST_FIT_DECREASING</constructionHeuristicType>
     </constructionHeuristic>
     
     <!-- Local Search with OPTIMIZATIONS -->

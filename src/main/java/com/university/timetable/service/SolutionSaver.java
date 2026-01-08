@@ -1,8 +1,12 @@
 package com.university.timetable.service;
 
 import com.university.timetable.domain.Lesson;
+import com.university.timetable.domain.Room;
 import com.university.timetable.domain.TimeTable;
+import com.university.timetable.domain.Timeslot;
 import com.university.timetable.repository.LessonRepository;
+import com.university.timetable.repository.RoomRepository;
+import com.university.timetable.repository.TimeslotRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,32 +23,60 @@ import org.springframework.transaction.annotation.Transactional;
 public class SolutionSaver {
 
     private final LessonRepository lessonRepository;
+    private final TimeslotRepository timeslotRepository;
+    private final RoomRepository roomRepository;
 
     /**
      * Save the solution to database with a new transaction.
+     * Note: We look up timeslots and rooms from DB by their attributes because
+     * the solver uses in-memory objects that may have IDs not matching the DB
+     * (especially timeslots which are dynamically regenerated from settings).
      */
     @Transactional
     public void saveSolution(TimeTable solution) {
-        log.info("Saving solution with score {} and {} lessons", 
-            solution.getScore(), solution.getLessons().size());
-        
+        log.info("Saving solution with score {} and {} lessons",
+                solution.getScore(), solution.getLessons().size());
+
         int saved = 0;
+
         for (Lesson lesson : solution.getLessons()) {
-            Long timeslotId = lesson.getTimeslot() != null ? lesson.getTimeslot().getId() : null;
-            Long roomId = lesson.getRoom() != null ? lesson.getRoom().getId() : null;
-            
-            log.debug("Saving Lesson {}: timeslot={}, room={}", 
-                lesson.getId(), timeslotId, roomId);
-            
+            Timeslot solverTimeslot = lesson.getTimeslot();
+            Room solverRoom = lesson.getRoom();
+
+            // Look up the actual DB timeslot by day+time
+            Timeslot dbTimeslot = null;
+            if (solverTimeslot != null) {
+                dbTimeslot = timeslotRepository.findByDayOfWeekAndStartTime(
+                        solverTimeslot.getDayOfWeek(),
+                        solverTimeslot.getStartTime()).orElse(null);
+
+                if (dbTimeslot == null) {
+                    log.warn("Timeslot not found in DB: {} {}",
+                            solverTimeslot.getDayOfWeek(), solverTimeslot.getStartTime());
+                }
+            }
+
+            // Look up room by ID (rooms should be stable, but verify it exists)
+            Room dbRoom = null;
+            if (solverRoom != null) {
+                dbRoom = roomRepository.findById(solverRoom.getId()).orElse(null);
+                if (dbRoom == null) {
+                    log.warn("Room not found in DB: {}", solverRoom.getId());
+                }
+            }
+
+            final Timeslot finalTimeslot = dbTimeslot;
+            final Room finalRoom = dbRoom;
+
             // Re-fetch the lesson from DB and update only the planning variables
             lessonRepository.findById(lesson.getId()).ifPresent(dbLesson -> {
-                dbLesson.setTimeslot(lesson.getTimeslot());
-                dbLesson.setRoom(lesson.getRoom());
+                dbLesson.setTimeslot(finalTimeslot);
+                dbLesson.setRoom(finalRoom);
                 lessonRepository.save(dbLesson);
             });
             saved++;
         }
-        
+
         log.info("Saved {} lessons successfully", saved);
     }
 }

@@ -1,6 +1,7 @@
 package com.university.timetable.solver;
 
 import com.university.timetable.domain.Lesson;
+import com.university.timetable.domain.SpecialEvent;
 import com.university.timetable.domain.StudentGroup;
 import com.university.timetable.service.ConstraintSettingsService;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
@@ -20,7 +21,7 @@ public class TimetableConstraintProvider implements ConstraintProvider {
 
     // Cached settings - loaded once on first access
     private volatile boolean settingsInitialized = false;
-    private volatile boolean loadedFromDb = false;  // Track if we actually loaded from DB
+    private volatile boolean loadedFromDb = false; // Track if we actually loaded from DB
     private LocalTime cachedLunchBreakStart;
     private LocalTime cachedLunchBreakEnd;
     private LocalTime cachedLatestEndTime;
@@ -37,20 +38,21 @@ public class TimetableConstraintProvider implements ConstraintProvider {
 
     /**
      * Initialize all settings from the service.
-     * If the Spring context wasn't ready on first call, we retry on subsequent calls.
+     * If the Spring context wasn't ready on first call, we retry on subsequent
+     * calls.
      */
     private void initializeSettings() {
         // If we already loaded from DB, don't retry
         if (loadedFromDb) {
             return;
         }
-        
+
         synchronized (this) {
             // Double-check inside synchronized block
             if (loadedFromDb) {
                 return;
             }
-            
+
             ConstraintSettingsService svc = SpringContextHolder.getBean(ConstraintSettingsService.class);
             if (svc != null) {
                 System.out.println("[ConstraintProvider] Loading settings from DB via service...");
@@ -68,11 +70,12 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 cachedWeightEarlyMorning = svc.getInt("weight_early_morning", 3);
                 cachedMaxLecturerConsecutiveHours = svc.getMaxLecturerConsecutiveHours();
                 loadedFromDb = true;
-                System.out.println("[ConstraintProvider] Loaded from DB: lunchBreakEnd=" + cachedLunchBreakEnd + 
-                    ", latestEndTime=" + cachedLatestEndTime + ", fridayEndTime=" + cachedFridayLatestEndTime);
+                System.out.println("[ConstraintProvider] Loaded from DB: lunchBreakEnd=" + cachedLunchBreakEnd +
+                        ", latestEndTime=" + cachedLatestEndTime + ", fridayEndTime=" + cachedFridayLatestEndTime);
             } else if (!settingsInitialized) {
                 // Only set defaults if we haven't set anything yet
-                System.err.println("[ConstraintProvider] WARNING: Service is null! Using hardcoded defaults (will retry later).");
+                System.err.println(
+                        "[ConstraintProvider] WARNING: Service is null! Using hardcoded defaults (will retry later).");
                 cachedLunchBreakStart = LocalTime.of(12, 0);
                 cachedLunchBreakEnd = LocalTime.of(14, 0);
                 cachedLatestEndTime = LocalTime.of(18, 0);
@@ -155,25 +158,26 @@ public class TimetableConstraintProvider implements ConstraintProvider {
     @Override
     public Constraint[] defineConstraints(ConstraintFactory factory) {
         return new Constraint[] {
-            // Hard Constraints
-            roomConflict(factory),
-            lecturerConflict(factory),
-            studentGroupConflict(factory),
-            roomFeatureRequired(factory),
-            zoneRestriction(factory),
-            lecturerUnavailability(factory),
-            lunchBreakOverlap(factory),
-            sameCourseOnSameDay(factory),
-            lessonExceedsEndTime(factory),
-            roomCapacityOverflow(factory),  // Room must fit all students
-            
-            // Soft Constraints
-            roomCapacityEfficiency(factory),
-            studentFatigue(factory),
-            lecturerRoomTransition(factory),
-            dayBalanceForStudentGroup(factory),
-            earlyMorningPenalty(factory),
-            lecturerFatigue(factory)
+                // Hard Constraints
+                roomConflict(factory),
+                lecturerConflict(factory),
+                studentGroupConflict(factory),
+                roomFeatureRequired(factory),
+                zoneRestriction(factory),
+                lecturerUnavailability(factory),
+                lunchBreakOverlap(factory),
+                sameCourseOnSameDay(factory),
+                lessonExceedsEndTime(factory),
+                roomCapacityOverflow(factory), // Room must fit all students
+                specialEventConflict(factory), // Prevent scheduling during special events
+
+                // Soft Constraints
+                roomCapacityEfficiency(factory),
+                studentFatigue(factory),
+                lecturerRoomTransition(factory),
+                dayBalanceForStudentGroup(factory),
+                earlyMorningPenalty(factory),
+                lecturerFatigue(factory)
         };
     }
 
@@ -182,43 +186,37 @@ public class TimetableConstraintProvider implements ConstraintProvider {
     private Constraint roomConflict(ConstraintFactory factory) {
         return factory.forEachUniquePair(Lesson.class,
                 Joiners.equal(Lesson::getRoom),
-                Joiners.equal(lesson -> lesson.getTimeslot() != null ? 
-                    lesson.getTimeslot().getDayOfWeek() : null))
-            .filter((lesson1, lesson2) -> 
-                !lesson1.isOnline() && !lesson2.isOnline() &&  // Skip online lessons
-                lesson1.getRoom() != null && 
-                lesson1.getTimeslot() != null && 
-                lesson2.getTimeslot() != null &&
-                intervalsOverlap(lesson1, lesson2))
-            .penalize(HardSoftScore.ONE_HARD)
-            .asConstraint("Room conflict");
+                Joiners.equal(lesson -> lesson.getTimeslot() != null ? lesson.getTimeslot().getDayOfWeek() : null))
+                .filter((lesson1, lesson2) -> !lesson1.isOnline() && !lesson2.isOnline() && // Skip online lessons
+                        lesson1.getRoom() != null &&
+                        lesson1.getTimeslot() != null &&
+                        lesson2.getTimeslot() != null &&
+                        intervalsOverlap(lesson1, lesson2))
+                .penalize(HardSoftScore.ONE_HARD)
+                .asConstraint("Room conflict");
     }
 
     private Constraint lecturerConflict(ConstraintFactory factory) {
         return factory.forEachUniquePair(Lesson.class,
                 Joiners.equal(Lesson::getLecturer),
-                Joiners.equal(lesson -> lesson.getTimeslot() != null ? 
-                    lesson.getTimeslot().getDayOfWeek() : null))
-            .filter((lesson1, lesson2) -> 
-                lesson1.getLecturer() != null && 
-                lesson1.getTimeslot() != null && 
-                lesson2.getTimeslot() != null &&
-                intervalsOverlap(lesson1, lesson2))
-            .penalize(HardSoftScore.ONE_HARD)
-            .asConstraint("Lecturer conflict");
+                Joiners.equal(lesson -> lesson.getTimeslot() != null ? lesson.getTimeslot().getDayOfWeek() : null))
+                .filter((lesson1, lesson2) -> lesson1.getLecturer() != null &&
+                        lesson1.getTimeslot() != null &&
+                        lesson2.getTimeslot() != null &&
+                        intervalsOverlap(lesson1, lesson2))
+                .penalize(HardSoftScore.ONE_HARD)
+                .asConstraint("Lecturer conflict");
     }
 
     private Constraint studentGroupConflict(ConstraintFactory factory) {
         return factory.forEachUniquePair(Lesson.class,
-                Joiners.equal(lesson -> lesson.getTimeslot() != null ? 
-                    lesson.getTimeslot().getDayOfWeek() : null))
-            .filter((lesson1, lesson2) -> 
-                lesson1.getTimeslot() != null && 
-                lesson2.getTimeslot() != null &&
-                hasStudentGroupOverlap(lesson1, lesson2) &&
-                intervalsOverlap(lesson1, lesson2))
-            .penalize(HardSoftScore.ONE_HARD)
-            .asConstraint("Student group conflict");
+                Joiners.equal(lesson -> lesson.getTimeslot() != null ? lesson.getTimeslot().getDayOfWeek() : null))
+                .filter((lesson1, lesson2) -> lesson1.getTimeslot() != null &&
+                        lesson2.getTimeslot() != null &&
+                        hasStudentGroupOverlap(lesson1, lesson2) &&
+                        intervalsOverlap(lesson1, lesson2))
+                .penalize(HardSoftScore.ONE_HARD)
+                .asConstraint("Student group conflict");
     }
 
     /**
@@ -238,39 +236,36 @@ public class TimetableConstraintProvider implements ConstraintProvider {
 
     private Constraint roomFeatureRequired(ConstraintFactory factory) {
         return factory.forEach(Lesson.class)
-            .filter(lesson -> 
-                !lesson.isOnline() &&  // Skip online lessons
-                lesson.getRoom() != null &&
-                lesson.getCourse() != null &&
-                lesson.getCourse().getRequiredFeatures() != null &&
-                !lesson.getCourse().getRequiredFeatures().isEmpty() &&
-                !lesson.getRoom().hasAllFeatures(lesson.getCourse().getRequiredFeatures()))
-            .penalize(HardSoftScore.ONE_HARD)
-            .asConstraint("Room feature required");
+                .filter(lesson -> !lesson.isOnline() && // Skip online lessons
+                        lesson.getRoom() != null &&
+                        lesson.getCourse() != null &&
+                        lesson.getCourse().getRequiredFeatures() != null &&
+                        !lesson.getCourse().getRequiredFeatures().isEmpty() &&
+                        !lesson.getRoom().hasAllFeatures(lesson.getCourse().getRequiredFeatures()))
+                .penalize(HardSoftScore.ONE_HARD)
+                .asConstraint("Room feature required");
     }
 
     private Constraint zoneRestriction(ConstraintFactory factory) {
         return factory.forEach(Lesson.class)
-            .filter(lesson -> 
-                !lesson.isOnline() &&  // Skip online lessons
-                lesson.getRoom() != null &&
-                lesson.getCourse() != null &&
-                lesson.getCourse().getAllowedZones() != null &&
-                !lesson.getCourse().getAllowedZones().isEmpty() &&
-                lesson.getRoom().getZone() != null &&
-                !lesson.getCourse().getAllowedZones().contains(lesson.getRoom().getZone()))
-            .penalize(HardSoftScore.ONE_HARD)
-            .asConstraint("Zone restriction");
+                .filter(lesson -> !lesson.isOnline() && // Skip online lessons
+                        lesson.getRoom() != null &&
+                        lesson.getCourse() != null &&
+                        lesson.getCourse().getAllowedZones() != null &&
+                        !lesson.getCourse().getAllowedZones().isEmpty() &&
+                        lesson.getRoom().getZone() != null &&
+                        !lesson.getCourse().getAllowedZones().contains(lesson.getRoom().getZone()))
+                .penalize(HardSoftScore.ONE_HARD)
+                .asConstraint("Zone restriction");
     }
 
     private Constraint lecturerUnavailability(ConstraintFactory factory) {
         return factory.forEach(Lesson.class)
-            .filter(lesson -> 
-                lesson.getLecturer() != null &&
-                lesson.getTimeslot() != null &&
-                !lesson.getLecturer().isAvailableAt(lesson.getTimeslot(), lesson.getDurationHours()))
-            .penalize(HardSoftScore.ONE_HARD)
-            .asConstraint("Lecturer unavailability");
+                .filter(lesson -> lesson.getLecturer() != null &&
+                        lesson.getTimeslot() != null &&
+                        !lesson.getLecturer().isAvailableAt(lesson.getTimeslot(), lesson.getDurationHours()))
+                .penalize(HardSoftScore.ONE_HARD)
+                .asConstraint("Lecturer unavailability");
     }
 
     /**
@@ -279,23 +274,23 @@ public class TimetableConstraintProvider implements ConstraintProvider {
      */
     private Constraint lunchBreakOverlap(ConstraintFactory factory) {
         return factory.forEach(Lesson.class)
-            .filter(lesson -> {
-                if (!isLunchBreakEnforced()) {
-                    return false;
-                }
-                if (lesson.getTimeslot() == null) {
-                    return false;
-                }
-                
-                LocalTime lessonStart = lesson.getTimeslot().getStartTime();
-                LocalTime lessonEnd = lesson.getEndTime();
-                LocalTime lunchStart = getLunchBreakStart();
-                LocalTime lunchEnd = getLunchBreakEnd();
-                
-                return lessonStart.isBefore(lunchEnd) && lunchStart.isBefore(lessonEnd);
-            })
-            .penalize(HardSoftScore.ONE_HARD)
-            .asConstraint("Lunch break overlap");
+                .filter(lesson -> {
+                    if (!isLunchBreakEnforced()) {
+                        return false;
+                    }
+                    if (lesson.getTimeslot() == null) {
+                        return false;
+                    }
+
+                    LocalTime lessonStart = lesson.getTimeslot().getStartTime();
+                    LocalTime lessonEnd = lesson.getEndTime();
+                    LocalTime lunchStart = getLunchBreakStart();
+                    LocalTime lunchEnd = getLunchBreakEnd();
+
+                    return lessonStart.isBefore(lunchEnd) && lunchStart.isBefore(lessonEnd);
+                })
+                .penalize(HardSoftScore.ONE_HARD)
+                .asConstraint("Lunch break overlap");
     }
 
     /**
@@ -304,15 +299,13 @@ public class TimetableConstraintProvider implements ConstraintProvider {
     private Constraint sameCourseOnSameDay(ConstraintFactory factory) {
         return factory.forEachUniquePair(Lesson.class,
                 Joiners.equal(Lesson::getCourse),
-                Joiners.equal(lesson -> lesson.getTimeslot() != null ? 
-                    lesson.getTimeslot().getDayOfWeek() : null))
-            .filter((lesson1, lesson2) -> 
-                !isSameCourseSameDayAllowed() &&
-                lesson1.getCourse() != null &&
-                lesson1.getTimeslot() != null && 
-                lesson2.getTimeslot() != null)
-            .penalize(HardSoftScore.ONE_HARD)
-            .asConstraint("Same course on same day");
+                Joiners.equal(lesson -> lesson.getTimeslot() != null ? lesson.getTimeslot().getDayOfWeek() : null))
+                .filter((lesson1, lesson2) -> !isSameCourseSameDayAllowed() &&
+                        lesson1.getCourse() != null &&
+                        lesson1.getTimeslot() != null &&
+                        lesson2.getTimeslot() != null)
+                .penalize(HardSoftScore.ONE_HARD)
+                .asConstraint("Same course on same day");
     }
 
     /**
@@ -323,22 +316,22 @@ public class TimetableConstraintProvider implements ConstraintProvider {
      */
     private Constraint lessonExceedsEndTime(ConstraintFactory factory) {
         return factory.forEach(Lesson.class)
-            .filter(lesson -> {
-                if (lesson.getTimeslot() == null) {
-                    return false;
-                }
-                LocalTime lessonEnd = lesson.getEndTime();
-                DayOfWeek day = lesson.getTimeslot().getDayOfWeek();
-                
-                // Friday has its own end time limit
-                LocalTime latestEnd = (day == DayOfWeek.FRIDAY) 
-                    ? getFridayLatestEndTime() 
-                    : getLatestEndTime();
-                    
-                return lessonEnd.isAfter(latestEnd);
-            })
-            .penalize(HardSoftScore.ONE_HARD)
-            .asConstraint("Lesson exceeds end time");
+                .filter(lesson -> {
+                    if (lesson.getTimeslot() == null) {
+                        return false;
+                    }
+                    LocalTime lessonEnd = lesson.getEndTime();
+                    DayOfWeek day = lesson.getTimeslot().getDayOfWeek();
+
+                    // Friday has its own end time limit
+                    LocalTime latestEnd = (day == DayOfWeek.FRIDAY)
+                            ? getFridayLatestEndTime()
+                            : getLatestEndTime();
+
+                    return lessonEnd.isAfter(latestEnd);
+                })
+                .penalize(HardSoftScore.ONE_HARD)
+                .asConstraint("Lesson exceeds end time");
     }
 
     /**
@@ -348,83 +341,113 @@ public class TimetableConstraintProvider implements ConstraintProvider {
      */
     private Constraint roomCapacityOverflow(ConstraintFactory factory) {
         return factory.forEach(Lesson.class)
-            .filter(lesson -> 
-                !lesson.isOnline() &&  // Skip online lessons - no capacity limit
-                lesson.getRoom() != null &&
-                lesson.getTotalStudentCount() > lesson.getRoom().getCapacity())
-            .penalize(HardSoftScore.ONE_HARD)
-            .asConstraint("Room capacity overflow");
+                .filter(lesson -> !lesson.isOnline() && // Skip online lessons - no capacity limit
+                        lesson.getRoom() != null &&
+                        lesson.getTotalStudentCount() > lesson.getRoom().getCapacity())
+                .penalize(HardSoftScore.ONE_HARD)
+                .asConstraint("Room capacity overflow");
+    }
+
+    /**
+     * Special Event Conflict - HARD CONSTRAINT
+     * Prevents scheduling lessons for student groups during special events.
+     * Also prevents using rooms and lecturers assigned to special events.
+     */
+    private Constraint specialEventConflict(ConstraintFactory factory) {
+        return factory.forEach(Lesson.class)
+                .join(SpecialEvent.class)
+                .filter((lesson, event) -> {
+                    if (lesson.getTimeslot() == null || !event.isActive()) {
+                        return false;
+                    }
+                    // Check if lesson overlaps with special event time
+                    if (!event.overlapsWithTimeslot(lesson.getTimeslot())) {
+                        return false;
+                    }
+                    // Check if any of the lesson's student groups are affected
+                    for (StudentGroup lessonGroup : lesson.getCourse().getAllStudentGroups()) {
+                        if (event.affectsStudentGroup(lessonGroup)) {
+                            return true;
+                        }
+                    }
+                    // Also check room conflict (if event has a room)
+                    if (event.getRoom() != null && lesson.getRoom() != null &&
+                            event.getRoom().getId().equals(lesson.getRoom().getId())) {
+                        return true;
+                    }
+                    // Also check lecturer conflict (if event has a lecturer)
+                    if (event.getLecturer() != null && lesson.getLecturer() != null &&
+                            event.getLecturer().getId().equals(lesson.getLecturer().getId())) {
+                        return true;
+                    }
+                    return false;
+                })
+                .penalize(HardSoftScore.ONE_HARD)
+                .asConstraint("Special event conflict");
     }
 
     // ==================== SOFT CONSTRAINTS ====================
 
     private Constraint roomCapacityEfficiency(ConstraintFactory factory) {
         return factory.forEach(Lesson.class)
-            .filter(lesson -> 
-                lesson.getRoom() != null &&
-                lesson.getTotalStudentCount() > 0)
-            .penalize(HardSoftScore.ONE_SOFT,
-                lesson -> {
-                    // Penalize rooms that are too large (wasted capacity)
-                    int diff = lesson.getRoom().getCapacity() - lesson.getTotalStudentCount();
-                    int weight = getWeightRoomCapacity();
-                    return Math.max(0, (diff / 10) * weight);
-                })
-            .asConstraint("Room capacity efficiency");
+                .filter(lesson -> lesson.getRoom() != null &&
+                        lesson.getTotalStudentCount() > 0)
+                .penalize(HardSoftScore.ONE_SOFT,
+                        lesson -> {
+                            // Penalize rooms that are too large (wasted capacity)
+                            int diff = lesson.getRoom().getCapacity() - lesson.getTotalStudentCount();
+                            int weight = getWeightRoomCapacity();
+                            return Math.max(0, (diff / 10) * weight);
+                        })
+                .asConstraint("Room capacity efficiency");
     }
 
     private Constraint studentFatigue(ConstraintFactory factory) {
         return factory.forEachUniquePair(Lesson.class,
                 Joiners.equal(Lesson::getStudentGroup),
-                Joiners.equal(lesson -> lesson.getTimeslot() != null ? 
-                    lesson.getTimeslot().getDayOfWeek() : null))
-            .filter((lesson1, lesson2) -> 
-                lesson1.getTimeslot() != null && 
-                lesson2.getTimeslot() != null &&
-                lesson1.getStudentGroup() != null &&
-                areConsecutive(lesson1, lesson2))
-            .penalize(HardSoftScore.ofSoft(getWeightStudentFatigue()))
-            .asConstraint("Student fatigue");
+                Joiners.equal(lesson -> lesson.getTimeslot() != null ? lesson.getTimeslot().getDayOfWeek() : null))
+                .filter((lesson1, lesson2) -> lesson1.getTimeslot() != null &&
+                        lesson2.getTimeslot() != null &&
+                        lesson1.getStudentGroup() != null &&
+                        areConsecutive(lesson1, lesson2))
+                .penalize(HardSoftScore.ofSoft(getWeightStudentFatigue()))
+                .asConstraint("Student fatigue");
     }
 
     private Constraint lecturerRoomTransition(ConstraintFactory factory) {
         return factory.forEachUniquePair(Lesson.class,
                 Joiners.equal(Lesson::getLecturer),
-                Joiners.equal(lesson -> lesson.getTimeslot() != null ? 
-                    lesson.getTimeslot().getDayOfWeek() : null))
-            .filter((lesson1, lesson2) -> 
-                lesson1.getLecturer() != null &&
-                lesson1.getTimeslot() != null && 
-                lesson2.getTimeslot() != null &&
-                lesson1.getRoom() != null &&
-                lesson2.getRoom() != null &&
-                areConsecutive(lesson1, lesson2) &&
-                !Objects.equals(lesson1.getRoom().getId(), lesson2.getRoom().getId()))
-            .penalize(HardSoftScore.ofSoft(getWeightLecturerTransition()),
-                (lesson1, lesson2) -> {
-                    if (lesson1.getRoom().getZone() != null && 
-                        lesson2.getRoom().getZone() != null &&
-                        !Objects.equals(lesson1.getRoom().getZone().getId(), 
-                                        lesson2.getRoom().getZone().getId())) {
-                        return 3;
-                    }
-                    return 1;
-                })
-            .asConstraint("Lecturer room transition");
+                Joiners.equal(lesson -> lesson.getTimeslot() != null ? lesson.getTimeslot().getDayOfWeek() : null))
+                .filter((lesson1, lesson2) -> lesson1.getLecturer() != null &&
+                        lesson1.getTimeslot() != null &&
+                        lesson2.getTimeslot() != null &&
+                        lesson1.getRoom() != null &&
+                        lesson2.getRoom() != null &&
+                        areConsecutive(lesson1, lesson2) &&
+                        !Objects.equals(lesson1.getRoom().getId(), lesson2.getRoom().getId()))
+                .penalize(HardSoftScore.ofSoft(getWeightLecturerTransition()),
+                        (lesson1, lesson2) -> {
+                            if (lesson1.getRoom().getZone() != null &&
+                                    lesson2.getRoom().getZone() != null &&
+                                    !Objects.equals(lesson1.getRoom().getZone().getId(),
+                                            lesson2.getRoom().getZone().getId())) {
+                                return 3;
+                            }
+                            return 1;
+                        })
+                .asConstraint("Lecturer room transition");
     }
 
     private Constraint dayBalanceForStudentGroup(ConstraintFactory factory) {
         return factory.forEachUniquePair(Lesson.class,
                 Joiners.equal(Lesson::getStudentGroup),
-                Joiners.equal(lesson -> lesson.getTimeslot() != null ? 
-                    lesson.getTimeslot().getDayOfWeek() : null))
-            .filter((lesson1, lesson2) -> 
-                isDayBalanceEnforced() &&
-                lesson1.getStudentGroup() != null &&
-                lesson1.getTimeslot() != null && 
-                lesson2.getTimeslot() != null)
-            .penalize(HardSoftScore.ofSoft(getWeightDayBalance()))
-            .asConstraint("Day balance for student group");
+                Joiners.equal(lesson -> lesson.getTimeslot() != null ? lesson.getTimeslot().getDayOfWeek() : null))
+                .filter((lesson1, lesson2) -> isDayBalanceEnforced() &&
+                        lesson1.getStudentGroup() != null &&
+                        lesson1.getTimeslot() != null &&
+                        lesson2.getTimeslot() != null)
+                .penalize(HardSoftScore.ofSoft(getWeightDayBalance()))
+                .asConstraint("Day balance for student group");
     }
 
     /**
@@ -434,11 +457,10 @@ public class TimetableConstraintProvider implements ConstraintProvider {
      */
     private Constraint earlyMorningPenalty(ConstraintFactory factory) {
         return factory.forEach(Lesson.class)
-            .filter(lesson -> 
-                lesson.getTimeslot() != null &&
-                lesson.getTimeslot().getStartTime().equals(LocalTime.of(7, 0)))
-            .penalize(HardSoftScore.ofSoft(getWeightEarlyMorning()))
-            .asConstraint("Early morning penalty");
+                .filter(lesson -> lesson.getTimeslot() != null &&
+                        lesson.getTimeslot().getStartTime().equals(LocalTime.of(7, 0)))
+                .penalize(HardSoftScore.ofSoft(getWeightEarlyMorning()))
+                .asConstraint("Early morning penalty");
     }
 
     /**
@@ -448,15 +470,13 @@ public class TimetableConstraintProvider implements ConstraintProvider {
     private Constraint lecturerFatigue(ConstraintFactory factory) {
         return factory.forEachUniquePair(Lesson.class,
                 Joiners.equal(Lesson::getLecturer),
-                Joiners.equal(lesson -> lesson.getTimeslot() != null ? 
-                    lesson.getTimeslot().getDayOfWeek() : null))
-            .filter((lesson1, lesson2) -> 
-                lesson1.getTimeslot() != null && 
-                lesson2.getTimeslot() != null &&
-                lesson1.getLecturer() != null &&
-                areConsecutive(lesson1, lesson2))
-            .penalize(HardSoftScore.ofSoft(getWeightStudentFatigue()))  // Reuse student fatigue weight
-            .asConstraint("Lecturer fatigue");
+                Joiners.equal(lesson -> lesson.getTimeslot() != null ? lesson.getTimeslot().getDayOfWeek() : null))
+                .filter((lesson1, lesson2) -> lesson1.getTimeslot() != null &&
+                        lesson2.getTimeslot() != null &&
+                        lesson1.getLecturer() != null &&
+                        areConsecutive(lesson1, lesson2))
+                .penalize(HardSoftScore.ofSoft(getWeightStudentFatigue())) // Reuse student fatigue weight
+                .asConstraint("Lecturer fatigue");
     }
 
     private int getMaxLecturerConsecutiveHours() {
@@ -471,7 +491,7 @@ public class TimetableConstraintProvider implements ConstraintProvider {
         LocalTime end1 = lesson1.getEndTime();
         LocalTime start2 = lesson2.getTimeslot().getStartTime();
         LocalTime end2 = lesson2.getEndTime();
-        
+
         return start1.isBefore(end2) && start2.isBefore(end1);
     }
 
@@ -480,21 +500,21 @@ public class TimetableConstraintProvider implements ConstraintProvider {
         LocalTime start2 = lesson2.getTimeslot().getStartTime();
         LocalTime end2 = lesson2.getEndTime();
         LocalTime start1 = lesson1.getTimeslot().getStartTime();
-        
+
         boolean consecutive = end1.equals(start2) || end2.equals(start1);
-        
+
         if (consecutive && isLunchBreakEnforced()) {
             LocalTime earlierEnd = end1.isBefore(end2) ? end1 : end2;
             LocalTime laterStart = start1.isAfter(start2) ? start1 : start2;
-            
+
             LocalTime lunchStart = getLunchBreakStart();
             LocalTime lunchEnd = getLunchBreakEnd();
-            
+
             if (earlierEnd.equals(lunchStart) && laterStart.equals(lunchEnd)) {
                 return false;
             }
         }
-        
+
         return consecutive;
     }
 }

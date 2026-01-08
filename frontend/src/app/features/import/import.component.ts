@@ -178,6 +178,12 @@ interface ImportStep {
           <div>
             <h3 class="font-semibold">Ready to Import</h3>
             <p class="text-sm text-secondary-500">{{ getReadyCount() }} file(s) selected for import</p>
+            <p *ngIf="getReadyCount() > 0 && !validationResult" class="text-sm text-yellow-600 mt-1">
+              ⚠ Please validate files before importing
+            </p>
+            <p *ngIf="validationResult && !validationResult.valid" class="text-sm text-red-600 mt-1">
+              ✗ Fix validation errors before importing
+            </p>
           </div>
           <div class="flex gap-3">
             <button (click)="validateFiles()" 
@@ -187,7 +193,8 @@ interface ImportStep {
             </button>
             <button (click)="startImport()" 
                     class="btn btn-primary"
-                    [disabled]="getReadyCount() === 0 || isImporting">
+                    [disabled]="getReadyCount() === 0 || isImporting || !validationResult?.valid"
+                    [title]="!validationResult ? 'Validate files first' : (!validationResult.valid ? 'Fix validation errors first' : 'Start importing')">
               {{ isImporting ? 'Importing...' : '🚀 Start Import' }}
             </button>
           </div>
@@ -220,21 +227,21 @@ export class ImportComponent {
     },
     {
       id: 4, entity: 'student-groups', label: 'Student Groups', required: true,
-      description: 'Classes or cohorts of students. Can be nested (parent-child hierarchy).',
-      format: 'name,size,parent_group_name', example: 'COSC_1A,40,COSC_Year1',
+      description: 'Classes or cohorts. Parent groups have EMPTY size (calculated from children). Child groups have actual student count.',
+      format: 'name,size,parent_group_name', example: 'Computer Science Year 1,,\nCSC 1A,40,Computer Science Year 1',
       file: null, status: 'pending', result: null, dependencies: []
     },
     {
       id: 5, entity: 'rooms', label: 'Rooms', required: true,
-      description: 'Physical spaces where lessons can be scheduled.',
-      format: 'name,capacity,zone_name', example: 'Room A101,50,Building A',
-      file: null, status: 'pending', result: null, dependencies: ['zones']
+      description: 'Physical spaces where lessons can be scheduled. Features are pipe-separated.',
+      format: 'name,capacity,zone_name,features', example: 'Room A101,50,Building A,Projector|Whiteboard',
+      file: null, status: 'pending', result: null, dependencies: ['zones', 'features']
     },
     {
       id: 6, entity: 'courses', label: 'Courses', required: true,
-      description: 'Subjects taught by lecturers to student groups. Set is_online=true for online courses.',
-      format: 'code,name,weekly_hours,lecturer_email,student_group_name,is_online',
-      example: 'COSC101,Intro to Programming,3,john.smith@university.edu,COSC_1A,false',
+      description: 'Subjects taught by lecturers to student groups. Use pipe (|) for combined lectures (e.g., CS_200|IT_200). Set is_online=true for online courses.',
+      format: 'code,name,weekly_hours,lecturer_email,student_group_names,is_online',
+      example: 'SEM200,Interdisciplinary Seminar,2,john@uni.edu,CS_200|IT_200|SE_200,false',
       file: null, status: 'pending', result: null, dependencies: ['lecturers', 'student-groups']
     }
   ];
@@ -310,28 +317,186 @@ export class ImportComponent {
       }
     }
 
-    // Cross-validation: Check lecturer emails in courses exist in lecturers file
-    const lecturerRows = fileContents.get('lecturers');
-    const courseRows = fileContents.get('courses');
-
-    if (lecturerRows && courseRows) {
-      const lecturerEmails = new Set(lecturerRows.map(r => r[1]?.toLowerCase().trim()).filter(Boolean));
-      for (let i = 0; i < courseRows.length; i++) {
-        const email = courseRows[i][3]?.toLowerCase().trim();
-        if (email && !lecturerEmails.has(email)) {
-          this.validationResult.warnings.push(`Courses row ${i + 2}: Lecturer email '${email}' not found in lecturers file`);
+    // Duplicate detection within each CSV file (strict mode - errors not warnings)
+    // Zones: check name uniqueness
+    const zonesData = fileContents.get('zones');
+    if (zonesData) {
+      const seenNames = new Map<string, number>();
+      for (let i = 0; i < zonesData.length; i++) {
+        const name = zonesData[i][0]?.toLowerCase().trim();
+        if (name) {
+          if (seenNames.has(name)) {
+            this.validationResult.errors.push(`Zones row ${i + 2}: Duplicate zone name '${zonesData[i][0].trim()}' (first seen in row ${seenNames.get(name)})`);
+            this.validationResult.valid = false;
+          } else {
+            seenNames.set(name, i + 2);
+          }
         }
       }
     }
 
-    // Cross-validation: Check student groups in courses exist
+    // Features: check name uniqueness
+    const featuresData = fileContents.get('features');
+    if (featuresData) {
+      const seenNames = new Map<string, number>();
+      for (let i = 0; i < featuresData.length; i++) {
+        const name = featuresData[i][0]?.toLowerCase().trim();
+        if (name) {
+          if (seenNames.has(name)) {
+            this.validationResult.errors.push(`Features row ${i + 2}: Duplicate feature name '${featuresData[i][0].trim()}' (first seen in row ${seenNames.get(name)})`);
+            this.validationResult.valid = false;
+          } else {
+            seenNames.set(name, i + 2);
+          }
+        }
+      }
+    }
+
+    // Rooms: check name uniqueness
+    const roomsData = fileContents.get('rooms');
+    if (roomsData) {
+      const seenNames = new Map<string, number>();
+      for (let i = 0; i < roomsData.length; i++) {
+        const name = roomsData[i][0]?.toLowerCase().trim();
+        if (name) {
+          if (seenNames.has(name)) {
+            this.validationResult.errors.push(`Rooms row ${i + 2}: Duplicate room name '${roomsData[i][0].trim()}' (first seen in row ${seenNames.get(name)})`);
+            this.validationResult.valid = false;
+          } else {
+            seenNames.set(name, i + 2);
+          }
+        }
+      }
+    }
+
+    // Lecturers: check name and email uniqueness
+    const lecturersData = fileContents.get('lecturers');
+    if (lecturersData) {
+      const seenNames = new Map<string, number>();
+      const seenEmails = new Map<string, number>();
+      for (let i = 0; i < lecturersData.length; i++) {
+        const name = lecturersData[i][0]?.toLowerCase().trim();
+        const email = lecturersData[i][1]?.toLowerCase().trim();
+        if (name) {
+          if (seenNames.has(name)) {
+            this.validationResult.errors.push(`Lecturers row ${i + 2}: Duplicate lecturer name '${lecturersData[i][0].trim()}' (first seen in row ${seenNames.get(name)})`);
+            this.validationResult.valid = false;
+          } else {
+            seenNames.set(name, i + 2);
+          }
+        }
+        if (email) {
+          if (seenEmails.has(email)) {
+            this.validationResult.errors.push(`Lecturers row ${i + 2}: Duplicate email '${lecturersData[i][1].trim()}' (first seen in row ${seenEmails.get(email)})`);
+            this.validationResult.valid = false;
+          } else {
+            seenEmails.set(email, i + 2);
+          }
+        }
+      }
+    }
+
+    // Student groups: check name uniqueness
+    const studentGroupsData = fileContents.get('student-groups');
+    if (studentGroupsData) {
+      const seenNames = new Map<string, number>();
+      for (let i = 0; i < studentGroupsData.length; i++) {
+        const name = studentGroupsData[i][0]?.toLowerCase().trim();
+        if (name) {
+          if (seenNames.has(name)) {
+            this.validationResult.errors.push(`Student Groups row ${i + 2}: Duplicate group name '${studentGroupsData[i][0].trim()}' (first seen in row ${seenNames.get(name)})`);
+            this.validationResult.valid = false;
+          } else {
+            seenNames.set(name, i + 2);
+          }
+        }
+      }
+    }
+
+    // Courses: check code uniqueness
+    const coursesData = fileContents.get('courses');
+    if (coursesData) {
+      const seenCodes = new Map<string, number>();
+      for (let i = 0; i < coursesData.length; i++) {
+        const code = coursesData[i][0]?.toLowerCase().trim();
+        if (code) {
+          if (seenCodes.has(code)) {
+            this.validationResult.errors.push(`Courses row ${i + 2}: Duplicate course code '${coursesData[i][0].trim()}' (first seen in row ${seenCodes.get(code)})`);
+            this.validationResult.valid = false;
+          } else {
+            seenCodes.set(code, i + 2);
+          }
+        }
+      }
+    }
+
+    // Cross-validation: Check lecturer emails in courses exist in lecturers file
+    const lecturerRows = fileContents.get('lecturers');
+    const courseRows = fileContents.get('courses');
+
+    if (courseRows) {
+      // Build set of valid lecturer emails
+      const lecturerEmails = new Set<string>();
+      if (lecturerRows) {
+        for (const row of lecturerRows) {
+          const email = row[1]?.toLowerCase().trim();
+          if (email) lecturerEmails.add(email);
+        }
+      }
+
+      // Check that every course has a valid lecturer email
+      const missingEmails: { email: string; row: number }[] = [];
+      for (let i = 0; i < courseRows.length; i++) {
+        const email = courseRows[i][3]?.toLowerCase().trim();
+        if (email && !lecturerEmails.has(email)) {
+          missingEmails.push({ email: courseRows[i][3]?.trim() || email, row: i + 2 });
+        }
+      }
+
+      if (missingEmails.length > 0) {
+        this.validationResult.valid = false;
+
+        if (!lecturerRows || lecturerRows.length === 0) {
+          this.validationResult.errors.push(
+            `Courses file contains lecturer emails but no lecturers file was selected. ` +
+            `Please upload a lecturers.csv file containing all lecturer emails used in courses.`
+          );
+        }
+
+        // Group by unique email for cleaner output
+        const uniqueMissing = [...new Set(missingEmails.map(m => m.email))];
+        if (uniqueMissing.length <= 5) {
+          for (const emailInfo of missingEmails) {
+            this.validationResult.errors.push(
+              `Courses row ${emailInfo.row}: Lecturer email '${emailInfo.email}' not found in lecturers file. ` +
+              `Ensure this email exists in lecturers.csv with exact same spelling (check for typos).`
+            );
+          }
+        } else {
+          this.validationResult.errors.push(
+            `${missingEmails.length} courses reference lecturer emails not found in lecturers file: ` +
+            `${uniqueMissing.slice(0, 3).join(', ')}... and ${uniqueMissing.length - 3} more. ` +
+            `Please check for typos or add missing lecturers to lecturers.csv.`
+          );
+        }
+      }
+    }
+
+    // Cross-validation: Check student groups in courses exist (supports pipe-separated multiple groups)
     const groupRows = fileContents.get('student-groups');
     if (groupRows && courseRows) {
       const groupNames = new Set(groupRows.map(r => r[0]?.toLowerCase().trim()).filter(Boolean));
       for (let i = 0; i < courseRows.length; i++) {
-        const groupName = courseRows[i][4]?.toLowerCase().trim();
-        if (groupName && !groupNames.has(groupName)) {
-          this.validationResult.warnings.push(`Courses row ${i + 2}: Student group '${groupName}' not found in student-groups file`);
+        const groupNamesStr = courseRows[i][4]?.trim();
+        if (groupNamesStr) {
+          // Split by pipe separator for multiple groups
+          const groupList = groupNamesStr.split('|');
+          for (const groupName of groupList) {
+            const trimmedName = groupName.toLowerCase().trim();
+            if (trimmedName && !groupNames.has(trimmedName)) {
+              this.validationResult.warnings.push(`Courses row ${i + 2}: Student group '${groupName.trim()}' not found in student-groups file`);
+            }
+          }
         }
       }
     }

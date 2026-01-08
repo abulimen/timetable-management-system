@@ -17,7 +17,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Service for managing and retrieving constraint settings.
- * Provides type-safe getters for various settings and caches values for performance.
+ * Provides type-safe getters for various settings and caches values for
+ * performance.
  */
 @Service
 @RequiredArgsConstructor
@@ -25,10 +26,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConstraintSettingsService {
 
     private final ConstraintSettingRepository repository;
-    
+
     // Cache for fast access during solving
     private final Map<String, String> settingsCache = new ConcurrentHashMap<>();
-    
+
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     @PostConstruct
@@ -44,9 +45,7 @@ public class ConstraintSettingsService {
     @Transactional(readOnly = true)
     public void refreshCache() {
         settingsCache.clear();
-        repository.findAll().forEach(s -> 
-            settingsCache.put(s.getSettingKey(), s.getSettingValue())
-        );
+        repository.findAll().forEach(s -> settingsCache.put(s.getSettingKey(), s.getSettingValue()));
     }
 
     // ==================== TIMING SETTINGS ====================
@@ -136,35 +135,50 @@ public class ConstraintSettingsService {
     @Transactional(readOnly = true)
     public ConstraintSetting getSetting(String key) {
         return repository.findBySettingKey(key)
-            .orElseThrow(() -> new IllegalArgumentException("Setting not found: " + key));
+                .orElseThrow(() -> new IllegalArgumentException("Setting not found: " + key));
     }
 
     @Transactional
     public ConstraintSetting updateSetting(String key, String value) {
         ConstraintSetting setting = getSetting(key);
-        
+
         // Validate the value based on data type
         validateValue(setting, value);
-        
+
         setting.setSettingValue(value);
         ConstraintSetting saved = repository.save(setting);
-        
+
         // Refresh cache
         settingsCache.put(key, value);
-        
+
         log.info("Updated setting {} = {}", key, value);
         return saved;
     }
 
     // ==================== HELPER METHODS ====================
 
-    private String getString(String key, String defaultValue) {
+    public String getString(String key, String defaultValue) {
         return settingsCache.getOrDefault(key, defaultValue);
+    }
+
+    /**
+     * Public alias for getString for availability settings.
+     */
+    public String getStringSetting(String key, String defaultValue) {
+        return getString(key, defaultValue);
+    }
+
+    /**
+     * Public alias for getBoolean for availability settings.
+     */
+    public boolean getBooleanSetting(String key, boolean defaultValue) {
+        return getBoolean(key, defaultValue);
     }
 
     public int getInt(String key, int defaultValue) {
         String value = settingsCache.get(key);
-        if (value == null) return defaultValue;
+        if (value == null)
+            return defaultValue;
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
@@ -175,7 +189,8 @@ public class ConstraintSettingsService {
 
     private LocalTime getTime(String key, LocalTime defaultValue) {
         String value = settingsCache.get(key);
-        if (value == null) return defaultValue;
+        if (value == null)
+            return defaultValue;
         try {
             return LocalTime.parse(value, TIME_FORMATTER);
         } catch (Exception e) {
@@ -184,9 +199,10 @@ public class ConstraintSettingsService {
         }
     }
 
-    private boolean getBoolean(String key, boolean defaultValue) {
+    public boolean getBoolean(String key, boolean defaultValue) {
         String value = settingsCache.get(key);
-        if (value == null) return defaultValue;
+        if (value == null)
+            return defaultValue;
         return Boolean.parseBoolean(value);
     }
 

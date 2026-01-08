@@ -6,8 +6,10 @@ import com.university.timetable.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class TimetableService {
 
     private final LessonRepository lessonRepository;
@@ -29,8 +32,8 @@ public class TimetableService {
      */
     public List<TimetableViewDTO> getAllLessons() {
         return lessonRepository.findAll().stream()
-            .map(this::toViewDTO)
-            .collect(Collectors.toList());
+                .map(this::toViewDTO)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -39,11 +42,11 @@ public class TimetableService {
      */
     public List<TimetableViewDTO> getLessonsByStudentGroup(Long studentGroupId) {
         StudentGroup group = studentGroupRepository.findById(studentGroupId)
-            .orElseThrow(() -> new IllegalArgumentException("Student group not found: " + studentGroupId));
-        
+                .orElseThrow(() -> new IllegalArgumentException("Student group not found: " + studentGroupId));
+
         return lessonRepository.findByStudentGroup(group).stream()
-            .map(this::toViewDTO)
-            .collect(Collectors.toList());
+                .map(this::toViewDTO)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -52,11 +55,11 @@ public class TimetableService {
      */
     public List<TimetableViewDTO> getLessonsByLecturer(Long lecturerId) {
         Lecturer lecturer = lecturerRepository.findById(lecturerId)
-            .orElseThrow(() -> new IllegalArgumentException("Lecturer not found: " + lecturerId));
-        
+                .orElseThrow(() -> new IllegalArgumentException("Lecturer not found: " + lecturerId));
+
         return lessonRepository.findByLecturer(lecturer).stream()
-            .map(this::toViewDTO)
-            .collect(Collectors.toList());
+                .map(this::toViewDTO)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -64,11 +67,11 @@ public class TimetableService {
      */
     public List<TimetableViewDTO> getLessonsByRoom(Long roomId) {
         Room room = roomRepository.findById(roomId)
-            .orElseThrow(() -> new IllegalArgumentException("Room not found: " + roomId));
-        
+                .orElseThrow(() -> new IllegalArgumentException("Room not found: " + roomId));
+
         return lessonRepository.findByRoom(room).stream()
-            .map(this::toViewDTO)
-            .collect(Collectors.toList());
+                .map(this::toViewDTO)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -76,7 +79,7 @@ public class TimetableService {
      */
     private TimetableViewDTO toViewDTO(Lesson lesson) {
         TimetableViewDTO dto = new TimetableViewDTO();
-        
+
         dto.setLessonId(lesson.getId());
         dto.setPartNumber(lesson.getPartNumber());
         dto.setDurationHours(lesson.getDurationHours());
@@ -84,41 +87,56 @@ public class TimetableService {
         dto.setOnline(lesson.isOnline());
         // Online lessons are scheduled if they have a timeslot (no room required)
         dto.setScheduled(lesson.getTimeslot() != null && (lesson.isOnline() || lesson.getRoom() != null));
-        
+
         // Course
         if (lesson.getCourse() != null) {
             dto.setCourseCode(lesson.getCourse().getCode());
             dto.setCourseName(lesson.getCourse().getName());
+
+            // Combined class info from course's studentGroups
+            Set<StudentGroup> allGroups = lesson.getCourse().getStudentGroups();
+            if (allGroups != null && allGroups.size() > 1) {
+                dto.setCombined(true);
+                dto.setCombinedGroupNames(allGroups.stream()
+                        .map(StudentGroup::getName)
+                        .sorted()
+                        .collect(java.util.stream.Collectors.toList()));
+                dto.setTotalStudentCount(lesson.getCourse().getTotalStudentCount());
+            } else {
+                dto.setCombined(false);
+                dto.setCombinedGroupNames(java.util.Collections.emptyList());
+                dto.setTotalStudentCount(lesson.getCourse().getTotalStudentCount());
+            }
         }
-        
+
         // Timeslot
         if (lesson.getTimeslot() != null) {
             dto.setDayOfWeek(lesson.getTimeslot().getDayOfWeek());
             dto.setStartTime(lesson.getTimeslot().getStartTime());
             dto.setEndTime(lesson.getEndTime());
         }
-        
+
         // Room
         if (lesson.getRoom() != null) {
             dto.setRoomId(lesson.getRoom().getId());
             dto.setRoomName(lesson.getRoom().getName());
             dto.setRoomCapacity(lesson.getRoom().getCapacity());
         }
-        
+
         // Lecturer
         if (lesson.getLecturer() != null) {
             dto.setLecturerId(lesson.getLecturer().getId());
             dto.setLecturerName(lesson.getLecturer().getName());
         }
-        
-        // Student Group
+
+        // Student Group (primary - for filtering)
         StudentGroup group = lesson.getStudentGroup();
         if (group != null) {
             dto.setStudentGroupId(group.getId());
             dto.setStudentGroupName(group.getName());
             dto.setStudentGroupSize(group.getSize());
         }
-        
+
         return dto;
     }
 }

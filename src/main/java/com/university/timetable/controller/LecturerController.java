@@ -5,12 +5,12 @@ import com.university.timetable.domain.LecturerUnavailability;
 import com.university.timetable.repository.LecturerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -22,6 +22,7 @@ public class LecturerController {
     private final LecturerRepository lecturerRepository;
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public List<LecturerDTO> getAll() {
         return lecturerRepository.findAll().stream()
                 .map(this::toDTO)
@@ -29,6 +30,7 @@ public class LecturerController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<LecturerDTO> getById(@PathVariable Long id) {
         return lecturerRepository.findById(id)
                 .map(l -> ResponseEntity.ok(toDTO(l)))
@@ -36,6 +38,7 @@ public class LecturerController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
     public LecturerDTO create(@RequestBody LecturerCreateDTO dto) {
         Lecturer lecturer = new Lecturer();
         lecturer.setName(dto.name);
@@ -44,6 +47,7 @@ public class LecturerController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
     public ResponseEntity<LecturerDTO> update(@PathVariable Long id, @RequestBody LecturerCreateDTO dto) {
         return lecturerRepository.findById(id)
                 .map(lecturer -> {
@@ -55,6 +59,7 @@ public class LecturerController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         if (!lecturerRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
@@ -64,6 +69,7 @@ public class LecturerController {
     }
 
     @PostMapping("/{id}/unavailability")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
     public ResponseEntity<LecturerDTO> addUnavailability(@PathVariable Long id, @RequestBody UnavailabilityDTO dto) {
         return lecturerRepository.findById(id)
                 .map(lecturer -> {
@@ -79,7 +85,9 @@ public class LecturerController {
     }
 
     @DeleteMapping("/{id}/unavailability/{unavailabilityId}")
-    public ResponseEntity<LecturerDTO> removeUnavailability(@PathVariable Long id, @PathVariable Long unavailabilityId) {
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
+    public ResponseEntity<LecturerDTO> removeUnavailability(@PathVariable Long id,
+            @PathVariable Long unavailabilityId) {
         return lecturerRepository.findById(id)
                 .map(lecturer -> {
                     lecturer.getUnavailabilities().removeIf(u -> u.getId().equals(unavailabilityId));

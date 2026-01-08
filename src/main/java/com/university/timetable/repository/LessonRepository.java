@@ -15,30 +15,30 @@ import java.util.List;
 
 @Repository
 public interface LessonRepository extends JpaRepository<Lesson, Long> {
-    
+
     List<Lesson> findByCourse(Course course);
-    
+
     List<Lesson> findByLecturer(Lecturer lecturer);
-    
+
     List<Lesson> findByRoom(Room room);
-    
+
     List<Lesson> findByTimeslot(Timeslot timeslot);
-    
-    // Find lessons by student group (through course)
-    @Query("SELECT l FROM Lesson l WHERE l.course.studentGroup = :studentGroup")
+
+    // Find lessons by student group (through course's many-to-many studentGroups)
+    @Query("SELECT DISTINCT l FROM Lesson l JOIN l.course.studentGroups sg WHERE sg = :studentGroup")
     List<Lesson> findByStudentGroup(@Param("studentGroup") StudentGroup studentGroup);
-    
+
     // Find lessons that are not pinned
     List<Lesson> findByPinnedFalse();
-    
+
     // Find lessons that have been scheduled (have timeslot and room)
     @Query("SELECT l FROM Lesson l WHERE l.timeslot IS NOT NULL AND l.room IS NOT NULL")
     List<Lesson> findScheduledLessons();
-    
+
     // Find unscheduled lessons
     @Query("SELECT l FROM Lesson l WHERE l.timeslot IS NULL OR l.room IS NULL")
     List<Lesson> findUnscheduledLessons();
-    
+
     // Count lessons for a course
     long countByCourse(Course course);
 }

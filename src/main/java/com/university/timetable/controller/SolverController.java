@@ -7,6 +7,7 @@ import com.university.timetable.service.SolverService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -37,32 +38,32 @@ public class SolverController {
      * If blocking issues are found, solver will NOT start and will return error.
      */
     @PostMapping("/solve")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
     public ResponseEntity<?> startSolving(
             @RequestBody(required = false) SolveRequestDTO request) {
-        
-        String mode = (request != null && request.getMode() != null) 
-            ? request.getMode() 
-            : "FULL_REPLAN";
-        
+
+        String mode = (request != null && request.getMode() != null)
+                ? request.getMode()
+                : "FULL_REPLAN";
+
         log.info("Solve requested with mode: {}. Running feasibility check first...", mode);
-        
+
         // STEP 1: Run feasibility check (this also regenerates timeslots from settings)
         InfeasibilityReport feasibilityReport = infeasibilityChecker.checkFeasibility();
-        
+
         // STEP 2: Check for blocking issues
         if (!feasibilityReport.isFeasible()) {
             log.warn("Solver NOT started - {} blocking issues found", feasibilityReport.getBlockingCount());
             return ResponseEntity.badRequest().body(java.util.Map.of(
-                "error", "FEASIBILITY_FAILED",
-                "message", "Cannot start solver - blocking issues found. Fix the issues and try again.",
-                "blockingCount", feasibilityReport.getBlockingCount(),
-                "issues", feasibilityReport.getIssues()
-            ));
+                    "error", "FEASIBILITY_FAILED",
+                    "message", "Cannot start solver - blocking issues found. Fix the issues and try again.",
+                    "blockingCount", feasibilityReport.getBlockingCount(),
+                    "issues", feasibilityReport.getIssues()));
         }
-        
-        log.info("Feasibility check passed ({} slots, {} warnings). Starting solver...", 
-            feasibilityReport.getTimeslotCount(), feasibilityReport.getWarningCount());
-        
+
+        log.info("Feasibility check passed ({} slots, {} warnings). Starting solver...",
+                feasibilityReport.getTimeslotCount(), feasibilityReport.getWarningCount());
+
         // STEP 3: Start solver
         try {
             SolverStatusDTO status = solverService.startSolving(mode);
@@ -70,16 +71,16 @@ public class SolverController {
         } catch (IllegalStateException e) {
             log.error("Cannot start solver", e);
             return ResponseEntity.badRequest()
-                .body(new SolverStatusDTO(null, "ERROR", e.getMessage()));
+                    .body(new SolverStatusDTO(null, "ERROR", e.getMessage()));
         }
     }
-
 
     /**
      * GET /api/v1/solver/status
      * Response: {"state": "SOLVING", "score": "0hard/-100soft"}
      */
     @GetMapping("/status")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<SolverStatusDTO> getStatus() {
         SolverStatusDTO status = solverService.getStatus();
         return ResponseEntity.ok(status);
@@ -90,6 +91,7 @@ public class SolverController {
      * Action: Early termination of the solver.
      */
     @PostMapping("/terminate")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
     public ResponseEntity<SolverStatusDTO> terminate() {
         log.info("Termination requested");
         SolverStatusDTO status = solverService.terminate();
@@ -102,6 +104,7 @@ public class SolverController {
      * Run this BEFORE solving to catch obvious issues early.
      */
     @GetMapping("/feasibility")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<InfeasibilityReport> checkFeasibility() {
         log.info("Running pre-solve feasibility check");
         InfeasibilityReport report = infeasibilityChecker.checkFeasibility();
@@ -114,10 +117,10 @@ public class SolverController {
      * Run this AFTER solving to understand why score is not 0hard.
      */
     @GetMapping("/analysis")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ScoreAnalysisDTO> getScoreAnalysis() {
         log.info("Analyzing current solution for constraint violations");
         ScoreAnalysisDTO analysis = justificationService.analyzeCurrentSolution();
         return ResponseEntity.ok(analysis);
     }
 }
-

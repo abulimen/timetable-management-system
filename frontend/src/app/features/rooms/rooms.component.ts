@@ -54,6 +54,30 @@ import { ApiService, Room, Zone, Feature } from '../../core/services/api.service
               </select>
             </div>
           </div>
+          
+          <!-- Features Selection -->
+          <div *ngIf="features.length > 0">
+            <label class="label mb-2">Features</label>
+            <div class="flex flex-wrap gap-2">
+              <label *ngFor="let feature of features" 
+                     class="inline-flex items-center px-3 py-2 rounded-lg border cursor-pointer transition-all"
+                     [class.bg-primary-100]="isFeatureSelected(feature.name)"
+                     [class.border-primary-500]="isFeatureSelected(feature.name)"
+                     [class.dark:bg-primary-900]="isFeatureSelected(feature.name)"
+                     [class.border-secondary-300]="!isFeatureSelected(feature.name)"
+                     [class.dark:border-secondary-600]="!isFeatureSelected(feature.name)">
+                <input type="checkbox" 
+                       [checked]="isFeatureSelected(feature.name)"
+                       (change)="toggleFeature(feature.name)"
+                       class="mr-2">
+                <span class="text-sm">{{ feature.name }}</span>
+              </label>
+            </div>
+          </div>
+          <div *ngIf="features.length === 0" class="text-sm text-secondary-500">
+            No features available. <a href="/features" class="text-primary-500 hover:underline">Add features first</a>
+          </div>
+          
           <div class="flex gap-2">
             <button type="submit" class="btn btn-primary">Save</button>
             <button type="button" (click)="cancelEdit()" class="btn btn-secondary">Cancel</button>
@@ -100,9 +124,10 @@ export class RoomsComponent implements OnInit {
 
   rooms: Room[] = [];
   zones: Zone[] = [];
+  features: Feature[] = [];
   showAddForm = false;
   editingRoom: Room | null = null;
-  formData = { name: '', capacity: 50, zoneId: undefined as number | undefined };
+  formData = { name: '', capacity: 50, zoneId: undefined as number | undefined, featureNames: [] as string[] };
   showDeleteAllConfirm = false;
   deleting = false;
   importing = false;
@@ -111,10 +136,25 @@ export class RoomsComponent implements OnInit {
   ngOnInit() {
     this.loadRooms();
     this.loadZones();
+    this.loadFeatures();
   }
 
   loadRooms() { this.api.getRooms().subscribe({ next: (rooms) => this.rooms = rooms }); }
   loadZones() { this.api.getZones().subscribe({ next: (zones) => this.zones = zones }); }
+  loadFeatures() { this.api.getFeatures().subscribe({ next: (features) => this.features = features }); }
+
+  isFeatureSelected(featureName: string): boolean {
+    return this.formData.featureNames.includes(featureName);
+  }
+
+  toggleFeature(featureName: string) {
+    const index = this.formData.featureNames.indexOf(featureName);
+    if (index > -1) {
+      this.formData.featureNames.splice(index, 1);
+    } else {
+      this.formData.featureNames.push(featureName);
+    }
+  }
 
   saveRoom() {
     if (this.editingRoom) {
@@ -130,7 +170,12 @@ export class RoomsComponent implements OnInit {
 
   editRoom(room: Room) {
     this.editingRoom = room;
-    this.formData = { name: room.name, capacity: room.capacity, zoneId: room.zoneId };
+    this.formData = {
+      name: room.name,
+      capacity: room.capacity,
+      zoneId: room.zoneId,
+      featureNames: room.features ? [...room.features] : []
+    };
     this.showAddForm = true;
   }
 
@@ -143,7 +188,7 @@ export class RoomsComponent implements OnInit {
   cancelEdit() {
     this.showAddForm = false;
     this.editingRoom = null;
-    this.formData = { name: '', capacity: 50, zoneId: undefined };
+    this.formData = { name: '', capacity: 50, zoneId: undefined, featureNames: [] };
   }
 
   confirmDeleteAll() { this.showDeleteAllConfirm = true; }
@@ -168,3 +213,4 @@ export class RoomsComponent implements OnInit {
     });
   }
 }
+

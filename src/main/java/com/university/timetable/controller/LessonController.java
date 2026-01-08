@@ -9,6 +9,7 @@ import com.university.timetable.repository.TimeslotRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -33,39 +34,38 @@ public class LessonController {
      * Action: Updates DB, sets is_pinned=true.
      */
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
     public ResponseEntity<?> updateLesson(
             @PathVariable Long id,
             @RequestBody LessonUpdateDTO updateDTO) {
-        
+
         log.info("Updating lesson {}: {}", id, updateDTO);
-        
+
         Lesson lesson = lessonRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Lesson not found: " + id));
-        
+                .orElseThrow(() -> new IllegalArgumentException("Lesson not found: " + id));
+
         // Update timeslot if provided
         if (updateDTO.getAssignedTimeslotId() != null) {
             lesson.setTimeslot(
-                timeslotRepository.findById(updateDTO.getAssignedTimeslotId())
-                    .orElseThrow(() -> new IllegalArgumentException("Timeslot not found"))
-            );
+                    timeslotRepository.findById(updateDTO.getAssignedTimeslotId())
+                            .orElseThrow(() -> new IllegalArgumentException("Timeslot not found")));
         }
-        
+
         // Update room if provided
         if (updateDTO.getAssignedRoomId() != null) {
             lesson.setRoom(
-                roomRepository.findById(updateDTO.getAssignedRoomId())
-                    .orElseThrow(() -> new IllegalArgumentException("Room not found"))
-            );
+                    roomRepository.findById(updateDTO.getAssignedRoomId())
+                            .orElseThrow(() -> new IllegalArgumentException("Room not found")));
         }
-        
+
         // Update pinned status if provided
         if (updateDTO.getPinned() != null) {
             lesson.setPinned(updateDTO.getPinned());
         }
-        
+
         Lesson saved = lessonRepository.save(lesson);
         log.info("Updated lesson: {}", saved);
-        
+
         return ResponseEntity.ok(toDTO(saved));
     }
 
@@ -74,9 +74,10 @@ public class LessonController {
      * Get a single lesson by ID.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<TimetableViewDTO> getLesson(@PathVariable Long id) {
         Lesson lesson = lessonRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Lesson not found: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Lesson not found: " + id));
         return ResponseEntity.ok(toDTO(lesson));
     }
 
@@ -87,7 +88,7 @@ public class LessonController {
         dto.setDurationHours(lesson.getDurationHours());
         dto.setPinned(lesson.isPinned());
         dto.setScheduled(lesson.getTimeslot() != null && lesson.getRoom() != null);
-        
+
         if (lesson.getCourse() != null) {
             dto.setCourseCode(lesson.getCourse().getCode());
             dto.setCourseName(lesson.getCourse().getName());
@@ -111,7 +112,7 @@ public class LessonController {
             dto.setStudentGroupName(lesson.getStudentGroup().getName());
             dto.setStudentGroupSize(lesson.getStudentGroup().getSize());
         }
-        
+
         return dto;
     }
 }
