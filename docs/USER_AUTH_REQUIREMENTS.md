@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary
 
-This document defines the requirements for implementing a **complete and robust user authentication and authorization system** for the Babcock University Timetable Management System (BUTMS). The system will provide secure access control, role-based permissions, and session management to protect sensitive scheduling data.
+This document defines the requirements for implementing a **complete and robust user authentication and authorization system** for the University Timetable Management System (BUTMS). The system will provide secure access control, role-based permissions, and session management to protect sensitive scheduling data.
 
 ---
 

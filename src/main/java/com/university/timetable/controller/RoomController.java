@@ -1,10 +1,12 @@
 package com.university.timetable.controller;
 
+import com.university.timetable.domain.AuditAction;
 import com.university.timetable.domain.Room;
 import com.university.timetable.domain.Feature;
 import com.university.timetable.repository.RoomRepository;
 import com.university.timetable.repository.FeatureRepository;
 import com.university.timetable.repository.ZoneRepository;
+import com.university.timetable.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +25,7 @@ public class RoomController {
     private final RoomRepository roomRepository;
     private final ZoneRepository zoneRepository;
     private final FeatureRepository featureRepository;
+    private final AuditLogService auditLogService;
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
@@ -60,7 +63,12 @@ public class RoomController {
             room.setFeatures(features);
         }
 
-        return ResponseEntity.ok(toDTO(roomRepository.save(room)));
+        Room saved = roomRepository.save(room);
+
+        auditLogService.logAction(AuditAction.CREATE, "Room", saved.getId().toString(),
+                saved.getName(), null, toDTO(saved), "Created room " + saved.getName());
+
+        return ResponseEntity.ok(toDTO(saved));
     }
 
     @PutMapping("/{id}")
@@ -84,7 +92,13 @@ public class RoomController {
                         room.setFeatures(features);
                     }
 
-                    return ResponseEntity.ok(toDTO(roomRepository.save(room)));
+                    RoomDTO previousState = toDTO(room);
+                    Room updated = roomRepository.save(room);
+
+                    auditLogService.logAction(AuditAction.UPDATE, "Room", updated.getId().toString(),
+                            updated.getName(), previousState, toDTO(updated), "Updated room " + updated.getName());
+
+                    return ResponseEntity.ok(toDTO(updated));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -92,11 +106,17 @@ public class RoomController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (!roomRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        roomRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+        return roomRepository.findById(id)
+                .map(room -> {
+                    RoomDTO previousState = toDTO(room);
+                    roomRepository.deleteById(id);
+
+                    auditLogService.logAction(AuditAction.DELETE, "Room", id.toString(),
+                            room.getName(), previousState, null, "Deleted room " + room.getName());
+
+                    return ResponseEntity.noContent().<Void>build();
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     private RoomDTO toDTO(Room room) {

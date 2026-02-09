@@ -1,0 +1,22 @@
+"Year Taken","Course ID","Course Title","Instuctor","Option","Credit Hours","No. GPA","Details"
+2,"BCH 202","General Biochemstry II","FADUNSIN  MOROMOKE","Nursing Group A",2.0,false,BCH 202
+2,"BCH 202","General Biochemstry II","Egbule  Mercy Nwakamaswor","Physiology",2.0,false,BCH 202
+2,"BCH 202","General Biochemstry II","Egbule  Mercy Nwakamaswor","Anatomy",2.0,false,BCH 202
+2,"BCH 202","General Biochemstry II","UKANGWA  Ngozi Angela","BIO-CHEM",2.0,false,BCH 202
+2,"BCH 202","General Biochemstry II","FADUNSIN  MOROMOKE","MED-LAB Direct Entry",2.0,false,BCH 202
+2,"BCH 202","General Biochemstry II","Ogunbiyi Babafemi Tosin","MED-LAB",2.0,false,BCH 202
+2,"BCH 202","General Biochemstry II","UKANGWA  Ngozi Angela","Nursing Direct Entry",2.0,false,BCH 202
+2,"BCH 202","General Biochemstry II","UKANGWA  Ngozi Angela","Nursing Group B",2.0,false,BCH 202
+2,"BCHM202","Foundations of Biochemistry II","Egbule  Mercy Nwakamaswor","Physiology",3.0,false,BCHM202
+2,"BU-BCH 218","Basic Clinical Biochemistry","UKANGWA  Ngozi Angela","BIO-CHEM",3.0,false,BU-BCH 218
+3,"BCH 302","Metabolism of Carbohydrates","Olajide   Laide Omoyiola","BIO-CHEM",2.0,false,BCH 302
+3,"BCH 304","Metabolism of Amino Acids and Proteins","Egbule  Mercy Nwakamaswor","BIO-CHEM",2.0,false,BCH 304
+3,"BCH 306","Analytical Methods in Biochemistry","Ogunbiyi Babafemi Tosin","BIO-CHEM",3.0,false,BCH 306
+3,"BCH 308","Bioenergetics","Ogunbiyi Babafemi Tosin","BIO-CHEM",1.0,false,BCH 308
+3,"BCH 350","Industrial Attachment (SIWES)","Ogunbiyi Babafemi Tosin","BIO-CHEM",6.0,false,BCH 350
+4,"BCHM418","Fundamentals of Molecular Biology and Biotechnology","Olajide   Laide Omoyiola","BIO-CHEM",3.0,false,BCHM418
+4,"BCHM426","Basics of Plant Biochemistry","Ogunbiyi Babafemi Tosin","BIO-CHEM",3.0,false,BCHM426
+4,"BCHM490","Research Project","OGBONNAYA  Faith Chidiebube","BIO-CHEM",6.0,false,BCHM490
+200,"BU-BCH 224","Functional Biochemistry","FADUNSIN  MOROMOKE","MED-LAB",3.0,false,BU-BCH 224
+200,"BU-BCH 224","Functional Biochemistry","FADUNSIN  MOROMOKE","BIO-CHEM",3.0,false,BU-BCH 224
+

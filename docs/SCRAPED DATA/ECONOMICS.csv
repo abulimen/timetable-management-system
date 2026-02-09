@@ -1,0 +1,52 @@
+"Year Taken","Course ID","Course Title","Instuctor","Option","Credit Hours","No. GPA","Details"
+1,"BU-ECO 128","Food Security and Economics of Agricultural Development","ADELEKE  ADEDAMOLA BAMIDELE","ECONS",2.0,false,BU-ECO 128
+1,"BU-ECO 128","Food Security and Economics of Agricultural Development","ADELEKE  ADEDAMOLA BAMIDELE","EconEdu",2.0,false,BU-ECO 128
+1,"BU-ECO 148","Economics and the Political System","Adesuyi  Oluwabukola Omobola","EDU ECONS",2.0,false,BU-ECO 148
+1,"BU-ECO 148","Economics and the Political System","Adesuyi  Oluwabukola Omobola","ECONS",2.0,false,BU-ECO 148
+1,"BU-ECO 162","Principles of International Economics","OKWU  Andy Titus","EDU ECONS",2.0,false,BU-ECO 162
+1,"BU-ECO 162","Principles of International Economics","OKWU  Andy Titus","ECONS",2.0,false,BU-ECO 162
+1,"BU-ECO 174","Introduction to Financial Economics","Aroyewun  Bola Olatubosun","EDU ECONS",2.0,false,BU-ECO 174
+1,"BU-ECO 174","Introduction to Financial Economics","Aroyewun  Bola Olatubosun","ECONS",2.0,false,BU-ECO 174
+1,"ECO 102","Principles of Economics ll","ADELEKE  ADEDAMOLA BAMIDELE","BUSAD",2.0,false,ECO 102
+1,"ECO 102","Principles of Economics ll","Adesuyi  Oluwabukola Omobola","EDU ECONS",2.0,false,ECO 102
+1,"ECO 102","Principles of Economics ll","Adesuyi  Oluwabukola Omobola","ECONS",2.0,false,ECO 102
+1,"ECO 102","Principles of Economics ll","ADELEKE  ADEDAMOLA BAMIDELE","MKT",2.0,false,ECO 102
+1,"ECO 102","Principles of Economics ll","OSENI  ISIAQ","ACCT A",2.0,false,ECO 102
+1,"ECO 102","Principles of Economics ll","Oluwalaiye  Babatunde","Finance",2.0,false,ECO 102
+1,"ECO 102","Principles of Economics ll","OSENI  ISIAQ","ACCT B",2.0,false,ECO 102
+1,"ECO 104","Introductory Mathematics ll","Binuyo  Babatunde Oloyede","ECONS",2.0,false,ECO 104
+1,"ECO 104","Introductory Mathematics ll","Binuyo  Babatunde Oloyede","EconEdu",2.0,false,ECO 104
+2,"ACC 202","Financial Accounting II","Alu  Chituru Nkechinyere Aseoluwa","ACCT A",3.0,false,ACC 202
+2,"ACC 202","Financial Accounting II","Olurin  Oluwatoyosi Tolulope","ACCT B",3.0,false,ACC 202
+2,"ACC 202","Financial Accounting II","OLALERE  MAYOWA DAVID","ECONS",3.0,false,ACC 202
+2,"BU-ECO 236","Elements of Econometrics","Musa  Dasauki Caleb","ECONS",2.0,false,BU-ECO 236
+2,"BU-ECO 242","Development Economics","Lawal  Esther Omotola","ECONS",2.0,false,BU-ECO 242
+2,"BU-ECO 242","Development Economics","UWANNAH  Ngozi","EDU ECONS",2.0,false,BU-ECO 242
+2,"ECO 202","Introduction to Microconomics II","Lawal  Nurudeen Abiodun","EDU ECONS",2.0,false,ECO 202
+2,"ECO 202","Introduction to Microconomics II","Lawal  Esther Omotola","ECONS",2.0,false,ECO 202
+2,"ECO 202","Introduction to Microconomics II","Lawal  Esther Omotola","Finance",2.0,false,ECO 202
+2,"ECO 204","Intro to Macroeconomics II","Eddy-Ewoh Uduakobong","ECONS",2.0,false,ECO 204
+2,"ECO 204","Intro to Macroeconomics II","Lawal  Esther Omotola","Finance",2.0,false,ECO 204
+2,"ECO 204","Intro to Macroeconomics II","Eddy-Ewoh Uduakobong","EDU ECONS",2.0,false,ECO 204
+2,"ECO 206","Statistics for Economists","Okedina  Iyabo Mary","ECONS",2.0,false,ECO 206
+2,"ECO 206","Statistics for Economists","Okedina  Iyabo Mary","EDU ECONS",2.0,false,ECO 206
+3,"BU-ECO 332","Health Economics","Adesuyi  Oluwabukola Omobola","EDU ECONS",2.0,false,BU-ECO 332
+3,"BU-ECO 332","Health Economics","Adesuyi  Oluwabukola Omobola","ECONS",2.0,false,BU-ECO 332
+3,"ECO 302","Intermediate Microeconomics ll","Oyedele ","ECONS",2.0,false,ECO 302
+3,"ECO 302","Intermediate Microeconomics ll","UWANNAH  Ngozi","EDU ECONS",2.0,false,ECO 302
+3,"ECO 304","	Intermediate Macroeconomics ll","Osundina  Olawumi Abeni","ECONS",2.0,false,ECO 304
+3,"ECO 304","	Intermediate Macroeconomics ll","Osundina  Olawumi Abeni","EDU ECONS",2.0,false,ECO 304
+3,"ECO 306","Introductory Econometrics","UWANNAH  Ngozi","EDU ECONS",3.0,false,ECO 306
+3,"ECO 306","Introductory Econometrics","Musa  Dasauki Caleb","ECONS",3.0,false,ECO 306
+3,"ECO 310","	Public Sector Economics","Aroyewun  Bola Olatubosun","ECONS",2.0,false,ECO 310
+3,"ECO 310","	Public Sector Economics","Aroyewun  Bola Olatubosun","EDU ECONS",2.0,false,ECO 310
+4,"ECON402","Advance Macro-Economics","OKWU  Andy Titus","EconEdu",3.0,false,ECON402
+4,"ECON402","Advance Macro-Economics","OKWU  Andy Titus","ECONS",3.0,false,ECON402
+4,"ECON414","Economic Planning II","Onakoya Adegbemi Babatunde","ECONS",3.0,false,ECON414
+4,"ECON442","Problems and Policies of Development","Lawal  Esther Omotola","ECONS",3.0,false,ECON442
+4,"ECON460","Petroleum Economics","Obiakor  Rowland Tochukwu","EconEdu",3.0,false,ECON460
+4,"ECON460","Petroleum Economics","Obiakor  Rowland Tochukwu","ECONS",3.0,false,ECON460
+4,"ECON462","Labour Economics and Industrial Relations","Oluwalaiye  Babatunde","EconEdu",3.0,false,ECON462
+4,"ECON462","Labour Economics and Industrial Relations","Oluwalaiye  Babatunde","ECONS",3.0,false,ECON462
+4,"ECON490","Research Project","Lawal  Esther Omotola","ECONS",6.0,false,ECON490
+

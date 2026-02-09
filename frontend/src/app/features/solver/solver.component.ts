@@ -1,6 +1,14 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ApiService, SolverStatus, SolverAnalysis, FeasibilityCheck } from '../../core/services/api.service';
+import {
+  ApiService,
+  SolverStatus,
+  SolverAnalysis,
+  FeasibilityCheck,
+  CourseFeasibilityDiagnostics,
+  FeatureScarcityDiagnostics,
+  LecturerLoadDiagnostics
+} from '../../core/services/api.service';
 
 @Component({
   selector: 'app-solver',
@@ -27,7 +35,20 @@ import { ApiService, SolverStatus, SolverAnalysis, FeasibilityCheck } from '../.
               <span class="text-lg font-medium">{{ status?.state || 'Unknown' }}</span>
               <span *ngIf="isSolving" class="text-sm text-secondary-500">(polling every 3s)</span>
             </div>
-            <p class="text-secondary-500 mt-1">Score: {{ status?.score || 'N/A' }}</p>
+            
+            <!-- Standard Score Display -->
+            <p *ngIf="status?.state !== 'ERROR'" class="text-secondary-500 mt-1">Score: {{ status?.score || 'N/A' }}</p>
+            
+            <!-- Error Alert -->
+            <div *ngIf="status?.state === 'ERROR'" class="mt-4 p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-200 rounded-lg flex items-start gap-3 max-w-xl">
+              <svg class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div>
+                <h3 class="font-bold">Solver Error</h3>
+                <p class="text-sm mt-1">{{ status?.score }}</p>
+              </div>
+            </div>
           </div>
           <div class="flex gap-3">
             <button 
@@ -54,6 +75,53 @@ import { ApiService, SolverStatus, SolverAnalysis, FeasibilityCheck } from '../.
         <div class="flex gap-4">
           <button (click)="checkFeasibility()" class="btn btn-secondary">Check Feasibility</button>
           <button (click)="loadAnalysis()" class="btn btn-secondary">Load Analysis</button>
+          <button (click)="loadDiagnostics()" class="btn btn-secondary">Load Diagnostics</button>
+        </div>
+      </div>
+
+      <!-- Cross-Entity Diagnostics -->
+      <div *ngIf="courseDiagnostics || featureDiagnostics || lecturerDiagnostics" class="card p-6">
+        <h2 class="text-lg font-semibold mb-4">Cross-Entity Diagnostics</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="p-4 bg-secondary-100 dark:bg-secondary-700 rounded-lg">
+            <p class="text-sm text-secondary-500">Course Feasibility</p>
+            <p class="text-xl font-bold" [class.text-red-600]="courseDiagnostics && !courseDiagnostics.feasible">
+              {{ courseDiagnostics ? (courseDiagnostics.feasible ? 'Feasible' : 'Blocked') : 'N/A' }}
+            </p>
+            <p *ngIf="courseDiagnostics" class="text-xs text-secondary-500 mt-1">
+              {{ courseDiagnostics.blockingCount }} blocking / {{ courseDiagnostics.warningCount }} warnings
+            </p>
+          </div>
+          <div class="p-4 bg-secondary-100 dark:bg-secondary-700 rounded-lg">
+            <p class="text-sm text-secondary-500">Feature Scarcity</p>
+            <p class="text-xl font-bold">{{ featureDiagnostics?.criticalCount || 0 }} critical</p>
+            <p *ngIf="featureDiagnostics" class="text-xs text-secondary-500 mt-1">
+              {{ featureDiagnostics.highCount }} high risk
+            </p>
+          </div>
+          <div class="p-4 bg-secondary-100 dark:bg-secondary-700 rounded-lg">
+            <p class="text-sm text-secondary-500">Lecturer Load</p>
+            <p class="text-xl font-bold">{{ lecturerDiagnostics?.criticalCount || 0 }} critical</p>
+            <p *ngIf="lecturerDiagnostics" class="text-xs text-secondary-500 mt-1">
+              {{ lecturerDiagnostics.highCount }} high risk
+            </p>
+          </div>
+        </div>
+
+        <div *ngIf="featureDiagnostics?.items?.length" class="mb-5">
+          <h3 class="font-medium mb-2">Top Feature Risks</h3>
+          <div *ngFor="let item of (featureDiagnostics?.items || []).slice(0, 5)" class="p-3 mb-2 rounded-lg bg-secondary-100 dark:bg-secondary-700">
+            <p class="font-medium">{{ item.name }} <span class="text-xs ml-2">({{ item.risk }})</span></p>
+            <p class="text-xs text-secondary-500">Demand {{ item.demandCount }} / Supply {{ item.supplyCount }} / Scarcity {{ item.scarcityRatio ?? 'INF' }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="lecturerDiagnostics?.items?.length">
+          <h3 class="font-medium mb-2">Top Lecturer Load Risks</h3>
+          <div *ngFor="let item of (lecturerDiagnostics?.items || []).slice(0, 5)" class="p-3 mb-2 rounded-lg bg-secondary-100 dark:bg-secondary-700">
+            <p class="font-medium">{{ item.name }} <span class="text-xs ml-2">({{ item.risk }})</span></p>
+            <p class="text-xs text-secondary-500">Assigned {{ item.assignedHours }}h / Available {{ item.availableHours }}h / Ratio {{ (item.loadRatio * 100).toFixed(0) }}%</p>
+          </div>
         </div>
       </div>
 
@@ -111,6 +179,9 @@ export class SolverComponent implements OnInit, OnDestroy {
   status: SolverStatus | null = null;
   analysis: SolverAnalysis | null = null;
   feasibility: FeasibilityCheck | null = null;
+  courseDiagnostics: CourseFeasibilityDiagnostics | null = null;
+  featureDiagnostics: FeatureScarcityDiagnostics | null = null;
+  lecturerDiagnostics: LecturerLoadDiagnostics | null = null;
   pollInterval: any = null;
 
   get isSolving() { return this.status?.state === 'SOLVING_ACTIVE' || this.status?.state === 'SOLVING'; }
@@ -184,7 +255,9 @@ export class SolverComponent implements OnInit, OnDestroy {
           console.error('Solver blocked by feasibility issues:', err.error.issues);
         } else {
           console.error('Failed to start solver:', err);
-          this.status = { jobId: '', state: 'ERROR', score: err.error?.message || 'Failed to start' };
+          // Backend returns error message in the 'score' field for SolverStatusDTO
+          const errorMsg = err.error?.score || err.error?.message || 'Failed to start';
+          this.status = { jobId: '', state: 'ERROR', score: errorMsg };
         }
       }
     });
@@ -207,5 +280,11 @@ export class SolverComponent implements OnInit, OnDestroy {
 
   loadAnalysis() {
     this.api.getSolverAnalysis().subscribe({ next: (a) => this.analysis = a });
+  }
+
+  loadDiagnostics() {
+    this.api.getCourseFeasibilityDiagnostics().subscribe({ next: (d) => this.courseDiagnostics = d });
+    this.api.getFeatureScarcityDiagnostics().subscribe({ next: (d) => this.featureDiagnostics = d });
+    this.api.getLecturerLoadDiagnostics().subscribe({ next: (d) => this.lecturerDiagnostics = d });
   }
 }

@@ -1,0 +1,33 @@
+"Year Taken","Course ID","Course Title","Instuctor","Option","Credit Hours","No. GPA","Details"
+2,"GET 206","Fundamentals of Thermodynamics","ADEMOKOYA  Shade Olubunmi","Electrical and Electronic Engineering",3.0,false,GET 206
+2,"GET 206","Fundamentals of Thermodynamics","AKANDE  ITOPA","Civil Engineering",3.0,false,GET 206
+2,"GET 206","Fundamentals of Thermodynamics","AKANDE  ITOPA","Mechanical Engineering",3.0,false,GET 206
+3,"CEE 302","Strength of Structural Materials","ADELOWO  TOFUNMI CALEB","Civil Engineering",2.0,false,CEE 302
+3,"CEE 306","Design of Structures I","OYENUGA   VICTOR O","Civil Engineering",2.0,false,CEE 306
+3,"CEE 308","Engineering Survey and Photogrammetry I","ABIODUN  OLUDAYO E","Civil Engineering",2.0,false,CEE 308
+3,"GET 302","Engineering Mathematics IV","AKINDELE  PETER O.","Civil Engineering",3.0,false,GET 302
+3,"GET 302","Engineering Mathematics IV","AKINDELE  PETER O.","Mechanical Engineering",3.0,false,GET 302
+3,"GET 302","Engineering Mathematics IV","AKINDELE  PETER O.","Electrical and Electronic Engineering",3.0,false,GET 302
+3,"GET 302","Engineering Mathematics IV","AKINDELE  PETER O.","Computer Engineering",3.0,false,GET 302
+3,"GET 302","Engineering Mathematics IV","AKINDELE  PETER O.","Computer Engn Grp 2",3.0,false,GET 302
+3,"GET 304","Engineering Communication, Technical Writing and Presentation","ADEMOKOYA  Shade Olubunmi","Mechanical Engineering",3.0,false,GET 304
+3,"GET 304","Engineering Communication, Technical Writing and Presentation","Omotosho  Olawale J.","Electrical and Electronic Engineering",3.0,false,GET 304
+3,"GET 304","Engineering Communication, Technical Writing and Presentation","ADELOWO  TOFUNMI CALEB","Civil Engineering",3.0,false,GET 304
+3,"GET 304","Engineering Communication, Technical Writing and Presentation","Adeniran  Ezekiel","Computer Engineering",3.0,false,GET 304
+3,"GET 304","Engineering Communication, Technical Writing and Presentation","Adeniran  Ezekiel","Computer Engn Grp 2",3.0,false,GET 304
+3,"GET 306","Renewable Energy System and Technology","Adeniran  Ezekiel","Computer Engineering",3.0,false,GET 306
+3,"GET 306","Renewable Energy System and Technology","ADEMOKOYA  Shade Olubunmi","Computer Engn Grp 2",3.0,false,GET 306
+3,"GET 306","Renewable Energy System and Technology","Adeniran  Ezekiel","Electrical and Electronic Engineering",3.0,false,GET 306
+3,"GET 306","Renewable Energy System and Technology","ADEMOKOYA  Shade Olubunmi","Civil Engineering",3.0,false,GET 306
+3,"GET 306","Renewable Energy System and Technology","Adeniran  Ezekiel","Mechanical Engineering",3.0,false,GET 306
+3,"GET 306","Renewable Energy System and Technology","ADEMOKOYA  Shade Olubunmi","Mechanical Engineering",3.0,false,GET 306
+3,"GET 306","Renewable Energy System and Technology","Adeniran  Ezekiel","Civil Engineering",3.0,false,GET 306
+3,"GET 390","SIWES II","ADEMOKOYA  Shade Olubunmi","Mechanical Engineering",4.0,false,GET 390
+3,"GET 390","SIWES II","Omotosho  Olawale J.","Electrical and Electronic Engineering",4.0,false,GET 390
+3,"GET 390","SIWES II","ADELOWO  TOFUNMI CALEB","Civil Engineering",4.0,false,GET 390
+3,"GET 390","SIWES II","ARINOLA   IBUKUNOLUWA O","Computer Engineering",4.0,false,GET 390
+3,"PHY 104","General Physics IV","Adenika  Charles","Electrical and Electronic Engineering",2.0,false,PHY 104
+3,"PHY 104","General Physics IV","Akintunde  Samuel O","Computer Engineering",2.0,false,PHY 104
+3,"PHY 104","General Physics IV","Adenika  Charles","Mechanical Engineering",2.0,false,PHY 104
+3,"PHY 104","General Physics IV","Adenika  Charles","Civil Engineering",2.0,false,PHY 104
+

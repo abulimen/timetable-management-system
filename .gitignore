@@ -65,3 +65,9 @@ temp/
 
 # Ignore backup folder
 backups/
+
+# YoYo AI version control directory
+.yoyo/
+
+# YoYo AI version control directory
+.yoyo/

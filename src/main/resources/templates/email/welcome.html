@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to {{systemName}}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        h1 {
+            color: #1f2937;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .greeting {
+            font-size: 18px;
+            color: #374151;
+            margin-bottom: 20px;
+        }
+        .credentials-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 25px;
+            margin: 25px 0;
+            color: white;
+        }
+        .credentials-box h3 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .credential-item {
+            display: flex;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+        .credential-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            opacity: 0.8;
+            width: 100px;
+        }
+        .credential-value {
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 12px;
+            border-radius: 4px;
+            flex: 1;
+        }
+        .warning {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .warning-icon {
+            font-size: 18px;
+            margin-right: 8px;
+        }
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 12px;
+        }
+        .help-text {
+            color: #6b7280;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🎓 {{systemName}}</div>
+            <div class="subtitle">Timetable Management System</div>
+        </div>
+
+        <h1>Welcome aboard!</h1>
+        
+        <p class="greeting">Hello {{firstName}},</p>
+        
+        <p>Your account has been created on <strong>{{systemName}}</strong>. You can now access the timetable management system using the credentials below.</p>
+
+        <div class="credentials-box">
+            <h3>🔐 Your Login Credentials</h3>
+            <div class="credential-item">
+                <span class="credential-label">Email:</span>
+                <span class="credential-value">{{email}}</span>
+            </div>
+            <div class="credential-item">
+                <span class="credential-label">Password:</span>
+                <span class="credential-value">{{temporaryPassword}}</span>
+            </div>
+        </div>
+
+        <div class="warning">
+            <span class="warning-icon">⚠️</span>
+            <strong>Important:</strong> For security reasons, you will be required to change your password upon first login.
+        </div>
+
+        <center>
+            <a href="{{loginUrl}}" class="btn">Login to Your Account →</a>
+        </center>
+
+        <p class="help-text">
+            If you have any questions or need assistance, please contact your system administrator.
+        </p>
+
+        <div class="footer">
+            <p>This is an automated message from {{systemName}}.</p>
+            <p>Please do not reply to this email.</p>
+            <p>© {{year}} University. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

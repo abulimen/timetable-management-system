@@ -27,6 +27,40 @@ import { ApiService, Setting } from '../../core/services/api.service';
         </div>
       </div>
 
+      <!-- Unavailability System Controls -->
+      <div class="card p-6 border-2 border-purple-500/50 bg-purple-500/5">
+        <h2 class="text-lg font-bold text-purple-600 mb-4">🚫 Unavailability System</h2>
+        
+        <div class="space-y-4">
+          <div class="flex items-center justify-between p-4 bg-purple-500/10 rounded-lg">
+            <div>
+              <h3 class="font-semibold">System Enabled</h3>
+              <p class="text-sm text-secondary-500">When OFF, lecturers don't see the unavailability feature and solver ignores all unavailability records.</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" [checked]="unavailabilitySettings.systemEnabled" (change)="toggleSystemEnabled()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="flex items-center justify-between p-4 bg-purple-500/10 rounded-lg" [class.opacity-50]="!unavailabilitySettings.systemEnabled">
+            <div>
+              <h3 class="font-semibold">Requests Open</h3>
+              <p class="text-sm text-secondary-500">When ON, lecturers can submit unavailability requests. When OFF, no new requests can be created.</p>
+              <p *ngIf="unavailabilitySettings.requestsOpen && unavailabilitySettings.systemEnabled" class="text-xs text-orange-500 mt-1">⚠️ Solver cannot run while requests are open!</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" [checked]="unavailabilitySettings.requestsOpen" (change)="toggleRequestsOpen()" [disabled]="!unavailabilitySettings.systemEnabled">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div *ngIf="unavailabilityMessage" class="mt-4 p-3 rounded-lg" [ngClass]="{'bg-green-500/20': unavailabilitySuccess, 'bg-red-500/20': !unavailabilitySuccess}">
+          {{ unavailabilityMessage }}
+        </div>
+      </div>
+
       <div class="card p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30">
         <div class="flex items-center justify-between">
           <div>
@@ -115,7 +149,15 @@ export class SettingsComponent implements OnInit {
   wipeMessage = '';
   wipeSuccess = false;
 
-  ngOnInit() { this.loadSettings(); }
+  // Unavailability system
+  unavailabilitySettings = { systemEnabled: false, requestsOpen: false };
+  unavailabilityMessage = '';
+  unavailabilitySuccess = false;
+
+  ngOnInit() {
+    this.loadSettings();
+    this.loadUnavailabilitySettings();
+  }
 
   loadSettings() {
     this.api.getSettings().subscribe({
@@ -124,6 +166,41 @@ export class SettingsComponent implements OnInit {
         this.categories = [...new Set(s.map(st => st.category))];
       }
     });
+  }
+
+  loadUnavailabilitySettings() {
+    this.http.get<any>('http://localhost:8080/api/v1/availability-requests/settings').subscribe({
+      next: (data) => this.unavailabilitySettings = data,
+      error: () => console.error('Failed to load unavailability settings')
+    });
+  }
+
+  toggleSystemEnabled() {
+    const newValue = !this.unavailabilitySettings.systemEnabled;
+    this.http.post<any>('http://localhost:8080/api/v1/availability-requests/settings', { systemEnabled: newValue }).subscribe({
+      next: (data) => {
+        this.unavailabilitySettings = data;
+        this.showUnavailabilityMessage(`System ${newValue ? 'enabled' : 'disabled'} successfully`, true);
+      },
+      error: () => this.showUnavailabilityMessage('Failed to update setting', false)
+    });
+  }
+
+  toggleRequestsOpen() {
+    const newValue = !this.unavailabilitySettings.requestsOpen;
+    this.http.post<any>('http://localhost:8080/api/v1/availability-requests/settings', { requestsOpen: newValue }).subscribe({
+      next: (data) => {
+        this.unavailabilitySettings = data;
+        this.showUnavailabilityMessage(`Requests ${newValue ? 'opened' : 'closed'} successfully`, true);
+      },
+      error: () => this.showUnavailabilityMessage('Failed to update setting', false)
+    });
+  }
+
+  private showUnavailabilityMessage(msg: string, success: boolean) {
+    this.unavailabilityMessage = msg;
+    this.unavailabilitySuccess = success;
+    setTimeout(() => this.unavailabilityMessage = '', 3000);
   }
 
   getSettingsByCategory(category: string): Setting[] {

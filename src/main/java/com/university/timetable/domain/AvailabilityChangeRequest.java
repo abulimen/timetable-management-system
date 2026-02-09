@@ -146,12 +146,11 @@ public class AvailabilityChangeRequest {
     // ==================== Enums ====================
 
     /**
-     * The availability status being requested.
+     * The unavailability status - only UNAVAILABLE is used.
+     * Kept as enum for potential future extensibility.
      */
     public enum AvailabilityStatus {
-        AVAILABLE,
-        UNAVAILABLE,
-        PREFERRED
+        UNAVAILABLE
     }
 
     /**

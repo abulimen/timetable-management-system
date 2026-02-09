@@ -1,0 +1,23 @@
+"Year Taken","Course ID","Course Title","Instuctor","Option","Credit Hours","No. GPA","Details"
+1,"BU-FIN 102","Introduction to Money and Banking","Ogbebor  Peter Ifeanyi","Finance",2.0,false,BU-FIN 102
+1,"BU-FIN 104","Introduction to Financial Technology","Ogbebor  Peter Ifeanyi","Finance",2.0,false,BU-FIN 104
+1,"BU-FIN 206","Financial Statistics","Akande  Comfort Omowunmi","Finance",2.0,false,BU-FIN 206
+2,"BU-FIN 208","Financial Investment Regulations","Alalade  Yimka","Finance",2.0,false,BU-FIN 208
+2,"FIN 202","Principle of Insurance","OGBOI  CHARLES CHARLES","Finance",2.0,false,FIN 202
+2,"FIN 204","Quantitative Finance","AKINTOLA  Francis Abolade","Finance",2.0,false,FIN 204
+3,"BU-FIN 302","Mortgage and Pensions Management","OGBOI  CHARLES CHARLES","Finance",2.0,false,BU-FIN 302
+3,"BU-FIN 306","Comparative Financial Systems","Ogbebor  Peter Ifeanyi","Finance",2.0,false,BU-FIN 306
+3,"BU-FIN 312","Financial Information Systems","Ogbebor  Peter Ifeanyi","Finance",2.0,false,BU-FIN 312
+3,"FIN 304","Development Finance","Omosebi  Ruth Tolulope","Finance",2.0,false,FIN 304
+3,"FIN 308","Bank Lending and Credit Administration","Ogbebor  Peter Ifeanyi","Finance",3.0,false,FIN 308
+3,"FIN 316","Practice of Deposit Insurance","AKINTOLA  Francis Abolade","Finance",3.0,false,FIN 316
+4,"FNCE428","Corporate Finance","OWUALAH  Owualah Owualah","Finance",3.0,false,FNCE428
+4,"FNCE432","International Banking and Finance","OGBOI  CHARLES CHARLES","Finance",3.0,false,FNCE432
+4,"FNCE462","Comparative Banking","Alalade  Yimka","Finance",3.0,false,FNCE462
+4,"FNCE476","Managerial Finance","UWANNAH  Ngozi","BusEdu",3.0,false,FNCE476
+4,"FNCE476","Managerial Finance","Alalade  Yimka","BUSAD",3.0,false,FNCE476
+4,"FNCE496","Risk Management for Financial Services","Ogbebor  Peter Ifeanyi","Finance",3.0,false,FNCE496
+4,"FNCE499","Research Project","Ogbebor  Peter Ifeanyi","Finance",6.0,false,FNCE499
+200,"FIN 210","Banking  Methods and Process","Omosebi  Ruth Tolulope","Finance",3.0,false,FIN 210
+200,"FIN 216","Fundamentals of Deposot Insurance","OWUALAH  Owualah Owualah","Finance",2.0,false,FIN 216
+

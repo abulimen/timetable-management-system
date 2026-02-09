@@ -1,6 +1,6 @@
 # Developer Handoff Document
 
-**Babcock University Timetable Management System (BUTMS)**
+**University Timetable Management System (BUTMS)**
 
 **Version:** 1.2.0  
 **Handoff Date:** 2026-01-08  
@@ -10,7 +10,7 @@
 
 ## 1. Executive Summary
 
-The Babcock University Timetable Management System (BUTMS) is an enterprise-grade automated timetable scheduling system using **OptaPlanner** constraint solver. The system automatically schedules university lessons into timeslots and rooms while respecting a comprehensive set of hard and soft constraints.
+The University Timetable Management System (BUTMS) is an enterprise-grade automated timetable scheduling system using **OptaPlanner** constraint solver. The system automatically schedules university lessons into timeslots and rooms while respecting a comprehensive set of hard and soft constraints.
 
 ### What This System Does
 

@@ -21,7 +21,7 @@ import java.util.Map;
  * Authentication controller handling login, logout, and token refresh.
  */
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @Slf4j
 public class AuthController {

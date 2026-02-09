@@ -1,7 +1,11 @@
 package com.university.timetable.controller;
 
+import com.university.timetable.domain.AuditAction;
 import com.university.timetable.domain.StudentGroup;
 import com.university.timetable.repository.StudentGroupRepository;
+import com.university.timetable.service.AuditLogService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +21,10 @@ import java.util.stream.Collectors;
 public class StudentGroupController {
 
     private final StudentGroupRepository studentGroupRepository;
+    private final AuditLogService auditLogService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
@@ -38,7 +46,10 @@ public class StudentGroupController {
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
     public StudentGroupDTO create(@RequestBody StudentGroupCreateDTO dto) {
         StudentGroup group = new StudentGroup();
-        group.setName(dto.name);
+        group.setBaseName(dto.baseName);
+        group.setLevel(dto.level);
+        group.setGroupNotation(dto.groupNotation);
+        group.setName(StudentGroup.computeName(dto.baseName, dto.level, dto.groupNotation));
         group.setSize(dto.size != null ? dto.size : 0);
 
         if (dto.parentGroupId != null) {
@@ -52,6 +63,9 @@ public class StudentGroupController {
             recalculateParentSize(saved.getParentGroup());
         }
 
+        auditLogService.logAction(AuditAction.CREATE, "StudentGroup", saved.getId().toString(),
+                saved.getName(), null, toDTO(saved), "Created student group " + saved.getName());
+
         return toDTO(saved);
     }
 
@@ -60,9 +74,13 @@ public class StudentGroupController {
     public ResponseEntity<StudentGroupDTO> update(@PathVariable Long id, @RequestBody StudentGroupCreateDTO dto) {
         return studentGroupRepository.findById(id)
                 .map(group -> {
+                    StudentGroupDTO previousState = toDTO(group);
                     StudentGroup oldParent = group.getParentGroup();
 
-                    group.setName(dto.name);
+                    group.setBaseName(dto.baseName);
+                    group.setLevel(dto.level);
+                    group.setGroupNotation(dto.groupNotation);
+                    group.setName(StudentGroup.computeName(dto.baseName, dto.level, dto.groupNotation));
                     group.setSize(dto.size != null ? dto.size : 0);
 
                     if (dto.parentGroupId != null) {
@@ -82,6 +100,9 @@ public class StudentGroupController {
                         recalculateParentSize(saved.getParentGroup());
                     }
 
+                    auditLogService.logAction(AuditAction.UPDATE, "StudentGroup", saved.getId().toString(),
+                            saved.getName(), previousState, toDTO(saved), "Updated student group " + saved.getName());
+
                     return ResponseEntity.ok(toDTO(saved));
                 })
                 .orElse(ResponseEntity.notFound().build());
@@ -92,6 +113,7 @@ public class StudentGroupController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         return studentGroupRepository.findById(id)
                 .map(group -> {
+                    StudentGroupDTO previousState = toDTO(group);
                     StudentGroup parent = group.getParentGroup();
                     studentGroupRepository.deleteById(id);
 
@@ -99,6 +121,9 @@ public class StudentGroupController {
                         studentGroupRepository.findById(parent.getId())
                                 .ifPresent(this::recalculateParentSize);
                     }
+
+                    auditLogService.logAction(AuditAction.DELETE, "StudentGroup", id.toString(),
+                            group.getName(), previousState, null, "Deleted student group " + group.getName());
 
                     return ResponseEntity.noContent().<Void>build();
                 })
@@ -116,9 +141,17 @@ public class StudentGroupController {
                 p.setSize(totalChildSize);
                 studentGroupRepository.save(p);
 
+                // Refresh the entity to ensure children list is up-to-date
+                entityManager.flush();
+                entityManager.refresh(p);
+
                 if (p.getParentGroup() != null) {
                     recalculateParentSize(p.getParentGroup());
                 }
+            } else {
+                // Even without children, refresh to update the children count
+                entityManager.flush();
+                entityManager.refresh(p);
             }
         });
     }
@@ -127,6 +160,9 @@ public class StudentGroupController {
         StudentGroupDTO dto = new StudentGroupDTO();
         dto.id = group.getId();
         dto.name = group.getName();
+        dto.baseName = group.getBaseName();
+        dto.level = group.getLevel();
+        dto.groupNotation = group.getGroupNotation();
         dto.size = group.getSize();
         dto.parentGroupId = group.getParentGroup() != null ? group.getParentGroup().getId() : null;
         dto.parentGroupName = group.getParentGroup() != null ? group.getParentGroup().getName() : null;
@@ -137,6 +173,9 @@ public class StudentGroupController {
     public static class StudentGroupDTO {
         public Long id;
         public String name;
+        public String baseName;
+        public Integer level;
+        public String groupNotation;
         public Integer size;
         public Long parentGroupId;
         public String parentGroupName;
@@ -144,7 +183,9 @@ public class StudentGroupController {
     }
 
     public static class StudentGroupCreateDTO {
-        public String name;
+        public String baseName;
+        public Integer level;
+        public String groupNotation;
         public Integer size;
         public Long parentGroupId;
     }

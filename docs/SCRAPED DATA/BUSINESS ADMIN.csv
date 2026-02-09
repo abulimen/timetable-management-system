@@ -1,0 +1,125 @@
+"Year Taken","Course ID","Course Title","Instuctor","Option","Credit Hours","No. GPA","Details"
+1,"AMS 102 ","Basic Mathematics","Maku Olukayode Emmanuel","BUSAD",2.0,false,AMS 102 
+1,"AMS 102 ","Basic Mathematics","Maku Olukayode Emmanuel","ACCT B",2.0,false,AMS 102 
+1,"AMS 102 ","Basic Mathematics","Akande  Comfort Omowunmi","Finance",2.0,false,AMS 102 
+1,"AMS 102 ","Basic Mathematics","Maku Olukayode Emmanuel","ACCT A",2.0,false,AMS 102 
+1,"AMS 102 ","Basic Mathematics","UKA  Uchenna A.","IRM",2.0,false,AMS 102 
+1,"AMS 102 ","Basic Mathematics","UKA  Uchenna A.","PUB",2.0,false,AMS 102 
+1,"AMS 102 ","Basic Mathematics","Maku Olukayode Emmanuel","MKT",2.0,false,AMS 102 
+1,"AMS 104","Principles of Project Management","Ahannaya   Chinedu Gandolph","IRM",2.0,false,AMS 104
+1,"AMS 104","Principles of Project Management","Ahannaya   Chinedu Gandolph","Finance",2.0,false,AMS 104
+1,"AMS 104","Principles of Project Management","Dogo  Edafe","BUSAD",2.0,false,AMS 104
+1,"AMS 104","Principles of Project Management","Ahannaya   Chinedu Gandolph","ACCT B",2.0,false,AMS 104
+1,"AMS 104","Principles of Project Management","Adewumi  Eyitayo Folashade","PUB",2.0,false,AMS 104
+1,"AMS 104","Principles of Project Management","Dogo  Edafe","MKT",2.0,false,AMS 104
+1,"AMS 104","Principles of Project Management","Ahannaya   Chinedu Gandolph","ACCT A",2.0,false,AMS 104
+1,"BED 122","Business Mathematics","UWANNAH  Ngozi","BusEdu",2.0,false,BED 122
+1,"BED 124","Principles of Marketing for Business Educators","UWANNAH  Ngozi","BusEdu",2.0,false,BED 124
+1,"BSAD102","Principles Of Management II","Ayeni  David","BUSAD",3.0,false,BSAD102
+1,"BSAD112","Business Mathematics Ii","Maku Olukayode Emmanuel","ACCT A",2.0,false,BSAD112
+1,"BSAD112","Business Mathematics Ii","Makun   Olukayode ","BUSAD",2.0,false,BSAD112
+1,"BSAD112","Business Mathematics Ii","DAVID  JOSEPH","MASS-COMM",2.0,false,BSAD112
+1,"BSAD112","Business Mathematics Ii","Maku Olukayode Emmanuel","ACCT B",2.0,false,BSAD112
+1,"BUA 102","Introduction to Business II","Egbuta  Olive Ugadiya","BUSAD",2.0,false,BUA 102
+1,"BU-BED 102","Introduction to Vocational Education","UWANNAH  Ngozi","BusEdu",3.0,false,BU-BED 102
+1,"BU-BED 104","Business Methods","UWANNAH  Ngozi","BusEdu",3.0,false,BU-BED 104
+1,"BU-BED 106","Introduction to Job Search Skills","UWANNAH  Ngozi","BusEdu",3.0,false,BU-BED 106
+1,"BU-BUA 102","Principles of Management 11","Egbuta  Olive Ugadiya","BUSAD",2.0,false,BU-BUA 102
+1,"BU-BUA 102","Principles of Management 11","Egbuta  Olive Ugadiya","MKT",2.0,false,BU-BUA 102
+1,"BU-BUA 102","Principles of Management 11","Ayeni  David","ACCT A",2.0,false,BU-BUA 102
+1,"BU-BUA 102","Principles of Management 11","Adeoye  Solomon Olusegun","ACCT B",2.0,false,BU-BUA 102
+1,"MKTG122","Principles of Marketing II","Adefulu  Adesoga","BUSAD",3.0,false,MKTG122
+2,"ACC 204","Cost Accounting","Soetan  Timothy Adisa","BUSAD",3.0,false,ACC 204
+2,"ACC 204","Cost Accounting","Owolabi  Babatunde A","ACCT A",3.0,false,ACC 204
+2,"ACC 204","Cost Accounting","Owolabi  Babatunde A","ACCT B",3.0,false,ACC 204
+2,"BSAD202","Management Theory","Esator  Goodluck","BUSAD",3.0,false,BSAD202
+2,"BSAD202","Management Theory","Binuyo  Adekunle","Biol",3.0,false,BSAD202
+2,"BSAD204","Production/Operations Management II","DAVID  JOSEPH","BUSAD",3.0,false,BSAD204
+2,"BSAD220","Foundations of Entrpreneurship","Dogo  Edafe","BUSAD",2.0,false,BSAD220
+2,"BSAD232","Statistics For Managements I I","DAVID  JOSEPH","BUSAD",3.0,false,BSAD232
+2,"BSAD244","Fundamentals of Insurance","Oduyoye  Oluseyi Odutola","BUSAD",2.0,false,BSAD244
+2,"BU-MKT 202","Insurance Marketing","Oduyoye  Oluseyi Odutola","MKT",3.0,false,BU-MKT 202
+2,"BU-MKT 222","Market Segmentation","Onu  Christopher Ajah","MKT",3.0,false,BU-MKT 222
+2,"ENT 211","Entrepreneurship and Innovation","DAVID  JOSEPH","EDUCATION",2.0,false,ENT 211
+2,"MKT 212","Business to Business Marketing","IBHIEDU  AMOS","MKT",2.0,false,MKT 212
+2,"MKT 220","Food Agricultural Marketing","Nwankwere Idowu Aderonke","MKT",2.0,false,MKT 220
+2,"MKT 222","Retail Wholesale Management","IBHIEDU  AMOS","MKT",2.0,false,MKT 222
+3,"BSAD304","Corporate Planning","Nwankwere Idowu Aderonke","BUSAD",3.0,false,BSAD304
+3,"BSAD312","Introduction to Management Sciences/Operations Research","DAVID  JOSEPH","BUSAD",3.0,false,BSAD312
+3,"BSAD317","Industrial and Labour Relations","UWANNAH  Ngozi","BusEdu",3.0,false,BSAD317
+3,"BUA 302","Human Behaviour in Organisations","AKPA  Victoria O","BUSAD",3.0,false,BUA 302
+3,"BUA 304","Human Resource Management","Adeoye  Solomon Olusegun","BUSAD",3.0,false,BUA 304
+3,"BUA 312","Small Business Management","Bamidele  Ayodeji Gbenga","BUSAD",2.0,false,BUA 312
+3,"BU-BUA 312","Research Methodology","WORIMEGBE  POWELL","MKT",3.0,false,BU-BUA 312
+3,"BU-BUA 312","Research Methodology","WORIMEGBE  POWELL","BUSAD",3.0,false,BU-BUA 312
+3,"BU-BUA 314","Business Law","ADEBAYO  JOSEPHINE ADEJOKE","BUSAD",3.0,false,BU-BUA 314
+3,"BU-BUA 326","Business Analytics for Management","DAVID  JOSEPH","BUSAD",3.0,false,BU-BUA 326
+3,"BU-MKT 302","Promotional Strategies II","Egwuonwu  Thomas Kalu","MKT",3.0,false,BU-MKT 302
+3,"ENT 312","Venture Creation","OLATUNJI  Elizabeth  Taiwo ","Nursing Group C",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","IBHIEDU  AMOS","ACCT",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Esator  Goodluck","CS",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Nwankwere Idowu Aderonke","PUBHEALTH",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","OLATUNJI  Elizabeth  Taiwo ","Estate Management",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Adeoye  Solomon Olusegun","Music",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Adeoye  Solomon Olusegun","MICRO-BIO",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","AJIBOYE  Oladele","HIST",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Esator  Goodluck","IT",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Francis-Odii  Mercy","Civil Engineering",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Nwankwere Idowu Aderonke","NUTRITION",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","AJIBOYE  Oladele","Mechanical Engineering",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","IBHIEDU  AMOS","ALL CLASS OPTIONS",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","AJIBOYE  Oladele","ENGL",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Ajiboye  Oluwapelumi Micheal","French",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Nwankwere Idowu Aderonke","Physiology",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Ayeni  David","ILD",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Esator  Goodluck","POLSC",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Esator  Goodluck","PUB",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","IBHIEDU  AMOS","Maths",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","IBHIEDU  AMOS","Biol",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","IBHIEDU  AMOS","Chem",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Nwankwere Idowu Aderonke","AGRIC",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Nwankwere Idowu Aderonke","BIO-CHEM",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","AJIBOYE  Oladele","CRS",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","OLATUNJI  Elizabeth  Taiwo ","MASS-COMM",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Nwankwere Idowu Aderonke","IRM",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Nwankwere Idowu Aderonke","ECONS",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Ayeni  David","JURISPRUDENCE & PUBLIC LAW",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Adeoye  Solomon Olusegun","Electrical and Electronic Engineering",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","IBHIEDU  AMOS","Computer Engineering",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Esator  Goodluck","SOWK GROUP A",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","OLATUNJI  Elizabeth  Taiwo ","Nursing Group A",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","OLATUNJI  Elizabeth  Taiwo ","Nursing Group B",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Adeoye  Solomon Olusegun","EDUCATION",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Esator  Goodluck","BUSAD",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Esator  Goodluck","MKT",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","IBHIEDU  AMOS","MED-LAB",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Adeoye  Solomon Olusegun","Finance",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Esator  Goodluck","Soft Eng Group A",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Esator  Goodluck","Soft Eng Group B",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Esator  Goodluck","Soft Eng Group C",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Esator  Goodluck","Soft Eng Group D",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Esator  Goodluck","Soft Eng Group E",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Esator  Goodluck","DE Software",2.0,false,ENT 312
+3,"ENT 312","Venture Creation","Nwankwere Idowu Aderonke","Anatomy",2.0,false,ENT 312
+3,"MKT 312","Logistics & Distribution Management","Egwuonwu  Thomas Kalu","MKT",2.0,false,MKT 312
+3,"MKT 322","Strategic Marketing","Kabuoh  Margret Nma","MKT",2.0,false,MKT 322
+3,"MKT 324","Marketing Operations Management","Kabuoh  Margret Nma","MKT",2.0,false,MKT 324
+3,"MKT 326","Sales Management","IBHIEDU  AMOS","MKT",2.0,false,MKT 326
+4,"BSAD404","Analysis of Business Decision II","WORIMEGBE  POWELL","MKT",3.0,false,BSAD404
+4,"BSAD404","Analysis of Business Decision II","WORIMEGBE  POWELL","BUSAD",3.0,false,BSAD404
+4,"BSAD408","Entrepreneurial Development II","Bamidele  Ayodeji Gbenga","BUSAD",3.0,false,BSAD408
+4,"BSAD408","Entrepreneurial Development II","Bamidele  Ayodeji Gbenga","MKT",3.0,false,BSAD408
+4,"BSAD430","Strategic Management","Makinde  Olubisi Grace","DE BUSAD/MKT",3.0,false,BSAD430
+4,"BSAD430","Strategic Management","Makinde  Olubisi Grace","BUSAD",3.0,false,BSAD430
+4,"BSAD430","Strategic Management","UWANNAH  Ngozi","BusEdu",3.0,false,BSAD430
+4,"BSAD490","Research Project","Makinde  Olubisi Grace","BUSAD",6.0,false,BSAD490
+4,"MKTG416","Electronic Marketing","Egwuonwu  Thomas Kalu","MKT",3.0,false,MKTG416
+4,"MKTG422","International Marketing","AJIKE Emmanuel Ogbonna","MKT",3.0,false,MKTG422
+4,"MKTG490","Research Project","Makinde  Olubisi Grace","MKT",6.0,false,MKTG490
+200,"BUA 202","Principles of Business Administration II","Nwankwere Idowu Aderonke","BUSAD",3.0,false,BUA 202
+200,"BUA 204","Quantitative Analysis in Management","DAVID  JOSEPH","BUSAD",3.0,false,BUA 204
+200,"BUA 216","Introduction to Financial Management","DAVID  JOSEPH","BUSAD",3.0,false,BUA 216
+200,"BUA 218","Green Management","Esator  Goodluck","BUSAD",2.0,false,BUA 218
+200,"BU-BUA 200","Introduction to Events Management","Dogo  Edafe","BUSAD",2.0,false,BU-BUA 200
+200,"BU-MKT 200","Managing Customer Expectations","Adefulu  Adesoga","MKT",3.0,false,BU-MKT 200
+

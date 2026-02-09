@@ -15,6 +15,31 @@ export class ApiService {
         return this.http.get<Stats>(`${this.baseUrl}/stats`);
     }
 
+    // Insights
+    getZoneInsights(): Observable<ZoneInsightsSummary> {
+        return this.http.get<ZoneInsightsSummary>(`${this.baseUrl}/insights/zones/summary`);
+    }
+
+    getFeatureInsights(): Observable<FeatureInsightsSummary> {
+        return this.http.get<FeatureInsightsSummary>(`${this.baseUrl}/insights/features/summary`);
+    }
+
+    getLecturerInsights(): Observable<LecturerInsightsSummary> {
+        return this.http.get<LecturerInsightsSummary>(`${this.baseUrl}/insights/lecturers/summary`);
+    }
+
+    getCourseFeasibilityDiagnostics(): Observable<CourseFeasibilityDiagnostics> {
+        return this.http.get<CourseFeasibilityDiagnostics>(`${this.baseUrl}/insights/diagnostics/course-feasibility`);
+    }
+
+    getFeatureScarcityDiagnostics(): Observable<FeatureScarcityDiagnostics> {
+        return this.http.get<FeatureScarcityDiagnostics>(`${this.baseUrl}/insights/diagnostics/feature-scarcity`);
+    }
+
+    getLecturerLoadDiagnostics(): Observable<LecturerLoadDiagnostics> {
+        return this.http.get<LecturerLoadDiagnostics>(`${this.baseUrl}/insights/diagnostics/lecturer-load`);
+    }
+
     // Zones
     getZones(): Observable<Zone[]> {
         return this.http.get<Zone[]>(`${this.baseUrl}/zones`);
@@ -165,6 +190,136 @@ export class ApiService {
     deleteSemesterArchive(code: string): Observable<void> {
         return this.http.delete<void>(`${this.baseUrl}/semesters/${code}`);
     }
+
+    // Export
+    getExportDepartments(): Observable<ExportDepartment[]> {
+        return this.http.get<ExportDepartment[]>(`${this.baseUrl}/export/departments`);
+    }
+
+    exportTimetable(format: 'excel' | 'pdf', payload: ExportRequest): Observable<Blob> {
+        return this.http.post(`${this.baseUrl}/export/${format}`, payload, {
+            responseType: 'blob'
+        });
+    }
+
+    // ==================== STAGING AREA ====================
+    submitToStaging(entity: string, file: File, note?: string): Observable<any> {
+        const formData = new FormData();
+        formData.append('file', file);
+        if (note) {
+            formData.append('note', note);
+        }
+        return this.http.post(`${this.baseUrl}/bulk/staging/${entity}`, formData);
+    }
+
+    getPendingBatches(): Observable<ImportBatch[]> {
+        return this.http.get<ImportBatch[]>(`${this.baseUrl}/bulk/staging/pending`);
+    }
+
+    approveBatch(id: number, resolutions?: Record<number, string>): Observable<any> {
+        return this.http.post(`${this.baseUrl}/bulk/staging/${id}/approve`, { resolutions });
+    }
+
+    rejectBatch(id: number, reason?: string): Observable<any> {
+        return this.http.post(`${this.baseUrl}/bulk/staging/${id}/reject`, { reason });
+    }
+
+    previewBatch(id: number): Observable<BulkImportResult> {
+        return this.http.get<BulkImportResult>(`${this.baseUrl}/bulk/staging/${id}/preview`);
+    }
+
+    // ==================== DRAFTS ====================
+
+    createDraft(entity: string, file: File): Observable<any> {
+        const formData = new FormData();
+        formData.append('file', file);
+        return this.http.post(`${this.baseUrl}/bulk/staging/draft/${entity}`, formData);
+    }
+
+    getMyDrafts(): Observable<ImportBatch[]> {
+        return this.http.get<ImportBatch[]>(`${this.baseUrl}/bulk/staging/drafts`);
+    }
+
+    getMySubmissions(): Observable<ImportBatch[]> {
+        return this.http.get<ImportBatch[]>(`${this.baseUrl}/bulk/staging/my-submissions`);
+    }
+
+    revertToDraft(id: number): Observable<any> {
+        return this.http.post(`${this.baseUrl}/bulk/staging/${id}/revert-to-draft`, {});
+    }
+
+    getDraft(id: number): Observable<{ id: number; entityType: string; originalFilename: string; content: string; createdAt: string }> {
+        return this.http.get<any>(`${this.baseUrl}/bulk/staging/draft/${id}`);
+    }
+
+    updateDraft(id: number, content: string): Observable<any> {
+        return this.http.put(`${this.baseUrl}/bulk/staging/draft/${id}`, { content });
+    }
+
+    submitDraft(id: number): Observable<any> {
+        return this.http.post(`${this.baseUrl}/bulk/staging/draft/${id}/submit`, {});
+    }
+
+    deleteDraft(id: number): Observable<any> {
+        return this.http.delete(`${this.baseUrl}/bulk/staging/draft/${id}`);
+    }
+}
+
+export interface ImportBatch {
+    id: number;
+    entityType: string;
+    originalFilename: string;
+    status: 'PENDING' | 'APPROVED' | 'REJECTED';
+    createdAt: string;
+    approvalDate?: string;
+    submissionNote?: string;
+    rejectionReason?: string;
+    createdBy?: {
+        id: number;
+        firstName: string;
+        lastName: string;
+        email: string;
+    };
+    approvedBy?: {
+        id: number;
+        firstName: string;
+        lastName: string;
+    };
+}
+
+export interface BulkImportResult {
+    createdCount: number;
+    updatedCount: number;
+    skippedCount: number;
+    errorCount: number;
+    validRows: ImportRowDetail[];
+    rowErrors: ImportRowError[];
+    globalErrors: string[];
+    conflicts?: ImportConflict[];
+}
+
+export interface ImportRowDetail {
+    rowNumber: number;
+    data: Record<string, string>;
+    status: string;
+    message: string;
+}
+
+export interface ImportRowError {
+    rowNumber: number;
+    message: string;
+    rawData: Record<string, string>;
+}
+
+export interface ImportConflict {
+    rowNumber: number;
+    key: string;
+    keyType: string;
+    existingId: number;
+    existingData: Record<string, any>;
+    newData: Record<string, any>;
+    conflictingFields: string[];
+    resolution?: 'KEEP_EXISTING' | 'UPDATE' | 'SKIP' | 'CREATE_NEW';
 }
 
 // Models
@@ -180,6 +335,99 @@ export interface Stats {
     scheduledLessonCount: number;
     unscheduledLessonCount: number;
     pinnedLessonCount: number;
+}
+
+export interface ZoneInsightsSummaryItem {
+    id: number;
+    name: string;
+    roomCount: number;
+    capacity: number;
+}
+
+export interface ZoneInsightsSummary {
+    totalZones: number;
+    usedZones: number;
+    unusedZones: number;
+    totalRooms: number;
+    totalCapacity: number;
+    zones: ZoneInsightsSummaryItem[];
+}
+
+export interface FeatureInsightsSummaryItem {
+    id: number;
+    name: string;
+    supplyCount: number;
+    demandCount: number;
+    scarcityRatio: number | null;
+    unboundedScarcity: boolean;
+}
+
+export interface FeatureInsightsSummary {
+    totalFeatures: number;
+    orphanedFeatures: number;
+    features: FeatureInsightsSummaryItem[];
+}
+
+export interface LecturerInsightsSummary {
+    totalLecturers: number;
+    noEmailCount: number;
+    unassignedCount: number;
+    overloadedCount: number;
+    overloadThreshold: number;
+    unavailabilityDensity: Record<string, number>;
+}
+
+export interface DiagnosticsIssue {
+    type: string;
+    severity: 'BLOCKING' | 'WARNING';
+    description: string;
+    recommendation: string;
+}
+
+export interface CourseFeasibilityDiagnostics {
+    feasible: boolean;
+    lessonCount: number;
+    timeslotCount: number;
+    roomCount: number;
+    availableRoomSlots: number;
+    blockingCount: number;
+    warningCount: number;
+    blockingIssues: DiagnosticsIssue[];
+    warningIssues: DiagnosticsIssue[];
+}
+
+export interface FeatureScarcityDiagnosticsItem {
+    id: number;
+    name: string;
+    supplyCount: number;
+    demandCount: number;
+    scarcityRatio: number | null;
+    unboundedScarcity: boolean;
+    risk: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+}
+
+export interface FeatureScarcityDiagnostics {
+    totalFeatures: number;
+    criticalCount: number;
+    highCount: number;
+    items: FeatureScarcityDiagnosticsItem[];
+}
+
+export interface LecturerLoadDiagnosticsItem {
+    id: number;
+    name: string;
+    assignedHours: number;
+    availableHours: number;
+    unavailableSlots: number;
+    loadRatio: number;
+    risk: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+}
+
+export interface LecturerLoadDiagnostics {
+    totalTimeslots: number;
+    criticalCount: number;
+    highCount: number;
+    items: LecturerLoadDiagnosticsItem[];
 }
 
 export interface Zone {
@@ -219,6 +467,9 @@ export interface Unavailability {
 export interface StudentGroup {
     id: number;
     name: string;
+    baseName?: string;
+    level?: number;
+    groupNotation?: string | null;
     size: number;
     parentGroupId: number | null;
     parentGroupName: string | null;
@@ -237,7 +488,9 @@ export interface Course {
     studentGroupIds: number[];  // Multi-group support
     studentGroupNames: string[];  // Multi-group names
     requiredFeatures: string[];
+    requiredFeatureIds?: number[];
     allowedZones: string[];
+    allowedZoneIds?: number[];
     online: boolean;
 }
 
@@ -318,4 +571,17 @@ export interface SemesterArchive {
     lessonCount: number;
     studentGroupCount: number;
     lecturerCount: number;
+}
+
+export interface ExportDepartment {
+    id: number;
+    name: string;
+    size: number;
+    childCount: number;
+    isParent: boolean;
+}
+
+export interface ExportRequest {
+    groupIds: number[];
+    title: string;
 }

@@ -14,7 +14,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const authService = inject(AuthService);
 
     // Skip auth for login/refresh endpoints
-    if (req.url.includes('/api/auth/login') || req.url.includes('/api/auth/refresh')) {
+    if (req.url.includes('/api/v1/auth/login') || req.url.includes('/api/v1/auth/refresh')) {
         return next(req);
     }
 
@@ -26,8 +26,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
     return next(req).pipe(
         catchError((error: HttpErrorResponse) => {
-            if (error.status === 401 && !req.url.includes('/api/auth/')) {
+            // Handle 401 - try to refresh token
+            if (error.status === 401 && !req.url.includes('/api/v1/auth/')) {
                 return handleTokenExpired(req, next, authService);
+            }
+            // Handle 403 - access denied, session likely expired
+            if (error.status === 403 && !req.url.includes('/api/v1/auth/')) {
+                authService.logout();
+                return throwError(() => error);
             }
             return throwError(() => error);
         })

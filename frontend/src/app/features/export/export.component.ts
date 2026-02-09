@@ -1,16 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { ApiService, StudentGroup } from '../../core/services/api.service';
-
-interface Department {
-    id: number;
-    name: string;
-    size: number;
-    childCount: number;
-    isParent: boolean;
-}
+import { ApiService, ExportDepartment, StudentGroup } from '../../core/services/api.service';
 
 @Component({
     selector: 'app-export',
@@ -138,13 +129,12 @@ interface Department {
   `
 })
 export class ExportComponent implements OnInit {
-    private http = inject(HttpClient);
     private api = inject(ApiService);
 
     scope: 'ALL' | 'DEPARTMENTS' | 'GROUPS' = 'ALL';
     exportTitle = '';
     selectedIds: number[] = [];
-    departments: Department[] = [];
+    departments: ExportDepartment[] = [];
     studentGroups: StudentGroup[] = [];
     exporting = false;
 
@@ -153,7 +143,7 @@ export class ExportComponent implements OnInit {
     }
 
     loadData() {
-        this.http.get<Department[]>('http://localhost:8080/api/v1/export/departments').subscribe({
+        this.api.getExportDepartments().subscribe({
             next: (deps) => this.departments = deps.filter(d => d.isParent || d.childCount > 0)
         });
         this.api.getStudentGroups().subscribe({
@@ -182,7 +172,7 @@ export class ExportComponent implements OnInit {
         this.export('pdf', 'application/pdf', 'pdf');
     }
 
-    private export(format: string, mimeType: string, extension: string) {
+    private export(format: 'excel' | 'pdf', mimeType: string, extension: string) {
         this.exporting = true;
 
         const payload = {
@@ -190,9 +180,7 @@ export class ExportComponent implements OnInit {
             title: this.exportTitle || 'Timetable Export'
         };
 
-        this.http.post(`http://localhost:8080/api/v1/export/${format}`, payload, {
-            responseType: 'blob'
-        }).subscribe({
+        this.api.exportTimetable(format, payload).subscribe({
             next: (blob) => {
                 this.exporting = false;
                 const url = window.URL.createObjectURL(blob);

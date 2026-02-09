@@ -1,0 +1,55 @@
+"Year Taken","Course ID","Course Title","Instuctor","Option","Credit Hours","No. GPA","Details"
+1,"BU-EDM 108","Guidance and Counselling for Educational Management","Adeoye  Ayodele Olusegun","EDU PLAN & ADMIN",3.0,false,BU-EDM 108
+1,"BU-EDM 114","Computer Application in Educational Management","IBE-MOSES  KELECHI Comfort","EDU PLAN & ADMIN",2.0,false,BU-EDM 114
+1,"BU-EDM 122","Educational Administration Reform in Nigeria","UWANNAH  Ngozi","EDU PLAN & ADMIN",3.0,false,BU-EDM 122
+1,"BU-EDU 104","Introduction to Reading Proficiency","JAMES  NMA CLARION","EngEdu",3.0,false,BU-EDU 104
+1,"BU-GCE 110","Laboratory Work 1","UWANNAH  Ngozi","Guidance and Counselling",1.0,false,BU-GCE 110
+1,"BU-GCE 112","Emotional Intelligence","Adeoye  Ayodele Olusegun","Guidance and Counselling",3.0,false,BU-GCE 112
+1,"EDM 102","Introduction to Management and Human Resources Behaviors in Organizations","UWANNAH  Ngozi","EDU PLAN & ADMIN",2.0,false,EDM 102
+1,"GCE 102","Principles and Techniques of Guidance and Counselling","Filade  Bankole","Guidance and Counselling",2.0,false,GCE 102
+2,"BU-EDM 218","School and Community Relations","IBE-MOSES  KELECHI Comfort","EDU PLAN & ADMIN",2.0,false,BU-EDM 218
+2,"BU-EDM 220","Ethical Framework in Educational Management","UWANNAH  Ngozi","EDU PLAN & ADMIN",2.0,false,BU-EDM 220
+2,"BU-EDM 222","Operations Management in Educational Practice","IBE-MOSES  KELECHI Comfort","EDU PLAN & ADMIN",3.0,false,BU-EDM 222
+2,"EDM 202","Programme Organization and Timetabling in Nigerian Schools","IBE-MOSES  KELECHI Comfort","EDU PLAN & ADMIN",2.0,false,EDM 202
+2,"EDM 204","Intro to Educational Planning and Policy","IBE-MOSES  KELECHI Comfort","EDU PLAN & ADMIN",2.0,false,EDM 204
+2,"EDU 202","Economics Education Methods","UWANNAH  Ngozi","EDU ECONS",2.0,false,EDU 202
+3,"BED 320","Marketing Management for Business Educators","UWANNAH  Ngozi","BusEdu",2.0,false,BED 320
+3,"BED 326","Nigerian Business Environment","UWANNAH  Ngozi","BusEdu",2.0,false,BED 326
+3,"BED 328","Word Processing for Business Educators II","UWANNAH  Ngozi","BusEdu",2.0,false,BED 328
+3,"BED 350","SIWES","UWANNAH  Ngozi","BusEdu",6.0,false,BED 350
+3,"BU-BED 302","Organization and Administration of Vocational Education","UWANNAH  Ngozi","BusEdu",3.0,false,BU-BED 302
+3,"BU-EDM 316","Accounting for School Management","IBE-MOSES  KELECHI Comfort","EDU PLAN & ADMIN",3.0,false,BU-EDM 316
+3,"BU-GCE 314","Stress Management Counseling","UWANNAH  Ngozi","Guidance and Counselling",2.0,false,BU-GCE 314
+3,"BU-GCE 316","Addiction and Substance Abuse Counseling","Williams, T. M.","Guidance and Counselling",2.0,false,BU-GCE 316
+3,"EDM 302","Legal Basis of Educational Management","UWANNAH  Ngozi","EDU PLAN & ADMIN",2.0,false,EDM 302
+3,"EDM 304","Educational Supervision and Quality Control in Nigeria","UWANNAH  Ngozi","EDU PLAN & ADMIN",2.0,false,EDM 304
+3,"EDU 302","Educational Measurements, Tests, Research Methods and Statistics","Ayodele K. O","EDUCATION",3.0,false,EDU 302
+3,"EDUC300","Teaching Practice II","UWANNAH  Ngozi","EDUCATION",3.0,false,EDUC300
+3,"EDUC302","Test, Measurement and Evaluation in Education","Ayodele K. O","EDUCATION",3.0,false,EDUC302
+3,"GCE 302","Organization of Guidance and Counselling in Schools","Filade  Bankole","Guidance and Counselling",2.0,false,GCE 302
+3,"GCE 304","Marriage/ Family Counselling and Child Guidance","Filade  Bankole","Guidance and Counselling",2.0,false,GCE 304
+3,"GCE 306","Rehabilitative and Pastoral Counselling","Adeoye  Ayodele Olusegun","Guidance and Counselling",2.0,false,GCE 306
+3,"LAS 324","Issues in Language Education","JAMES  NMA CLARION","EngEdu",2.0,false,LAS 324
+3,"LAS 348","Theories of Learning Applied Language Education","JAMES  NMA CLARION","EngEdu",2.0,false,LAS 348
+4,"BEDU402","Management Information System","UWANNAH  Ngozi","BusEdu",2.0,false,BEDU402
+4,"EDPA406","Nat'l and Internat'l Perspectives in Educational management","UWANNAH  Ngozi","EDU PLAN & ADMIN",2.0,false,EDPA406
+4,"EDPA414","School Business Management","IBE-MOSES  KELECHI Comfort","EDU PLAN & ADMIN",3.0,false,EDPA414
+4,"EDUC412","Introduction to Special Education","Adeoye  Ayodele Olusegun","EDUCATION",2.0,false,EDUC412
+4,"EDUC490","Research Project","UWANNAH  Ngozi","EDUCATION",6.0,false,EDUC490
+4,"GCPY402","Group Dynamics","Aderanti  Ruth A","Guidance and Counselling",2.0,false,GCPY402
+4,"GCPY412","Assessment and Evaluation of School Counseling","Aderanti  Ruth A","Guidance and Counselling",2.0,false,GCPY412
+4,"GCPY414","Inter-Cultural Education","Adeoye  Ayodele Olusegun","Guidance and Counselling",2.0,false,GCPY414
+4,"GCPY432","Conflict and Conflict resolution in work place","Filade  Bankole","Guidance and Counselling",2.0,false,GCPY432
+200,"BED 214","Business Communication Report Writing","UWANNAH  Ngozi","BusEdu",2.0,false,BED 214
+200,"BED 222","Cost Accounting for Business Educators","UWANNAH  Ngozi","BusEdu",2.0,false,BED 222
+200,"BU-BED 232","Fundamentals of Business Education","UWANNAH  Ngozi","BusEdu",3.0,false,BU-BED 232
+200,"BU-BED 234","Employment Readiness Skills","UWANNAH  Ngozi","BusEdu",3.0,false,BU-BED 234
+200,"BU-GCE 210","Laboratory Academic Counselling","UWANNAH  Ngozi","Guidance and Counselling",1.0,false,BU-GCE 210
+200,"BU-GCE 220","Developmental Psychology","UWANNAH  Ngozi","Guidance and Counselling",3.0,false,BU-GCE 220
+200,"BU-GCE 226","Psychology of Deviant Behaviour","Ayodele K. O","Guidance and Counselling",3.0,false,BU-GCE 226
+200,"EDU 200","Field Practice to be done in summer","UWANNAH  Ngozi","EDUCATION",3.0,false,EDU 200
+200,"EDU 200","Field Practice to be done in summer","UWANNAH  Ngozi","EngEdu",3.0,false,EDU 200
+200,"GCE 202","Adolescence Psychology and Teenage Conselling","Williams, T. M.","Guidance and Counselling",2.0,false,GCE 202
+200,"GCE 204","Psychological Testing in Counselling","Aderanti  Ruth A","Guidance and Counselling",2.0,false,GCE 204
+400,"EDPA412","Policy Analysis and Emerging Problems in Nigeria Education","UWANNAH  Ngozi","EDU PLAN & ADMIN",3.0,false,EDPA412
+

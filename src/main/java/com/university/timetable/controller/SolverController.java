@@ -1,6 +1,7 @@
 package com.university.timetable.controller;
 
 import com.university.timetable.dto.*;
+import com.university.timetable.service.AuditLogService;
 import com.university.timetable.service.ConstraintJustificationService;
 import com.university.timetable.service.InfeasibilityChecker;
 import com.university.timetable.service.SolverService;
@@ -29,6 +30,7 @@ public class SolverController {
     private final SolverService solverService;
     private final InfeasibilityChecker infeasibilityChecker;
     private final ConstraintJustificationService justificationService;
+    private final AuditLogService auditLogService;
 
     /**
      * POST /api/v1/solver/solve
@@ -67,9 +69,16 @@ public class SolverController {
         // STEP 3: Start solver
         try {
             SolverStatusDTO status = solverService.startSolving(mode);
+
+            // Audit logging
+            auditLogService.logSchedulerAction(
+                    "Solver started in " + mode + " mode with " + feasibilityReport.getTimeslotCount() + " timeslots",
+                    true);
+
             return ResponseEntity.ok(status);
         } catch (IllegalStateException e) {
             log.error("Cannot start solver", e);
+            auditLogService.logSchedulerAction("Solver start failed: " + e.getMessage(), false);
             return ResponseEntity.badRequest()
                     .body(new SolverStatusDTO(null, "ERROR", e.getMessage()));
         }
@@ -95,6 +104,12 @@ public class SolverController {
     public ResponseEntity<SolverStatusDTO> terminate() {
         log.info("Termination requested");
         SolverStatusDTO status = solverService.terminate();
+
+        // Audit logging
+        auditLogService.logSchedulerAction(
+                "Solver manually terminated. Final score: " + (status.getScore() != null ? status.getScore() : "N/A"),
+                true);
+
         return ResponseEntity.ok(status);
     }
 

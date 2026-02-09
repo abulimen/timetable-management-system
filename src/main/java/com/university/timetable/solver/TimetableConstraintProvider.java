@@ -259,13 +259,23 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 .asConstraint("Zone restriction");
     }
 
+    /**
+     * Lecturer Unavailability - CONFIGURABLE.
+     * Only applies if the unavailability system is enabled in settings.
+     */
     private Constraint lecturerUnavailability(ConstraintFactory factory) {
         return factory.forEach(Lesson.class)
-                .filter(lesson -> lesson.getLecturer() != null &&
+                .filter(lesson -> isUnavailabilitySystemEnabled() &&
+                        lesson.getLecturer() != null &&
                         lesson.getTimeslot() != null &&
                         !lesson.getLecturer().isAvailableAt(lesson.getTimeslot(), lesson.getDurationHours()))
                 .penalize(HardSoftScore.ONE_HARD)
                 .asConstraint("Lecturer unavailability");
+    }
+
+    private boolean isUnavailabilitySystemEnabled() {
+        ConstraintSettingsService svc = SpringContextHolder.getBean(ConstraintSettingsService.class);
+        return svc != null && svc.isUnavailabilitySystemEnabled();
     }
 
     /**

@@ -1,0 +1,78 @@
+"Year Taken","Course ID","Course Title","Instuctor","Option","Credit Hours","No. GPA","Details"
+3,"BU-BCH 330","Forensic Biochemistry for Allied Health Sciences","UKANGWA  Ngozi Angela","MED-LAB",2.0,false,BU-BCH 330
+3,"BU-BCH 332","Hormonal Biochemistry for Allied Health Sciences","Ogunbiyi Babafemi Tosin","MED-LAB",2.0,false,BU-BCH 332
+3,"BU-PHA 344","Advanced Pharmacology and Toxicology","Funwei  Roland Ibenipere","MED-LAB",2.0,false,BU-PHA 344
+3,"MLS 302","Basic Haematology","Udofia  Stephen Sunday","MED-LAB",2.0,false,MLS 302
+3,"MLS 304","Basic Histopathology","OLUWALOYE  Taiwo G","MED-LAB",2.0,false,MLS 304
+3,"MLS 306","Laboratory Posting I","OFEM  Oluchi","MED-LAB",2.0,false,MLS 306
+3,"MLS 306","Laboratory Posting I","Okorochi  Chinenye Alaezi","MED-LAB",2.0,false,MLS 306
+3,"MLS 306","Laboratory Posting I","OSAKUE  Eguagie O.","MED-LAB",2.0,false,MLS 306
+3,"MLS 308","Fundamentals of blood group serology","ILEOMA  Emmanuel","MED-LAB",2.0,false,MLS 308
+3,"MLS 310","Biomedical Engineering","Okorochi  Chinenye Alaezi","MED-LAB",2.0,false,MLS 310
+4,"MLSC410","Introduction to Cytology","Okorochi  Chinenye Alaezi","MED-LAB",2.0,false,MLSC410
+4,"MLSC412","Medical Entomology and Parasitology","Effiong  Effiong Joseph","MED-LAB",2.0,false,MLSC412
+4,"MLSC412","Medical Entomology and Parasitology","Dada  Michael","MED-LAB",2.0,false,MLSC412
+4,"MLSC412","Medical Entomology and Parasitology","Enitan  S.","MED-LAB",2.0,false,MLSC412
+4,"MLSC412","Medical Entomology and Parasitology","OFEM  Oluchi","MED-LAB",2.0,false,MLSC412
+4,"MLSC414","Immunology and Immunochemistry II","OLUWALOYE  Taiwo G","MED-LAB",3.0,false,MLSC414
+4,"MLSC414","Immunology and Immunochemistry II","ILEOMA  Emmanuel","MED-LAB",3.0,false,MLSC414
+4,"MLSC414","Immunology and Immunochemistry II","Enitan  S.","MED-LAB",3.0,false,MLSC414
+4,"MLSC414","Immunology and Immunochemistry II","ADEJUMO ","MED-LAB",3.0,false,MLSC414
+4,"MLSC416","Histopathology","OLUWALOYE  Taiwo G","MED-LAB",3.0,false,MLSC416
+4,"MLSC416","Histopathology","Bankole  Julius","MED-LAB",3.0,false,MLSC416
+4,"MLSC416","Histopathology","Okorochi  Chinenye Alaezi","MED-LAB",3.0,false,MLSC416
+4,"MLSC428","Blood Group Serology","ILEOMA  Emmanuel","MED-LAB",3.0,false,MLSC428
+4,"MLSC428","Blood Group Serology","Udofia  Stephen Sunday","MED-LAB",3.0,false,MLSC428
+4,"MLSC444","Clincial Laboratory Postings IV","Dada  Michael","MED-LAB",3.0,false,MLSC444
+4,"MLSC444","Clincial Laboratory Postings IV","FATUNMBI  OLUSOLA JOHN","MED-LAB",3.0,false,MLSC444
+4,"MLSC444","Clincial Laboratory Postings IV","OLUWALOYE  Taiwo G","MED-LAB",3.0,false,MLSC444
+4,"MLSC444","Clincial Laboratory Postings IV","AKINJINMI  AKINTUNDE AKINTAYO","MED-LAB",3.0,false,MLSC444
+4,"MLSC444","Clincial Laboratory Postings IV","Enitan  S.","MED-LAB",3.0,false,MLSC444
+4,"MLSC444","Clincial Laboratory Postings IV","OSAKUE  Eguagie O.","MED-LAB",3.0,false,MLSC444
+4,"MLSC444","Clincial Laboratory Postings IV","NWAEJIGH  PROMISE CHINEYE","MED-LAB",3.0,false,MLSC444
+5,"MLSB506","Specialized Haematological Techniques","ILEOMA  Emmanuel","MED-LAB",3.0,false,MLSB506
+5,"MLSB506","Specialized Haematological Techniques","Udofia  Stephen Sunday","MED-LAB",3.0,false,MLSB506
+5,"MLSB508","Specialized Blood Group Serology Techniques","ILEOMA  Emmanuel","MED-LAB",3.0,false,MLSB508
+5,"MLSB508","Specialized Blood Group Serology Techniques","Udofia  Stephen Sunday","MED-LAB",3.0,false,MLSB508
+5,"MLSB510","Haemostasis","Udofia  Stephen Sunday","MED-LAB",2.0,false,MLSB510
+5,"MLSB510","Haemostasis","ILEOMA  Emmanuel","MED-LAB",2.0,false,MLSB510
+5,"MLSC504","Cytogenetics","Udofia  Stephen Sunday","MED-LAB",3.0,false,MLSC504
+5,"MLSC508","Clinical Laboratory Postings VI","AKINJINMI  AKINTUNDE AKINTAYO","MED-LAB",3.0,false,MLSC508
+5,"MLSC508","Clinical Laboratory Postings VI","OLUWALOYE  Taiwo G","MED-LAB",3.0,false,MLSC508
+5,"MLSC508","Clinical Laboratory Postings VI","OSAKUE  Eguagie O.","MED-LAB",3.0,false,MLSC508
+5,"MLSC508","Clinical Laboratory Postings VI","ILEOMA  Emmanuel","MED-LAB",3.0,false,MLSC508
+5,"MLSC508","Clinical Laboratory Postings VI","Enitan  S.","MED-LAB",3.0,false,MLSC508
+5,"MLSC508","Clinical Laboratory Postings VI","ADEJUMO ","MED-LAB",3.0,false,MLSC508
+5,"MLSC508","Clinical Laboratory Postings VI","OFEM  Oluchi","MED-LAB",3.0,false,MLSC508
+5,"MLSC590","Research Project","NWAEJIGH  PROMISE CHINEYE","MED-LAB",6.0,false,MLSC590
+5,"MLSH504","Histopathology Techniques and Embalment","Okorochi  Chinenye Alaezi","MED-LAB",3.0,false,MLSH504
+5,"MLSH504","Histopathology Techniques and Embalment","OLUWALOYE  Taiwo G","MED-LAB",3.0,false,MLSH504
+5,"MLSH506","Museum Techniques","OLUWALOYE  Taiwo G","MED-LAB",3.0,false,MLSH506
+5,"MLSH506","Museum Techniques","Okorochi  Chinenye Alaezi","MED-LAB",3.0,false,MLSH506
+5,"MLSM504","Pharmaceutical Microbiology and Microbial Genetics","Enitan  S.","MED-LAB",3.0,false,MLSM504
+5,"MLSM504","Pharmaceutical Microbiology and Microbial Genetics","Effiong  Effiong Joseph","MED-LAB",3.0,false,MLSM504
+5,"MLSM506","Medical Virology","OFEM  Oluchi","MED-LAB",3.0,false,MLSM506
+5,"MLSM506","Medical Virology","Enitan  S.","MED-LAB",3.0,false,MLSM506
+5,"MLSM506","Medical Virology","Dada  Michael","MED-LAB",3.0,false,MLSM506
+5,"MLSM508","Laboratory Techniques in Microbiology","Dada  Michael","MED-LAB",3.0,false,MLSM508
+5,"MLSM508","Laboratory Techniques in Microbiology","Enitan  S.","MED-LAB",3.0,false,MLSM508
+5,"MLSM508","Laboratory Techniques in Microbiology","OFEM  Oluchi","MED-LAB",3.0,false,MLSM508
+5,"MLSM512","Public Health Microbiology and Epidemiology","OFEM  Oluchi","MED-LAB",3.0,false,MLSM512
+5,"MLSP504","Drug Monitoring, Toxicology and Inborn Error of Metabolism","OSAKUE  Eguagie O.","MED-LAB",3.0,false,MLSP504
+5,"MLSP504","Drug Monitoring, Toxicology and Inborn Error of Metabolism","FATUNMBI  OLUSOLA JOHN","MED-LAB",3.0,false,MLSP504
+5,"MLSP506","Clinical & Reproductive Endocrinology","OSAKUE  Eguagie O.","MED-LAB",3.0,false,MLSP506
+5,"MLSP506","Clinical & Reproductive Endocrinology","AKINJINMI  AKINTUNDE AKINTAYO","MED-LAB",3.0,false,MLSP506
+5,"MLSP506","Clinical & Reproductive Endocrinology","NWAEJIGH  PROMISE CHINEYE","MED-LAB",3.0,false,MLSP506
+5,"MLSP508","Techniques in Clinical Chemistry","FATUNMBI  OLUSOLA JOHN","MED-LAB",3.0,false,MLSP508
+5,"MLSP508","Techniques in Clinical Chemistry","AKINJINMI  AKINTUNDE AKINTAYO","MED-LAB",3.0,false,MLSP508
+5,"MLSP508","Techniques in Clinical Chemistry","OSAKUE  Eguagie O.","MED-LAB",3.0,false,MLSP508
+5,"MLSP508","Techniques in Clinical Chemistry","NWAEJIGH  PROMISE CHINEYE","MED-LAB",3.0,false,MLSP508
+5,"MLSP510","Techniques in Clinical Chemistry II","NWAEJIGH  PROMISE CHINEYE","MED-LAB",2.0,false,MLSP510
+5,"MLSP510","Techniques in Clinical Chemistry II","FATUNMBI  OLUSOLA JOHN","MED-LAB",2.0,false,MLSP510
+5,"MLSP510","Techniques in Clinical Chemistry II","OSAKUE  Eguagie O.","MED-LAB",2.0,false,MLSP510
+5,"MLSP510","Techniques in Clinical Chemistry II","AKINJINMI  AKINTUNDE AKINTAYO","MED-LAB",2.0,false,MLSP510
+200,"BU-ANA 204","Anatomy of Thorax Abdomen Pelvis and Perineum","Adelakin  Lola Adeola","MED-LAB",3.0,false,BU-ANA 204
+200,"BU-MCB 208","Waste Management Microbiology","OSISAMI  TOYOSI","MICRO-BIO",3.0,false,BU-MCB 208
+200,"BU-MLS 202","Laboratory Management I","XXXX","Summer",2.0,false,BU-MLS 202
+200,"BU-MLS 202","Laboratory Harzard Management I","Dada  Michael","MED-LAB",2.0,false,BU-MLS 202
+

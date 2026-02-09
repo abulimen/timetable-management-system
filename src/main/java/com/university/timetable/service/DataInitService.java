@@ -33,16 +33,16 @@ public class DataInitService {
     @Transactional
     public void initialize() {
         log.info("Initializing data...");
-        
+
         // Generate timeslots if not exist
         if (!timeslotService.hasTimeslots()) {
             timeslotService.generateTimeslots();
         }
-        
+
         // Generate lessons for courses that don't have any
         List<Course> courses = courseRepository.findAll();
         int generated = 0;
-        
+
         for (Course course : courses) {
             long lessonCount = lessonRepository.countByCourse(course);
             if (lessonCount == 0 && course.getTotalWeeklyHours() > 0) {
@@ -50,14 +50,14 @@ public class DataInitService {
                 generated++;
             }
         }
-        
+
         if (generated > 0) {
             log.info("Generated lessons for {} courses", generated);
         }
-        
+
         log.info("Data initialization complete. {} courses, {} lessons, {} timeslots",
-            courseRepository.count(),
-            lessonRepository.count(),
-            timeslotService.getAllTimeslots().size());
+                courseRepository.count(),
+                lessonRepository.count(),
+                timeslotService.getAllTimeslots().size());
     }
 }

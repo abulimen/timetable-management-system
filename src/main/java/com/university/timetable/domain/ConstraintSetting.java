@@ -50,10 +50,11 @@ public class ConstraintSetting {
     }
 
     public enum Category {
-        TIMING, LIMITS, WEIGHTS, FEATURES
+        TIMING, LIMITS, WEIGHTS, FEATURES, SYSTEM
     }
 
-    public ConstraintSetting(String settingKey, String settingValue, DataType dataType, Category category, String description) {
+    public ConstraintSetting(String settingKey, String settingValue, DataType dataType, Category category,
+            String description) {
         this.settingKey = settingKey;
         this.settingValue = settingValue;
         this.dataType = dataType;

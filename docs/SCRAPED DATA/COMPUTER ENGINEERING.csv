@@ -1,0 +1,27 @@
+"Year Taken","Course ID","Course Title","Instuctor","Option","Credit Hours","No. GPA","Details"
+1,"CPE 112","Introduction to Computer Engineering","OGUNLERE  Samson Ojo","Computer Engn Grp 2",2.0,false,CPE 112
+1,"CPE 112","Introduction to Computer Engineering","OGUNLERE  Samson Ojo","Computer Engineering",2.0,false,CPE 112
+2,"BU-CPE 202","Innovative Technologies and Emerging Trends","OGUNLERE  Samson Ojo","Computer Engineering",2.0,false,BU-CPE 202
+2,"BU-CPE 202","Innovative Technologies and Emerging Trends","OGUNLERE  Samson Ojo","Computer Engn Grp 2",2.0,false,BU-CPE 202
+2,"GET 202","Engineering Materials","ADEMOKOYA  Shade Olubunmi","Civil Engineering",3.0,false,GET 202
+2,"GET 202","Engineering Materials","ADEMOKOYA  Shade Olubunmi","Mechanical Engineering",3.0,false,GET 202
+2,"GET 202","Engineering Materials","ADEMOKOYA  Shade Olubunmi","Computer Engineering",3.0,false,GET 202
+2,"GET 202","Engineering Materials","ADEMOKOYA  Shade Olubunmi","Computer Engn Grp 2",3.0,false,GET 202
+2,"GET 204","Student Workshop Practice","ARINOLA   IBUKUNOLUWA O","Computer Engineering",2.0,false,GET 204
+2,"GET 204","Student Workshop Practice","ARINOLA   IBUKUNOLUWA O","Computer Engn Grp 2",2.0,false,GET 204
+2,"GET 204","Student Workshop Practice","ADELOWO  TOFUNMI CALEB","Civil Engineering",2.0,false,GET 204
+2,"GET 204","Student Workshop Practice","ADEMOKOYA  Shade Olubunmi","Mechanical Engineering",2.0,false,GET 204
+2,"GET 204","Student Workshop Practice","Omotosho  Olawale J.","Electrical and Electronic Engineering",2.0,false,GET 204
+2,"GET 210","Engineering Mathematics II","ADELEYE   ROTIMI","Computer Engn Grp 2",3.0,false,GET 210
+2,"GET 210","Engineering Mathematics II","ADELEYE   ROTIMI","Electrical and Electronic Engineering",3.0,false,GET 210
+2,"GET 210","Engineering Mathematics II","ADELEYE   ROTIMI","Computer Engineering",3.0,false,GET 210
+2,"GET 210","Engineering Mathematics II","ADELEYE   ROTIMI","Civil Engineering",3.0,false,GET 210
+2,"GET 210","Engineering Mathematics II","ADELEYE   ROTIMI","Mechanical Engineering",3.0,false,GET 210
+2,"GET 290","SIWES I","ADELOWO  TOFUNMI CALEB","Civil Engineering",3.0,false,GET 290
+2,"GET 290","SIWES I","ARINOLA   IBUKUNOLUWA O","Computer Engineering",3.0,false,GET 290
+2,"GET 290","SIWES I","ARINOLA   IBUKUNOLUWA O","Computer Engn Grp 2",3.0,false,GET 290
+2,"GET 290","SIWES I","ADEMOKOYA  Shade Olubunmi","Mechanical Engineering",3.0,false,GET 290
+2,"GET 290","SIWES I","Omotosho  Olawale J.","Electrical and Electronic Engineering",3.0,false,GET 290
+3,"CPE 302","Measurement and Instrumentation","OGUNLERE  Samson Ojo","Computer Engn Grp 2",3.0,false,CPE 302
+3,"CPE 302","Measurement and Instrumentation","OGUNLERE  Samson Ojo","Computer Engineering",3.0,false,CPE 302
+

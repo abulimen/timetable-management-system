@@ -52,6 +52,8 @@
               "src/assets"
             ],
             "styles": [
+              "node_modules/handsontable/styles/handsontable.min.css",
+              "node_modules/handsontable/styles/ht-theme-main.min.css",
               "src/styles.scss"
             ],
             "scripts": []
@@ -66,8 +68,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
                 }
               ],
               "outputHashing": "all"
@@ -119,5 +121,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "513808fb-9a7b-4e30-a053-5002d05fa56f"
   }
 }

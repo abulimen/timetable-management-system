@@ -1,0 +1,31 @@
+"Year Taken","Course ID","Course Title","Instuctor","Option","Credit Hours","No. GPA","Details"
+1,"BU-MCB 102","Biblical Foundations in Microbiology","Aina  Daniel Ayandiran","MICRO-BIO",2.0,false,BU-MCB 102
+2,"BU-MCB 202","Intro to Veterinary Microbiology","AMODU  Samuel","MICRO-BIO",3.0,false,BU-MCB 202
+2,"BU-MCB 202","Intro to Veterinary Microbiology","OSISAMI  TOYOSI","MICRO-BIO",3.0,false,BU-MCB 202
+2,"BU-MCB 204","Soil Microbiology","Onumaegbu  Chinweizu Obioma","MICRO-BIO",3.0,false,BU-MCB 204
+2,"BU-MCB 204","Soil Microbiology","ADEGOKE  OLUWAFERANMI MARVELOUS","MICRO-BIO",3.0,false,BU-MCB 204
+2,"BU-MCB 206","Biodeterioration","Oyedele  OluwawapelumI Adejoke","MICRO-BIO",2.0,false,BU-MCB 206
+2,"BU-MCB 212","Fundamentals of Bacteriology","FAGBEMI  KEHINDE OLUWAKEMI","MICRO-BIO",2.0,false,BU-MCB 212
+2,"BU-NSC 202","Microbial Organisms and Nursing Practice","UCHENNA-NZEWANTA    UTUVI D","Nursing Group C",3.0,false,BU-NSC 202
+2,"BU-NSC 202","Microbial Organisms and Nursing Practice","UCHENNA-NZEWANTA    UTUVI D","Nursing Group B",3.0,false,BU-NSC 202
+2,"BU-NSC 202","Microbial Organisms and Nursing Practice","Thonda   Oluwakemi","Nursing Group A",3.0,false,BU-NSC 202
+2,"MBIO202","General Microbiology II","Ezeamagu  Cajethan  Onyebuchi","MICRO-BIO",3.0,false,MBIO202
+3,"MBIO312","Biodeterioration","Onumaegbu  Chinweizu Obioma","MICRO-BIO",2.0,false,MBIO312
+3,"MBIO316","Ecology of Microbes","OSISAMI  TOYOSI","MICRO-BIO",3.0,false,MBIO316
+3,"MBIO318","Fundamentals of Virology","Adeoye-Isijola  Morenike Olutunmbi","MICRO-BIO",3.0,false,MBIO318
+3,"MBIO322","Basic Research Methodology","AMODU  Samuel","MICRO-BIO",2.0,false,MBIO322
+3,"MBIO360","Students Industrial Work Experience (SIWES)","Thonda   Oluwakemi","MICRO-BIO",6.0,false,MBIO360
+3,"MCB 324","Microbial Ecology","Ezeamagu  Cajethan  Onyebuchi","MICRO-BIO",3.0,false,MCB 324
+3,"MCB 350","Industrial Attachment II (36 Weeks)","Thonda   Oluwakemi","MICRO-BIO",6.0,false,MCB 350
+3,"MCB 398","Entrepreneurship and Microbiology","Mensah-Agyei  Grace Oluwatoyin","MICRO-BIO",1.0,false,MCB 398
+4,"MBIO402","Industrial Microbiology","FAGBEMI  KEHINDE OLUWAKEMI","MICRO-BIO",3.0,false,MBIO402
+4,"MBIO402","Industrial Microbiology","FAGBEMI  KEHINDE OLUWAKEMI","Biol",3.0,false,MBIO402
+4,"MBIO414","Pharmaceutical Microbiology","ADEFISOYE  MARTINS AJIBADE","MICRO-BIO",3.0,false,MBIO414
+4,"MBIO 418","Clinical and Medical Microbiology","Mensah-Agyei  Grace Oluwatoyin","MICRO-BIO",3.0,false,MBIO 418
+4,"MBIO418","Clinical and Medical Microbiology","Mensah-Agyei  Grace Oluwatoyin","MICRO-BIO",3.0,false,MBIO418
+4,"MBIO418","Clinical and Medical Microbiology","Adeoye-Isijola  Morenike Olutunmbi","Main",3.0,false,MBIO418
+4,"MBIO490","Research Project","Thonda   Oluwakemi","MICRO-BIO",6.0,false,MBIO490
+5,"MLSH508","Introductory Concepts in Oncology","OLUWALOYE  Taiwo G","MED-LAB",2.0,false,MLSH508
+5,"MLSH508","Introductory Concepts in Oncology","Okorochi  Chinenye Alaezi","MED-LAB",2.0,false,MLSH508
+200,"BU-MCB 200","Bioethics and Patent Law in Microbiology","Oyedele  OluwawapelumI Adejoke","MICRO-BIO",3.0,false,BU-MCB 200
+

@@ -23,6 +23,21 @@ export const routes: Routes = [
         canActivate: [authGuard]
     },
     {
+        path: 'lecturer/dashboard',
+        loadComponent: () => import('./features/lecturer-dashboard/lecturer-dashboard.component').then(m => m.LecturerDashboardComponent),
+        canActivate: [authGuard]
+    },
+    {
+        path: 'availability-requests',
+        loadComponent: () => import('./features/availability-requests/availability-requests.component').then(m => m.AvailabilityRequestsComponent),
+        canActivate: [authGuard, coordinatorGuard]
+    },
+    {
+        path: 'lecturer-unavailabilities',
+        loadComponent: () => import('./features/lecturer-unavailabilities/lecturer-unavailabilities.component').then(m => m.LecturerUnavailabilitiesComponent),
+        canActivate: [authGuard, coordinatorGuard]
+    },
+    {
         path: 'zones',
         loadComponent: () => import('./features/zones/zones.component').then(m => m.ZonesComponent),
         canActivate: [authGuard, coordinatorGuard]
@@ -63,8 +78,28 @@ export const routes: Routes = [
         canActivate: [authGuard, adminGuard]
     },
     {
-        path: 'import',
-        loadComponent: () => import('./features/import/import.component').then(m => m.ImportComponent),
+        path: 'data-imports',
+        loadComponent: () => import('./features/import/drafts/my-drafts.component').then(m => m.MyDraftsComponent),
+        canActivate: [authGuard, coordinatorGuard]
+    },
+    {
+        path: 'import/draft/:id',
+        loadComponent: () => import('./features/import/drafts/draft-editor.component').then(m => m.DraftEditorComponent),
+        canActivate: [authGuard, coordinatorGuard]
+    },
+    {
+        path: 'import/submissions',
+        loadComponent: () => import('./features/import/submissions/my-submissions.component').then(m => m.MySubmissionsComponent),
+        canActivate: [authGuard, coordinatorGuard]
+    },
+    {
+        path: 'admin/approvals',
+        loadComponent: () => import('./features/import/staging/pending-approvals.component').then(m => m.PendingApprovalsComponent),
+        canActivate: [authGuard, coordinatorGuard]
+    },
+    {
+        path: 'admin/history',
+        loadComponent: () => import('./features/import/import-history/import-history.component').then(m => m.ImportHistoryComponent),
         canActivate: [authGuard, coordinatorGuard]
     },
     {
@@ -85,6 +120,11 @@ export const routes: Routes = [
     {
         path: 'users',
         loadComponent: () => import('./features/users/users.component').then(m => m.UsersComponent),
+        canActivate: [authGuard, adminGuard]
+    },
+    {
+        path: 'audit-logs',
+        loadComponent: () => import('./features/audit-logs/audit-logs.component').then(m => m.AuditLogsComponent),
         canActivate: [authGuard, adminGuard]
     },
     {

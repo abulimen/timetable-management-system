@@ -1,0 +1,102 @@
+"Year Taken","Course ID","Course Title","Instuctor","Option","Credit Hours","No. GPA","Details"
+1,"ACC 102","Introduction to Financial Accounting II","Soetan  Timothy Adisa","MKT",3.0,false,ACC 102
+1,"ACC 102","Introduction to Financial Accounting II","Soetan  Timothy Adisa","BUSAD",3.0,false,ACC 102
+1,"ACC 102","Introduction to Financial Accounting II","Alu  Chituru Nkechinyere Aseoluwa","ACCT A",3.0,false,ACC 102
+1,"ACC 102","Introduction to Financial Accounting II","Olurin  Oluwatoyosi Tolulope","ACCT B",3.0,false,ACC 102
+1,"ACC 102","Introduction to Financial Accounting II","OLALERE  MAYOWA DAVID","ECONS",3.0,false,ACC 102
+1,"ACC 102","Introduction to Financial Accounting II","Akinsanya  Rebecca","Finance",3.0,false,ACC 102
+1,"ACCT102","Principles Of Accounting II","Awoyinka  Gbenga","ACCT A",3.0,false,ACCT102
+1,"ACCT102","Principles Of Accounting II","Soetan  Timothy Adisa","BUSAD",3.0,false,ACCT102
+1,"BED 114","Financial Accounting for Business Educators I  ","UWANNAH  Ngozi","BusEdu",2.0,false,BED 114
+1,"BU-ACC 208","Business Law","SOTUNSA  ERIOLUWA","ACCT A",3.0,false,BU-ACC 208
+1,"BU-ACC 208","Business Law","Oyagiri  Buduka Isaac","ACCT B",3.0,false,BU-ACC 208
+1,"BU-ACC 210","Introduction to Human Resoruce Accounting","ONU  GIFT","ACCT B",2.0,false,BU-ACC 210
+1,"BU-ACC 210","Introduction to Human Resoruce Accounting","ONU  GIFT","ACCT A",2.0,false,BU-ACC 210
+1,"BU-ACC 212","Introduction to Business Analytics","Enyi. Patrick Enyi","ACCT B",2.0,false,BU-ACC 212
+1,"BU-ACC 212","Introduction to Business Analytics","Enyi. Patrick Enyi","ACCT A",2.0,false,BU-ACC 212
+2,"ACC 206","Accounting Laboratory","AJAYI-OWOEYE  Ayooluwa olotu","ACCT B",3.0,false,ACC 206
+2,"ACC 206","Accounting Laboratory","AJAYI-OWOEYE  Ayooluwa olotu","ACCT A",3.0,false,ACC 206
+2,"ACCT202","Financial Accounting II","Olurin  Oluwatoyosi Tolulope","ACCT B",3.0,false,ACCT202
+2,"ACCT202","Financial Accounting II","Alu  Chituru Nkechinyere Aseoluwa","ACCT A",3.0,false,ACCT202
+2,"ACCT204","Cost Accounting II","Owolabi  Babatunde A","ACCT B",3.0,false,ACCT204
+2,"ACCT204","Cost Accounting II","Owolabi  Babatunde A","ACCT A",3.0,false,ACCT204
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","Biol",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","Chem",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","AGRIC",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","BIO-CHEM",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","DE History",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","PUB",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","ILD",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","CRS",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","Estate Management",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","IT",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","ACCT",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","CS",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","PUBHEALTH",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","Music",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","MICRO-BIO",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","HIST",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","POLSC",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","Civil Engineering",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","NUTRITION",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","Mechanical Engineering",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","DADA  Rachael Lola","ALL CLASS OPTIONS",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","ENGL",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","French",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","Physiology",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","Maths",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","MASS-COMM",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","mcom DE",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","IRM",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","ECONS",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","JURISPRUDENCE & PUBLIC LAW",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","Electrical and Electronic Engineering",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","Computer Engineering",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","DADA  Rachael Lola","SOWK GROUP A",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","NURSING",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","Nursing Direct Entry",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","EDUCATION",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","Guidance and Counselling",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","BUSAD",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","MKT",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","MED-LAB",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","Finance",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","Soft Eng Group A",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","Soft Eng Group B",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","Soft Eng Group C",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","Soft Eng Group D",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","Soft Eng Group E",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","DE Software",0.0,false,BU-GST 022
+2,"BU-GST 022","Citizenship Orientation","ABIOYE  Funke Victoria","Anatomy",0.0,false,BU-GST 022
+3,"ACC 302","Financial Reporting II","OGUNDAJO  GRACE Oyeyemi","ACCT A",3.0,false,ACC 302
+3,"ACC 302","Financial Reporting II","OGUNDAJO  GRACE Oyeyemi","ACCT B",3.0,false,ACC 302
+3,"ACC 306","Taxation II","Owolabi  Babatunde A","ACCT B",3.0,false,ACC 306
+3,"ACC 306","Taxation II","ADEBAWO  OLUSEYE OLUSEYI","ACCT A",3.0,false,ACC 306
+3,"ACC 308","Public Sector Accounting & Reporting","OLALERE  MAYOWA DAVID","ACCT B",3.0,false,ACC 308
+3,"ACC 308","Public Sector Accounting & Reporting","ONU  GIFT","ACCT A",3.0,false,ACC 308
+3,"ACCT302","Advanced Financial Accounting II","OGUNDAJO  GRACE Oyeyemi","ACCT A",3.0,false,ACCT302
+3,"ACCT302","Advanced Financial Accounting II","OGUNDAJO  GRACE Oyeyemi","ACCT B",3.0,false,ACCT302
+3,"ACCT326","Computer Application and Accounting Packages I","Izang  Julia Ufuoma","ACCT B",3.0,false,ACCT326
+3,"ACCT326","Computer Application and Accounting Packages I","AJAYI-OWOEYE  Ayooluwa olotu","ACCT A",3.0,false,ACCT326
+3,"ACCT328","Principles of Taxation","Owolabi  Babatunde A","ACCT B",3.0,false,ACCT328
+3,"ACCT328","Principles of Taxation","ADEBAWO  OLUSEYE OLUSEYI","ACCT A",3.0,false,ACCT328
+3,"ACCT362","Accounting Research Method","Ajibade  Ayodeji  Temitope","ACCT B",3.0,false,ACCT362
+3,"ACCT362","Accounting Research Method","Ajibade  Ayodeji  Temitope","ACCT A",3.0,false,ACCT362
+3,"BU-ACC 304","Accounting Research Methods","Ajibade  Ayodeji  Temitope","ACCT A",2.0,false,BU-ACC 304
+3,"BU-ACC 304","Accounting Research Methods","Ajibade  Ayodeji  Temitope","ACCT B",2.0,false,BU-ACC 304
+3,"BU-ACC 310","Computer Applications & Mgt. Inform. Systems","AJAYI-OWOEYE  Ayooluwa olotu","ACCT A",2.0,false,BU-ACC 310
+3,"BU-ACC 310","Computer Applications & Mgt. Inform. Systems","Izang  Julia Ufuoma","ACCT B",2.0,false,BU-ACC 310
+3,"BU-ACC 312","Accounting Theory","Ahannaya   Chinedu Gandolph","ACCT B",2.0,false,BU-ACC 312
+3,"BU-ACC 312","Accounting Theory","Olurin  Oluwatoyosi Tolulope","ACCT A",2.0,false,BU-ACC 312
+4,"ACCT406","International Corporate Finance","Izang  Julia Ufuoma","ACCT B",3.0,false,ACCT406
+4,"ACCT406","International Corporate Finance","OGUNDAJO  GRACE Oyeyemi","ACCT A",3.0,false,ACCT406
+4,"ACCT420","Public Sector Accounting and Finance","Izang  Julia Ufuoma","ACCT B",3.0,false,ACCT420
+4,"ACCT420","Public Sector Accounting and Finance","Ahannaya   Chinedu Gandolph","ACCT A",3.0,false,ACCT420
+4,"ACCT434","Taxation II","ADEGBIE  Folajimi Festus","ACCT B",3.0,false,ACCT434
+4,"ACCT434","Taxation II","Dada  Samuel","ACCT A",3.0,false,ACCT434
+4,"ACCT444","Financial Management II","Kwarbai  Jerry Danjuma","ACCT B",3.0,false,ACCT444
+4,"ACCT444","Financial Management II","Kwarbai  Jerry Danjuma","ACCT A",3.0,false,ACCT444
+4,"ACCT462","Financial Reporting and Ethics of Accounting I","Nwaobia  Appolos","ACCT B",3.0,false,ACCT462
+4,"ACCT462","Financial Reporting and Ethics of Accounting I","ADEBAWO  OLUSEYE OLUSEYI","ACCT A",3.0,false,ACCT462
+4,"ACCT490","Research Project ","Nwaobia  Appolos","ACCT",6.0,false,ACCT490
+

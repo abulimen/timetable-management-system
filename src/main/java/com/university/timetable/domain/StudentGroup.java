@@ -33,6 +33,28 @@ public class StudentGroup {
     @EqualsAndHashCode.Include
     private Long id;
 
+    /**
+     * The base name without level/group suffix (e.g., "Computer Science").
+     */
+    @Column(nullable = false)
+    private String baseName;
+
+    /**
+     * Level indicator (100, 200, 300, 400, 500, 600).
+     */
+    @Column(nullable = false)
+    private Integer level;
+
+    /**
+     * Optional group notation (A, B, C, DE, etc.). Null for parent groups.
+     */
+    @Column
+    private String groupNotation;
+
+    /**
+     * Computed full name = baseName + " " + level + groupNotation.
+     * Stored for efficient querying.
+     */
     @Column(nullable = false)
     private String name;
 
@@ -46,15 +68,46 @@ public class StudentGroup {
     @OneToMany(mappedBy = "parentGroup", fetch = FetchType.EAGER)
     private List<StudentGroup> children = new ArrayList<>();
 
-    public StudentGroup(String name, int size) {
-        this.name = name;
+    public StudentGroup(String baseName, Integer level, String groupNotation, int size) {
+        this.baseName = baseName;
+        this.level = level;
+        this.groupNotation = groupNotation;
+        this.name = computeName(baseName, level, groupNotation);
         this.size = size;
     }
 
-    public StudentGroup(String name, int size, StudentGroup parentGroup) {
-        this.name = name;
+    public StudentGroup(String baseName, Integer level, String groupNotation, int size, StudentGroup parentGroup) {
+        this.baseName = baseName;
+        this.level = level;
+        this.groupNotation = groupNotation;
+        this.name = computeName(baseName, level, groupNotation);
         this.size = size;
         this.parentGroup = parentGroup;
+    }
+
+    /**
+     * Compute the full name from components.
+     * Format: "baseName level[groupNotation]" e.g., "Computer Science 100A"
+     */
+    public static String computeName(String baseName, Integer level, String groupNotation) {
+        StringBuilder sb = new StringBuilder();
+        if (baseName != null) {
+            sb.append(baseName);
+        }
+        if (level != null) {
+            sb.append(" ").append(level).append(" LEVEL");
+        }
+        if (groupNotation != null && !groupNotation.trim().isEmpty()) {
+            sb.append(" (GRP ").append(groupNotation.trim()).append(")");
+        }
+        return sb.toString().trim();
+    }
+
+    /**
+     * Update name when fields change.
+     */
+    public void updateComputedName() {
+        this.name = computeName(this.baseName, this.level, this.groupNotation);
     }
 
     /**
@@ -91,9 +144,9 @@ public class StudentGroup {
         if (other == null) {
             return false;
         }
-        return this.equals(other) 
-            || this.isParentOf(other) 
-            || other.isParentOf(this);
+        return this.equals(other)
+                || this.isParentOf(other)
+                || other.isParentOf(this);
     }
 
     @Override

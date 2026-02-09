@@ -1,0 +1,64 @@
+"Year Taken","Course ID","Course Title","Instuctor","Option","Credit Hours","No. GPA","Details"
+1,"BU-MCM 122","Social Psychology of Communication","ADETOLA   ADESEGUN S","MASS-COMM",2.0,false,BU-MCM 122
+1,"BU-MCM 124","Public Communication","Atakiti  Ifeoluwa","MASS-COMM",2.0,false,BU-MCM 124
+1,"CMS 102","Writing for the Media","Olomojobi  Femi","MASS-COMM",2.0,false,CMS 102
+1,"MCM 102","Principles of Public Relations","Suleiman J","MASS-COMM",2.0,false,MCM 102
+1,"MCM 104","Introduction to News Writing","IKPEGBU  EMMANUEL OKEAHIALAM","MASS-COMM",2.0,false,MCM 104
+1,"MCM 106","African Communication System","CHINANU-AKPUH  CHINWE COMFORT","MASS-COMM",2.0,false,MCM 106
+1,"MCOM118","Introduction To Photojournalism","Atakiti  Ifeoluwa","MASS-COMM",3.0,false,MCOM118
+2,"MCOM212","Public Communication and Speech Writing","Atakiti  Ifeoluwa","MASS-COMM",3.0,false,MCOM212
+2,"MCOM222","Landmark Issues in Nigeria Mass Media","Olomojobi  Femi","MASS-COMM",3.0,false,MCOM222
+3,"BU-CMS 342","Persuasion, Propaganda, Misinformation","Anatsui   Clementina ","MASS-COMM",2.0,false,BU-CMS 342
+3,"BU-MCM 316","Journalism and Health Communication","Jegede  O. Omolayo","MASS-COM GROUP C",2.0,false,BU-MCM 316
+3,"BU-MCM 318","Coding for Marketing Communication","Suleiman J","MASS-COM GROUP A",2.0,false,BU-MCM 318
+3,"BU-MCM 320","Film Adaptation","CHINANU-AKPUH  CHINWE COMFORT","MASS-COM GROUP B",2.0,false,BU-MCM 320
+3,"CMS 302","Foundation of Communication Research","IKPEGBU  EMMANUEL OKEAHIALAM","MASS-COMM",2.0,false,CMS 302
+3,"MCM 302","Online Journalism","ADETOLA   ADESEGUN S","MASS-COMM",2.0,false,MCM 302
+3,"MCM 304","Foreign Correspondence","BEREDEM   MARY Leka","MASS-COM GROUP C",2.0,false,MCM 304
+3,"MCM 306","Investigative Journalism","ADETOLA   ADESEGUN S","MASS-COM GROUP C",2.0,false,MCM 306
+3,"MCM 308","Broadcast Programming, management and Operations","Atakiti  Ifeoluwa","MASS-COM GROUP B",2.0,false,MCM 308
+3,"MCM 310","	International and Foreign Broadcasting","Ajaegbu  Oguchi","MASS-COM GROUP B",2.0,false,MCM 310
+3,"MCM 312","Organization and Management of PRAD Agencies","Ogunwemimo  Oluwafisayo O.","MASS-COM GROUP A",2.0,false,MCM 312
+3,"MCM 314","International PRAD","Anatsui   Clementina ","MASS-COM GROUP A",2.0,false,MCM 314
+3,"MCOM332","Broadcast Presentation and Commentary","Atakiti  Ifeoluwa","MASS-COM GROUP B",3.0,false,MCOM332
+3,"MCOM336","Drama and Documentary Production","Ajaegbu  Oguchi","MASS-COM GROUP B",3.0,false,MCOM336
+3,"MCOM338","Film Theory and Aesthetics","Jegede  O. Omolayo","MASS-COM GROUP B",3.0,false,MCOM338
+3,"MCOM342","Media Planning and Management","Ogunwemimo  Oluwafisayo O.","MASS-COM GROUP A",3.0,false,MCOM342
+3,"MCOM344","Advert Creative Writing and Technique","ABISOYE  GODLYN","MASS-COM GROUP A",3.0,false,MCOM344
+3,"MCOM346","Specialized Reporting","IKPEGBU  EMMANUEL OKEAHIALAM","MASS-COMM",3.0,false,MCOM346
+3,"MCOM356","Photo Editing","Apata, W.","MASS-COMM",3.0,false,MCOM356
+3,"MCOM366","Research in Mass Communication","IKPEGBU  EMMANUEL OKEAHIALAM","MASS-COMM",3.0,false,MCOM366
+3,"MCOM368","PR Techniques and Implementation","Suleiman J","MASS-COM GROUP A",3.0,false,MCOM368
+4,"MCOM418","Issues in Religious Communication","Anatsui   Clementina ","MASS-COMM",3.0,false,MCOM418
+4,"MCOM420","Webpage Designing And Publishing","SADARE  OLABANJI Emmanuel","MASS-COMM",3.0,false,MCOM420
+4,"MCOM432","Broadcast Management and Programming","BEREDEM   MARY Leka","MASS-COM GROUP B",3.0,false,MCOM432
+4,"MCOM436","Film Criticism and Appreciation","Atakiti  Ifeoluwa","MASS-COM GROUP B",3.0,false,MCOM436
+4,"MCOM442","Economic and Social Issues in Public Relations Advertizing","Adekoya  H.O","MASS-COM GROUP A",3.0,false,MCOM442
+4,"MCOM444","Integrated Marketing Communications","Ogunwemimo  Oluwafisayo O.","MASS-COM GROUP A",3.0,false,MCOM444
+4,"MCOM456","Communication and Society","Ajaegbu  Oguchi","MASS-COM GROUP B",3.0,false,MCOM456
+4,"MCOM490","Research Project","Ogunwemimo  Oluwafisayo O.","MASS-COMM",6.0,false,MCOM490
+200,"BU-CMS 218","Sports Communication","Olomojobi  Femi","MASS-COMM",2.0,false,BU-CMS 218
+200,"BU-CMS 218","Sports Communication","Olomojobi  Femi","mcom DE",2.0,false,BU-CMS 218
+200,"BU-CMS 220","Fundamentals of Christian Writings","CHINANU-AKPUH  CHINWE COMFORT","mcom DE",2.0,false,BU-CMS 220
+200,"BU-CMS 220","Fundamentals of Christian Writings","CHINANU-AKPUH  CHINWE COMFORT","MASS-COMM",2.0,false,BU-CMS 220
+200,"BU-MCM 224","Christian Mission Broadcasting","Jegede  O. Omolayo","MASS-COM GROUP B",2.0,false,BU-MCM 224
+200,"BU-MCM 224","Christian Mission Broadcasting","Jegede  O. Omolayo","mcom DE",2.0,false,BU-MCM 224
+200,"BU-MCM 226","Accessible Inclusive Publishing","Okere  Sam","mcom DE",2.0,false,BU-MCM 226
+200,"BU-MCM 226","Accessible Inclusive Publishing","Okere  Sam","MASS-COM GROUP C",2.0,false,BU-MCM 226
+200,"MCM 202","Editing and Graphics Communication","Apata, W.","MASS-COMM",3.0,false,MCM 202
+200,"MCM 202","Editing and Graphics Communication","Apata, W.","mcom DE",3.0,false,MCM 202
+200,"MCM 204","Advanced and Specialised Reporting","BEREDEM   MARY Leka","mcom DE",3.0,false,MCM 204
+200,"MCM 204","Advanced and Specialised Reporting","BEREDEM   MARY Leka","MASS-COM GROUP C",3.0,false,MCM 204
+200,"MCM 206","Manuscript Editing Layout and Design in Book Publishing","Okere  Sam","MASS-COM GROUP C",2.0,false,MCM 206
+200,"MCM 206","Manuscript Editing Layout and Design in Book Publishing","Okere  Sam","mcom DE",2.0,false,MCM 206
+200,"MCM 208","Radio TV Programme Writing","AKINTAYO  AYODUNNI","MASS-COM GROUP B",2.0,false,MCM 208
+200,"MCM 208","Radio TV Programme Writing","AKINTAYO  AYODUNNI","mcom DE",2.0,false,MCM 208
+200,"MCM 210","Presentation and Performance","Adekoya  H.O","MASS-COM GROUP B",2.0,false,MCM 210
+200,"MCM 210","Presentation and Performance","Adekoya  H.O","mcom DE",2.0,false,MCM 210
+200,"MCM 212","Marketing Foundations for Public Relations and Advertising","ABISOYE  GODLYN","MASS-COM GROUP A",2.0,false,MCM 212
+200,"MCM 212","Marketing Foundations for Public Relations and Advertising","ABISOYE  GODLYN","mcom DE",2.0,false,MCM 212
+200,"MCM 214","Advert Copy Writing","ABISOYE  GODLYN","mcom DE",2.0,false,MCM 214
+200,"MCM 214","Advert Copy Writing","ABISOYE  GODLYN","MASS-COM GROUP A",2.0,false,MCM 214
+200,"MCM 216","Fundamentals of Media Relations","Atakiti  Ifeoluwa","mcom DE",2.0,false,MCM 216
+200,"MCM 216","Fundamentals of Media Relations","Atakiti  Ifeoluwa","MASS-COM GROUP A",2.0,false,MCM 216
+

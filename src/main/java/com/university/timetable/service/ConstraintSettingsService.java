@@ -120,6 +120,66 @@ public class ConstraintSettingsService {
         return getBoolean("same_course_same_day_allowed", false);
     }
 
+    // ==================== UNAVAILABILITY SYSTEM SETTINGS ====================
+
+    /**
+     * Check if the unavailability system is enabled.
+     * When disabled, lecturers don't see the feature and solver ignores
+     * unavailabilities.
+     */
+    // ==================== SYSTEM SETTINGS ====================
+
+    public int getRollbackWindowHours() {
+        return getInt("bulk_import_rollback_window_hours", 24);
+    }
+
+    // ==================== AVAILABILITY SETTINGS ====================
+
+    public boolean isUnavailabilitySystemEnabled() {
+        return getBoolean("unavailability_system_enabled", false);
+    }
+
+    /**
+     * Check if unavailability requests are open for submission.
+     * When closed, no one can create new requests.
+     */
+    public boolean isUnavailabilityRequestsOpen() {
+        return getBoolean("unavailability_requests_open", false);
+    }
+
+    /**
+     * Enable or disable the unavailability system.
+     */
+    @Transactional
+    public void setUnavailabilitySystemEnabled(boolean enabled) {
+        updateOrCreateSetting("unavailability_system_enabled", String.valueOf(enabled));
+    }
+
+    /**
+     * Open or close unavailability request submissions.
+     */
+    @Transactional
+    public void setUnavailabilityRequestsOpen(boolean open) {
+        updateOrCreateSetting("unavailability_requests_open", String.valueOf(open));
+    }
+
+    private void updateOrCreateSetting(String key, String value) {
+        repository.findBySettingKey(key).ifPresentOrElse(
+                setting -> {
+                    setting.setSettingValue(value);
+                    repository.save(setting);
+                    settingsCache.put(key, value);
+                },
+                () -> {
+                    ConstraintSetting newSetting = new ConstraintSetting();
+                    newSetting.setSettingKey(key);
+                    newSetting.setSettingValue(value);
+                    repository.save(newSetting);
+                    settingsCache.put(key, value);
+                });
+        log.info("Set {} = {}", key, value);
+    }
+
     // ==================== CRUD OPERATIONS ====================
 
     @Transactional(readOnly = true)

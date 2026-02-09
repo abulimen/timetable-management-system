@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary 
 
-This document defines the requirements for implementing a **complete and robust audit logging system** for the Babcock University Timetable Management System (BUTMS). The audit log will track all significant actions performed within the system, providing accountability, traceability, and compliance capabilities.
+This document defines the requirements for implementing a **complete and robust audit logging system** for the University Timetable Management System (BUTMS). The audit log will track all significant actions performed within the system, providing accountability, traceability, and compliance capabilities.
 
 ---
 

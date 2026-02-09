@@ -90,6 +90,9 @@ public class SpecialEventController {
     }
 
     private void updateFromDTO(SpecialEvent event, SpecialEventCreateDTO dto) {
+        if (dto == null) {
+            throw new IllegalArgumentException("Request body is required");
+        }
         event.setName(dto.name);
         event.setDescription(dto.description);
         event.setDayOfWeek(DayOfWeek.valueOf(dto.dayOfWeek.toUpperCase()));
@@ -98,8 +101,11 @@ public class SpecialEventController {
         event.setOnline(dto.online != null && dto.online);
         event.setActive(dto.active == null || dto.active);
 
+        Room selectedRoom = null;
         if (dto.roomId != null) {
-            roomRepository.findById(dto.roomId).ifPresent(event::setRoom);
+            selectedRoom = roomRepository.findById(dto.roomId)
+                    .orElseThrow(() -> new IllegalArgumentException("Room not found: " + dto.roomId));
+            event.setRoom(selectedRoom);
         } else {
             event.setRoom(null);
         }
@@ -116,6 +122,26 @@ public class SpecialEventController {
                     .filter(java.util.Optional::isPresent)
                     .map(java.util.Optional::get)
                     .collect(Collectors.toSet());
+
+            boolean hasChildGroup = groups.stream()
+                    .map(StudentGroup::getParentGroup)
+                    .anyMatch(java.util.Objects::nonNull);
+            if (hasChildGroup) {
+                throw new IllegalArgumentException("Only parent groups can be selected for special events");
+            }
+
+            if (!event.isOnline() && selectedRoom != null) {
+                int totalPopulation = groups.stream()
+                        .map(StudentGroup::getSize)
+                        .filter(java.util.Objects::nonNull)
+                        .mapToInt(Integer::intValue)
+                        .sum();
+                if (totalPopulation > selectedRoom.getCapacity()) {
+                    throw new IllegalArgumentException(
+                            "Selected groups population (" + totalPopulation + ") exceeds room capacity (" +
+                                    selectedRoom.getCapacity() + ")");
+                }
+            }
             event.setStudentGroups(groups);
         } else {
             event.setStudentGroups(Set.of());

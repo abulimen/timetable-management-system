@@ -32,6 +32,7 @@ public class SolverService {
     private final SpecialEventRepository specialEventRepository;
     private final TimeslotService timeslotService;
     private final SolutionSaver solutionSaver;
+    private final ConstraintSettingsService constraintSettingsService;
 
     private static final Long PROBLEM_ID = 1L;
     private String currentJobId;
@@ -46,6 +47,14 @@ public class SolverService {
      */
     public SolverStatusDTO startSolving(String mode) {
         log.info("Starting solver in {} mode", mode);
+
+        // Block solving if unavailability system is enabled but requests are still open
+        if (constraintSettingsService.isUnavailabilitySystemEnabled() &&
+                constraintSettingsService.isUnavailabilityRequestsOpen()) {
+            throw new IllegalStateException(
+                    "Cannot generate timetable while unavailability requests are still open. " +
+                            "Please close the request period first.");
+        }
 
         // Ensure timeslots exist
         if (!timeslotService.hasTimeslots()) {

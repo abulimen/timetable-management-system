@@ -8,6 +8,7 @@ import com.university.timetable.domain.User;
 import com.university.timetable.repository.LecturerRepository;
 import com.university.timetable.repository.UserRepository;
 import com.university.timetable.service.AvailabilityChangeRequestService;
+import com.university.timetable.service.ConstraintSettingsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -34,16 +35,53 @@ public class AvailabilityChangeRequestController {
     private final AvailabilityChangeRequestService requestService;
     private final LecturerRepository lecturerRepository;
     private final UserRepository userRepository;
+    private final ConstraintSettingsService constraintSettingsService;
+
+    /**
+     * Get unavailability system settings status.
+     */
+    @GetMapping("/settings")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Map<String, Object>> getSettings() {
+        return ResponseEntity.ok(Map.of(
+                "systemEnabled", constraintSettingsService.isUnavailabilitySystemEnabled(),
+                "requestsOpen", constraintSettingsService.isUnavailabilityRequestsOpen()));
+    }
+
+    /**
+     * Update unavailability system settings (Admin only).
+     */
+    @PostMapping("/settings")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<Map<String, Object>> updateSettings(@RequestBody Map<String, Boolean> settings) {
+        if (settings.containsKey("systemEnabled")) {
+            constraintSettingsService.setUnavailabilitySystemEnabled(settings.get("systemEnabled"));
+        }
+        if (settings.containsKey("requestsOpen")) {
+            constraintSettingsService.setUnavailabilityRequestsOpen(settings.get("requestsOpen"));
+        }
+        return ResponseEntity.ok(Map.of(
+                "systemEnabled", constraintSettingsService.isUnavailabilitySystemEnabled(),
+                "requestsOpen", constraintSettingsService.isUnavailabilityRequestsOpen(),
+                "message", "Settings updated successfully"));
+    }
 
     /**
      * Submit a new availability change request.
-     * Lecturers can submit requests for their own availability.
+     * Blocked when requests are closed.
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR', 'LECTURER')")
     public ResponseEntity<?> submitRequest(
             @RequestBody AvailabilityChangeRequestDTO dto,
             Authentication authentication) {
+
+        // Block if requests are closed
+        if (!constraintSettingsService.isUnavailabilityRequestsOpen()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "REQUESTS_CLOSED",
+                    "message", "Unavailability request submissions are currently closed"));
+        }
 
         User currentUser = getCurrentUser(authentication);
         Lecturer lecturer = getLecturer(dto.lecturerId);
@@ -88,6 +126,17 @@ public class AvailabilityChangeRequestController {
     }
 
     /**
+     * Get all requests (history).
+     */
+    @GetMapping
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
+    public List<AvailabilityChangeRequestResponseDTO> getAllRequests() {
+        return requestService.getAllRequests().stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Get pending request count (for dashboard badge).
      */
     @GetMapping("/pending/count")
@@ -115,6 +164,23 @@ public class AvailabilityChangeRequestController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(requests);
+    }
+
+    /**
+     * Get request statistics for a specific lecturer.
+     */
+    @GetMapping("/lecturer/{lecturerId}/stats")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
+    public ResponseEntity<Map<String, Object>> getLecturerStats(@PathVariable Long lecturerId) {
+        Lecturer lecturer = getLecturer(lecturerId);
+        Map<String, Long> stats = requestService.getLecturerRequestStats(lecturer);
+        return ResponseEntity.ok(Map.of(
+                "lecturerId", lecturerId,
+                "lecturerName", lecturer.getName(),
+                "approved", stats.getOrDefault("approved", 0L),
+                "pending", stats.getOrDefault("pending", 0L),
+                "rejected", stats.getOrDefault("rejected", 0L),
+                "total", stats.getOrDefault("total", 0L)));
     }
 
     /**
@@ -219,6 +285,66 @@ public class AvailabilityChangeRequestController {
         } catch (IllegalArgumentException | IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "RETURN_FAILED",
+                    "message", e.getMessage()));
+        }
+    }
+
+    /**
+     * Resubmit a returned request with updated information.
+     * Only the original requester can resubmit.
+     */
+    @PutMapping("/{id}/resubmit")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR', 'LECTURER')")
+    public ResponseEntity<?> resubmitRequest(
+            @PathVariable Long id,
+            @RequestBody AvailabilityChangeRequestDTO dto,
+            Authentication authentication) {
+
+        User currentUser = getCurrentUser(authentication);
+
+        try {
+            AvailabilityChangeRequest request = requestService.resubmitRequest(
+                    id,
+                    currentUser,
+                    DayOfWeek.valueOf(dto.dayOfWeek.toUpperCase()),
+                    LocalTime.parse(dto.startTime),
+                    LocalTime.parse(dto.endTime),
+                    AvailabilityStatus.valueOf(dto.newStatus.toUpperCase()),
+                    dto.reason);
+
+            return ResponseEntity.ok(toDTO(request));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "RESUBMIT_FAILED",
+                    "message", e.getMessage()));
+        }
+    }
+
+    /**
+     * Revoke an approved request (change back to rejected).
+     * Only admins can revoke, and only before the deadline.
+     */
+    @PostMapping("/{id}/revoke")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
+    public ResponseEntity<?> revokeRequest(
+            @PathVariable Long id,
+            @RequestBody ReviewDTO dto,
+            Authentication authentication) {
+
+        if (dto == null || dto.notes == null || dto.notes.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "VALIDATION_ERROR",
+                    "message", "Revocation reason is required"));
+        }
+
+        User reviewer = getCurrentUser(authentication);
+
+        try {
+            AvailabilityChangeRequest request = requestService.revokeRequest(id, reviewer, dto.notes);
+            return ResponseEntity.ok(toDTO(request));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "REVOKE_FAILED",
                     "message", e.getMessage()));
         }
     }

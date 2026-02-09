@@ -1,0 +1,34 @@
+"Year Taken","Course ID","Course Title","Instuctor","Option","Credit Hours","No. GPA","Details"
+1,"BU-CYB 106","Fundamentals of Digital Media","ADELOWO   OPEYEMI","Cyber Security",2.0,false,BU-CYB 106
+1,"BU-IFT 106","Information Technology in Business","Izang   Aaron A","IT Group A",3.0,false,BU-IFT 106
+1,"BU-IFT 106","Information Technology in Business","Izang   Aaron A","IT Group B",3.0,false,BU-IFT 106
+1,"BU-IFT 108","Introduction to Operations Research","Oyerinde  Emmanuel Ifeoluwa","Cyber Security",3.0,false,BU-IFT 108
+1,"BU-IFT 108","Introduction to Operations Research","Oyerinde  Emmanuel Ifeoluwa","IT Group A",3.0,false,BU-IFT 108
+1,"BU-IFT 108","Introduction to Operations Research","Oyerinde  Emmanuel Ifeoluwa","IT Group B",3.0,false,BU-IFT 108
+2,"BU-COS 202","Introduction to Cybersecurity and Strategy","OGU  Emmanuel Chinomso","IT Group A",2.0,false,BU-COS 202
+2,"BU-COS 202","Introduction to Cybersecurity and Strategy","OGU  Emmanuel Chinomso","IT Group B",2.0,false,BU-COS 202
+2,"BU-COS 202","Introduction to Cybersecurity and Strategy","OGU  Emmanuel Chinomso","IT Group C",2.0,false,BU-COS 202
+2,"BU-IFT 220","Intro to Information Security","ADELOWO   OPEYEMI","IT Group C",3.0,false,BU-IFT 220
+2,"BU-IFT 220","Intro to Information Security","ADELOWO   OPEYEMI","IT Group B",3.0,false,BU-IFT 220
+2,"BU-IFT 220","Intro to Information Security","ADELOWO   OPEYEMI","IT Group A",3.0,false,BU-IFT 220
+2,"INS 202","Human-Computer Interface","Alao  Olujimi D","IT Group A",2.0,false,INS 202
+2,"INS 202","Human-Computer Interface","Alao  Olujimi D","IT Group B",2.0,false,INS 202
+3,"IFT 304","Web Development using Content Management Systems","Ajaegbu  Chigozirim","IT Group A",2.0,false,IFT 304
+3,"IFT 304","Web Development using Content Management Systems","Ajaegbu  Chigozirim","IT Group C",2.0,false,IFT 304
+3,"IFT 304","Web Development using Content Management Systems","Ajaegbu  Chigozirim","IT Group B",2.0,false,IFT 304
+3,"IFT 322","IT Innovation and Entrepreneurship","Ajaegbu  Chigozirim","IT Group C",2.0,false,IFT 322
+3,"IFT 322","IT Innovation and Entrepreneurship","Ajaegbu  Chigozirim","IT Group B",2.0,false,IFT 322
+3,"IFT 322","IT Innovation and Entrepreneurship","Ajaegbu  Chigozirim","IT Group A",2.0,false,IFT 322
+3,"IFT 342","Network Servers and Infrastructures","Ajaegbu  Chigozirim","IT Group B",2.0,false,IFT 342
+3,"IFT 342","Network Servers and Infrastructures","Ajaegbu  Chigozirim","IT Group A",2.0,false,IFT 342
+3,"IFT 350","SIWES","Fatade  Oluwayemisi B","IT",6.0,false,IFT 350
+3,"ITGY312","IT Project Development and Management","Izang   Aaron A","IT Group A",3.0,false,ITGY312
+3,"ITGY312","IT Project Development and Management","Izang   Aaron A","IT Group B",3.0,false,ITGY312
+4,"ITGY402","Applied Networks and Security","Alao  Olujimi D","IT Group A",3.0,false,ITGY402
+4,"ITGY402","Applied Networks and Security","Alao  Olujimi D","IT Group B",3.0,false,ITGY402
+4,"ITGY404","Web Development Using Content Management Systems","Ajaegbu  Chigozirim","IT",3.0,false,ITGY404
+4,"ITGY406","Data and Application Security","OGU  Emmanuel Chinomso","IT Group B",3.0,false,ITGY406
+4,"ITGY408","Wireless Communications and Networking","Ajaegbu  Chigozirim","IT Group A",3.0,false,ITGY408
+4,"ITGY408","Wireless Communications and Networking","ADEDIRAN  OLUWASEYI","IT Group B",3.0,false,ITGY408
+4,"ITGY490","Research Project (IT)","EWEOYA  IBUKUN Onaolapo","IT",6.0,false,ITGY490
+

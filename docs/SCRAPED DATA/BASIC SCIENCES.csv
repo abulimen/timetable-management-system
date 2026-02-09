@@ -1,0 +1,285 @@
+"Year Taken","Course ID","Course Title","Instuctor","Option","Credit Hours","No. GPA","Details"
+1,"BIO 102","General Biology II","Ajiboye  Oluwapelumi Micheal","MICRO-BIO",2.0,false,BIO 102
+1,"BIO 102","General Biology II","OGUNBIYI  OPEYEMI CHRISTIANA","Biol",2.0,false,BIO 102
+1,"BIO 102","General Biology II","OGUNBIYI  OPEYEMI CHRISTIANA","MED-LAB",2.0,false,BIO 102
+1,"BIO 102","General Biology II","ADEWUNMI  Aderiike","Nursing Group A",2.0,false,BIO 102
+1,"BIO 102","General Biology II","ADEWUNMI  Aderiike","Nursing Group B",2.0,false,BIO 102
+1,"BIO 102","General Biology II","ANIMASHAUN  Rufus","PUBHEALTH",2.0,false,BIO 102
+1,"BIO 102","General Biology II","ANIMASHAUN  Rufus","Physiology",2.0,false,BIO 102
+1,"BIO 102","General Biology II","OGUNBIYI  OPEYEMI CHRISTIANA","Chem",2.0,false,BIO 102
+1,"BIO 102","General Biology II","ADEWUNMI  Aderiike","Nursing Group C",2.0,false,BIO 102
+1,"BIO 102","General Biology II","OGUNBIYI  OPEYEMI CHRISTIANA","Anatomy",2.0,false,BIO 102
+1,"BIO 102","General Biology II","Ajiboye  Oluwapelumi Micheal","BIO-CHEM",2.0,false,BIO 102
+1,"BIO 102","General Biology II","OGUNBIYI  OPEYEMI CHRISTIANA","NUTRITION",2.0,false,BIO 102
+1,"BIO 108 ","General Biology Practical II ","Ajiboye  Oluwapelumi Micheal","MICRO-BIO",1.0,false,BIO 108 
+1,"BIO 108 ","General Biology Practical II ","OGUNBIYI  OPEYEMI CHRISTIANA","NUTRITION",1.0,false,BIO 108 
+1,"BIO 108 ","General Biology Practical II ","ANIMASHAUN  Rufus","PUBHEALTH",1.0,false,BIO 108 
+1,"BIO 108 ","General Biology Practical II ","ANIMASHAUN  Rufus","Physiology",1.0,false,BIO 108 
+1,"BIO 108 ","General Biology Practical II ","OGUNBIYI  OPEYEMI CHRISTIANA","Biol",1.0,false,BIO 108 
+1,"BIO 108 ","General Biology Practical II ","Ajiboye  Oluwapelumi Micheal","BIO-CHEM",1.0,false,BIO 108 
+1,"BIO 108 ","General Biology Practical II ","ADEWUNMI  Aderiike","Nursing Group C",1.0,false,BIO 108 
+1,"BIO 108 ","General Biology Practical II ","ADEWUNMI  Aderiike","Nursing Group B",1.0,false,BIO 108 
+1,"BIO 108 ","General Biology Practical II ","ADEWUNMI  Aderiike","Nursing Group A",1.0,false,BIO 108 
+1,"BIO 108 ","General Biology Practical II ","OGUNBIYI  OPEYEMI CHRISTIANA","MED-LAB",1.0,false,BIO 108 
+1,"BIO 108 ","General Biology Practical II ","OGUNBIYI  OPEYEMI CHRISTIANA","Chem",1.0,false,BIO 108 
+1,"BIOL102","General Biology II","ADEWUNMI  Aderiike","NUTRITION",3.0,false,BIOL102
+1,"BU-BIO 112","Cultural and Economic Biology","Odutayo, Foluke Odunlami Idowu","Biol",2.0,false,BU-BIO 112
+1,"BU-BIO 114","Health and Nutrition Biology","Ajiboye  Oluwapelumi Micheal","Biol",2.0,false,BU-BIO 114
+1,"BU-BIO 114","Health and Nutrition Biology","Ajiboye  Oluwapelumi Micheal","MED-LAB",2.0,false,BU-BIO 114
+1,"BU-MTH 102","Elementary Mathematics II","Ayinde, Semiu Akinpelu","MED-LAB",2.0,false,BU-MTH 102
+1,"BU-MTH 104","Mechanics","Agunbiade   Samson Ademola","Maths",3.0,false,BU-MTH 104
+1,"BU-MTH 106","Applied Algebra","UKA  Uchenna A.","Maths",2.0,false,BU-MTH 106
+1,"CHEM102","General Chemistry II","Idika  Digbo Iku","Physics/Electronics",3.0,false,CHEM102
+1,"CHEM102","General Chemistry II","Idika  Digbo Iku","NUTRITION",3.0,false,CHEM102
+1,"CHM 102","General Chemistry II","BAMIGBOYE   OYEDOLAPO","MICRO-BIO",2.0,false,CHM 102
+1,"CHM 102","General Chemistry II","Shokunbi Oluwatosin Sarah","AGRIC",2.0,false,CHM 102
+1,"CHM 102","General Chemistry II","Shokunbi Oluwatosin Sarah","Nursing Group B",2.0,false,CHM 102
+1,"CHM 102","General Chemistry II","BANKOLE  OLUWATOSIN","Biol",2.0,false,CHM 102
+1,"CHM 102","General Chemistry II","Shokunbi Oluwatosin Sarah","Nursing Group A",2.0,false,CHM 102
+1,"CHM 102","General Chemistry II","BAMIGBOYE   OYEDOLAPO","Electrical and Electronic Engineering",2.0,false,CHM 102
+1,"CHM 102","General Chemistry II","BANKOLE  OLUWATOSIN","Chem",2.0,false,CHM 102
+1,"CHM 102","General Chemistry II","ADARAMOLA , Feyisara Banji","PUBHEALTH",2.0,false,CHM 102
+1,"CHM 102","General Chemistry II","BANKOLE  OLUWATOSIN","Anatomy",2.0,false,CHM 102
+1,"CHM 102","General Chemistry II","BAMIGBOYE   OYEDOLAPO","BIO-CHEM",2.0,false,CHM 102
+1,"CHM 102","General Chemistry II","Shokunbi Oluwatosin Sarah","Nursing Group C",2.0,false,CHM 102
+1,"CHM 102","General Chemistry II","Popoola  Micheal","Physiology",2.0,false,CHM 102
+1,"CHM 102","General Chemistry II","Popoola  Micheal","Civil Engineering",2.0,false,CHM 102
+1,"CHM 102","General Chemistry II","Shokunbi Oluwatosin Sarah","NUTRITION",2.0,false,CHM 102
+1,"CHM 102","General Chemistry II","BANKOLE  OLUWATOSIN","MED-LAB",2.0,false,CHM 102
+1,"CHM 102","General Chemistry II","Idika  Digbo Iku","Mechanical Engineering",2.0,false,CHM 102
+1,"CHM 108","General Chemistry Practical II","Popoola  Micheal","Civil Engineering",1.0,false,CHM 108
+1,"CHM 108","General Chemistry Practical II","BANKOLE  OLUWATOSIN","Anatomy",1.0,false,CHM 108
+1,"CHM 108","General Chemistry Practical II","Shokunbi Oluwatosin Sarah","Nursing Group A",1.0,false,CHM 108
+1,"CHM 108","General Chemistry Practical II","Shokunbi Oluwatosin Sarah","Nursing Group B",1.0,false,CHM 108
+1,"CHM 108","General Chemistry Practical II","BANKOLE  OLUWATOSIN","Biol",1.0,false,CHM 108
+1,"CHM 108","General Chemistry Practical II","Shokunbi Oluwatosin Sarah","AGRIC",1.0,false,CHM 108
+1,"CHM 108","General Chemistry Practical II","ADARAMOLA , Feyisara Banji","PUBHEALTH",1.0,false,CHM 108
+1,"CHM 108","General Chemistry Practical II","Shokunbi Oluwatosin Sarah","Nursing Group C",1.0,false,CHM 108
+1,"CHM 108","General Chemistry Practical II","Shokunbi Oluwatosin Sarah","NUTRITION",1.0,false,CHM 108
+1,"CHM 108","General Chemistry Practical II","Popoola  Micheal","Physiology",1.0,false,CHM 108
+1,"CHM 108","General Chemistry Practical II","Idika  Digbo Iku","Mechanical Engineering",1.0,false,CHM 108
+1,"CHM 108","General Chemistry Practical II","BANKOLE  OLUWATOSIN","Chem",1.0,false,CHM 108
+1,"CHM 108","General Chemistry Practical II","BAMIGBOYE   OYEDOLAPO","Electrical and Electronic Engineering",1.0,false,CHM 108
+1,"CHM 108","General Chemistry Practical II","BAMIGBOYE   OYEDOLAPO","BIO-CHEM",1.0,false,CHM 108
+1,"CHM 108","General Chemistry Practical II","BAMIGBOYE   OYEDOLAPO","MICRO-BIO",1.0,false,CHM 108
+1,"CHM 108","General Chemistry Practical II","BANKOLE  OLUWATOSIN","MED-LAB",1.0,false,CHM 108
+1,"MATH102","General Mathematics II","Agunbiade   Samson Ademola","Physics/Electronics",3.0,false,MATH102
+1,"MATH102","General Mathematics II","Agunbiade   Samson Ademola","NUTRITION",3.0,false,MATH102
+1,"MTH 102","Elementary Mathematics II (Calculus)","Adio  Adesina Kamorudeen","Chem",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","Agunbiade   Samson Ademola","IT Group A",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","Bamishile  Olabode Oludare","IT Group B",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","UKA  Uchenna A.","CS GROUP B",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","Bamishile  Olabode Oludare","CS GROUP C",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","Bamishile  Olabode Oludare","CS GROUP D",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","Kanu, Richmond Uchenna","CS GROUP A",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","Bamishile  Olabode Oludare","Info Systems",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","Agunbiade   Samson Ademola","Cyber Security",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","Bamishile  Olabode Oludare","Cyber Security",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","Kanu, Richmond Uchenna","MICRO-BIO",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","ALAMU-AWONIRAN  FUNMILOLA","Civil Engineering",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","Bamishile  Olabode Oludare","NUTRITION",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","ALAMU-AWONIRAN  FUNMILOLA","Mechanical Engineering",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","Bamishile  Olabode Oludare","Estate Management",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","Adio  Adesina Kamorudeen","Maths",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","Adio  Adesina Kamorudeen","Biol",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","Bamishile  Olabode Oludare","AGRIC",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","Adio  Adesina Kamorudeen","BIO-CHEM",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","Agunbiade   Samson Ademola","Soft Eng Group E",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","ALAMU-AWONIRAN  FUNMILOLA","Soft Eng Group D",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","ALAMU-AWONIRAN  FUNMILOLA","Soft Eng Group C",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","UKA  Uchenna A.","Soft Eng Group B",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","UKA  Uchenna A.","Soft Eng Group A",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","UKA  Uchenna A.","Electrical and Electronic Engineering",2.0,false,MTH 102
+1,"MTH 102","Elementary Mathematics II (Calculus)","Ayinde, Semiu Akinpelu","Computer Engineering",2.0,false,MTH 102
+1,"PHY 102","General Physics II","Kehinde  Daniel Olusegun","CIS Group B",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Oyewole  , I. O.","Nursing Group B",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Kehinde  Daniel Olusegun","CS GROUP C",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Adenika  Charles","Soft Eng Group D",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Adenika  Charles","Soft Eng Group E",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Kehinde  Daniel Olusegun","Chem",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Kehinde  Daniel Olusegun","Biol",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Akintunde  Samuel O","Anatomy",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Kehinde  Daniel Olusegun","Cyber Security",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Akintunde  Samuel O","Physiology",2.0,false,PHY 102
+1,"PHY 102","General Physics II","ADETUNJI  EMMANUEL OLUGBEMIGA","PUBHEALTH",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Kehinde  Daniel Olusegun","Info Systems",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Oyewole  , I. O.","Nursing Group C",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Oyewole  , I. O.","Nursing Group A",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Kehinde  Daniel Olusegun","AGRIC",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Akintunde  Samuel O","IT Group A",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Kehinde  Daniel Olusegun","CS GROUP D",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Akintunde  Samuel O","Computer Engineering",2.0,false,PHY 102
+1,"PHY 102","General Physics II","OLATUNJI  OLUWASEYI DAMILOLA","Electrical and Electronic Engineering",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Akintunde  Samuel O","Nursing Group C",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Akintunde  Samuel O","Nursing Group A",2.0,false,PHY 102
+1,"PHY 102","General Physics II","OLATUNJI  OLUWASEYI DAMILOLA","Mechanical Engineering",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Akintunde  Samuel O","MED-LAB",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Akintunde  Samuel O","Nursing Group B",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Adenika  Charles","Soft Eng Group A",2.0,false,PHY 102
+1,"PHY 102","General Physics II","OLATUNJI  OLUWASEYI DAMILOLA","NUTRITION",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Akintunde  Samuel O","IT Group B",2.0,false,PHY 102
+1,"PHY 102","General Physics II","ADETUNJI  EMMANUEL OLUGBEMIGA","MICRO-BIO",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Adenika  Charles","Soft Eng Group B",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Adenika  Charles","Soft Eng Group C",2.0,false,PHY 102
+1,"PHY 102","General Physics II","Kehinde  Daniel Olusegun","CS GROUP A",2.0,false,PHY 102
+1,"PHY 102","General Physics II","OLATUNJI  OLUWASEYI DAMILOLA","Civil Engineering",2.0,false,PHY 102
+1,"PHY 102","General Physics II","ADETUNJI  EMMANUEL OLUGBEMIGA","BIO-CHEM",2.0,false,PHY 102
+1,"PHY 108","General Physics Practical II","Akintunde  Samuel O","Nursing Group C",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","Kehinde  Daniel Olusegun","Biol",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","Akintunde  Samuel O","Physiology",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","Kehinde  Daniel Olusegun","AGRIC",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","Adenika  Charles","Mechanical Engineering",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","Akintunde  Samuel O","MED-LAB",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","OLATUNJI  OLUWASEYI DAMILOLA","NUTRITION",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","ADETUNJI  EMMANUEL OLUGBEMIGA","MICRO-BIO",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","Adenika  Charles","Civil Engineering",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","ADETUNJI  EMMANUEL OLUGBEMIGA","BIO-CHEM",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","Kehinde  Daniel Olusegun","Cyber Security",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","Akintunde  Samuel O","Anatomy",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","ADETUNJI  EMMANUEL OLUGBEMIGA","PUBHEALTH",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","Oyewole  , I. O.","Nursing Group A",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","Oyewole  , I. O.","Nursing Group B",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","Oyewole  , I. O.","Nursing Group C",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","Adenika  Charles","Soft Eng Group E",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","OLATUNJI  OLUWASEYI DAMILOLA","Info Systems",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","Kehinde  Daniel Olusegun","Chem",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","Adenika  Charles","Soft Eng Group D",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","Adenika  Charles","Soft Eng Group C",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","Adenika  Charles","Soft Eng Group B",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","Adenika  Charles","Soft Eng Group A",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","Adenika  Charles","Electrical and Electronic Engineering",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","OLATUNJI  OLUWASEYI DAMILOLA","Computer Engineering",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","OLATUNJI  OLUWASEYI DAMILOLA","CS GROUP D",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","OLATUNJI  OLUWASEYI DAMILOLA","CS GROUP C",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","OLATUNJI  OLUWASEYI DAMILOLA","CS GROUP B",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","OLATUNJI  OLUWASEYI DAMILOLA","CS GROUP A",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","Akintunde  Samuel O","IT Group B",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","Akintunde  Samuel O","IT Group A",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","Akintunde  Samuel O","Nursing Group A",1.0,false,PHY 108
+1,"PHY 108","General Physics Practical II","Akintunde  Samuel O","Nursing Group B",1.0,false,PHY 108
+1,"PHYS102","General Physics II","Kehinde  Daniel Olusegun","NUTRITION",3.0,false,PHYS102
+1,"PHYS108","General Physics Laboratory II","Kehinde  Daniel Olusegun","Physics/Electronics",1.0,false,PHYS108
+1,"STA 112","Probability I","Ayanlowo  Emmanuel Ayanlola","CS GROUP B",3.0,false,STA 112
+1,"STA 112","Probability I","Ayanlowo  Emmanuel Ayanlola","CS GROUP A",3.0,false,STA 112
+1,"STA 112","Probability I","Ayanlowo  Emmanuel Ayanlola","Soft Eng Group C",3.0,false,STA 112
+1,"STA 112","Probability I","ALAMU-AWONIRAN  FUNMILOLA","Civil Engineering",3.0,false,STA 112
+1,"STA 112","Probability I","Bamishile  Olabode Oludare","Soft Eng Group E",3.0,false,STA 112
+1,"STA 112","Probability I","ALAMU-AWONIRAN  FUNMILOLA","Electrical and Electronic Engineering",3.0,false,STA 112
+1,"STA 112","Probability I","Ayanlowo  Emmanuel Ayanlola","Soft Eng Group B",3.0,false,STA 112
+1,"STA 112","Probability I","ALAMU-AWONIRAN  FUNMILOLA","Mechanical Engineering",3.0,false,STA 112
+1,"STA 112","Probability I","Ayanlowo  Emmanuel Ayanlola","Computer Engineering",3.0,false,STA 112
+1,"STA 112","Probability I","Ayanlowo  Emmanuel Ayanlola","Soft Eng Group D",3.0,false,STA 112
+1,"STA 112","Probability I","Ayanlowo  Emmanuel Ayanlola","Soft Eng Group A",3.0,false,STA 112
+1,"STA 112","Probability I","Ayanlowo  Emmanuel Ayanlola","CS GROUP D",3.0,false,STA 112
+1,"STA 112","Probability I","Ayanlowo  Emmanuel Ayanlola","CS GROUP C",3.0,false,STA 112
+1,"STA 112","Probability I","ALAMU-AWONIRAN  FUNMILOLA","Maths",3.0,false,STA 112
+2,"BIO 208","Biostatistics for Allied Health Sciences","Oritogun  Kolawole S","Physiology",2.0,false,BIO 208
+2,"BIO 208","Biostatistics for Allied Health Sciences","Oritogun  Kolawole S","Anatomy",2.0,false,BIO 208
+2,"BIO 208","Biostatistics for Allied Health Sciences","Ayanlowo  Emmanuel Ayanlola","Biol",2.0,false,BIO 208
+2,"BIO 208","Biostatistics for Allied Health Sciences","Oritogun  Kolawole S","NUTRITION",2.0,false,BIO 208
+2,"BIOL206","Cell and Developmental Biology","OGUNWENMO  K. Olusola","Physiology",2.0,false,BIOL206
+2,"BIOL206","Cell and Developmental Biology","OGUNWENMO  K. Olusola","MICRO-BIO",2.0,false,BIOL206
+2,"BIOL208","Ecology I","ADEWUNMI  Aderiike","MICRO-BIO",2.0,false,BIOL208
+2,"BIOL220","Plant and Animal Physiology I","Odutayo, Foluke Odunlami Idowu","MICRO-BIO",2.0,false,BIOL220
+2,"BU-MTH 212","Mathematics Computational Techniques II Mathematica","Adio  Adesina Kamorudeen","Maths",2.0,false,BU-MTH 212
+2,"BU-MTH 213","Probability 2","Kanu, Richmond Uchenna","Maths",3.0,false,BU-MTH 213
+2,"BU-MTH 216","Discrete Mathematics","UKA  Uchenna A.","Maths",2.0,false,BU-MTH 216
+2,"CHEM214","Organic Chemistry II","Idika  Digbo Iku","MICRO-BIO",3.0,false,CHEM214
+2,"CHM 208","General Chemistry Practical IV","Idika  Digbo Iku","Chem",1.0,false,CHM 208
+2,"CHM 210","Physical Chemistry 1","BANKOLE  OLUWATOSIN","BIO-CHEM",2.0,false,CHM 210
+2,"CHM 210","Physical Chemistry 1","Idika  Digbo Iku","Chem",2.0,false,CHM 210
+2,"CHM 212","Inorganic Chemistry 1","Idika  Digbo Iku","BIO-CHEM",2.0,false,CHM 212
+2,"CHM 212","Inorganic Chemistry 1","Idika  Digbo Iku","Chem",2.0,false,CHM 212
+2,"CHM 214","Structure and Bonding","BANKOLE  OLUWATOSIN","Chem",2.0,false,CHM 214
+2,"CHM 214","Structure and Bonding","BANKOLE  OLUWATOSIN","BIO-CHEM",2.0,false,CHM 214
+2,"MTH 202","Elementary Differential Equations","Ayinde, Semiu Akinpelu","Maths",2.0,false,MTH 202
+2,"MTH 202","Elementary Differential Equations","Agunbiade   Samson Ademola","CS GROUP A",2.0,false,MTH 202
+2,"MTH 202","Elementary Differential Equations","Bamishile  Olabode Oludare","CS GROUP D",2.0,false,MTH 202
+2,"MTH 202","Elementary Differential Equations","Ayinde, Semiu Akinpelu","CS GROUP C",2.0,false,MTH 202
+2,"MTH 202","Elementary Differential Equations","Ayinde, Semiu Akinpelu","CS GROUP B",2.0,false,MTH 202
+2,"MTH 202","Elementary Differential Equations","Agunbiade   Samson Ademola","Soft Eng Group A",2.0,false,MTH 202
+2,"MTH 202","Elementary Differential Equations","Agunbiade   Samson Ademola","Soft Eng Group B",2.0,false,MTH 202
+2,"MTH 202","Elementary Differential Equations","Agunbiade   Samson Ademola","Soft Eng Group C",2.0,false,MTH 202
+2,"MTH 202","Elementary Differential Equations","Adelodun, Joseph","Soft Eng Group D",2.0,false,MTH 202
+2,"MTH 202","Elementary Differential Equations","Agunbiade   Samson Ademola","Soft Eng Group E",2.0,false,MTH 202
+2,"MTH 202","Elementary Differential Equations","Agunbiade   Samson Ademola","DE Software",2.0,false,MTH 202
+2,"MTH 206","Linear Algebra II","Adelodun, Joseph","Maths",1.0,false,MTH 206
+2,"MTH 209","Introduction to Numerical Analysis","Bamishile  Olabode Oludare","Maths",2.0,false,MTH 209
+2,"MTH 210","Vector Analysis","Kanu, Richmond Uchenna","Maths",1.0,false,MTH 210
+2,"STAT204","BIOSTATISTICS","Akinwole  Oladele Timothy","MICRO-BIO",2.0,false,STAT204
+2,"STAT204","BIOSTATISTICS","Akinboye  Olufunso E","Biol",2.0,false,STAT204
+2,"STAT204","BIOSTATISTICS","Akinwole  Oladele Timothy","NUTRITION",2.0,false,STAT204
+2,"ZOOL202","Lower Invertebrates","Oyewole  , I. O.","MICRO-BIO",2.0,false,ZOOL202
+2,"ZOOL214","Animal Diversity I","OGUNBIYI  OPEYEMI CHRISTIANA","Biol",3.0,false,ZOOL214
+3,"BIO 300","SIWES","Ajiboye  Oluwapelumi Micheal","Biol",3.0,false,BIO 300
+3,"BIO 302","Population Biology and Evolution","OGUNWENMO  K. Olusola","Biol",2.0,false,BIO 302
+3,"BIO 304","Nigerian Flora and Fauna","Odutayo, Foluke Odunlami Idowu","Biol",2.0,false,BIO 304
+3,"BIO 306","Systematic Biology","ADEWUNMI  Aderiike","Biol",2.0,false,BIO 306
+3,"BU-BIO 308","Ecology II","ADEWUNMI  Aderiike","Biol",2.0,false,BU-BIO 308
+3,"BU-CHM 322","Soil Chemistry","Anokwuru  Chinedu","Chem",3.0,false,BU-CHM 322
+3,"BU-MTH 318","Numerical Analysis and Computation I","Adio  Adesina Kamorudeen","Maths",2.0,false,BU-MTH 318
+3,"CHM 302","Inorganic Chemistry II","Popoola  Micheal","Chem",2.0,false,CHM 302
+3,"CHM 304","Atomic & molecular structure & Symmetry","BANKOLE  OLUWATOSIN","Chem",2.0,false,CHM 304
+3,"CHM 312","Analytical Atomic Spectroscopy","ADARAMOLA , Feyisara Banji","Chem",2.0,false,CHM 312
+3,"CHM 314","Entrepreneurship Skill in Chemistry","Idika  Digbo Iku","Chem",2.0,false,CHM 314
+3,"CHM 316","Applied Spectroscopy","Idika  Digbo Iku","Chem",2.0,false,CHM 316
+3,"MTH 302","Ordinary Differential Equations","Adelodun, Joseph","Maths",2.0,false,MTH 302
+3,"MTH 305","Complex Analysis II","Ayinde, Semiu Akinpelu","Maths",2.0,false,MTH 305
+3,"MTH 306","Abstract Algebra II","Adelodun, Joseph","Maths",2.0,false,MTH 306
+3,"MTH 308","Introduction to Mathematical Modelling","Adelodun, Joseph","Maths",2.0,false,MTH 308
+3,"MTH 310","Mathematical Methods II","Kanu, Richmond Uchenna","Maths",2.0,false,MTH 310
+3,"MTH 399","Industrial Attachment II (12 Weeks)","Ajiboye  Oluwapelumi Micheal","Maths",3.0,false,MTH 399
+3,"ZOO 312","The Biology of Tropical Parasite","Oyewole  , I. O.","Biol",2.0,false,ZOO 312
+3,"ZOOL304","Biology of Tropical Parasites","Oyewole  , I. O.","MICRO-BIO",2.0,false,ZOOL304
+4,"BIOL402","Developmental Biology","Odutayo, Foluke Odunlami Idowu","Biol",3.0,false,BIOL402
+4,"BIOL404","Population Ecology and Biogeography","Odutayo, Foluke Odunlami Idowu","Biol",3.0,false,BIOL404
+4,"BIOL406","Cytogenetics","OGUNWENMO  K. Olusola","Biol",2.0,false,BIOL406
+4,"BIOL408","Human Genetics and Genomics","ANIMASHAUN  Rufus","Biol",3.0,false,BIOL408
+4,"BIOL416","Marine Biology","Ajiboye  Oluwapelumi Micheal","Biol",2.0,false,BIOL416
+4,"BIOL418","Hydrobiology","ANIMASHAUN  Rufus","Biol",2.0,false,BIOL418
+4,"BIOL420","Comparative Virology","Ajiboye  Oluwapelumi Micheal","Biol",2.0,false,BIOL420
+4,"BIOL490","Independent Research Project","ADEWUNMI  Aderiike","Biol",6.0,false,BIOL490
+4,"BOTA406","Economic Plants","ANIMASHAUN  Rufus","Biol",2.0,false,BOTA406
+4,"CHEM402","Organic Synthesis","Anokwuru  Chinedu","Chem",3.0,false,CHEM402
+4,"CHEM406","Organometallic Chemistry L2. P.1.T.O","Anokwuru  Chinedu","Chem",3.0,false,CHEM406
+4,"CHEM424","Coordination Chemistry","Shokunbi Oluwatosin Sarah","Chem",3.0,false,CHEM424
+4,"CHEM436","Radiochemistry and Nuclear Chemistry","ADARAMOLA , Feyisara Banji","Chem",3.0,false,CHEM436
+4,"CHEM490","Research Project ","Idika  Digbo Iku","Chem",6.0,false,CHEM490
+4,"EVMT406","Waste Management","OGUNBIYI  OPEYEMI CHRISTIANA","Biol",3.0,false,EVMT406
+4,"EVMT408","Wildlife Ecology, Conservation and Management","ANIMASHAUN  Rufus","Biol",3.0,false,EVMT408
+4,"EVMT410","Petroleum and Environment","ANIMASHAUN  Rufus","Biol",2.0,false,EVMT410
+4,"EVMT412","Environmental Toxicology II","Odutayo, Foluke Odunlami Idowu","Biol",3.0,false,EVMT412
+4,"EVMT414","Water resources of Nigeria","Ajiboye  Oluwapelumi Micheal","Biol",2.0,false,EVMT414
+4,"EVMT420","Natural Resources Conservation and Environmental Management","Ajiboye  Oluwapelumi Micheal","Biol",2.0,false,EVMT420
+4,"EVMT490","Research Project","ADEWUNMI  Aderiike","Biol",6.0,false,EVMT490
+4,"MATH406","Lesbogue Measure and Integration","Ayinde, Semiu Akinpelu","Maths",3.0,false,MATH406
+4,"MATH408","Theory of Partial Differential Equation","Kanu, Richmond Uchenna","Maths",3.0,false,MATH408
+4,"MATH416","Measure Theory","Ayinde, Semiu Akinpelu","Maths",3.0,false,MATH416
+4,"MATH418","Algebraic Number theory","Adelodun, Joseph","Maths",3.0,false,MATH418
+4,"MATH424","Numerical Analysis and Computation II","Adio  Adesina Kamorudeen","Maths",3.0,false,MATH424
+4,"MATH430","Advanced Algebra II","Adelodun, Joseph","Maths",3.0,false,MATH430
+4,"MATH490","Research Project","Adio  Adesina Kamorudeen","Maths",6.0,false,MATH490
+4,"MBBT408","Process Biotechnology","Odutayo, Foluke Odunlami Idowu","Biol",2.0,false,MBBT408
+4,"MBBT410","Biotechnology of Animal Reproduction","Odutayo, Foluke Odunlami Idowu","Biol",2.0,false,MBBT410
+4,"MBBT424","Industrial Biotechnology","Ajiboye  Oluwapelumi Micheal","Biol",3.0,false,MBBT424
+4,"MBBT428","Biosafety, Bioethics and Intellectual Property Rights","OGUNWENMO  K. Olusola","Biol",2.0,false,MBBT428
+4,"MBBT490","Research Project","ADEWUNMI  Aderiike","Biol",6.0,false,MBBT490
+4,"PHYS402","Quantum Mechanics II","Kehinde  Daniel Olusegun","Physics/Electronics",3.0,false,PHYS402
+4,"PHYS404","Electrodynamics","Kehinde  Daniel Olusegun","Physics/Electronics",2.0,false,PHYS404
+4,"PHYS406","Atomic and Molecular Spectroscopy","Akintunde  Samuel O","Physics/Electronics",3.0,false,PHYS406
+4,"PHYS408","Analytical Mechanics III","Adenika  Charles","Physics/Electronics",2.0,false,PHYS408
+4,"PHYS412","Nuclear and Particle Physics II","Akintunde  Samuel O","Physics/Electronics",2.0,false,PHYS412
+4,"PHYS414","Astronomy","ADETUNJI  EMMANUEL OLUGBEMIGA","Physics/Electronics",2.0,false,PHYS414
+4,"PHYS416","Biophysics","ADETUNJI  EMMANUEL OLUGBEMIGA","Physics/Electronics",2.0,false,PHYS416
+4,"PHYS490","Research Project","Kehinde  Daniel Olusegun","Physics/Electronics",6.0,false,PHYS490
+4,"ZOOL402","Principles of Parasitology","Oyewole  , I. O.","MICRO-BIO",2.0,false,ZOOL402
+4,"ZOOL414","Parasitology II","Oyewole  , I. O.","Biol",3.0,false,ZOOL414
+200,"BIO 202","Introductory Ecology","ADEWUNMI  Aderiike","Biol",2.0,false,BIO 202
+200,"BIO 204","Biological Techniques","OGUNWENMO  K. Olusola","Biol",2.0,false,BIO 204
+200,"BIO 206","Hydrobiology","OGUNBIYI  OPEYEMI CHRISTIANA","Biol",2.0,false,BIO 206
+200,"BOT 202","Seedless Plants","ADEWUNMI  Aderiike","Biol",2.0,false,BOT 202
+200,"BU-BIO 212","Plant Animal Adaptation and Toxinology","Odutayo, Foluke Odunlami Idowu","Biol",3.0,false,BU-BIO 212
+200,"BU-BIO 214","Introductory Aerobiology","ANIMASHAUN  Rufus","Biol",2.0,false,BU-BIO 214
+200,"BU-EMT 206","Human Environment and Sustainable Devolopment","Ajiboye  Oluwapelumi Micheal","Biol",3.0,false,BU-EMT 206
+200,"ZOO 212","Invertebrate Zoology II","Oyewole  , I. O.","Biol",2.0,false,ZOO 212
+

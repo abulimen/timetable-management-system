@@ -13,6 +13,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -78,7 +79,7 @@ public class AvailabilityChangeRequestService {
      * Approve a change request and apply the availability change.
      */
     public AvailabilityChangeRequest approveRequest(Long requestId, User reviewer, String reviewNotes) {
-        AvailabilityChangeRequest request = requestRepository.findById(requestId)
+        AvailabilityChangeRequest request = requestRepository.findByIdWithDetails(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Request not found: " + requestId));
 
         if (request.getStatus() != RequestStatus.PENDING) {
@@ -103,7 +104,7 @@ public class AvailabilityChangeRequestService {
      * Reject a change request.
      */
     public AvailabilityChangeRequest rejectRequest(Long requestId, User reviewer, String reviewNotes) {
-        AvailabilityChangeRequest request = requestRepository.findById(requestId)
+        AvailabilityChangeRequest request = requestRepository.findByIdWithDetails(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Request not found: " + requestId));
 
         if (request.getStatus() != RequestStatus.PENDING) {
@@ -124,7 +125,7 @@ public class AvailabilityChangeRequestService {
      * Return a request for more information.
      */
     public AvailabilityChangeRequest returnRequest(Long requestId, User reviewer, String reviewNotes) {
-        AvailabilityChangeRequest request = requestRepository.findById(requestId)
+        AvailabilityChangeRequest request = requestRepository.findByIdWithDetails(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("Request not found: " + requestId));
 
         if (request.getStatus() != RequestStatus.PENDING) {
@@ -142,6 +143,92 @@ public class AvailabilityChangeRequestService {
     }
 
     /**
+     * Revoke an approved request (change to rejected).
+     * Only works for APPROVED requests.
+     */
+    public AvailabilityChangeRequest revokeRequest(Long requestId, User reviewer, String reviewNotes) {
+        AvailabilityChangeRequest request = requestRepository.findByIdWithDetails(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Request not found: " + requestId));
+
+        if (request.getStatus() != RequestStatus.APPROVED) {
+            throw new IllegalStateException(
+                    "Only approved requests can be revoked. Current status: " + request.getStatus());
+        }
+
+        // TODO: Add deadline check here if needed
+        // For now, allowing revocation at any time before semester ends
+
+        request.setStatus(RequestStatus.REJECTED);
+        request.setReviewedBy(reviewer);
+        request.setReviewedAt(LocalDateTime.now());
+        request.setReviewNotes("REVOKED: " + reviewNotes);
+
+        log.info("Revoked approval for request {} by {}: {}", requestId, reviewer.getEmail(), reviewNotes);
+
+        return requestRepository.save(request);
+    }
+
+    /**
+     * Resubmit a returned request with updated information.
+     * Only works for requests with RETURNED status.
+     */
+    public AvailabilityChangeRequest resubmitRequest(
+            Long requestId,
+            User currentUser,
+            DayOfWeek dayOfWeek,
+            LocalTime startTime,
+            LocalTime endTime,
+            AvailabilityStatus newStatus,
+            String reason) {
+
+        AvailabilityChangeRequest request = requestRepository.findByIdWithDetails(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Request not found: " + requestId));
+
+        // Check request is in RETURNED status
+        if (request.getStatus() != RequestStatus.RETURNED) {
+            throw new IllegalStateException(
+                    "Only returned requests can be resubmitted. Current status: " + request.getStatus());
+        }
+
+        // Verify the current user is the original requester (for lecturers)
+        if (currentUser.getRole().name().equals("LECTURER")) {
+            if (currentUser.getLecturer() == null ||
+                    !currentUser.getLecturer().getId().equals(request.getLecturer().getId())) {
+                throw new IllegalStateException("You can only resubmit your own requests");
+            }
+        }
+
+        // Validate reason length
+        if (reason == null || reason.trim().length() < 20) {
+            throw new IllegalArgumentException("Reason must be at least 20 characters");
+        }
+
+        // Recalculate affected lessons
+        List<Lesson> affectedLessons = findAffectedLessons(request.getLecturer(), dayOfWeek, startTime, endTime);
+        String affectedLessonIds = affectedLessons.stream()
+                .map(l -> l.getId().toString())
+                .collect(java.util.stream.Collectors.joining(","));
+
+        // Update the request
+        request.setDayOfWeek(dayOfWeek);
+        request.setStartTime(startTime);
+        request.setEndTime(endTime);
+        request.setNewStatus(newStatus);
+        request.setReason(reason.trim());
+        request.setStatus(RequestStatus.PENDING);
+        request.setAffectedLessonsCount(affectedLessons.size());
+        request.setAffectedLessonIds(affectedLessonIds.isEmpty() ? null : affectedLessonIds);
+        request.setReviewedBy(null);
+        request.setReviewedAt(null);
+        request.setReviewNotes(null);
+
+        log.info("Resubmitted availability change request {} for lecturer {}", requestId,
+                request.getLecturer().getName());
+
+        return requestRepository.save(request);
+    }
+
+    /**
      * Get all pending requests for review.
      */
     @Transactional(readOnly = true)
@@ -150,11 +237,39 @@ public class AvailabilityChangeRequestService {
     }
 
     /**
+     * Get all requests (history).
+     */
+    @Transactional(readOnly = true)
+    public List<AvailabilityChangeRequest> getAllRequests() {
+        return requestRepository.findAllWithDetails();
+    }
+
+    /**
      * Get requests for a specific lecturer.
      */
     @Transactional(readOnly = true)
     public List<AvailabilityChangeRequest> getRequestsForLecturer(Lecturer lecturer) {
         return requestRepository.findByLecturerOrderByCreatedAtDesc(lecturer);
+    }
+
+    /**
+     * Get request statistics for a lecturer.
+     */
+    @Transactional(readOnly = true)
+    public Map<String, Long> getLecturerRequestStats(Lecturer lecturer) {
+        List<AvailabilityChangeRequest> requests = requestRepository.findByLecturerOrderByCreatedAtDesc(lecturer);
+
+        long approved = requests.stream().filter(r -> r.getStatus() == RequestStatus.APPROVED).count();
+        long pending = requests.stream().filter(r -> r.getStatus() == RequestStatus.PENDING).count();
+        long rejected = requests.stream().filter(r -> r.getStatus() == RequestStatus.REJECTED).count();
+        long total = requests.size();
+
+        Map<String, Long> stats = new java.util.HashMap<>();
+        stats.put("approved", approved);
+        stats.put("pending", pending);
+        stats.put("rejected", rejected);
+        stats.put("total", total);
+        return stats;
     }
 
     /**
@@ -227,12 +342,6 @@ public class AvailabilityChangeRequestService {
             unavailability.setStartTime(request.getStartTime());
             unavailability.setEndTime(request.getEndTime());
             lecturer.getUnavailabilities().add(unavailability);
-            lecturerRepository.save(lecturer);
-        } else if (request.getNewStatus() == AvailabilityStatus.AVAILABLE) {
-            // Remove matching unavailability entries
-            lecturer.getUnavailabilities().removeIf(u -> u.getDayOfWeek() == request.getDayOfWeek() &&
-                    u.getStartTime().equals(request.getStartTime()) &&
-                    u.getEndTime().equals(request.getEndTime()));
             lecturerRepository.save(lecturer);
         }
 

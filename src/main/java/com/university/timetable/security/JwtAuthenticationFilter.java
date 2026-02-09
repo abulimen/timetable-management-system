@@ -37,14 +37,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             String jwt = extractJwtFromRequest(request);
+            log.debug("JWT from request: {} (path: {})", jwt != null ? "[present]" : "[absent]",
+                    request.getRequestURI());
 
             if (StringUtils.hasText(jwt) && jwtService.isTokenValid(jwt)) {
                 String email = jwtService.extractEmail(jwt);
                 String tokenType = jwtService.extractTokenType(jwt);
+                log.debug("Token valid for: {} (type: {})", email, tokenType);
 
                 // Only accept access tokens for authentication
                 if ("access".equals(tokenType) && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+                    log.debug("User authorities: {}", userDetails.getAuthorities());
 
                     if (jwtService.validateToken(jwt, userDetails.getUsername())) {
                         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
@@ -56,9 +60,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         log.debug("Authenticated user: {}", email);
                     }
                 }
+            } else if (jwt != null) {
+                log.warn("Invalid JWT token for path: {}", request.getRequestURI());
             }
         } catch (Exception e) {
-            log.debug("Cannot set user authentication: {}", e.getMessage());
+            log.warn("Cannot set user authentication: {} (path: {})", e.getMessage(), request.getRequestURI());
         }
 
         filterChain.doFilter(request, response);

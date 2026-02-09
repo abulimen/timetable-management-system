@@ -12,7 +12,7 @@ import { Subscription, filter } from 'rxjs';
     <header class="h-16 bg-white dark:bg-secondary-800 border-b border-secondary-200 dark:border-secondary-700 flex items-center justify-between px-6">
       <div class="flex items-center gap-4">
         <h2 class="text-lg font-semibold text-secondary-800 dark:text-secondary-100">
-          Babcock University Timetable System
+          University Timetable System
         </h2>
       </div>
 

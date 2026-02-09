@@ -5,10 +5,10 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService, LoginRequest } from '../../core/services/auth.service';
 
 @Component({
-    selector: 'app-login',
-    standalone: true,
-    imports: [CommonModule, FormsModule],
-    template: `
+  selector: 'app-login',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
     <div class="login-container">
       <div class="login-card">
         <!-- Logo & Header -->
@@ -21,7 +21,7 @@ import { AuthService, LoginRequest } from '../../core/services/auth.service';
             </svg>
           </div>
           <h1>Timetable Management</h1>
-          <p>Babcock University</p>
+          <p>University</p>
         </div>
 
         <!-- Login Form -->
@@ -102,7 +102,7 @@ import { AuthService, LoginRequest } from '../../core/services/auth.service';
       </div>
     </div>
   `,
-    styles: [`
+  styles: [`
     .login-container {
       min-height: 100vh;
       display: flex;
@@ -314,34 +314,44 @@ import { AuthService, LoginRequest } from '../../core/services/auth.service';
   `]
 })
 export class LoginComponent {
-    private authService = inject(AuthService);
-    private router = inject(Router);
-    private route = inject(ActivatedRoute);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
-    credentials: LoginRequest = {
-        email: '',
-        password: ''
-    };
+  credentials: LoginRequest = {
+    email: '',
+    password: ''
+  };
 
-    showPassword = false;
-    isLoading = false;
-    errorMessage = '';
+  showPassword = false;
+  isLoading = false;
+  errorMessage = '';
 
-    onSubmit(): void {
-        if (this.isLoading) return;
+  onSubmit(): void {
+    if (this.isLoading) return;
 
-        this.isLoading = true;
-        this.errorMessage = '';
+    this.isLoading = true;
+    this.errorMessage = '';
 
-        this.authService.login(this.credentials).subscribe({
-            next: () => {
-                const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
-                this.router.navigateByUrl(returnUrl);
-            },
-            error: (error) => {
-                this.isLoading = false;
-                this.errorMessage = error.message || 'Login failed. Please try again.';
-            }
-        });
-    }
+    this.authService.login(this.credentials).subscribe({
+      next: () => {
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+        if (returnUrl) {
+          this.router.navigateByUrl(returnUrl);
+        } else {
+          // Redirect based on role
+          const user = this.authService.getCurrentUser();
+          if (user?.role === 'LECTURER') {
+            this.router.navigateByUrl('/lecturer/dashboard');
+          } else {
+            this.router.navigateByUrl('/dashboard');
+          }
+        }
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.errorMessage = error.message || 'Login failed. Please try again.';
+      }
+    });
+  }
 }

@@ -2,6 +2,7 @@ package com.university.timetable.controller;
 
 import com.university.timetable.domain.*;
 import com.university.timetable.repository.*;
+import com.university.timetable.service.AuditLogService;
 import com.university.timetable.service.LessonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ public class CourseController {
     private final FeatureRepository featureRepository;
     private final ZoneRepository zoneRepository;
     private final LessonService lessonService;
+    private final AuditLogService auditLogService;
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
@@ -95,6 +97,11 @@ public class CourseController {
             lessonService.generateLessons(saved);
         }
 
+        // Audit logging
+        auditLogService.logAction(AuditAction.CREATE, "Course", saved.getId().toString(),
+                saved.getCode() + " - " + saved.getName(), null, toDTO(saved),
+                "Created course " + saved.getCode());
+
         return ResponseEntity.ok(toDTO(saved));
     }
 
@@ -110,6 +117,8 @@ public class CourseController {
 
                     if (dto.lecturerId != null) {
                         lecturerRepository.findById(dto.lecturerId).ifPresent(course::setLecturer);
+                    } else {
+                        course.setLecturer(null);
                     }
 
                     // Handle multi-group (preferred) OR single group (legacy)
@@ -126,6 +135,10 @@ public class CourseController {
                         }
                     } else if (dto.studentGroupId != null) {
                         studentGroupRepository.findById(dto.studentGroupId).ifPresent(course::setStudentGroup);
+                        course.setStudentGroups(Set.of());
+                    } else {
+                        course.setStudentGroup(null);
+                        course.setStudentGroups(Set.of());
                     }
 
                     if (dto.requiredFeatureIds != null) {
@@ -146,7 +159,15 @@ public class CourseController {
                         course.setAllowedZones(zones);
                     }
 
-                    return ResponseEntity.ok(toDTO(courseRepository.save(course)));
+                    CourseDTO previousState = toDTO(course);
+                    Course updated = courseRepository.save(course);
+
+                    // Audit logging
+                    auditLogService.logAction(AuditAction.UPDATE, "Course", updated.getId().toString(),
+                            updated.getCode() + " - " + updated.getName(), previousState, toDTO(updated),
+                            "Updated course " + updated.getCode());
+
+                    return ResponseEntity.ok(toDTO(updated));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -154,11 +175,19 @@ public class CourseController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (!courseRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        courseRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+        return courseRepository.findById(id)
+                .map(course -> {
+                    CourseDTO previousState = toDTO(course);
+                    courseRepository.deleteById(id);
+
+                    // Audit logging
+                    auditLogService.logAction(AuditAction.DELETE, "Course", id.toString(),
+                            course.getCode() + " - " + course.getName(), previousState, null,
+                            "Deleted course " + course.getCode());
+
+                    return ResponseEntity.noContent().<Void>build();
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping("/{id}/generate-lessons")
@@ -170,6 +199,104 @@ public class CourseController {
                     return ResponseEntity.ok(toDTO(course));
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    // ==================== BATCH OPERATIONS ====================
+
+    /**
+     * PATCH /api/v1/courses/batch
+     * Bulk update courses (change lecturer, update hours, etc.)
+     */
+    @PatchMapping("/batch")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
+    public ResponseEntity<BatchResponse> batchUpdate(@RequestBody BatchUpdateRequest request) {
+        if (request.ids == null || request.ids.isEmpty()) {
+            return ResponseEntity.badRequest().body(new BatchResponse(0, 0, List.of("No course IDs provided")));
+        }
+
+        int updated = 0;
+        int failed = 0;
+        List<String> errors = new java.util.ArrayList<>();
+
+        for (Long id : request.ids) {
+            try {
+                Course course = courseRepository.findById(id).orElse(null);
+                if (course == null) {
+                    failed++;
+                    errors.add("Course ID " + id + " not found");
+                    continue;
+                }
+
+                // Apply updates
+                if (request.lecturerId != null) {
+                    if (request.lecturerId == -1) {
+                        course.setLecturer(null); // Clear lecturer
+                    } else {
+                        lecturerRepository.findById(request.lecturerId).ifPresent(course::setLecturer);
+                    }
+                }
+                if (request.totalWeeklyHours != null) {
+                    course.setTotalWeeklyHours(request.totalWeeklyHours);
+                }
+                if (request.online != null) {
+                    course.setOnline(request.online);
+                }
+
+                courseRepository.save(course);
+                updated++;
+
+                // Audit log
+                auditLogService.logAction(AuditAction.UPDATE, "Course", id.toString(),
+                        course.getCode(), null, null, "Batch updated");
+
+            } catch (Exception e) {
+                failed++;
+                errors.add("Course ID " + id + ": " + e.getMessage());
+            }
+        }
+
+        return ResponseEntity.ok(new BatchResponse(updated, failed, errors));
+    }
+
+    /**
+     * DELETE /api/v1/courses/batch
+     * Bulk delete courses
+     */
+    @DeleteMapping("/batch")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<BatchResponse> batchDelete(@RequestBody BatchDeleteRequest request) {
+        if (request.ids == null || request.ids.isEmpty()) {
+            return ResponseEntity.badRequest().body(new BatchResponse(0, 0, List.of("No course IDs provided")));
+        }
+
+        int deleted = 0;
+        int failed = 0;
+        List<String> errors = new java.util.ArrayList<>();
+
+        for (Long id : request.ids) {
+            try {
+                Course course = courseRepository.findById(id).orElse(null);
+                if (course == null) {
+                    failed++;
+                    errors.add("Course ID " + id + " not found");
+                    continue;
+                }
+
+                String code = course.getCode();
+                courseRepository.deleteById(id);
+                deleted++;
+
+                // Audit log
+                auditLogService.logAction(AuditAction.DELETE, "Course", id.toString(),
+                        code, null, null, "Batch deleted");
+
+            } catch (Exception e) {
+                failed++;
+                errors.add("Course ID " + id + ": " + e.getMessage());
+            }
+        }
+
+        return ResponseEntity.ok(new BatchResponse(deleted, failed, errors));
     }
 
     private CourseDTO toDTO(Course course) {
@@ -198,11 +325,19 @@ public class CourseController {
         dto.requiredFeatures = course.getRequiredFeatures() != null
                 ? course.getRequiredFeatures().stream().map(Feature::getName).collect(Collectors.toList())
                 : List.of();
+        dto.requiredFeatureIds = course.getRequiredFeatures() != null
+                ? course.getRequiredFeatures().stream().map(Feature::getId).collect(Collectors.toList())
+                : List.of();
         dto.allowedZones = course.getAllowedZones() != null
                 ? course.getAllowedZones().stream().map(Zone::getName).collect(Collectors.toList())
                 : List.of();
+        dto.allowedZoneIds = course.getAllowedZones() != null
+                ? course.getAllowedZones().stream().map(Zone::getId).collect(Collectors.toList())
+                : List.of();
         return dto;
     }
+
+    // ==================== DTOs ====================
 
     public static class CourseDTO {
         public Long id;
@@ -217,6 +352,8 @@ public class CourseController {
         public List<String> studentGroupNames; // Multi-group names
         public List<String> requiredFeatures;
         public List<String> allowedZones;
+        public List<Long> requiredFeatureIds;
+        public List<Long> allowedZoneIds;
         public Boolean online;
     }
 
@@ -231,5 +368,28 @@ public class CourseController {
         public List<Long> allowedZoneIds;
         public Boolean generateLessons;
         public Boolean online;
+    }
+
+    public static class BatchUpdateRequest {
+        public List<Long> ids;
+        public Long lecturerId; // null = don't change, -1 = clear
+        public Integer totalWeeklyHours;
+        public Boolean online;
+    }
+
+    public static class BatchDeleteRequest {
+        public List<Long> ids;
+    }
+
+    public static class BatchResponse {
+        public int updated;
+        public int failed;
+        public List<String> errors;
+
+        public BatchResponse(int updated, int failed, List<String> errors) {
+            this.updated = updated;
+            this.failed = failed;
+            this.errors = errors;
+        }
     }
 }

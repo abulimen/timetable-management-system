@@ -1,0 +1,43 @@
+"Year Taken","Course ID","Course Title","Instuctor","Option","Credit Hours","No. GPA","Details"
+1,"AGG 102","Introduction to Agriculture I","OYEKALE  OLUWAFUNMIKE OMOWUNMI","AGRIC",2.0,false,AGG 102
+1,"AGG 112","Introduction to Agriculture II","Nwokocha  Amarachi","AGRIC",1.0,false,AGG 112
+1,"ANSC510","Animal Products and Processing","Ndubuisi-Ogbonna  Lois Chidinm","AGRIC",2.0,false,ANSC510
+1,"BU-AGG 114","Introduction to Digital Agriculture","Akinboye  Olufunso E","AGRIC",2.0,false,BU-AGG 114
+2,"AGR 202","Intro to Agricultural Economics Ext and Rural Sociology","Afodu  Osagie","AGRIC",3.0,false,AGR 202
+2,"AGR 204","Intro to Animal Production","Ndubuisi-Ogbonna  Lois Chidinm","AGRIC",2.0,false,AGR 204
+2,"AGR 206","Principles of Family and Consumer Sciences","Akintunde   Adeyinka  Oye","AGRIC",2.0,false,AGR 206
+2,"BU-AGR 208","Intro to Ecosystem Analysis","Akinboye  Olufunso E","AGRIC",2.0,false,BU-AGR 208
+2,"BU-AGR 210","Essentials of Food Security","Akinwole  Oladele Timothy","AGRIC",2.0,false,BU-AGR 210
+2,"BU-AGR 212","Anatomy and Physiology of Farm Animals","OLARINMOYE  Ayodeji Oluwadare","AGRIC",1.0,false,BU-AGR 212
+3,"AGE 306","Application of Computer to Agriculture	","Afodu  Osagie","AGRIC",2.0,false,AGE 306
+3,"ANS 302","Introduction to Animal Breeding and Genetics","Afodu  Osagie","AGRIC",2.0,false,ANS 302
+3,"ANS 304","Non-Ruminant Animal Production","Ndubuisi-Ogbonna  Lois Chidinm","AGRIC",2.0,false,ANS 304
+3,"CPS 302","Permanent Crops Production","Akinboye  Olufunso E","AGRIC",2.0,false,CPS 302
+3,"CPS 304","Crop Genetics and Breeding","Nwagburuka  Cyril Chikere","AGRIC",2.0,false,CPS 304
+3,"SOS 302","Introduction to Agric. Mechanization","Balogun James Adebayo","AGRIC",2.0,false,SOS 302
+4,"AGRI490","Field Practical Training  I","OYEKALE  OLUWAFUNMIKE OMOWUNMI","AGRIC",20.0,false,AGRI490
+5,"AGRE508","Agricultural Finance","Balogun, Olubumi Lawrence","AGRIC",3.0,false,AGRE508
+5,"AGRE510","Agric Resource Economic and Agrarian Law","Babalola, Daniel Akinola","AGRIC",2.0,false,AGRE510
+5,"AGRE512","Economics of Cooperatives in Agriculture","Balogun, Olubumi Lawrence","AGRIC",3.0,false,AGRE512
+5,"AGRE514","Audio-Visual in Aids Extention","Babalola, Daniel Akinola","AGRIC",2.0,false,AGRE514
+5,"AGRE524","Agricultural Policy and Development","Akinwole  Oladele Timothy","AGRIC",2.0,false,AGRE524
+5,"AGRE528","Rural Community Devolopment, Technology and Social Change","Babalola, Daniel Akinola","AGRIC",3.0,false,AGRE528
+5,"AGRE532","Principles of Macroeconomics in Agriculture","Babalola, Daniel Akinola","AGRIC",2.0,false,AGRE532
+5,"AGRE534","Agricultural Commodity Trade and Marketing","Alufohai  Grace Oghenerobor","AGRIC",2.0,false,AGRE534
+5,"AGRE536","Leadership and Change Management in Agribusiness","Babalola, Daniel Akinola","AGRIC",2.0,false,AGRE536
+5,"AGRE538","Social Psychology","Babalola, Daniel Akinola","AGRIC",3.0,false,AGRE538
+5,"AGRE542","Rural Sociology","Babalola, Daniel Akinola","AGRIC",2.0,false,AGRE542
+5,"AGRI500","Field Practical Training II","Akinboye  Olufunso E","AGRIC",5.0,false,AGRI500
+5,"AGRI599","Research Project","Ndubuisi-Ogbonna  Lois Chidinm","AGRIC",6.0,false,AGRI599
+5,"AGRI599","Research Project","Babalola, Daniel Akinola","AGRIC",6.0,false,AGRI599
+5,"AGRY502","Seed Production and Certification","Akinboye  Olufunso E","AGRIC",2.0,false,AGRY502
+5,"AGRY504","Pasture and Forage Management","OYEKALE  OLUWAFUNMIKE OMOWUNMI","AGRIC",2.0,false,AGRY504
+5,"AGRY506","Physiology of Crop Growth and Yield II","OYEKALE  OLUWAFUNMIKE OMOWUNMI","AGRIC",3.0,false,AGRY506
+5,"AGRY508","Soil Microbiology","Nwokocha  Amarachi","AGRIC",2.0,false,AGRY508
+5,"AGRY510","Landscape Design and Construction","Akinboye  Olufunso E","AGRIC",2.0,false,AGRY510
+5,"ANSC504","Monogastric (Swine and Rabbit) Production","Olumide  Martha Dupe","AGRIC",2.0,false,ANSC504
+5,"ANSC506","Animal Breeding Methods and Livestock Improvement","Akintunde   Adeyinka  Oye","AGRIC",3.0,false,ANSC506
+5,"ANSC508","Bioclimatology of Farm Animals","OLARINMOYE  Ayodeji Oluwadare","AGRIC",2.0,false,ANSC508
+5,"ANSC512","Reproductive Physiology and Artificial insemination","Akintunde   Adeyinka  Oye","AGRIC",2.0,false,ANSC512
+5,"ANSC514","Animal Health and Diseases","OLARINMOYE  Ayodeji Oluwadare","AGRIC",2.0,false,ANSC514
+

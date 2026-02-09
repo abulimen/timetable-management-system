@@ -31,7 +31,7 @@ export interface LoginRequest {
     providedIn: 'root'
 })
 export class AuthService {
-    private readonly API_URL = 'http://localhost:8080/api/auth';
+    private readonly API_URL = 'http://localhost:8080/api/v1/auth';
     private readonly ACCESS_TOKEN_KEY = 'access_token';
     private readonly REFRESH_TOKEN_KEY = 'refresh_token';
     private readonly USER_KEY = 'current_user';
@@ -97,12 +97,14 @@ export class AuthService {
             clearTimeout(this.tokenExpirationTimer);
         }
 
-        // Refresh 1 minute before expiration (default 14 minutes if not specified)
-        const refreshIn = ((expiresInSeconds || 900) - 60) * 1000;
+        // Refresh 5 minutes before expiration (default 55 minutes if not specified for 1 hour token)
+        const refreshIn = ((expiresInSeconds || 3600) - 300) * 1000;
 
         if (refreshIn > 0) {
             this.tokenExpirationTimer = setTimeout(() => {
-                this.refreshToken().subscribe();
+                this.refreshToken().subscribe({
+                    error: () => console.error('Auto token refresh failed')
+                });
             }, refreshIn);
         }
     }

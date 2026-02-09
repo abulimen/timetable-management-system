@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -34,12 +35,14 @@ public class UserService {
     private final LecturerRepository lecturerRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     private static final String PASSWORD_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%";
 
     /**
      * Get all users with pagination.
      */
+    @Transactional(readOnly = true)
     public Page<UserDTO> getAllUsers(Pageable pageable) {
         return userRepository.findAllByOrderByCreatedAtDesc(pageable)
                 .map(this::toDTO);
@@ -48,6 +51,7 @@ public class UserService {
     /**
      * Get user by ID.
      */
+    @Transactional(readOnly = true)
     public UserDTO getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + id));
@@ -57,6 +61,7 @@ public class UserService {
     /**
      * Search users by name or email.
      */
+    @Transactional(readOnly = true)
     public Page<UserDTO> searchUsers(String query, Pageable pageable) {
         return userRepository.searchUsers(query, pageable)
                 .map(this::toDTO);
@@ -65,6 +70,7 @@ public class UserService {
     /**
      * Get users by role.
      */
+    @Transactional(readOnly = true)
     public List<UserDTO> getUsersByRole(UserRole role) {
         return userRepository.findByRole(role).stream()
                 .map(this::toDTO)
@@ -73,6 +79,7 @@ public class UserService {
 
     /**
      * Create a new user.
+     * Password is auto-generated and emailed to the user.
      */
     @Transactional
     public UserDTO createUser(CreateUserRequest request, User creatorUser) {
@@ -81,17 +88,23 @@ public class UserService {
             throw new IllegalArgumentException("Email already exists: " + request.getEmail());
         }
 
+        // SUPER_ADMIN cannot be created - there can only be one!
+        if (request.getRole() == UserRole.SUPER_ADMIN) {
+            throw new IllegalArgumentException(
+                    "Cannot create SUPER_ADMIN accounts. There can only be one SUPER_ADMIN.");
+        }
+
         // Validate role hierarchy - can only create users with lower roles
         if (!canManageRole(creatorUser.getRole(), request.getRole())) {
             throw new IllegalArgumentException("You cannot create a user with role: " + request.getRole());
         }
 
-        // Validate password complexity
-        validatePassword(request.getPassword());
+        // Auto-generate secure password
+        String generatedPassword = generateRandomPassword();
 
         User user = User.builder()
                 .email(request.getEmail().toLowerCase())
-                .passwordHash(passwordEncoder.encode(request.getPassword()))
+                .passwordHash(passwordEncoder.encode(generatedPassword))
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .phone(request.getPhone())
@@ -112,6 +125,18 @@ public class UserService {
         user = userRepository.save(user);
         log.info("User created: {} by {}", user.getEmail(), creatorUser.getEmail());
 
+        // Auto-create/link Lecturer entity if role is LECTURER
+        if (user.getRole() == UserRole.LECTURER) {
+            createOrLinkLecturer(user);
+        }
+
+        // Send welcome email with credentials (async)
+        emailService.sendWelcomeEmail(
+                user.getEmail(),
+                user.getFirstName(),
+                user.getLastName(),
+                generatedPassword);
+
         return toDTO(user);
     }
 
@@ -127,6 +152,9 @@ public class UserService {
         if (!canManageRole(updaterUser.getRole(), user.getRole())) {
             throw new IllegalArgumentException("You cannot edit this user");
         }
+
+        // Track previous role for lecturer sync
+        UserRole previousRole = user.getRole();
 
         // Update email if changed
         if (request.getEmail() != null && !request.getEmail().equalsIgnoreCase(user.getEmail())) {
@@ -165,6 +193,9 @@ public class UserService {
         user = userRepository.save(user);
         log.info("User updated: {} by {}", user.getEmail(), updaterUser.getEmail());
 
+        // Sync Lecturer entity if role changed
+        syncLecturerEntity(user, previousRole);
+
         return toDTO(user);
     }
 
@@ -181,13 +212,18 @@ public class UserService {
             throw new IllegalArgumentException("Only SUPER_ADMIN can deactivate users");
         }
 
-        // Cannot deactivate yourself
-        if (user.getId().equals(deleterUser.getId())) {
-            throw new IllegalArgumentException("You cannot deactivate your own account");
+        // Cannot deactivate any SUPER_ADMIN account (including yourself)
+        if (user.getRole() == UserRole.SUPER_ADMIN) {
+            throw new IllegalArgumentException("Cannot deactivate SUPER_ADMIN accounts");
         }
 
         user.setActive(false);
         userRepository.save(user);
+
+        // Unlink lecturer if user was a LECTURER
+        if (user.getRole() == UserRole.LECTURER) {
+            unlinkLecturer(user);
+        }
 
         // Revoke all refresh tokens
         refreshTokenRepository.revokeAllUserTokens(id);
@@ -197,6 +233,7 @@ public class UserService {
 
     /**
      * Reset user password (admin action).
+     * New password is emailed to the user.
      */
     @Transactional
     public String resetPassword(Long id, User adminUser) {
@@ -218,6 +255,13 @@ public class UserService {
         // Revoke all existing refresh tokens
         refreshTokenRepository.revokeAllUserTokens(id);
 
+        // Send password reset email (async)
+        emailService.sendPasswordResetEmail(
+                user.getEmail(),
+                user.getFirstName(),
+                user.getLastName(),
+                newPassword);
+
         log.info("Password reset for user: {} by {}", user.getEmail(), adminUser.getEmail());
 
         return newPassword;
@@ -230,6 +274,11 @@ public class UserService {
     public void lockUser(Long id, int minutes) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + id));
+
+        // Cannot lock SUPER_ADMIN accounts
+        if (user.getRole() == UserRole.SUPER_ADMIN) {
+            throw new IllegalArgumentException("Cannot lock SUPER_ADMIN accounts");
+        }
 
         LocalDateTime lockUntil = LocalDateTime.now().plusMinutes(minutes);
         userRepository.lockAccount(id, lockUntil);
@@ -310,6 +359,83 @@ public class UserService {
         if (!password.matches(".*[0-9].*")) {
             throw new IllegalArgumentException("Password must contain at least one number");
         }
+    }
+
+    /**
+     * Synchronize Lecturer entity based on user role.
+     * - If user has LECTURER role: Create Lecturer if not exists, link it
+     * - If user doesn't have LECTURER role: Unlink existing Lecturer
+     */
+    private void syncLecturerEntity(User user, UserRole previousRole) {
+        boolean wasLecturer = previousRole == UserRole.LECTURER;
+        boolean isLecturer = user.getRole() == UserRole.LECTURER;
+
+        if (isLecturer && !wasLecturer) {
+            // User is now a LECTURER - create/link Lecturer entity
+            createOrLinkLecturer(user);
+        } else if (!isLecturer && wasLecturer) {
+            // User is no longer a LECTURER - unlink Lecturer entity
+            unlinkLecturer(user);
+        }
+    }
+
+    /**
+     * Create or link a Lecturer entity for a user with LECTURER role.
+     * Updates BOTH sides of the bidirectional relationship.
+     */
+    private void createOrLinkLecturer(User user) {
+        // Check if lecturer already exists for this user (via Lecturer.user)
+        Optional<Lecturer> existingLecturer = lecturerRepository.findByUser(user);
+        if (existingLecturer.isPresent()) {
+            // Ensure User.lecturer is also set
+            if (user.getLecturer() == null) {
+                user.setLecturer(existingLecturer.get());
+                userRepository.save(user);
+            }
+            log.info("Lecturer already linked to user: {}", user.getEmail());
+            return;
+        }
+
+        // Check if there's a lecturer with matching email that can be linked
+        Optional<Lecturer> lecturerByEmail = lecturerRepository.findByEmail(user.getEmail());
+        if (lecturerByEmail.isPresent()) {
+            Lecturer lecturer = lecturerByEmail.get();
+            if (lecturer.getUser() == null) {
+                // Link both sides
+                lecturer.setUser(user);
+                user.setLecturer(lecturer);
+                lecturerRepository.save(lecturer);
+                userRepository.save(user);
+                log.info("Linked existing lecturer {} to user {}", lecturer.getName(), user.getEmail());
+                return;
+            }
+        }
+
+        // Create new Lecturer entity
+        String fullName = user.getFirstName() + " " + user.getLastName();
+        Lecturer newLecturer = new Lecturer();
+        newLecturer.setName(fullName);
+        newLecturer.setEmail(user.getEmail());
+        newLecturer.setUser(user);
+        Lecturer savedLecturer = lecturerRepository.save(newLecturer);
+
+        // Link user to lecturer
+        user.setLecturer(savedLecturer);
+        userRepository.save(user);
+
+        log.info("Created new lecturer {} for user {}", fullName, user.getEmail());
+    }
+
+    /**
+     * Unlink a Lecturer entity when user is no longer a LECTURER.
+     * Does NOT delete the Lecturer - they may have courses/lessons assigned.
+     */
+    private void unlinkLecturer(User user) {
+        lecturerRepository.findByUser(user).ifPresent(lecturer -> {
+            lecturer.setUser(null);
+            lecturerRepository.save(lecturer);
+            log.info("Unlinked lecturer {} from user {}", lecturer.getName(), user.getEmail());
+        });
     }
 
     /**

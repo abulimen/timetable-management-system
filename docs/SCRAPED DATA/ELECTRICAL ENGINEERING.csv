@@ -1,0 +1,14 @@
+"Year Taken","Course ID","Course Title","Instuctor","Option","Credit Hours","No. GPA","Details"
+1,"EEE 102","Introduction to Electrical and Electronic Engineering","Omotosho  Olawale J.","Electrical and Electronic Engineering",2.0,false,EEE 102
+1,"GET 102","Engineering Graphics and Solid Modelling","ADEMOKOYA  Shade Olubunmi","Mechanical Engineering",2.0,false,GET 102
+1,"GET 102","Engineering Graphics and Solid Modelling","ADEMOKOYA  Shade Olubunmi","Civil Engineering",2.0,false,GET 102
+1,"GET 102","Engineering Graphics and Solid Modelling","ADEMOKOYA  Shade Olubunmi","Electrical and Electronic Engineering",2.0,false,GET 102
+1,"GET 102","Engineering Graphics and Solid Modelling","ADEMOKOYA  Shade Olubunmi","Computer Engineering",2.0,false,GET 102
+1,"GET 102","Engineering Graphics and Solid Modelling","ADEMOKOYA  Shade Olubunmi","Computer Engn Grp 2",2.0,false,GET 102
+2,"BU-GET 208","Strength of Material","Adeniran  Ezekiel","Electrical and Electronic Engineering",3.0,false,BU-GET 208
+2,"EEE 202","Applied Electricity II","Omotosho  Olawale J.","Electrical and Electronic Engineering",3.0,false,EEE 202
+2,"STA 202","Statistics for Physical Sciences and Engineering","Ayanlowo  Emmanuel Ayanlola","Chem",2.0,false,STA 202
+3,"BU-GET 202","Engineering Materials","ADEMOKOYA  Shade Olubunmi","Electrical and Electronic Engineering",3.0,false,BU-GET 202
+3,"EEE 322","Digital Electronic Circuits","ABOLARIN  AYODEJI","Electrical and Electronic Engineering",2.0,false,EEE 322
+3,"EEE 322","Digital Electronic Circuits","ABOLARIN  AYODEJI","Computer Engineering",2.0,false,EEE 322
+

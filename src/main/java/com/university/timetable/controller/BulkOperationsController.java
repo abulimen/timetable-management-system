@@ -1,19 +1,32 @@
 package com.university.timetable.controller;
 
+import com.university.timetable.domain.ImportHistory;
+import com.university.timetable.domain.ImportBatch;
+import com.university.timetable.domain.User;
 import com.university.timetable.service.BulkImportService;
+import com.university.timetable.service.ConstraintSettingsService;
 import com.university.timetable.service.DataWipeService;
+import com.university.timetable.service.ImportHistoryService;
+import com.university.timetable.service.StagingService;
+import com.university.timetable.repository.UserRepository;
+import com.university.timetable.dto.BulkImportResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Controller for bulk data operations.
- * Handles system-wide data wipe, bulk entity deletion, and CSV import.
+ * Handles system-wide data wipe, bulk entity deletion, CSV import, and import
+ * history.
  */
 @RestController
 @RequestMapping("/api/v1/bulk")
@@ -23,6 +36,10 @@ public class BulkOperationsController {
 
     private final DataWipeService dataWipeService;
     private final BulkImportService bulkImportService;
+    private final ImportHistoryService importHistoryService;
+    private final ConstraintSettingsService constraintSettingsService;
+    private final StagingService stagingService;
+    private final UserRepository userRepository;
 
     /**
      * DELETE /api/v1/bulk/system-wipe
@@ -99,7 +116,8 @@ public class BulkOperationsController {
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
     public ResponseEntity<?> importFromCsv(
             @PathVariable String entity,
-            @RequestParam("file") MultipartFile file) {
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "dryRun", defaultValue = "false") boolean dryRun) {
 
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of(
@@ -107,34 +125,26 @@ public class BulkOperationsController {
                     "message", "Please upload a CSV file"));
         }
 
-        log.info("Importing {} from CSV file: {}", entity, file.getOriginalFilename());
+        log.info("Importing {} from CSV file: {} (dryRun={})", entity, file.getOriginalFilename(), dryRun);
 
         try {
-            Map<String, Object> result = switch (entity.toLowerCase()) {
-                case "lecturers" -> bulkImportService.importLecturers(file);
-                case "rooms" -> bulkImportService.importRooms(file);
-                case "student-groups", "studentgroups" -> bulkImportService.importStudentGroups(file);
-                case "zones" -> bulkImportService.importZones(file);
-                case "features" -> bulkImportService.importFeatures(file);
-                case "courses" -> bulkImportService.importCourses(file);
+            BulkImportResult result = switch (entity.toLowerCase()) {
+                case "lecturers" -> bulkImportService.importLecturers(file, dryRun);
+                case "rooms" -> bulkImportService.importRooms(file, dryRun);
+                case "student-groups", "studentgroups" -> bulkImportService.importStudentGroups(file, dryRun);
+                case "zones" -> bulkImportService.importZones(file, dryRun);
+                case "features" -> bulkImportService.importFeatures(file, dryRun);
+                case "courses" -> bulkImportService.importCourses(file, dryRun);
+                case "users" -> bulkImportService.importUsers(file, dryRun);
                 default -> throw new IllegalArgumentException("Unknown entity type: " + entity);
             };
 
-            return ResponseEntity.ok(Map.of(
-                    "status", "IMPORTED",
-                    "entity", entity,
-                    "created", result.get("created"),
-                    "skipped", result.get("skipped"),
-                    "errors", result.get("errors")));
+            return ResponseEntity.ok(result);
+
         } catch (BulkImportService.BulkImportException e) {
-            // Atomic import validation failed - return all errors
-            log.warn("Bulk import validation failed for {} with {} errors", entity, e.getErrors().size());
-            return ResponseEntity.unprocessableEntity().body(Map.of(
-                    "error", "VALIDATION_FAILED",
-                    "message", "Import rejected - validation errors found. No data was imported.",
-                    "entity", entity,
-                    "errorCount", e.getErrors().size(),
-                    "errors", e.getErrors()));
+            // Atomic import validation failed - return detailed result
+            log.warn("Bulk import validation failed for {} with {} errors", entity, e.getResult().getErrorCount());
+            return ResponseEntity.unprocessableEntity().body(e.getResult());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "INVALID_ENTITY",
@@ -152,7 +162,7 @@ public class BulkOperationsController {
      * Download CSV template for the specified entity type.
      */
     @GetMapping(value = "/{entity}/template", produces = "text/csv")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> downloadTemplate(@PathVariable String entity) {
         try {
             String template = bulkImportService.getTemplate(entity);
@@ -182,5 +192,364 @@ public class BulkOperationsController {
                 Map.of("format", "code,name,weekly_hours,lecturer_email,student_group_name", "example",
                         "COSC101,Intro to Programming,3,john@uni.edu,COSC_1A"),
                 "importOrder", "1. Zones → 2. Lecturers → 3. Student Groups → 4. Rooms → 5. Courses"));
+    }
+
+    // ==================== IMPORT HISTORY ENDPOINTS ====================
+
+    /**
+     * GET /api/v1/bulk/history
+     * Get list of all import operations with rollback status.
+     */
+    @GetMapping("/history")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
+    public ResponseEntity<List<Map<String, Object>>> getImportHistory() {
+        List<ImportHistory> history = importHistoryService.getHistory();
+        int rollbackWindowHours = constraintSettingsService.getRollbackWindowHours();
+
+        List<Map<String, Object>> response = history.stream().map(h -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", h.getId());
+            map.put("timestamp", h.getTimestamp().toString());
+            map.put("entityType", h.getEntityType());
+            map.put("importMode", h.getImportMode());
+            map.put("fileName", h.getFileName() != null ? h.getFileName() : "");
+            map.put("createdCount", h.getCreatedCount());
+            map.put("updatedCount", h.getUpdatedCount());
+            map.put("skippedCount", h.getSkippedCount());
+            map.put("canRollback", h.isRollbackAvailable(rollbackWindowHours));
+            map.put("rolledBack", h.getRolledBack());
+            map.put("userName",
+                    h.getUser() != null ? h.getUser().getFirstName() + " " + h.getUser().getLastName() : "System");
+            return map;
+        }).toList();
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * POST /api/v1/bulk/history/{id}/rollback
+     * Rollback a specific import operation (within 24 hours).
+     */
+    @PostMapping("/history/{id}/rollback")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<?> rollbackImport(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        // Check if rollback is possible
+        if (!importHistoryService.canRollback(id)) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "ROLLBACK_NOT_AVAILABLE",
+                    "message",
+                    "This import cannot be rolled back. It may be older than 24 hours or already rolled back."));
+        }
+
+        try {
+            User currentUser = userRepository.findByEmailIgnoreCase(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            boolean success = importHistoryService.rollback(id, currentUser);
+
+            if (success) {
+                // Try to restore staging batch if it exists
+                stagingService.restoreBatchFromHistory(id);
+
+                log.info("Import {} successfully rolled back by {}", id, userDetails.getUsername());
+                return ResponseEntity.ok(Map.of(
+                        "status", "ROLLED_BACK",
+                        "message", "Import has been successfully rolled back",
+                        "importId", id));
+            } else {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "error", "ROLLBACK_FAILED",
+                        "message", "Rollback operation failed"));
+            }
+        } catch (Exception e) {
+            log.error("Rollback failed for import {}", id, e);
+            return ResponseEntity.internalServerError().body(Map.of(
+                    "error", "ROLLBACK_ERROR",
+                    "message", "An error occurred during rollback: " + e.getMessage()));
+        }
+    }
+
+    // ==================== STAGING AREA ENDPOINTS ====================
+
+    /**
+     * POST /api/v1/bulk/staging/{entityType}
+     * Submit a file for approval (Staging).
+     */
+    @PostMapping("/staging/{entityType}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
+    public ResponseEntity<?> submitForApproval(
+            @PathVariable String entityType,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "note", required = false) String note,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        try {
+            User uploader = userRepository.findByEmailIgnoreCase(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            var batch = stagingService.createBatch(file, entityType, uploader, note);
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "SUBMITTED",
+                    "message", "File submitted for approval",
+                    "batchId", batch.getId()));
+        } catch (com.university.timetable.service.BulkImportService.BulkImportException e) {
+            return ResponseEntity.unprocessableEntity().body(e.getResult());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * GET /api/v1/bulk/staging/pending
+     * List all pending batches.
+     */
+    @GetMapping("/staging/pending")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<?> getPendingBatches() {
+        return ResponseEntity.ok(stagingService.getPendingBatches());
+    }
+
+    /**
+     * GET /api/v1/bulk/staging/{batchId}/preview
+     * Preview a batch details (parsed content check).
+     */
+    @GetMapping("/staging/{batchId}/preview")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<?> previewBatch(@PathVariable Long batchId) {
+        try {
+            BulkImportResult result = stagingService.previewBatch(batchId);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * POST /api/v1/bulk/staging/{batchId}/approve
+     * Approve and execute a batch.
+     */
+    @PostMapping("/staging/{batchId}/approve")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<?> approveBatch(
+            @PathVariable Long batchId,
+            @RequestBody(required = false) Map<String, Object> body,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            User approver = userRepository.findByEmailIgnoreCase(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            Map<Integer, String> resolutions = null;
+            if (body != null && body.containsKey("resolutions")) {
+                resolutions = new HashMap<>();
+                Map<?, ?> rawRes = (Map<?, ?>) body.get("resolutions");
+                for (Map.Entry<?, ?> entry : rawRes.entrySet()) {
+                    Integer rowNum = Integer.valueOf(entry.getKey().toString());
+                    String resolution = entry.getValue().toString();
+                    resolutions.put(rowNum, resolution);
+                }
+            }
+
+            BulkImportResult result = stagingService.approveBatch(batchId, approver, resolutions);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * POST /api/v1/bulk/staging/{batchId}/reject
+     * Reject a batch.
+     */
+    @PostMapping("/staging/{batchId}/reject")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<?> rejectBatch(
+            @PathVariable Long batchId,
+            @RequestBody(required = false) Map<String, String> body,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            User rejector = userRepository.findByEmailIgnoreCase(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            String reason = body != null ? body.get("reason") : null;
+            stagingService.rejectBatch(batchId, rejector, reason);
+            return ResponseEntity.ok(Map.of("status", "REJECTED"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * POST /api/v1/bulk/staging/{batchId}/revert-to-draft
+     * Revert a rejected batch back to draft for re-editing.
+     */
+    @PostMapping("/staging/{batchId}/revert-to-draft")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
+    public ResponseEntity<?> revertToDraft(
+            @PathVariable Long batchId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            User user = userRepository.findByEmailIgnoreCase(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            ImportBatch newDraft = stagingService.revertToDraft(batchId, user);
+            return ResponseEntity.ok(Map.of("status", "DRAFT", "id", newDraft.getId()));
+        } catch (SecurityException e) {
+            return ResponseEntity.status(403).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    // ==================== DRAFT ENDPOINTS ====================
+
+    /**
+     * POST /api/v1/bulk/staging/draft/{entityType}
+     * Create a new draft import.
+     */
+    @PostMapping("/staging/draft/{entityType}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
+    public ResponseEntity<?> createDraft(
+            @PathVariable String entityType,
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            User uploader = userRepository.findByEmailIgnoreCase(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            var batch = stagingService.createDraft(file, entityType, uploader);
+            return ResponseEntity.ok(Map.of(
+                    "status", "DRAFT_CREATED",
+                    "draftId", batch.getId()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * GET /api/v1/bulk/staging/drafts
+     * List my drafts.
+     */
+    @GetMapping("/staging/drafts")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
+    public ResponseEntity<?> getMyDrafts(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findByEmailIgnoreCase(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return ResponseEntity.ok(stagingService.getDrafts(user));
+    }
+
+    /**
+     * GET /api/v1/bulk/staging/my-submissions
+     * List user's submitted batches (PENDING, APPROVED, REJECTED).
+     */
+    @GetMapping("/staging/my-submissions")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
+    public ResponseEntity<?> getMySubmissions(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = userRepository.findByEmailIgnoreCase(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return ResponseEntity.ok(stagingService.getMySubmissions(user));
+    }
+
+    /**
+     * GET /api/v1/bulk/staging/draft/{id}
+     * Get draft details (including content).
+     */
+    @GetMapping("/staging/draft/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
+    public ResponseEntity<?> getDraft(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            User user = userRepository.findByEmailIgnoreCase(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            var draft = stagingService.getDraft(id, user); // checks ownership
+
+            // Return content as string along with metadata
+            String content = new String(draft.getFileData(), java.nio.charset.StandardCharsets.UTF_8);
+
+            return ResponseEntity.ok(Map.of(
+                    "id", draft.getId(),
+                    "entityType", draft.getEntityType(),
+                    "originalFilename", draft.getOriginalFilename(),
+                    "content", content,
+                    "createdAt", draft.getCreatedAt().toString()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * PUT /api/v1/bulk/staging/draft/{id}
+     * Update draft content.
+     */
+    @PutMapping("/staging/draft/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
+    public ResponseEntity<?> updateDraft(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            User user = userRepository.findByEmailIgnoreCase(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            String content = body.get("content");
+            if (content == null)
+                throw new IllegalArgumentException("Content required");
+
+            stagingService.updateDraft(id, user, content);
+            return ResponseEntity.ok(Map.of("status", "UPDATED"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * POST /api/v1/bulk/staging/draft/{id}/submit
+     * Submit draft for approval.
+     */
+    @PostMapping("/staging/draft/{id}/submit")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
+    public ResponseEntity<?> submitDraft(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            User user = userRepository.findByEmailIgnoreCase(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            stagingService.submitDraft(id, user);
+            return ResponseEntity.ok(Map.of("status", "SUBMITTED"));
+        } catch (IllegalArgumentException e) {
+            // Validation error often comes as IllegalArgumentException from
+            // BulkImportService
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (com.university.timetable.service.BulkImportService.BulkImportException e) {
+            return ResponseEntity.unprocessableEntity().body(e.getResult());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * DELETE /api/v1/bulk/staging/draft/{id}
+     * Delete draft.
+     */
+    @DeleteMapping("/staging/draft/{id}")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
+    public ResponseEntity<?> deleteDraft(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            User user = userRepository.findByEmailIgnoreCase(userDetails.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            stagingService.deleteDraft(id, user);
+            return ResponseEntity.ok(Map.of("status", "DELETED"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 }

@@ -1,340 +1,340 @@
-name,size,parent_group_name
-Computer Science Year 1,200,
-COSC-1A,50,Computer Science Year 1
-COSC-1B,50,Computer Science Year 1
-COSC-1C,50,Computer Science Year 1
-COSC-1D,50,Computer Science Year 1
-Computer Science Year 2,180,
-COSC-2A,45,Computer Science Year 2
-COSC-2B,45,Computer Science Year 2
-COSC-2C,45,Computer Science Year 2
-COSC-2D,45,Computer Science Year 2
-Computer Science Year 3,140,
-COSC-3A,35,Computer Science Year 3
-COSC-3B,35,Computer Science Year 3
-COSC-3C,35,Computer Science Year 3
-COSC-3D,35,Computer Science Year 3
-Computer Science Year 4,80,
-COSC-4A,40,Computer Science Year 4
-COSC-4B,40,Computer Science Year 4
-Software Engineering Year 1,160,
-SENG-1A,40,Software Engineering Year 1
-SENG-1B,40,Software Engineering Year 1
-SENG-1C,40,Software Engineering Year 1
-SENG-1D,40,Software Engineering Year 1
-Software Engineering Year 2,140,
-SENG-2A,35,Software Engineering Year 2
-SENG-2B,35,Software Engineering Year 2
-SENG-2C,35,Software Engineering Year 2
-SENG-2D,35,Software Engineering Year 2
-Software Engineering Year 3,120,
-SENG-3A,30,Software Engineering Year 3
-SENG-3B,30,Software Engineering Year 3
-SENG-3C,30,Software Engineering Year 3
-SENG-3D,30,Software Engineering Year 3
-Software Engineering Year 4,80,
-SENG-4A,40,Software Engineering Year 4
-SENG-4B,40,Software Engineering Year 4
-Information Technology Year 1,150,
-INFT-1A,50,Information Technology Year 1
-INFT-1B,50,Information Technology Year 1
-INFT-1C,50,Information Technology Year 1
-Information Technology Year 2,130,
-INFT-2A,43,Information Technology Year 2
-INFT-2B,43,Information Technology Year 2
-INFT-2C,44,Information Technology Year 2
-Information Technology Year 3,100,
-INFT-3A,34,Information Technology Year 3
-INFT-3B,33,Information Technology Year 3
-INFT-3C,33,Information Technology Year 3
-Information Technology Year 4,70,
-INFT-4A,35,Information Technology Year 4
-INFT-4B,35,Information Technology Year 4
-Cybersecurity Year 1,100,
-CYBS-1A,50,Cybersecurity Year 1
-CYBS-1B,50,Cybersecurity Year 1
-Cybersecurity Year 2,90,
-CYBS-2A,45,Cybersecurity Year 2
-CYBS-2B,45,Cybersecurity Year 2
-Cybersecurity Year 3,70,
-CYBS-3A,35,Cybersecurity Year 3
-CYBS-3B,35,Cybersecurity Year 3
-Cybersecurity Year 4,60,
-CYBS-4A,30,Cybersecurity Year 4
-CYBS-4B,30,Cybersecurity Year 4
-Electrical Engineering Year 1,180,
-EENG-1A,45,Electrical Engineering Year 1
-EENG-1B,45,Electrical Engineering Year 1
-EENG-1C,45,Electrical Engineering Year 1
-EENG-1D,45,Electrical Engineering Year 1
-Electrical Engineering Year 2,160,
-EENG-2A,40,Electrical Engineering Year 2
-EENG-2B,40,Electrical Engineering Year 2
-EENG-2C,40,Electrical Engineering Year 2
-EENG-2D,40,Electrical Engineering Year 2
-Electrical Engineering Year 3,120,
-EENG-3A,40,Electrical Engineering Year 3
-EENG-3B,40,Electrical Engineering Year 3
-EENG-3C,40,Electrical Engineering Year 3
-Electrical Engineering Year 4,90,
-EENG-4A,45,Electrical Engineering Year 4
-EENG-4B,45,Electrical Engineering Year 4
-Mechanical Engineering Year 1,170,
-MENG-1A,43,Mechanical Engineering Year 1
-MENG-1B,43,Mechanical Engineering Year 1
-MENG-1C,42,Mechanical Engineering Year 1
-MENG-1D,42,Mechanical Engineering Year 1
-Mechanical Engineering Year 2,150,
-MENG-2A,38,Mechanical Engineering Year 2
-MENG-2B,38,Mechanical Engineering Year 2
-MENG-2C,37,Mechanical Engineering Year 2
-MENG-2D,37,Mechanical Engineering Year 2
-Mechanical Engineering Year 3,110,
-MENG-3A,37,Mechanical Engineering Year 3
-MENG-3B,37,Mechanical Engineering Year 3
-MENG-3C,36,Mechanical Engineering Year 3
-Mechanical Engineering Year 4,90,
-MENG-4A,45,Mechanical Engineering Year 4
-MENG-4B,45,Mechanical Engineering Year 4
-Civil Engineering Year 1,160,
-CENG-1A,40,Civil Engineering Year 1
-CENG-1B,40,Civil Engineering Year 1
-CENG-1C,40,Civil Engineering Year 1
-CENG-1D,40,Civil Engineering Year 1
-Civil Engineering Year 2,140,
-CENG-2A,35,Civil Engineering Year 2
-CENG-2B,35,Civil Engineering Year 2
-CENG-2C,35,Civil Engineering Year 2
-CENG-2D,35,Civil Engineering Year 2
-Civil Engineering Year 3,100,
-CENG-3A,34,Civil Engineering Year 3
-CENG-3B,33,Civil Engineering Year 3
-CENG-3C,33,Civil Engineering Year 3
-Civil Engineering Year 4,80,
-CENG-4A,40,Civil Engineering Year 4
-CENG-4B,40,Civil Engineering Year 4
-Medicine Year 1,150,
-MED-1A,50,Medicine Year 1
-MED-1B,50,Medicine Year 1
-MED-1C,50,Medicine Year 1
-Medicine Year 2,140,
-MED-2A,47,Medicine Year 2
-MED-2B,47,Medicine Year 2
-MED-2C,46,Medicine Year 2
-Medicine Year 3,130,
-MED-3A,44,Medicine Year 3
-MED-3B,43,Medicine Year 3
-MED-3C,43,Medicine Year 3
-Medicine Year 4,120,
-MED-4A,40,Medicine Year 4
-MED-4B,40,Medicine Year 4
-MED-4C,40,Medicine Year 4
-Medicine Year 5,90,
-MED-5A,45,Medicine Year 5
-MED-5B,45,Medicine Year 5
-Medicine Year 6,70,
-MED-6A,35,Medicine Year 6
-MED-6B,35,Medicine Year 6
-Pharmacy Year 1,100,
-PHAR-1A,50,Pharmacy Year 1
-PHAR-1B,50,Pharmacy Year 1
-Pharmacy Year 2,90,
-PHAR-2A,45,Pharmacy Year 2
-PHAR-2B,45,Pharmacy Year 2
-Pharmacy Year 3,80,
-PHAR-3A,40,Pharmacy Year 3
-PHAR-3B,40,Pharmacy Year 3
-Pharmacy Year 4,80,
-PHAR-4A,40,Pharmacy Year 4
-PHAR-4B,40,Pharmacy Year 4
-Nursing Year 1,120,
-NURS-1A,40,Nursing Year 1
-NURS-1B,40,Nursing Year 1
-NURS-1C,40,Nursing Year 1
-Nursing Year 2,110,
-NURS-2A,37,Nursing Year 2
-NURS-2B,37,Nursing Year 2
-NURS-2C,36,Nursing Year 2
-Nursing Year 3,90,
-NURS-3A,45,Nursing Year 3
-NURS-3B,45,Nursing Year 3
-Nursing Year 4,80,
-NURS-4A,40,Nursing Year 4
-NURS-4B,40,Nursing Year 4
-Law Year 1,150,
-LAW-1A,50,Law Year 1
-LAW-1B,50,Law Year 1
-LAW-1C,50,Law Year 1
-Law Year 2,130,
-LAW-2A,44,Law Year 2
-LAW-2B,43,Law Year 2
-LAW-2C,43,Law Year 2
-Law Year 3,110,
-LAW-3A,37,Law Year 3
-LAW-3B,37,Law Year 3
-LAW-3C,36,Law Year 3
-Law Year 4,110,
-LAW-4A,37,Law Year 4
-LAW-4B,37,Law Year 4
-LAW-4C,36,Law Year 4
-Accounting Year 1,150,
-ACCT-1A,50,Accounting Year 1
-ACCT-1B,50,Accounting Year 1
-ACCT-1C,50,Accounting Year 1
-Accounting Year 2,130,
-ACCT-2A,44,Accounting Year 2
-ACCT-2B,43,Accounting Year 2
-ACCT-2C,43,Accounting Year 2
-Accounting Year 3,110,
-ACCT-3A,37,Accounting Year 3
-ACCT-3B,37,Accounting Year 3
-ACCT-3C,36,Accounting Year 3
-Accounting Year 4,90,
-ACCT-4A,45,Accounting Year 4
-ACCT-4B,45,Accounting Year 4
-Business Administration Year 1,170,
-BADM-1A,43,Business Administration Year 1
-BADM-1B,43,Business Administration Year 1
-BADM-1C,42,Business Administration Year 1
-BADM-1D,42,Business Administration Year 1
-Business Administration Year 2,150,
-BADM-2A,38,Business Administration Year 2
-BADM-2B,38,Business Administration Year 2
-BADM-2C,37,Business Administration Year 2
-BADM-2D,37,Business Administration Year 2
-Business Administration Year 3,120,
-BADM-3A,40,Business Administration Year 3
-BADM-3B,40,Business Administration Year 3
-BADM-3C,40,Business Administration Year 3
-Business Administration Year 4,110,
-BADM-4A,37,Business Administration Year 4
-BADM-4B,37,Business Administration Year 4
-BADM-4C,36,Business Administration Year 4
-Economics Year 1,130,
-ECON-1A,44,Economics Year 1
-ECON-1B,43,Economics Year 1
-ECON-1C,43,Economics Year 1
-Economics Year 2,120,
-ECON-2A,40,Economics Year 2
-ECON-2B,40,Economics Year 2
-ECON-2C,40,Economics Year 2
-Economics Year 3,95,
-ECON-3A,48,Economics Year 3
-ECON-3B,47,Economics Year 3
-Economics Year 4,75,
-ECON-4A,38,Economics Year 4
-ECON-4B,37,Economics Year 4
-Mass Communication Year 1,120,
-MCOM-1A,40,Mass Communication Year 1
-MCOM-1B,40,Mass Communication Year 1
-MCOM-1C,40,Mass Communication Year 1
-Mass Communication Year 2,100,
-MCOM-2A,34,Mass Communication Year 2
-MCOM-2B,33,Mass Communication Year 2
-MCOM-2C,33,Mass Communication Year 2
-Mass Communication Year 3,85,
-MCOM-3A,43,Mass Communication Year 3
-MCOM-3B,42,Mass Communication Year 3
-Mass Communication Year 4,75,
-MCOM-4A,38,Mass Communication Year 4
-MCOM-4B,37,Mass Communication Year 4
-Political Science Year 1,110,
-POLS-1A,37,Political Science Year 1
-POLS-1B,37,Political Science Year 1
-POLS-1C,36,Political Science Year 1
-Political Science Year 2,95,
-POLS-2A,48,Political Science Year 2
-POLS-2B,47,Political Science Year 2
-Political Science Year 3,80,
-POLS-3A,40,Political Science Year 3
-POLS-3B,40,Political Science Year 3
-Political Science Year 4,65,
-POLS-4A,33,Political Science Year 4
-POLS-4B,32,Political Science Year 4
-Psychology Year 1,100,
-PSYC-1A,50,Psychology Year 1
-PSYC-1B,50,Psychology Year 1
-Psychology Year 2,90,
-PSYC-2A,45,Psychology Year 2
-PSYC-2B,45,Psychology Year 2
-Psychology Year 3,70,
-PSYC-3A,35,Psychology Year 3
-PSYC-3B,35,Psychology Year 3
-Psychology Year 4,60,
-PSYC-4A,30,Psychology Year 4
-PSYC-4B,30,Psychology Year 4
-Education Year 1,120,
-EDUC-1A,40,Education Year 1
-EDUC-1B,40,Education Year 1
-EDUC-1C,40,Education Year 1
-Education Year 2,110,
-EDUC-2A,37,Education Year 2
-EDUC-2B,37,Education Year 2
-EDUC-2C,36,Education Year 2
-Education Year 3,90,
-EDUC-3A,45,Education Year 3
-EDUC-3B,45,Education Year 3
-Education Year 4,80,
-EDUC-4A,40,Education Year 4
-EDUC-4B,40,Education Year 4
-Agriculture Year 1,110,
-AGRI-1A,37,Agriculture Year 1
-AGRI-1B,37,Agriculture Year 1
-AGRI-1C,36,Agriculture Year 1
-Agriculture Year 2,95,
-AGRI-2A,48,Agriculture Year 2
-AGRI-2B,47,Agriculture Year 2
-Agriculture Year 3,80,
-AGRI-3A,40,Agriculture Year 3
-AGRI-3B,40,Agriculture Year 3
-Agriculture Year 4,65,
-AGRI-4A,33,Agriculture Year 4
-AGRI-4B,32,Agriculture Year 4
-Chemistry Year 1,90,
-CHEM-1A,45,Chemistry Year 1
-CHEM-1B,45,Chemistry Year 1
-Chemistry Year 2,80,
-CHEM-2A,40,Chemistry Year 2
-CHEM-2B,40,Chemistry Year 2
-Chemistry Year 3,60,
-CHEM-3A,30,Chemistry Year 3
-CHEM-3B,30,Chemistry Year 3
-Chemistry Year 4,50,
-CHEM-4A,25,Chemistry Year 4
-CHEM-4B,25,Chemistry Year 4
-Physics Year 1,85,
-PHYS-1A,43,Physics Year 1
-PHYS-1B,42,Physics Year 1
-Physics Year 2,75,
-PHYS-2A,38,Physics Year 2
-PHYS-2B,37,Physics Year 2
-Physics Year 3,55,
-PHYS-3A,28,Physics Year 3
-PHYS-3B,27,Physics Year 3
-Physics Year 4,45,
-PHYS-4A,23,Physics Year 4
-PHYS-4B,22,Physics Year 4
-Mathematics Year 1,80,
-MATH-1A,40,Mathematics Year 1
-MATH-1B,40,Mathematics Year 1
-Mathematics Year 2,70,
-MATH-2A,35,Mathematics Year 2
-MATH-2B,35,Mathematics Year 2
-Mathematics Year 3,55,
-MATH-3A,28,Mathematics Year 3
-MATH-3B,27,Mathematics Year 3
-Mathematics Year 4,45,
-MATH-4A,23,Mathematics Year 4
-MATH-4B,22,Mathematics Year 4
-English Language Year 1,95,
-ENGL-1A,48,English Language Year 1
-ENGL-1B,47,English Language Year 1
-English Language Year 2,85,
-ENGL-2A,43,English Language Year 2
-ENGL-2B,42,English Language Year 2
-English Language Year 3,65,
-ENGL-3A,33,English Language Year 3
-ENGL-3B,32,English Language Year 3
-English Language Year 4,55,
-ENGL-4A,28,English Language Year 4
-ENGL-4B,27,English Language Year 4
+base_name,is_parent,level,group,size,parent_group_name
+COSC,T,100,,200,
+COSC,F,100,A,50,COSC 100 LEVEL
+COSC,F,100,B,50,COSC 100 LEVEL
+COSC,F,100,C,50,COSC 100 LEVEL
+COSC,F,100,D,50,COSC 100 LEVEL
+COSC,T,200,,180,
+COSC,F,200,A,45,COSC 200 LEVEL
+COSC,F,200,B,45,COSC 200 LEVEL
+COSC,F,200,C,45,COSC 200 LEVEL
+COSC,F,200,D,45,COSC 200 LEVEL
+COSC,T,300,,140,
+COSC,F,300,A,35,COSC 300 LEVEL
+COSC,F,300,B,35,COSC 300 LEVEL
+COSC,F,300,C,35,COSC 300 LEVEL
+COSC,F,300,D,35,COSC 300 LEVEL
+COSC,T,400,,80,
+COSC,F,400,A,40,COSC 400 LEVEL
+COSC,F,400,B,40,COSC 400 LEVEL
+SENG,T,100,,160,
+SENG,F,100,A,40,SENG 100 LEVEL
+SENG,F,100,B,40,SENG 100 LEVEL
+SENG,F,100,C,40,SENG 100 LEVEL
+SENG,F,100,D,40,SENG 100 LEVEL
+SENG,T,200,,140,
+SENG,F,200,A,35,SENG 200 LEVEL
+SENG,F,200,B,35,SENG 200 LEVEL
+SENG,F,200,C,35,SENG 200 LEVEL
+SENG,F,200,D,35,SENG 200 LEVEL
+SENG,T,300,,120,
+SENG,F,300,A,30,SENG 300 LEVEL
+SENG,F,300,B,30,SENG 300 LEVEL
+SENG,F,300,C,30,SENG 300 LEVEL
+SENG,F,300,D,30,SENG 300 LEVEL
+SENG,T,400,,80,
+SENG,F,400,A,40,SENG 400 LEVEL
+SENG,F,400,B,40,SENG 400 LEVEL
+INFT,T,100,,150,
+INFT,F,100,A,50,INFT 100 LEVEL
+INFT,F,100,B,50,INFT 100 LEVEL
+INFT,F,100,C,50,INFT 100 LEVEL
+INFT,T,200,,130,
+INFT,F,200,A,43,INFT 200 LEVEL
+INFT,F,200,B,43,INFT 200 LEVEL
+INFT,F,200,C,44,INFT 200 LEVEL
+INFT,T,300,,100,
+INFT,F,300,A,34,INFT 300 LEVEL
+INFT,F,300,B,33,INFT 300 LEVEL
+INFT,F,300,C,33,INFT 300 LEVEL
+INFT,T,400,,70,
+INFT,F,400,A,35,INFT 400 LEVEL
+INFT,F,400,B,35,INFT 400 LEVEL
+CYBS,T,100,,100,
+CYBS,F,100,A,50,CYBS 100 LEVEL
+CYBS,F,100,B,50,CYBS 100 LEVEL
+CYBS,T,200,,90,
+CYBS,F,200,A,45,CYBS 200 LEVEL
+CYBS,F,200,B,45,CYBS 200 LEVEL
+CYBS,T,300,,70,
+CYBS,F,300,A,35,CYBS 300 LEVEL
+CYBS,F,300,B,35,CYBS 300 LEVEL
+CYBS,T,400,,60,
+CYBS,F,400,A,30,CYBS 400 LEVEL
+CYBS,F,400,B,30,CYBS 400 LEVEL
+EENG,T,100,,180,
+EENG,F,100,A,45,EENG 100 LEVEL
+EENG,F,100,B,45,EENG 100 LEVEL
+EENG,F,100,C,45,EENG 100 LEVEL
+EENG,F,100,D,45,EENG 100 LEVEL
+EENG,T,200,,160,
+EENG,F,200,A,40,EENG 200 LEVEL
+EENG,F,200,B,40,EENG 200 LEVEL
+EENG,F,200,C,40,EENG 200 LEVEL
+EENG,F,200,D,40,EENG 200 LEVEL
+EENG,T,300,,120,
+EENG,F,300,A,40,EENG 300 LEVEL
+EENG,F,300,B,40,EENG 300 LEVEL
+EENG,F,300,C,40,EENG 300 LEVEL
+EENG,T,400,,90,
+EENG,F,400,A,45,EENG 400 LEVEL
+EENG,F,400,B,45,EENG 400 LEVEL
+MENG,T,100,,170,
+MENG,F,100,A,43,MENG 100 LEVEL
+MENG,F,100,B,43,MENG 100 LEVEL
+MENG,F,100,C,42,MENG 100 LEVEL
+MENG,F,100,D,42,MENG 100 LEVEL
+MENG,T,200,,150,
+MENG,F,200,A,38,MENG 200 LEVEL
+MENG,F,200,B,38,MENG 200 LEVEL
+MENG,F,200,C,37,MENG 200 LEVEL
+MENG,F,200,D,37,MENG 200 LEVEL
+MENG,T,300,,110,
+MENG,F,300,A,37,MENG 300 LEVEL
+MENG,F,300,B,37,MENG 300 LEVEL
+MENG,F,300,C,36,MENG 300 LEVEL
+MENG,T,400,,90,
+MENG,F,400,A,45,MENG 400 LEVEL
+MENG,F,400,B,45,MENG 400 LEVEL
+CENG,T,100,,160,
+CENG,F,100,A,40,CENG 100 LEVEL
+CENG,F,100,B,40,CENG 100 LEVEL
+CENG,F,100,C,40,CENG 100 LEVEL
+CENG,F,100,D,40,CENG 100 LEVEL
+CENG,T,200,,140,
+CENG,F,200,A,35,CENG 200 LEVEL
+CENG,F,200,B,35,CENG 200 LEVEL
+CENG,F,200,C,35,CENG 200 LEVEL
+CENG,F,200,D,35,CENG 200 LEVEL
+CENG,T,300,,100,
+CENG,F,300,A,34,CENG 300 LEVEL
+CENG,F,300,B,33,CENG 300 LEVEL
+CENG,F,300,C,33,CENG 300 LEVEL
+CENG,T,400,,80,
+CENG,F,400,A,40,CENG 400 LEVEL
+CENG,F,400,B,40,CENG 400 LEVEL
+MED,T,100,,150,
+MED,F,100,A,50,MED 100 LEVEL
+MED,F,100,B,50,MED 100 LEVEL
+MED,F,100,C,50,MED 100 LEVEL
+MED,T,200,,140,
+MED,F,200,A,47,MED 200 LEVEL
+MED,F,200,B,47,MED 200 LEVEL
+MED,F,200,C,46,MED 200 LEVEL
+MED,T,300,,130,
+MED,F,300,A,44,MED 300 LEVEL
+MED,F,300,B,43,MED 300 LEVEL
+MED,F,300,C,43,MED 300 LEVEL
+MED,T,400,,120,
+MED,F,400,A,40,MED 400 LEVEL
+MED,F,400,B,40,MED 400 LEVEL
+MED,F,400,C,40,MED 400 LEVEL
+MED,T,500,,90,
+MED,F,500,A,45,MED 500 LEVEL
+MED,F,500,B,45,MED 500 LEVEL
+MED,T,600,,70,
+MED,F,600,A,35,MED 600 LEVEL
+MED,F,600,B,35,MED 600 LEVEL
+PHAR,T,100,,100,
+PHAR,F,100,A,50,PHAR 100 LEVEL
+PHAR,F,100,B,50,PHAR 100 LEVEL
+PHAR,T,200,,90,
+PHAR,F,200,A,45,PHAR 200 LEVEL
+PHAR,F,200,B,45,PHAR 200 LEVEL
+PHAR,T,300,,80,
+PHAR,F,300,A,40,PHAR 300 LEVEL
+PHAR,F,300,B,40,PHAR 300 LEVEL
+PHAR,T,400,,80,
+PHAR,F,400,A,40,PHAR 400 LEVEL
+PHAR,F,400,B,40,PHAR 400 LEVEL
+NURS,T,100,,120,
+NURS,F,100,A,40,NURS 100 LEVEL
+NURS,F,100,B,40,NURS 100 LEVEL
+NURS,F,100,C,40,NURS 100 LEVEL
+NURS,T,200,,110,
+NURS,F,200,A,37,NURS 200 LEVEL
+NURS,F,200,B,37,NURS 200 LEVEL
+NURS,F,200,C,36,NURS 200 LEVEL
+NURS,T,300,,90,
+NURS,F,300,A,45,NURS 300 LEVEL
+NURS,F,300,B,45,NURS 300 LEVEL
+NURS,T,400,,80,
+NURS,F,400,A,40,NURS 400 LEVEL
+NURS,F,400,B,40,NURS 400 LEVEL
+LAW,T,100,,150,
+LAW,F,100,A,50,LAW 100 LEVEL
+LAW,F,100,B,50,LAW 100 LEVEL
+LAW,F,100,C,50,LAW 100 LEVEL
+LAW,T,200,,130,
+LAW,F,200,A,44,LAW 200 LEVEL
+LAW,F,200,B,43,LAW 200 LEVEL
+LAW,F,200,C,43,LAW 200 LEVEL
+LAW,T,300,,110,
+LAW,F,300,A,37,LAW 300 LEVEL
+LAW,F,300,B,37,LAW 300 LEVEL
+LAW,F,300,C,36,LAW 300 LEVEL
+LAW,T,400,,110,
+LAW,F,400,A,37,LAW 400 LEVEL
+LAW,F,400,B,37,LAW 400 LEVEL
+LAW,F,400,C,36,LAW 400 LEVEL
+ACCT,T,100,,150,
+ACCT,F,100,A,50,ACCT 100 LEVEL
+ACCT,F,100,B,50,ACCT 100 LEVEL
+ACCT,F,100,C,50,ACCT 100 LEVEL
+ACCT,T,200,,130,
+ACCT,F,200,A,44,ACCT 200 LEVEL
+ACCT,F,200,B,43,ACCT 200 LEVEL
+ACCT,F,200,C,43,ACCT 200 LEVEL
+ACCT,T,300,,110,
+ACCT,F,300,A,37,ACCT 300 LEVEL
+ACCT,F,300,B,37,ACCT 300 LEVEL
+ACCT,F,300,C,36,ACCT 300 LEVEL
+ACCT,T,400,,90,
+ACCT,F,400,A,45,ACCT 400 LEVEL
+ACCT,F,400,B,45,ACCT 400 LEVEL
+BADM,T,100,,170,
+BADM,F,100,A,43,BADM 100 LEVEL
+BADM,F,100,B,43,BADM 100 LEVEL
+BADM,F,100,C,42,BADM 100 LEVEL
+BADM,F,100,D,42,BADM 100 LEVEL
+BADM,T,200,,150,
+BADM,F,200,A,38,BADM 200 LEVEL
+BADM,F,200,B,38,BADM 200 LEVEL
+BADM,F,200,C,37,BADM 200 LEVEL
+BADM,F,200,D,37,BADM 200 LEVEL
+BADM,T,300,,120,
+BADM,F,300,A,40,BADM 300 LEVEL
+BADM,F,300,B,40,BADM 300 LEVEL
+BADM,F,300,C,40,BADM 300 LEVEL
+BADM,T,400,,110,
+BADM,F,400,A,37,BADM 400 LEVEL
+BADM,F,400,B,37,BADM 400 LEVEL
+BADM,F,400,C,36,BADM 400 LEVEL
+ECON,T,100,,130,
+ECON,F,100,A,44,ECON 100 LEVEL
+ECON,F,100,B,43,ECON 100 LEVEL
+ECON,F,100,C,43,ECON 100 LEVEL
+ECON,T,200,,120,
+ECON,F,200,A,40,ECON 200 LEVEL
+ECON,F,200,B,40,ECON 200 LEVEL
+ECON,F,200,C,40,ECON 200 LEVEL
+ECON,T,300,,95,
+ECON,F,300,A,48,ECON 300 LEVEL
+ECON,F,300,B,47,ECON 300 LEVEL
+ECON,T,400,,75,
+ECON,F,400,A,38,ECON 400 LEVEL
+ECON,F,400,B,37,ECON 400 LEVEL
+MCOM,T,100,,120,
+MCOM,F,100,A,40,MCOM 100 LEVEL
+MCOM,F,100,B,40,MCOM 100 LEVEL
+MCOM,F,100,C,40,MCOM 100 LEVEL
+MCOM,T,200,,100,
+MCOM,F,200,A,34,MCOM 200 LEVEL
+MCOM,F,200,B,33,MCOM 200 LEVEL
+MCOM,F,200,C,33,MCOM 200 LEVEL
+MCOM,T,300,,85,
+MCOM,F,300,A,43,MCOM 300 LEVEL
+MCOM,F,300,B,42,MCOM 300 LEVEL
+MCOM,T,400,,75,
+MCOM,F,400,A,38,MCOM 400 LEVEL
+MCOM,F,400,B,37,MCOM 400 LEVEL
+POLS,T,100,,110,
+POLS,F,100,A,37,POLS 100 LEVEL
+POLS,F,100,B,37,POLS 100 LEVEL
+POLS,F,100,C,36,POLS 100 LEVEL
+POLS,T,200,,95,
+POLS,F,200,A,48,POLS 200 LEVEL
+POLS,F,200,B,47,POLS 200 LEVEL
+POLS,T,300,,80,
+POLS,F,300,A,40,POLS 300 LEVEL
+POLS,F,300,B,40,POLS 300 LEVEL
+POLS,T,400,,65,
+POLS,F,400,A,33,POLS 400 LEVEL
+POLS,F,400,B,32,POLS 400 LEVEL
+PSYC,T,100,,100,
+PSYC,F,100,A,50,PSYC 100 LEVEL
+PSYC,F,100,B,50,PSYC 100 LEVEL
+PSYC,T,200,,90,
+PSYC,F,200,A,45,PSYC 200 LEVEL
+PSYC,F,200,B,45,PSYC 200 LEVEL
+PSYC,T,300,,70,
+PSYC,F,300,A,35,PSYC 300 LEVEL
+PSYC,F,300,B,35,PSYC 300 LEVEL
+PSYC,T,400,,60,
+PSYC,F,400,A,30,PSYC 400 LEVEL
+PSYC,F,400,B,30,PSYC 400 LEVEL
+EDUC,T,100,,120,
+EDUC,F,100,A,40,EDUC 100 LEVEL
+EDUC,F,100,B,40,EDUC 100 LEVEL
+EDUC,F,100,C,40,EDUC 100 LEVEL
+EDUC,T,200,,110,
+EDUC,F,200,A,37,EDUC 200 LEVEL
+EDUC,F,200,B,37,EDUC 200 LEVEL
+EDUC,F,200,C,36,EDUC 200 LEVEL
+EDUC,T,300,,90,
+EDUC,F,300,A,45,EDUC 300 LEVEL
+EDUC,F,300,B,45,EDUC 300 LEVEL
+EDUC,T,400,,80,
+EDUC,F,400,A,40,EDUC 400 LEVEL
+EDUC,F,400,B,40,EDUC 400 LEVEL
+AGRI,T,100,,110,
+AGRI,F,100,A,37,AGRI 100 LEVEL
+AGRI,F,100,B,37,AGRI 100 LEVEL
+AGRI,F,100,C,36,AGRI 100 LEVEL
+AGRI,T,200,,95,
+AGRI,F,200,A,48,AGRI 200 LEVEL
+AGRI,F,200,B,47,AGRI 200 LEVEL
+AGRI,T,300,,80,
+AGRI,F,300,A,40,AGRI 300 LEVEL
+AGRI,F,300,B,40,AGRI 300 LEVEL
+AGRI,T,400,,65,
+AGRI,F,400,A,33,AGRI 400 LEVEL
+AGRI,F,400,B,32,AGRI 400 LEVEL
+CHEM,T,100,,90,
+CHEM,F,100,A,45,CHEM 100 LEVEL
+CHEM,F,100,B,45,CHEM 100 LEVEL
+CHEM,T,200,,80,
+CHEM,F,200,A,40,CHEM 200 LEVEL
+CHEM,F,200,B,40,CHEM 200 LEVEL
+CHEM,T,300,,60,
+CHEM,F,300,A,30,CHEM 300 LEVEL
+CHEM,F,300,B,30,CHEM 300 LEVEL
+CHEM,T,400,,50,
+CHEM,F,400,A,25,CHEM 400 LEVEL
+CHEM,F,400,B,25,CHEM 400 LEVEL
+PHYS,T,100,,85,
+PHYS,F,100,A,43,PHYS 100 LEVEL
+PHYS,F,100,B,42,PHYS 100 LEVEL
+PHYS,T,200,,75,
+PHYS,F,200,A,38,PHYS 200 LEVEL
+PHYS,F,200,B,37,PHYS 200 LEVEL
+PHYS,T,300,,55,
+PHYS,F,300,A,28,PHYS 300 LEVEL
+PHYS,F,300,B,27,PHYS 300 LEVEL
+PHYS,T,400,,45,
+PHYS,F,400,A,23,PHYS 400 LEVEL
+PHYS,F,400,B,22,PHYS 400 LEVEL
+MATH,T,100,,80,
+MATH,F,100,A,40,MATH 100 LEVEL
+MATH,F,100,B,40,MATH 100 LEVEL
+MATH,T,200,,70,
+MATH,F,200,A,35,MATH 200 LEVEL
+MATH,F,200,B,35,MATH 200 LEVEL
+MATH,T,300,,55,
+MATH,F,300,A,28,MATH 300 LEVEL
+MATH,F,300,B,27,MATH 300 LEVEL
+MATH,T,400,,45,
+MATH,F,400,A,23,MATH 400 LEVEL
+MATH,F,400,B,22,MATH 400 LEVEL
+ENGL,T,100,,95,
+ENGL,F,100,A,48,ENGL 100 LEVEL
+ENGL,F,100,B,47,ENGL 100 LEVEL
+ENGL,T,200,,85,
+ENGL,F,200,A,43,ENGL 200 LEVEL
+ENGL,F,200,B,42,ENGL 200 LEVEL
+ENGL,T,300,,65,
+ENGL,F,300,A,33,ENGL 300 LEVEL
+ENGL,F,300,B,32,ENGL 300 LEVEL
+ENGL,T,400,,55,
+ENGL,F,400,A,28,ENGL 400 LEVEL
+ENGL,F,400,B,27,ENGL 400 LEVEL

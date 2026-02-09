@@ -36,6 +36,14 @@ public class Lecturer {
     @Column
     private String email;
 
+    /**
+     * Link to the user account for this lecturer.
+     * Lecturers must have a user account with LECTURER role to be imported.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @OneToMany(mappedBy = "lecturer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<LecturerUnavailability> unavailabilities = new ArrayList<>();
 
@@ -60,7 +68,7 @@ public class Lecturer {
         }
         var lessonEnd = timeslot.getStartTime().plusHours(durationHours);
         return unavailabilities.stream()
-            .noneMatch(u -> u.overlaps(timeslot.getDayOfWeek(), timeslot.getStartTime(), lessonEnd));
+                .noneMatch(u -> u.overlaps(timeslot.getDayOfWeek(), timeslot.getStartTime(), lessonEnd));
     }
 
     public void addUnavailability(LecturerUnavailability unavailability) {
