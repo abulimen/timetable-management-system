@@ -451,6 +451,14 @@ public class UserService {
     }
 
     /**
+     * Get all user identifiers for validation.
+     */
+    @Transactional(readOnly = true)
+    public List<com.university.timetable.dto.UserIdentifierDTO> getAllUserIdentifiers() {
+        return userRepository.findAllIdentifiers();
+    }
+
+    /**
      * Convert User entity to DTO.
      */
     private UserDTO toDTO(User user) {

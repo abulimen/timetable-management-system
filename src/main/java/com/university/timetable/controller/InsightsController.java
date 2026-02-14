@@ -16,6 +16,7 @@ import com.university.timetable.repository.LessonRepository;
 import com.university.timetable.repository.RoomRepository;
 import com.university.timetable.repository.TimeslotRepository;
 import com.university.timetable.repository.ZoneRepository;
+import com.university.timetable.service.ConstraintSettingsService;
 import com.university.timetable.service.InfeasibilityChecker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -45,6 +47,7 @@ public class InsightsController {
     private final LecturerRepository lecturerRepository;
     private final LessonRepository lessonRepository;
     private final TimeslotRepository timeslotRepository;
+    private final ConstraintSettingsService settingsService;
     private final InfeasibilityChecker infeasibilityChecker;
 
     @GetMapping("/zones/summary")
@@ -143,7 +146,10 @@ public class InsightsController {
                 .filter(lecturer -> assignmentCountByLecturerId.getOrDefault(lecturer.getId(), 0L) >= overloadThreshold)
                 .count();
 
-        List<String> slots = List.of("08:00", "10:00", "12:00", "14:00", "16:00", "18:00");
+        LocalTime densityStart = settingsService.getEarliestStartTime();
+        LocalTime densityEnd = settingsService.getLatestEndTime();
+        final int densitySlotHours = 1;
+        List<String> slots = buildDensitySlots(densityStart, densityEnd, densitySlotHours);
         List<DayOfWeek> days = List.of(
                 DayOfWeek.MONDAY,
                 DayOfWeek.TUESDAY,
@@ -175,7 +181,17 @@ public class InsightsController {
             }
         }
 
-        return new LecturerSummaryResponse(total, noEmail, unassigned, overloaded, overloadThreshold, density);
+        return new LecturerSummaryResponse(
+                total,
+                noEmail,
+                unassigned,
+                overloaded,
+                overloadThreshold,
+                densityStart.toString(),
+                densityEnd.toString(),
+                densitySlotHours,
+                slots,
+                density);
     }
 
     @GetMapping("/diagnostics/course-feasibility")
@@ -307,6 +323,19 @@ public class InsightsController {
         return !point.isBefore(start) && point.isBefore(end);
     }
 
+    private static List<String> buildDensitySlots(LocalTime start, LocalTime end, int intervalHours) {
+        if (start == null || end == null || !start.isBefore(end) || intervalHours <= 0) {
+            return List.of("08:00", "10:00", "12:00", "14:00", "16:00");
+        }
+        List<String> slots = new ArrayList<>();
+        LocalTime current = start;
+        while (current.isBefore(end)) {
+            slots.add(current.toString());
+            current = current.plusHours(intervalHours);
+        }
+        return slots;
+    }
+
     private static int riskScore(String risk) {
         if ("CRITICAL".equals(risk)) {
             return 3;
@@ -356,6 +385,10 @@ public class InsightsController {
             int unassignedCount,
             int overloadedCount,
             int overloadThreshold,
+            String densityStartTime,
+            String densityEndTime,
+            int densitySlotHours,
+            List<String> densitySlots,
             Map<String, Integer> unavailabilityDensity
     ) {
     }

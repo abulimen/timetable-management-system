@@ -1,6 +1,8 @@
 package com.university.timetable.controller;
 
+import com.university.timetable.domain.AuditAction;
 import com.university.timetable.dto.ImportResultDTO;
+import com.university.timetable.service.AuditLogService;
 import com.university.timetable.service.IngestionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ImportController {
 
     private final IngestionService ingestionService;
+    private final AuditLogService auditLogService;
 
     /**
      * POST /api/v1/import/upload
@@ -42,9 +45,27 @@ public class ImportController {
 
         try {
             ImportResultDTO result = ingestionService.importExcel(file);
+            auditLogService.logAction(
+                    AuditAction.SYSTEM_ACTION,
+                    "ExcelImport",
+                    file.getOriginalFilename(),
+                    file.getOriginalFilename(),
+                    null,
+                    result,
+                    "Excel import completed");
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             log.error("Error importing Excel file", e);
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "ExcelImport",
+                    file.getOriginalFilename(),
+                    file.getOriginalFilename(),
+                    null,
+                    null,
+                    "Excel import failed",
+                    false,
+                    e.getMessage());
             ImportResultDTO errorResult = new ImportResultDTO();
             errorResult.addError(0, "file", "Failed to process file: " + e.getMessage(), "IMPORT_FAILED");
             return ResponseEntity.badRequest().body(errorResult);

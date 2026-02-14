@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, tap, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { toApiUrl } from '../config/api-base-url';
 
 // Interfaces
 export interface User {
@@ -31,7 +32,7 @@ export interface LoginRequest {
     providedIn: 'root'
 })
 export class AuthService {
-    private readonly API_URL = 'http://localhost:8080/api/v1/auth';
+    private readonly API_URL = toApiUrl('/api/v1/auth');
     private readonly ACCESS_TOKEN_KEY = 'access_token';
     private readonly REFRESH_TOKEN_KEY = 'refresh_token';
     private readonly USER_KEY = 'current_user';

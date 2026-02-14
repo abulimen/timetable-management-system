@@ -101,6 +101,14 @@ public class SpecialEvent {
      * Check if a student group is affected by this event.
      */
     public boolean affectsStudentGroup(StudentGroup group) {
-        return studentGroups.contains(group);
+        if (group == null || studentGroups == null || studentGroups.isEmpty()) {
+            return false;
+        }
+        for (StudentGroup eventGroup : studentGroups) {
+            if (eventGroup != null && eventGroup.hasConflictWith(group)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

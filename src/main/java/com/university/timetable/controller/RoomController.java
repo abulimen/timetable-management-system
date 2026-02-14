@@ -76,6 +76,7 @@ public class RoomController {
     public ResponseEntity<RoomDTO> update(@PathVariable Long id, @RequestBody RoomCreateDTO dto) {
         return roomRepository.findById(id)
                 .map(room -> {
+                    RoomDTO previousState = toDTO(room);
                     room.setName(dto.name);
                     room.setCapacity(dto.capacity);
 
@@ -92,7 +93,6 @@ public class RoomController {
                         room.setFeatures(features);
                     }
 
-                    RoomDTO previousState = toDTO(room);
                     Room updated = roomRepository.save(room);
 
                     auditLogService.logAction(AuditAction.UPDATE, "Room", updated.getId().toString(),

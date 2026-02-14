@@ -3,6 +3,7 @@ import { ReferenceDataService } from '../services/reference-data.service';
 import {
     requiredValidator,
     emailValidator,
+    phoneValidator,
     positiveIntValidator,
     nonNegativeIntValidator,
     booleanValidator,
@@ -22,6 +23,8 @@ export interface ValidatedColDef extends ColDef {
     referenceCheck?: boolean;
     supportsMultiple?: boolean; // Indicates if column supports pipe-separated values
     placeholder?: string;
+    required?: boolean;
+    strictAutocomplete?: boolean;
 }
 
 /**
@@ -50,10 +53,123 @@ export function getColumnDefinitions(
         case 'features':
             return getFeatureColumns();
         case 'users':
-            return getUserColumns();
+            return getUserColumns(refDataService);
         default:
             return [];
     }
+}
+
+// ... (other functions remain same) ...
+
+function getUserColumns(refDataService: ReferenceDataService): ValidatedColDef[] {
+    const normalizeEmail = (value: any) => String(value || '').trim().toLowerCase();
+    const normalizePhone = (value: any) => String(value || '').replace(/\D/g, '');
+
+    const duplicateEmailValidator: CellValidator = (value: any, _rowData?: any, allRows?: any[]) => {
+        const email = normalizeEmail(value);
+        if (!email) {
+            return { valid: true, status: 'valid' };
+        }
+
+        // 1. Check for duplicates within the current spreadsheet/grid
+        if (Array.isArray(allRows)) {
+            const count = allRows.filter(row => normalizeEmail(row?.email) === email).length;
+            if (count > 1) {
+                return { valid: false, status: 'error', message: `Duplicate email '${email}' found in spreadsheet` };
+            }
+        }
+
+        // 2. Check against database (existing users)
+        if (refDataService.hasUserEmail(email)) {
+            return { valid: false, status: 'error', message: `Email '${email}' already exists in database` };
+        }
+
+        return { valid: true, status: 'valid' };
+    };
+
+    const duplicatePhoneValidator: CellValidator = (value: any, _rowData?: any, allRows?: any[]) => {
+        const phone = String(value || '').trim();
+        if (!phone) {
+            return { valid: true, status: 'valid' };
+        }
+        const normalized = normalizePhone(phone);
+        if (!normalized) {
+            return { valid: true, status: 'valid' };
+        }
+
+        // 1. Check for duplicates in current file
+        if (Array.isArray(allRows)) {
+            const count = allRows.filter(row => normalizePhone(row?.phone) === normalized).length;
+            if (count > 1) {
+                return { valid: false, status: 'error', message: `Duplicate phone '${phone}' found in spreadsheet` };
+            }
+        }
+
+        // 2. Check against database
+        if (refDataService.hasUserPhone(normalized)) {
+            return { valid: false, status: 'error', message: `Phone '${phone}' already exists in database` };
+        }
+
+        return { valid: true, status: 'valid' };
+    };
+
+    return [
+        {
+            field: 'email',
+            headerName: 'Email',
+            editable: true,
+            flex: 1,
+            required: true,
+            validator: combineValidators(requiredValidator, emailValidator, duplicateEmailValidator),
+            placeholder: 'Required'
+        },
+        {
+            field: 'first_name',
+            headerName: 'First Name',
+            editable: true,
+            width: 150,
+            required: true,
+            validator: requiredValidator,
+            placeholder: 'Required'
+        },
+        {
+            field: 'last_name',
+            headerName: 'Last Name',
+            editable: true,
+            width: 150,
+            required: true,
+            validator: requiredValidator,
+            placeholder: 'Required'
+        },
+        {
+            field: 'role',
+            headerName: 'Role',
+            editable: true,
+            width: 120,
+            validator: roleValidator,
+            required: true,
+            autocompleteValues: () => ['ADMIN', 'COORDINATOR', 'LECTURER', 'VIEWER'],
+            strictAutocomplete: true,
+            placeholder: 'ADMIN/COORDINATOR/LECTURER/VIEWER'
+        },
+        {
+            field: 'department',
+            headerName: 'Department (Optional)',
+            editable: true,
+            flex: 1,
+            required: false,
+            placeholder: 'Optional'
+        },
+        {
+            field: 'phone',
+            headerName: 'Phone (Optional)',
+            editable: true,
+            width: 150,
+            required: false,
+            validator: combineValidators(phoneValidator, duplicatePhoneValidator),
+            placeholder: 'Optional'
+        }
+    ];
 }
 
 function getLecturerColumns(): ValidatedColDef[] {
@@ -76,6 +192,66 @@ function getLecturerColumns(): ValidatedColDef[] {
 }
 
 function getCourseColumns(refDataService: ReferenceDataService): ValidatedColDef[] {
+    const validateCourseGroupOverlap = (value: any, rowData?: any, allRows?: any[]) => {
+        const code = String(rowData?.code || '').trim().toUpperCase();
+        if (!code) {
+            return { valid: true, status: 'valid' as const };
+        }
+
+        const rawGroups = String(value || '')
+            .split('|')
+            .map(v => v.trim())
+            .filter(v => v.length > 0);
+
+        if (rawGroups.length === 0) {
+            return { valid: true, status: 'valid' as const };
+        }
+
+        const normalizedGroups = rawGroups.map(group => group.toLowerCase());
+        const uniqueGroups = new Set(normalizedGroups);
+        if (uniqueGroups.size !== normalizedGroups.length) {
+            return { valid: false, status: 'error' as const, message: 'Duplicate student groups in same row are not allowed' };
+        }
+
+        if (!Array.isArray(allRows) || allRows.length === 0) {
+            return { valid: true, status: 'valid' as const };
+        }
+
+        const usageCount = new Map<string, number>();
+        for (const candidate of allRows) {
+            const candidateCode = String(candidate?.code || '').trim().toUpperCase();
+            if (candidateCode !== code) {
+                continue;
+            }
+
+            const candidateGroups = String(candidate?.student_group_names || '')
+                .split('|')
+                .map((v: string) => v.trim())
+                .filter((v: string) => v.length > 0)
+                .map((v: string) => v.toLowerCase());
+
+            if (candidateGroups.length === 0) {
+                continue;
+            }
+            for (const group of candidateGroups) {
+                usageCount.set(group, (usageCount.get(group) || 0) + 1);
+            }
+        }
+
+        const overlappingGroups = Array.from(uniqueGroups).filter(group => (usageCount.get(group) || 0) > 1);
+        if (overlappingGroups.length > 0) {
+            return {
+                valid: false,
+                status: 'error' as const,
+                message: `Duplicate assignment for code ${code}: group(s) already used -> ${overlappingGroups
+                    .map(group => group.toUpperCase())
+                    .join(', ')}`
+            };
+        }
+
+        return { valid: true, status: 'valid' as const };
+    };
+
     return [
         {
             field: 'code',
@@ -112,7 +288,13 @@ function getCourseColumns(refDataService: ReferenceDataService): ValidatedColDef
             headerName: 'Student Groups',
             editable: true,
             flex: 1,
-            validator: createForeignKeyValidator(refDataService, 'studentGroup', true),
+            validator: (value: any, rowData?: any, allRows?: any[]) => {
+                const refCheck = createForeignKeyValidator(refDataService, 'studentGroup', true)(value, rowData, allRows);
+                if (!refCheck.valid) {
+                    return refCheck;
+                }
+                return validateCourseGroupOverlap(value, rowData, allRows);
+            },
             referenceCheck: true,
             autocompleteValues: () => refDataService.getStudentGroupNames(),
             tooltipValueGetter: () => 'Separate multiple groups with |',
@@ -390,54 +572,7 @@ function getFeatureColumns(): ValidatedColDef[] {
     ];
 }
 
-function getUserColumns(): ValidatedColDef[] {
-    return [
-        {
-            field: 'email',
-            headerName: 'Email',
-            editable: true,
-            flex: 1,
-            validator: combineValidators(requiredValidator, emailValidator)
-        },
-        {
-            field: 'first_name',
-            headerName: 'First Name',
-            editable: true,
-            width: 150,
-            validator: requiredValidator
-        },
-        {
-            field: 'last_name',
-            headerName: 'Last Name',
-            editable: true,
-            width: 150,
-            validator: requiredValidator
-        },
-        {
-            field: 'role',
-            headerName: 'Role',
-            editable: true,
-            width: 120,
-            validator: roleValidator,
-            cellEditor: 'agSelectCellEditor',
-            cellEditorParams: {
-                values: ['ADMIN', 'COORDINATOR', 'LECTURER', 'VIEWER']
-            }
-        },
-        {
-            field: 'department',
-            headerName: 'Department',
-            editable: true,
-            flex: 1
-        },
-        {
-            field: 'phone',
-            headerName: 'Phone',
-            editable: true,
-            width: 150
-        }
-    ];
-}
+
 
 /**
  * Get CSV headers for an entity type.

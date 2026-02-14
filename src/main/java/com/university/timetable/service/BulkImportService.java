@@ -40,6 +40,7 @@ public class BulkImportService {
     private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final ImportHistoryService importHistoryService;
+    private final LessonService lessonService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -58,7 +59,6 @@ public class BulkImportService {
      */
     public String getTemplate(String entityType) {
         return switch (entityType.toLowerCase()) {
-            case "lecturers" -> "name,email\nJohn Smith,john.smith@university.edu\nJane Doe,jane.doe@university.edu";
             case "rooms" ->
                 "name,capacity,zone_name,features\nRoom A101,50,Building A,Projector|Whiteboard\nRoom B202,100,Building B,Projector\nLab C301,30,Building C,Computers|Lab Equipment";
             case "student-groups", "studentgroups" ->
@@ -357,8 +357,23 @@ public class BulkImportService {
         BulkImportResult result = new BulkImportResult();
         List<User> validUsers = new ArrayList<>();
         List<String> generatedPasswords = new ArrayList<>();
+        List<Long> createdUserIds = new ArrayList<>();
         Set<String> seenEmails = new HashSet<>();
+        Set<String> seenPhones = new HashSet<>();
         int rowNum = 1; // Header is row 0
+
+        // Avoid N database queries per row by preloading existing identifiers once.
+        Set<String> existingEmails = new HashSet<>();
+        Set<String> existingPhones = new HashSet<>();
+        for (com.university.timetable.dto.UserIdentifierDTO id : userRepository.findAllIdentifiers()) {
+            if (id.getEmail() != null && !id.getEmail().isBlank()) {
+                existingEmails.add(id.getEmail().trim().toLowerCase());
+            }
+            String normalizedPhone = normalizePhone(id.getPhone());
+            if (!normalizedPhone.isEmpty()) {
+                existingPhones.add(normalizedPhone);
+            }
+        }
 
         // PHASE 1: Validate all rows
         for (String[] values : rows) {
@@ -394,6 +409,7 @@ public class BulkImportService {
             String roleStr = values[3].trim().toUpperCase();
             String department = values.length > 4 ? values[4].trim() : null;
             String phone = values.length > 5 ? values[5].trim() : null;
+            String normalizedPhone = normalizePhone(phone);
 
             rowData.put("email", email);
             rowData.put("firstName", firstName);
@@ -422,16 +438,39 @@ public class BulkImportService {
                 hasError = true;
             }
 
+            // Check duplicate phone in CSV (if provided)
+            if (!normalizedPhone.isEmpty() && seenPhones.contains(normalizedPhone)) {
+                result.getRowErrors().add(ImportRowError.builder()
+                        .rowNumber(rowNum)
+                        .message("Duplicate phone in CSV '" + phone + "'")
+                        .rawData(rowData)
+                        .build());
+                hasError = true;
+            }
+
             if (hasError)
                 continue;
 
             seenEmails.add(email);
+            if (!normalizedPhone.isEmpty()) {
+                seenPhones.add(normalizedPhone);
+            }
 
             // Check if email already exists in database
-            if (userRepository.existsByEmailIgnoreCase(email)) {
+            if (existingEmails.contains(email)) {
                 result.getRowErrors().add(ImportRowError.builder()
                         .rowNumber(rowNum)
                         .message("Email already exists '" + email + "'")
+                        .rawData(rowData)
+                        .build());
+                continue;
+            }
+
+            // Check if phone already exists in database (if provided)
+            if (!normalizedPhone.isEmpty() && existingPhones.contains(normalizedPhone)) {
+                result.getRowErrors().add(ImportRowError.builder()
+                        .rowNumber(rowNum)
+                        .message("Phone already exists '" + phone + "'")
                         .rawData(rowData)
                         .build());
                 continue;
@@ -479,24 +518,21 @@ public class BulkImportService {
             if (hasError)
                 continue;
 
-            // Generate password
-            String password = generateSecurePassword();
-
-            // Build user
-            User user = User.builder()
-                    .email(email)
-                    .passwordHash(passwordEncoder.encode(password))
-                    .firstName(firstName)
-                    .lastName(lastName)
-                    .phone(phone != null && !phone.isEmpty() ? phone : null)
-                    .department(department != null && !department.isEmpty() ? department : null)
-                    .role(role)
-                    .active(true)
-                    .emailVerified(false)
-                    .mustChangePassword(true)
-                    .build();
-
             if (!dryRun) {
+                // Password generation + BCrypt hashing are expensive; only do them for real imports.
+                String password = generateSecurePassword();
+                User user = User.builder()
+                        .email(email)
+                        .passwordHash(passwordEncoder.encode(password))
+                        .firstName(firstName)
+                        .lastName(lastName)
+                        .phone(phone != null && !phone.isEmpty() ? phone : null)
+                        .department(department != null && !department.isEmpty() ? department : null)
+                        .role(role)
+                        .active(true)
+                        .emailVerified(false)
+                        .mustChangePassword(true)
+                        .build();
                 validUsers.add(user);
                 generatedPasswords.add(password);
             }
@@ -529,6 +565,7 @@ public class BulkImportService {
 
             userRepository.save(user);
             created++;
+            createdUserIds.add(user.getId());
 
             // Auto-create/link Lecturer entity if role is LECTURER
             if (user.getRole() == UserRole.LECTURER) {
@@ -543,9 +580,17 @@ public class BulkImportService {
                     password);
         }
 
+        result.setImportHistoryId(recordHistory("USERS", originalFilename, createdUserIds));
         log.info("Bulk imported {} users", created);
         result.setCreatedCount(created);
         return result;
+    }
+
+    private String normalizePhone(String phone) {
+        if (phone == null) {
+            return "";
+        }
+        return phone.replaceAll("[\\s\\-()]+", "").trim().toLowerCase();
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -1453,8 +1498,48 @@ public class BulkImportService {
             throws Exception {
 
         BulkImportResult result = new BulkImportResult();
-        Set<String> seenCodes = new HashSet<>();
         List<Course> validCourses = new ArrayList<>();
+
+        // Preload reference data once to avoid per-row database lookups.
+        Map<String, Lecturer> lecturersByEmail = new HashMap<>();
+        for (Lecturer lecturer : lecturerRepository.findAll()) {
+            String key = normalizeLookupKey(lecturer.getEmail());
+            if (!key.isEmpty()) {
+                lecturersByEmail.putIfAbsent(key, lecturer);
+            }
+        }
+
+        Map<String, StudentGroup> groupsByName = new HashMap<>();
+        for (StudentGroup group : studentGroupRepository.findAll()) {
+            String key = normalizeLookupKey(group.getName());
+            if (!key.isEmpty()) {
+                groupsByName.putIfAbsent(key, group);
+            }
+        }
+
+        Map<String, Feature> featuresByName = new HashMap<>();
+        for (Feature feature : featureRepository.findAll()) {
+            String key = normalizeLookupKey(feature.getName());
+            if (!key.isEmpty()) {
+                featuresByName.putIfAbsent(key, feature);
+            }
+        }
+
+        Map<String, Zone> zonesByName = new HashMap<>();
+        for (Zone zone : zoneRepository.findAll()) {
+            String key = normalizeLookupKey(zone.getName());
+            if (!key.isEmpty()) {
+                zonesByName.putIfAbsent(key, zone);
+            }
+        }
+
+        Map<String, List<Course>> existingCoursesByCode = new HashMap<>();
+        for (Course course : courseRepository.findAll()) {
+            String codeKey = normalizeCourseCode(course.getCode());
+            if (!codeKey.isEmpty()) {
+                existingCoursesByCode.computeIfAbsent(codeKey, k -> new ArrayList<>()).add(course);
+            }
+        }
 
         // PHASE 1: Validate ALL rows first
         log.warn("========== STARTING COURSE VALIDATION FOR {} ROWS ==========", rows.size());
@@ -1586,8 +1671,8 @@ public class BulkImportService {
             // Validate lecturer exists if specified
             Lecturer lecturer = null;
             if (lecturerEmail != null && !lecturerEmail.isEmpty()) {
-                Optional<Lecturer> lecturerOpt = lecturerRepository.findByEmail(lecturerEmail);
-                if (lecturerOpt.isEmpty()) {
+                lecturer = lecturersByEmail.get(normalizeLookupKey(lecturerEmail));
+                if (lecturer == null) {
                     log.warn("VALIDATION FAIL - Lecturer not found: '{}' at row {}", lecturerEmail, rowNum);
                     result.getRowErrors().add(ImportRowError.builder()
                             .rowNumber(rowNum)
@@ -1596,7 +1681,6 @@ public class BulkImportService {
                             .build());
                     continue; // Stop processing this row
                 }
-                lecturer = lecturerOpt.get();
             }
 
             // Validate student groups exist if specified (pipe-separated for multiple)
@@ -1605,11 +1689,22 @@ public class BulkImportService {
             if (studentGroupNamesStr != null && !studentGroupNamesStr.isEmpty()) {
                 String[] groupNames = studentGroupNamesStr.split("\\|");
                 boolean allGroupsFound = true;
+                Set<String> normalizedSeenGroups = new HashSet<>();
                 for (String groupName : groupNames) {
                     String trimmedGroupName = groupName.trim();
                     if (!trimmedGroupName.isEmpty()) {
-                        Optional<StudentGroup> groupOpt = studentGroupRepository.findByName(trimmedGroupName);
-                        if (groupOpt.isEmpty()) {
+                        String normalizedGroupName = trimmedGroupName.toLowerCase();
+                        if (!normalizedSeenGroups.add(normalizedGroupName)) {
+                            result.getRowErrors().add(ImportRowError.builder()
+                                    .rowNumber(rowNum)
+                                    .message("Duplicate student group in row: '" + trimmedGroupName + "'")
+                                    .rawData(rowData)
+                                    .build());
+                            allGroupsFound = false;
+                            continue;
+                        }
+                        StudentGroup group = groupsByName.get(normalizeLookupKey(trimmedGroupName));
+                        if (group == null) {
                             log.warn("VALIDATION FAIL - Student group not found: '{}' at row {}", trimmedGroupName,
                                     rowNum);
                             result.getRowErrors().add(ImportRowError.builder()
@@ -1619,7 +1714,7 @@ public class BulkImportService {
                                     .build());
                             allGroupsFound = false;
                         } else {
-                            studentGroups.add(groupOpt.get());
+                            studentGroups.add(group);
                         }
                     }
                 }
@@ -1628,12 +1723,14 @@ public class BulkImportService {
                 }
             }
 
-            // Allow duplicate codes - will aggregate later
-            // Just track them for aggregation
-            seenCodes.add(code);
-
-            // Check if course already exists in database - detect CONFLICT for resolution
-            Optional<Course> existingCourseOpt = courseRepository.findByCode(code);
+            // Check if an equivalent course already exists using (code + student-group
+            // signature).
+            // Duplicate codes are allowed, so code alone is not a conflict key.
+            String groupSignature = buildStudentGroupSignature(studentGroups);
+            Optional<Course> existingCourseOpt = existingCoursesByCode.getOrDefault(normalizeCourseCode(code), List.of()).stream()
+                    .filter(existing -> Objects.equals(buildStudentGroupSignature(existing.getAllStudentGroups()),
+                            groupSignature))
+                    .findFirst();
             if (existingCourseOpt.isPresent()) {
                 Course existing = existingCourseOpt.get();
 
@@ -1670,8 +1767,8 @@ public class BulkImportService {
                 if (!conflictingFields.isEmpty()) {
                     result.getConflicts().add(ImportConflictDTO.builder()
                             .rowNumber(rowNum)
-                            .key(code)
-                            .keyType("code")
+                            .key(code + "::" + groupSignature)
+                            .keyType("course_code_group_signature")
                             .existingId(existing.getId())
                             .existingData(existingData)
                             .newData(newData)
@@ -1688,6 +1785,18 @@ public class BulkImportService {
                             .build());
                 }
                 continue; // Don't add to validCourses - needs resolution
+            }
+
+            // Prevent duplicate course-group assignment for same code across different
+            // entries.
+            String overlapError = findCourseGroupOverlapError(code, studentGroups, validCourses, existingCoursesByCode);
+            if (overlapError != null) {
+                result.getRowErrors().add(ImportRowError.builder()
+                        .rowNumber(rowNum)
+                        .message(overlapError)
+                        .rawData(rowData)
+                        .build());
+                continue;
             }
 
             // Build valid course for later save
@@ -1713,10 +1822,8 @@ public class BulkImportService {
                 for (String featureName : featureNames) {
                     String trimmedName = featureName.trim();
                     if (!trimmedName.isEmpty()) {
-                        Optional<Feature> featureOpt = featureRepository.findByName(trimmedName);
-                        if (featureOpt.isPresent()) {
-                            courseFeatures.add(featureOpt.get());
-                        } else {
+                        Feature feature = featuresByName.get(normalizeLookupKey(trimmedName));
+                        if (feature == null) {
                             log.warn("VALIDATION FAIL - Row {} missing feature: '{}'", rowNum, trimmedName);
                             result.getRowErrors().add(ImportRowError.builder()
                                     .rowNumber(rowNum)
@@ -1724,6 +1831,8 @@ public class BulkImportService {
                                     .rawData(rowData)
                                     .build());
                             allFeaturesFound = false;
+                        } else {
+                            courseFeatures.add(feature);
                         }
                     }
                 }
@@ -1741,10 +1850,8 @@ public class BulkImportService {
                 for (String zoneName : zoneNames) {
                     String trimmedName = zoneName.trim();
                     if (!trimmedName.isEmpty()) {
-                        Optional<Zone> zoneOpt = zoneRepository.findByName(trimmedName);
-                        if (zoneOpt.isPresent()) {
-                            courseZones.add(zoneOpt.get());
-                        } else {
+                        Zone zone = zonesByName.get(normalizeLookupKey(trimmedName));
+                        if (zone == null) {
                             log.warn("VALIDATION FAIL - Row {} missing zone: '{}'", rowNum, trimmedName);
                             result.getRowErrors().add(ImportRowError.builder()
                                     .rowNumber(rowNum)
@@ -1752,6 +1859,8 @@ public class BulkImportService {
                                     .rawData(rowData)
                                     .build());
                             allZonesFound = false;
+                        } else {
+                            courseZones.add(zone);
                         }
                     }
                 }
@@ -1784,60 +1893,18 @@ public class BulkImportService {
             throw new BulkImportException(result);
         }
 
-        // PHASE 2.5: Aggregate courses with same code (merge groups, features, zones)
-        Map<String, Course> aggregatedCourses = new HashMap<>();
-        for (Course course : validCourses) {
-            String code = course.getCode();
-            if (!aggregatedCourses.containsKey(code)) {
-                aggregatedCourses.put(code, course);
-            } else {
-                // Merge with existing
-                Course existing = aggregatedCourses.get(code);
-
-                // Merge student groups
-                if (course.getStudentGroups() != null) {
-                    if (existing.getStudentGroups() == null) {
-                        existing.setStudentGroups(new HashSet<>());
-                    }
-                    existing.getStudentGroups().addAll(course.getStudentGroups());
-                    // Update primary group to first one
-                    if (!existing.getStudentGroups().isEmpty()) {
-                        existing.setStudentGroup(existing.getStudentGroups().iterator().next());
-                    }
-                }
-
-                // Merge required features
-                if (course.getRequiredFeatures() != null) {
-                    if (existing.getRequiredFeatures() == null) {
-                        existing.setRequiredFeatures(new HashSet<>());
-                    }
-                    existing.getRequiredFeatures().addAll(course.getRequiredFeatures());
-                }
-
-                // Merge allowed zones
-                if (course.getAllowedZones() != null) {
-                    if (existing.getAllowedZones() == null) {
-                        existing.setAllowedZones(new HashSet<>());
-                    }
-                    existing.getAllowedZones().addAll(course.getAllowedZones());
-                }
-
-                // Keep first lecturer (could be enhanced to track multiple)
-                // The variety in CSV lecturers is preserved in the import history
-            }
-        }
-
-        List<Course> finalCourses = new ArrayList<>(aggregatedCourses.values());
-        log.info("Aggregated {} course rows into {} unique courses", validCourses.size(), finalCourses.size());
+        List<Course> finalCourses = validCourses;
+        log.info("Prepared {} course rows as independent course entities", finalCourses.size());
 
         // PHASE 3: Save all valid entries atomically
         if (!dryRun) {
-            courseRepository.saveAll(finalCourses);
+            List<Course> savedCourses = courseRepository.saveAll(finalCourses);
+            ensureLessonsForImportedCourses(savedCourses);
             log.info("Imported {} courses atomically", finalCourses.size());
 
             // Record history
             result.setImportHistoryId(
-                    recordHistory("COURSES", originalFilename, finalCourses.stream().map(Course::getId).toList()));
+                    recordHistory("COURSES", originalFilename, savedCourses.stream().map(Course::getId).toList()));
         } else {
             log.warn("DRY RUN - Skipping save of {} courses", finalCourses.size());
         }
@@ -1849,6 +1916,69 @@ public class BulkImportService {
             log.info("IMPORT COMPLETE. Success.");
         }
         return result;
+    }
+
+    private String findCourseGroupOverlapError(String code, Set<StudentGroup> incomingGroups,
+            List<Course> pendingCourses, Map<String, List<Course>> existingCoursesByCode) {
+        if (code == null || code.isBlank() || incomingGroups == null || incomingGroups.isEmpty()) {
+            return null;
+        }
+        Set<Long> incomingIds = incomingGroups.stream()
+                .map(StudentGroup::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        if (incomingIds.isEmpty()) {
+            return null;
+        }
+
+        List<String> overlappingNames = new ArrayList<>();
+
+        for (Course existing : existingCoursesByCode.getOrDefault(normalizeCourseCode(code), List.of())) {
+            Set<StudentGroup> existingGroups = existing.getAllStudentGroups();
+            for (StudentGroup group : existingGroups) {
+                if (group.getId() != null && incomingIds.contains(group.getId())) {
+                    overlappingNames.add(group.getName());
+                }
+            }
+        }
+
+        if (pendingCourses != null) {
+            for (Course pending : pendingCourses) {
+                if (!code.equals(pending.getCode())) {
+                    continue;
+                }
+                Set<StudentGroup> pendingGroups = pending.getAllStudentGroups();
+                for (StudentGroup group : pendingGroups) {
+                    if (group.getId() != null && incomingIds.contains(group.getId())) {
+                        overlappingNames.add(group.getName());
+                    }
+                }
+            }
+        }
+
+        if (overlappingNames.isEmpty()) {
+            return null;
+        }
+        String names = overlappingNames.stream()
+                .filter(Objects::nonNull)
+                .distinct()
+                .sorted()
+                .collect(Collectors.joining(", "));
+        return "Duplicate course-group assignment for code '" + code + "': group(s) already assigned -> " + names;
+    }
+
+    private String normalizeLookupKey(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value.trim().toLowerCase();
+    }
+
+    private String normalizeCourseCode(String code) {
+        if (code == null) {
+            return "";
+        }
+        return code.trim().toUpperCase();
     }
 
     /**
@@ -1875,6 +2005,8 @@ public class BulkImportService {
             String hoursStr = row.getOrDefault("weeklyHours", "0").trim();
             String lecturerEmail = row.getOrDefault("lecturerEmail", "").trim();
             String isOnlineStr = row.getOrDefault("isOnline", "false").trim().toLowerCase();
+            String studentGroupNames = row
+                    .getOrDefault("studentGroupNames", row.getOrDefault("student_group_names", "")).trim();
 
             if (code.isEmpty() || name.isEmpty()) {
                 result.getRowErrors().add(ImportRowError.builder()
@@ -1914,8 +2046,44 @@ public class BulkImportService {
                 lecturer = lecturerOpt.get();
             }
 
+            Set<StudentGroup> groups = new HashSet<>();
+            if (!studentGroupNames.isEmpty()) {
+                Set<String> normalizedSeenGroups = new HashSet<>();
+                for (String part : studentGroupNames.split("\\|")) {
+                    String groupNameToken = part.trim();
+                    if (groupNameToken.isEmpty()) {
+                        continue;
+                    }
+                    String normalizedGroupName = groupNameToken.toLowerCase();
+                    if (!normalizedSeenGroups.add(normalizedGroupName)) {
+                        result.getRowErrors().add(ImportRowError.builder()
+                                .rowNumber(rowNum)
+                                .message("Duplicate student group in row: " + groupNameToken)
+                                .rawData(row)
+                                .build());
+                        groups.clear();
+                        break;
+                    }
+                    Optional<StudentGroup> groupOpt = studentGroupRepository.findByName(groupNameToken);
+                    if (groupOpt.isEmpty()) {
+                        result.getRowErrors().add(ImportRowError.builder()
+                                .rowNumber(rowNum)
+                                .message("Student group not found: " + groupNameToken)
+                                .rawData(row)
+                                .build());
+                        groups.clear();
+                        break;
+                    }
+                    groups.add(groupOpt.get());
+                }
+                if (!result.getRowErrors().isEmpty()
+                        && result.getRowErrors().get(result.getRowErrors().size() - 1).getRowNumber() == rowNum) {
+                    continue;
+                }
+            }
+
             // Check for existing course
-            Optional<Course> existingOpt = courseRepository.findByCode(code);
+            Optional<Course> existingOpt = courseRepository.findFirstByCodeOrderByIdAsc(code);
 
             if (existingOpt.isPresent()) {
                 // Get the resolution for this row
@@ -1933,23 +2101,45 @@ public class BulkImportService {
                     existing.setTotalWeeklyHours(weeklyHours);
                     existing.setLecturer(lecturer);
                     existing.setOnline(isOnline);
+                    if (!groups.isEmpty()) {
+                        existing.setStudentGroups(groups);
+                        existing.setStudentGroup(groups.iterator().next());
+                    }
+                    String overlapError = findCourseGroupOverlapForResolution(code, groups, existing.getId(), toCreate,
+                            toUpdate);
+                    if (overlapError != null) {
+                        result.getRowErrors().add(ImportRowError.builder()
+                                .rowNumber(rowNum)
+                                .message(overlapError)
+                                .rawData(row)
+                                .build());
+                        continue;
+                    }
                     toUpdate.add(existing);
                     continue;
                 }
 
                 if (resolution == ImportConflictDTO.ConflictResolution.CREATE_NEW) {
-                    // Create with modified code (append _2, _3, etc.)
-                    String newCode = code;
-                    int suffix = 2;
-                    while (courseRepository.findByCode(newCode).isPresent()) {
-                        newCode = code + "_" + suffix++;
-                    }
                     Course course = new Course();
-                    course.setCode(newCode);
+                    // Duplicate course codes are supported; create another independent course row.
+                    course.setCode(code);
                     course.setName(name);
                     course.setTotalWeeklyHours(weeklyHours);
                     course.setLecturer(lecturer);
                     course.setOnline(isOnline);
+                    if (!groups.isEmpty()) {
+                        course.setStudentGroups(groups);
+                        course.setStudentGroup(groups.iterator().next());
+                    }
+                    String overlapError = findCourseGroupOverlapForResolution(code, groups, null, toCreate, toUpdate);
+                    if (overlapError != null) {
+                        result.getRowErrors().add(ImportRowError.builder()
+                                .rowNumber(rowNum)
+                                .message(overlapError)
+                                .rawData(row)
+                                .build());
+                        continue;
+                    }
                     toCreate.add(course);
                     continue;
                 }
@@ -1961,6 +2151,19 @@ public class BulkImportService {
                 course.setTotalWeeklyHours(weeklyHours);
                 course.setLecturer(lecturer);
                 course.setOnline(isOnline);
+                if (!groups.isEmpty()) {
+                    course.setStudentGroups(groups);
+                    course.setStudentGroup(groups.iterator().next());
+                }
+                String overlapError = findCourseGroupOverlapForResolution(code, groups, null, toCreate, toUpdate);
+                if (overlapError != null) {
+                    result.getRowErrors().add(ImportRowError.builder()
+                            .rowNumber(rowNum)
+                            .message(overlapError)
+                            .rawData(row)
+                            .build());
+                    continue;
+                }
                 toCreate.add(course);
             }
         }
@@ -1971,14 +2174,20 @@ public class BulkImportService {
         }
 
         // Save all
+        List<Course> savedCreated = List.of();
+        List<Course> savedUpdated = List.of();
         if (!toCreate.isEmpty()) {
-            courseRepository.saveAll(toCreate);
+            savedCreated = courseRepository.saveAll(toCreate);
             result.setCreatedCount(toCreate.size());
         }
         if (!toUpdate.isEmpty()) {
-            courseRepository.saveAll(toUpdate);
+            savedUpdated = courseRepository.saveAll(toUpdate);
             result.setUpdatedCount(toUpdate.size());
         }
+        List<Course> importedCourses = new ArrayList<>(savedCreated.size() + savedUpdated.size());
+        importedCourses.addAll(savedCreated);
+        importedCourses.addAll(savedUpdated);
+        ensureLessonsForImportedCourses(importedCourses);
 
         log.info("Imported {} courses with resolutions: {} created, {} updated, {} skipped",
                 toCreate.size() + toUpdate.size(), toCreate.size(), toUpdate.size(), result.getSkippedCount());
@@ -2055,6 +2264,107 @@ public class BulkImportService {
         }
         log.info("Imported zones with resolutions: {} created, {} updated", toCreate.size(), toUpdate.size());
         return result;
+    }
+
+    private void ensureLessonsForImportedCourses(List<Course> courses) {
+        if (courses == null || courses.isEmpty()) {
+            return;
+        }
+        int generatedFor = 0;
+        int syncedFor = 0;
+        for (Course course : courses) {
+            if (course == null || course.getId() == null || course.getTotalWeeklyHours() <= 0) {
+                continue;
+            }
+
+            long lessonCount = lessonRepository.countByCourse(course);
+            if (lessonCount == 0) {
+                lessonService.generateLessons(course);
+                generatedFor++;
+                continue;
+            }
+
+            lessonService.updateLessonsForCourse(course, course.getTotalWeeklyHours());
+            List<Lesson> lessons = lessonRepository.findByCourse(course);
+            boolean lecturerUpdated = false;
+            for (Lesson lesson : lessons) {
+                if (!Objects.equals(lesson.getLecturer(), course.getLecturer())) {
+                    lesson.setLecturer(course.getLecturer());
+                    lecturerUpdated = true;
+                }
+            }
+            if (lecturerUpdated) {
+                lessonRepository.saveAll(lessons);
+            }
+            syncedFor++;
+        }
+        if (generatedFor > 0 || syncedFor > 0) {
+            log.info("Course import lesson sync complete: generated for {}, synced {}", generatedFor, syncedFor);
+        }
+    }
+
+    private String findCourseGroupOverlapForResolution(
+            String code,
+            Set<StudentGroup> incomingGroups,
+            Long currentCourseId,
+            List<Course> toCreate,
+            List<Course> toUpdate) {
+        if (incomingGroups == null || incomingGroups.isEmpty()) {
+            return null;
+        }
+        List<Course> pending = new ArrayList<>();
+        if (toCreate != null) {
+            pending.addAll(toCreate);
+        }
+        if (toUpdate != null) {
+            pending.addAll(toUpdate);
+        }
+
+        Set<Long> incomingIds = incomingGroups.stream()
+                .map(StudentGroup::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        List<String> overlapNames = new ArrayList<>();
+        for (Course existing : courseRepository.findByCode(code)) {
+            if (currentCourseId != null && Objects.equals(existing.getId(), currentCourseId)) {
+                continue;
+            }
+            existing.getAllStudentGroups().stream()
+                    .filter(group -> group.getId() != null && incomingIds.contains(group.getId()))
+                    .map(StudentGroup::getName)
+                    .forEach(overlapNames::add);
+        }
+        for (Course pendingCourse : pending) {
+            if (currentCourseId != null && Objects.equals(pendingCourse.getId(), currentCourseId)) {
+                continue;
+            }
+            if (!code.equals(pendingCourse.getCode())) {
+                continue;
+            }
+            pendingCourse.getAllStudentGroups().stream()
+                    .filter(group -> group.getId() != null && incomingIds.contains(group.getId()))
+                    .map(StudentGroup::getName)
+                    .forEach(overlapNames::add);
+        }
+        if (overlapNames.isEmpty()) {
+            return null;
+        }
+        return "Duplicate course-group assignment for code '" + code + "': group(s) already assigned -> "
+                + overlapNames.stream().filter(Objects::nonNull).distinct().sorted().collect(Collectors.joining(", "));
+    }
+
+    private String buildStudentGroupSignature(Set<StudentGroup> groups) {
+        if (groups == null || groups.isEmpty()) {
+            return "";
+        }
+        return groups.stream()
+                .map(StudentGroup::getName)
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .sorted()
+                .collect(Collectors.joining("|"));
     }
 
     /**

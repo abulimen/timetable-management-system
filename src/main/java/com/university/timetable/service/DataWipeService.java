@@ -172,6 +172,10 @@ public class DataWipeService {
         };
 
         log.info("Deleted {} {} records", count, entityType);
+        auditLogService.logSystemAction(
+                "Bulk delete-all executed for entity '" + entityType + "' with deleted count: " + count,
+                true,
+                null);
         return count;
     }
 }

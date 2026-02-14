@@ -7,11 +7,13 @@ import com.university.timetable.domain.Room;
 import com.university.timetable.domain.StudentGroup;
 import com.university.timetable.domain.Timeslot;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface LessonRepository extends JpaRepository<Lesson, Long> {
@@ -28,6 +30,9 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
     @Query("SELECT DISTINCT l FROM Lesson l JOIN l.course.studentGroups sg WHERE sg = :studentGroup")
     List<Lesson> findByStudentGroup(@Param("studentGroup") StudentGroup studentGroup);
 
+    @Query("SELECT DISTINCT l FROM Lesson l JOIN l.course.studentGroups sg WHERE sg IN :studentGroups")
+    List<Lesson> findByAnyStudentGroups(@Param("studentGroups") Set<StudentGroup> studentGroups);
+
     // Find lessons that are not pinned
     List<Lesson> findByPinnedFalse();
 
@@ -41,4 +46,8 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
 
     // Count lessons for a course
     long countByCourse(Course course);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE Lesson l SET l.timeslot = null, l.room = null, l.pinned = false")
+    int clearAllAssignmentsAndPins();
 }

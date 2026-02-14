@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.time.DayOfWeek;
 import java.time.Year;
 import java.util.HashMap;
 import java.util.List;
@@ -96,6 +97,53 @@ public class EmailService {
     }
 
     /**
+     * Send lecturer availability lifecycle notification.
+     */
+    @Async
+    public void sendAvailabilityNotification(String email, String lecturerName, String action,
+            DayOfWeek dayOfWeek, String startTime, String endTime, String notes) {
+        try {
+            String safeName = lecturerName != null && !lecturerName.isBlank() ? lecturerName : "Lecturer";
+            String safeAction = action != null ? action.trim().toUpperCase() : "UPDATED";
+            String safeDay = dayOfWeek != null ? dayOfWeek.name() : "N/A";
+            String safeStart = startTime != null ? startTime : "N/A";
+            String safeEnd = endTime != null ? endTime : "N/A";
+            String safeNotes = notes != null ? notes : "";
+
+            String subject = systemName + " - Unavailability " + safeAction;
+            String htmlContent = """
+                    <html>
+                      <body style="font-family: Arial, sans-serif; color:#1f2937; line-height:1.5;">
+                        <h2 style="margin-bottom: 8px;">Unavailability Update</h2>
+                        <p>Hello %s,</p>
+                        <p>Your unavailability record was <strong>%s</strong>.</p>
+                        <ul>
+                          <li><strong>Day:</strong> %s</li>
+                          <li><strong>Time:</strong> %s - %s</li>
+                        </ul>
+                        %s
+                        <p style="margin-top: 16px;">Regards,<br/>%s</p>
+                      </body>
+                    </html>
+                    """.formatted(
+                    escapeHtml(safeName),
+                    escapeHtml(safeAction),
+                    escapeHtml(safeDay),
+                    escapeHtml(safeStart),
+                    escapeHtml(safeEnd),
+                    safeNotes.isBlank()
+                            ? ""
+                            : "<p><strong>Notes:</strong> " + escapeHtml(safeNotes) + "</p>",
+                    escapeHtml(systemName));
+
+            sendEmail(email, safeName, subject, htmlContent);
+            log.info("Availability notification sent to {} [{}]", email, safeAction);
+        } catch (Exception e) {
+            log.error("Failed to send availability notification to {}: {}", email, e.getMessage());
+        }
+    }
+
+    /**
      * Load an email template and substitute variables.
      * Variables in template use {{variableName}} format.
      */
@@ -155,5 +203,17 @@ public class EmailService {
      */
     public boolean isConfigured() {
         return apiKey != null && !apiKey.isBlank();
+    }
+
+    private String escapeHtml(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
     }
 }

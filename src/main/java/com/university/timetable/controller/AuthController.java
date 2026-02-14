@@ -1,9 +1,11 @@
 package com.university.timetable.controller;
 
+import com.university.timetable.domain.AuditAction;
 import com.university.timetable.domain.User;
 import com.university.timetable.dto.LoginRequest;
 import com.university.timetable.dto.LoginResponse;
 import com.university.timetable.dto.RefreshTokenRequest;
+import com.university.timetable.service.AuditLogService;
 import com.university.timetable.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final AuditLogService auditLogService;
 
     /**
      * Login with email and password.
@@ -34,21 +37,62 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+        String email = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : null;
         try {
             LoginResponse response = authService.login(request);
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "Auth",
+                    email,
+                    "Login",
+                    null,
+                    Map.of("email", email != null ? email : ""),
+                    "Authentication login successful",
+                    true,
+                    null);
             return ResponseEntity.ok(response);
         } catch (LockedException e) {
             log.warn("Login failed - account locked: {}", request.getEmail());
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "Auth",
+                    email,
+                    "Login",
+                    null,
+                    null,
+                    "Authentication login failed: account locked",
+                    false,
+                    e.getMessage());
             return ResponseEntity.status(423).body(Map.of(
                     "error", "Account Locked",
                     "message", e.getMessage()));
         } catch (BadCredentialsException e) {
             log.warn("Login failed - bad credentials: {}", request.getEmail());
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "Auth",
+                    email,
+                    "Login",
+                    null,
+                    null,
+                    "Authentication login failed: bad credentials",
+                    false,
+                    e.getMessage());
             return ResponseEntity.status(401).body(Map.of(
                     "error", "Authentication Failed",
                     "message", "Invalid email or password"));
         } catch (Exception e) {
             log.error("Login error: {}", e.getMessage());
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "Auth",
+                    email,
+                    "Login",
+                    null,
+                    null,
+                    "Authentication login failed: internal error",
+                    false,
+                    e.getMessage());
             return ResponseEntity.status(500).body(Map.of(
                     "error", "Internal Error",
                     "message", "An error occurred during login"));
@@ -63,9 +107,30 @@ public class AuthController {
     public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
         try {
             LoginResponse response = authService.refreshToken(request);
+            String email = response.getUser() != null ? response.getUser().getEmail() : null;
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "Auth",
+                    email,
+                    "TokenRefresh",
+                    null,
+                    Map.of("email", email != null ? email : ""),
+                    "Authentication token refresh successful",
+                    true,
+                    null);
             return ResponseEntity.ok(response);
         } catch (BadCredentialsException e) {
             log.warn("Token refresh failed: {}", e.getMessage());
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "Auth",
+                    null,
+                    "TokenRefresh",
+                    null,
+                    null,
+                    "Authentication token refresh failed",
+                    false,
+                    e.getMessage());
             return ResponseEntity.status(401).body(Map.of(
                     "error", "Token Refresh Failed",
                     "message", "Invalid or expired refresh token"));
@@ -80,6 +145,16 @@ public class AuthController {
     public ResponseEntity<?> logout(@RequestBody(required = false) RefreshTokenRequest request) {
         String refreshToken = request != null ? request.getRefreshToken() : null;
         authService.logout(refreshToken);
+        auditLogService.logActionSync(
+                AuditAction.SYSTEM_ACTION,
+                "Auth",
+                null,
+                "Logout",
+                null,
+                null,
+                "Authentication logout successful",
+                true,
+                null);
         return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
     }
 
@@ -121,6 +196,16 @@ public class AuthController {
         User user = authService.getCurrentUser(email);
 
         authService.logoutAll(user.getId());
+        auditLogService.logActionSync(
+                AuditAction.SYSTEM_ACTION,
+                "Auth",
+                String.valueOf(user.getId()),
+                "LogoutAll",
+                null,
+                Map.of("email", user.getEmail()),
+                "Authentication logout-all successful",
+                true,
+                null);
 
         return ResponseEntity.ok(Map.of("message", "Logged out from all devices"));
     }

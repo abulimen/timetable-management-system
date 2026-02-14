@@ -2,6 +2,7 @@ package com.university.timetable.controller;
 
 import com.university.timetable.domain.*;
 import com.university.timetable.repository.*;
+import com.university.timetable.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +24,7 @@ public class SpecialEventController {
     private final StudentGroupRepository studentGroupRepository;
     private final RoomRepository roomRepository;
     private final LecturerRepository lecturerRepository;
+    private final AuditLogService auditLogService;
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
@@ -54,6 +56,14 @@ public class SpecialEventController {
         SpecialEvent event = new SpecialEvent();
         updateFromDTO(event, dto);
         SpecialEvent saved = specialEventRepository.save(event);
+        auditLogService.logAction(
+                AuditAction.CREATE,
+                "SpecialEvent",
+                String.valueOf(saved.getId()),
+                saved.getName(),
+                null,
+                toDTO(saved),
+                "Created special event " + saved.getName());
         return ResponseEntity.ok(toDTO(saved));
     }
 
@@ -62,8 +72,18 @@ public class SpecialEventController {
     public ResponseEntity<SpecialEventDTO> update(@PathVariable Long id, @RequestBody SpecialEventCreateDTO dto) {
         return specialEventRepository.findById(id)
                 .map(event -> {
+                    SpecialEventDTO previousState = toDTO(event);
                     updateFromDTO(event, dto);
-                    return ResponseEntity.ok(toDTO(specialEventRepository.save(event)));
+                    SpecialEvent saved = specialEventRepository.save(event);
+                    auditLogService.logAction(
+                            AuditAction.UPDATE,
+                            "SpecialEvent",
+                            String.valueOf(saved.getId()),
+                            saved.getName(),
+                            previousState,
+                            toDTO(saved),
+                            "Updated special event " + saved.getName());
+                    return ResponseEntity.ok(toDTO(saved));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -71,11 +91,21 @@ public class SpecialEventController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        if (!specialEventRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        specialEventRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+        return specialEventRepository.findById(id)
+                .map(event -> {
+                    SpecialEventDTO previousState = toDTO(event);
+                    specialEventRepository.deleteById(id);
+                    auditLogService.logAction(
+                            AuditAction.DELETE,
+                            "SpecialEvent",
+                            String.valueOf(id),
+                            event.getName(),
+                            previousState,
+                            null,
+                            "Deleted special event " + event.getName());
+                    return ResponseEntity.noContent().<Void>build();
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}/toggle-active")
@@ -83,8 +113,18 @@ public class SpecialEventController {
     public ResponseEntity<SpecialEventDTO> toggleActive(@PathVariable Long id) {
         return specialEventRepository.findById(id)
                 .map(event -> {
+                    SpecialEventDTO previousState = toDTO(event);
                     event.setActive(!event.isActive());
-                    return ResponseEntity.ok(toDTO(specialEventRepository.save(event)));
+                    SpecialEvent saved = specialEventRepository.save(event);
+                    auditLogService.logAction(
+                            AuditAction.UPDATE,
+                            "SpecialEvent",
+                            String.valueOf(saved.getId()),
+                            saved.getName(),
+                            previousState,
+                            toDTO(saved),
+                            "Toggled special event active flag: " + saved.getName() + " -> " + saved.isActive());
+                    return ResponseEntity.ok(toDTO(saved));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }

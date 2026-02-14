@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -44,7 +45,16 @@ public class TimetableService {
         StudentGroup group = studentGroupRepository.findById(studentGroupId)
                 .orElseThrow(() -> new IllegalArgumentException("Student group not found: " + studentGroupId));
 
-        return lessonRepository.findByStudentGroup(group).stream()
+        Set<StudentGroup> relatedGroups = new LinkedHashSet<>();
+        relatedGroups.add(group);
+        if (group.getParentGroup() != null) {
+            relatedGroups.add(group.getParentGroup());
+        }
+        if (group.getChildren() != null && !group.getChildren().isEmpty()) {
+            relatedGroups.addAll(group.getChildren());
+        }
+
+        return lessonRepository.findByAnyStudentGroups(relatedGroups).stream()
                 .map(this::toViewDTO)
                 .collect(Collectors.toList());
     }
@@ -95,16 +105,14 @@ public class TimetableService {
 
             // Combined class info from course's studentGroups
             Set<StudentGroup> allGroups = lesson.getCourse().getStudentGroups();
-            if (allGroups != null && allGroups.size() > 1) {
+            List<String> displayGroupNames = expandToChildDisplayNames(allGroups);
+            if (displayGroupNames.size() > 1) {
                 dto.setCombined(true);
-                dto.setCombinedGroupNames(allGroups.stream()
-                        .map(StudentGroup::getName)
-                        .sorted()
-                        .collect(java.util.stream.Collectors.toList()));
+                dto.setCombinedGroupNames(displayGroupNames);
                 dto.setTotalStudentCount(lesson.getCourse().getTotalStudentCount());
             } else {
                 dto.setCombined(false);
-                dto.setCombinedGroupNames(java.util.Collections.emptyList());
+                dto.setCombinedGroupNames(displayGroupNames);
                 dto.setTotalStudentCount(lesson.getCourse().getTotalStudentCount());
             }
         }
@@ -138,5 +146,32 @@ public class TimetableService {
         }
 
         return dto;
+    }
+
+    private List<String> expandToChildDisplayNames(Set<StudentGroup> groups) {
+        if (groups == null || groups.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+        Set<String> names = new LinkedHashSet<>();
+        for (StudentGroup group : groups) {
+            if (group == null) {
+                continue;
+            }
+            if (group.getParentGroup() != null) {
+                names.add(group.getName());
+                continue;
+            }
+            List<StudentGroup> children = group.getChildren();
+            if (children != null && !children.isEmpty()) {
+                for (StudentGroup child : children) {
+                    if (child != null) {
+                        names.add(child.getName());
+                    }
+                }
+            } else {
+                names.add(group.getName());
+            }
+        }
+        return names.stream().sorted().toList();
     }
 }

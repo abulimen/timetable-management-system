@@ -26,11 +26,19 @@ export interface FeatureRef {
     name: string;
 }
 
+export interface UserIdentifierRef {
+    email: string;
+    phone?: string;
+}
+
+
+
 export interface ReferenceData {
     lecturers: LecturerRef[];
     studentGroups: StudentGroupRef[];
     zones: ZoneRef[];
     features: FeatureRef[];
+    userIdentifiers: UserIdentifierRef[]; // New field
     loaded: boolean;
 }
 
@@ -40,12 +48,14 @@ export interface ReferenceData {
 export class ReferenceDataService {
     private http = inject(HttpClient);
     private baseUrl = 'http://localhost:8080/api/v1';
+    private userUrl = 'http://localhost:8080/api/users'; // Admin API
 
     private dataSubject = new BehaviorSubject<ReferenceData>({
         lecturers: [],
         studentGroups: [],
         zones: [],
         features: [],
+        userIdentifiers: [],
         loaded: false
     });
 
@@ -57,12 +67,22 @@ export class ReferenceDataService {
      */
     async loadAll(): Promise<ReferenceData> {
         try {
+            // Note: getUserIdentifiers requires ADMIN role. If this fails (e.g. 403), we just ignore it for now.
+            // But usually the import feature is ADMIN only.
             const [lecturers, studentGroups, zones, features] = await Promise.all([
                 firstValueFrom(this.http.get<LecturerRef[]>(`${this.baseUrl}/lecturers`)),
                 firstValueFrom(this.http.get<StudentGroupRef[]>(`${this.baseUrl}/student-groups`)),
                 firstValueFrom(this.http.get<ZoneRef[]>(`${this.baseUrl}/zones`)),
                 firstValueFrom(this.http.get<FeatureRef[]>(`${this.baseUrl}/features`))
             ]);
+
+            // Attempt to load user identifiers (might fail if not admin, catch separately)
+            let userIdentifiers: UserIdentifierRef[] = [];
+            try {
+                userIdentifiers = await firstValueFrom(this.http.get<UserIdentifierRef[]>(`${this.userUrl}/identifiers`));
+            } catch (e) {
+                console.warn('Failed to load user identifiers (probably not admin or endpoint missing)', e);
+            }
 
             const data: ReferenceData = {
                 lecturers: lecturers || [],
@@ -75,6 +95,7 @@ export class ReferenceDataService {
                 })),
                 zones: zones || [],
                 features: features || [],
+                userIdentifiers: userIdentifiers || [],
                 loaded: true
             };
 
@@ -161,6 +182,27 @@ export class ReferenceDataService {
     hasFeature(name: string): boolean {
         return this.dataSubject.value.features.some(
             f => f.name.toLowerCase() === name.toLowerCase()
+        );
+    }
+
+    /**
+     * Check if a user email exists (in DB).
+     */
+    hasUserEmail(email: string): boolean {
+        if (!email) return false;
+        return this.dataSubject.value.userIdentifiers.some(
+            u => u.email.toLowerCase() === email.trim().toLowerCase()
+        );
+    }
+
+    /**
+     * Check if a user phone exists (in DB).
+     */
+    hasUserPhone(phone: string): boolean {
+        if (!phone) return false;
+        const normalizedPhone = phone.replace(/[^\d+]/g, '');
+        return this.dataSubject.value.userIdentifiers.some(
+            u => u.phone && u.phone.replace(/[^\d+]/g, '') === normalizedPhone
         );
     }
 

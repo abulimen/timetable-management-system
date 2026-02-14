@@ -15,8 +15,15 @@ public class SolverStatusDTO {
     private String jobId;
     private String state;
     private String score;
+    private Long durationMs;
     
     public SolverStatusDTO(String state, String score) {
+        this.state = state;
+        this.score = score;
+    }
+
+    public SolverStatusDTO(String jobId, String state, String score) {
+        this.jobId = jobId;
         this.state = state;
         this.score = score;
     }

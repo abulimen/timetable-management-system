@@ -1,5 +1,6 @@
 package com.university.timetable.controller;
 
+import com.university.timetable.domain.AuditAction;
 import com.university.timetable.domain.AvailabilityChangeRequest;
 import com.university.timetable.domain.AvailabilityChangeRequest.AvailabilityStatus;
 import com.university.timetable.domain.AvailabilityChangeRequest.RequestStatus;
@@ -7,6 +8,7 @@ import com.university.timetable.domain.Lecturer;
 import com.university.timetable.domain.User;
 import com.university.timetable.repository.LecturerRepository;
 import com.university.timetable.repository.UserRepository;
+import com.university.timetable.service.AuditLogService;
 import com.university.timetable.service.AvailabilityChangeRequestService;
 import com.university.timetable.service.ConstraintSettingsService;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +38,7 @@ public class AvailabilityChangeRequestController {
     private final LecturerRepository lecturerRepository;
     private final UserRepository userRepository;
     private final ConstraintSettingsService constraintSettingsService;
+    private final AuditLogService auditLogService;
 
     /**
      * Get unavailability system settings status.
@@ -54,12 +57,24 @@ public class AvailabilityChangeRequestController {
     @PostMapping("/settings")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<Map<String, Object>> updateSettings(@RequestBody Map<String, Boolean> settings) {
+        boolean oldSystemEnabled = constraintSettingsService.isUnavailabilitySystemEnabled();
+        boolean oldRequestsOpen = constraintSettingsService.isUnavailabilityRequestsOpen();
         if (settings.containsKey("systemEnabled")) {
             constraintSettingsService.setUnavailabilitySystemEnabled(settings.get("systemEnabled"));
         }
         if (settings.containsKey("requestsOpen")) {
             constraintSettingsService.setUnavailabilityRequestsOpen(settings.get("requestsOpen"));
         }
+        auditLogService.logAction(
+                AuditAction.UPDATE,
+                "AvailabilityRequestSettings",
+                "global",
+                "Availability Request Settings",
+                Map.of("systemEnabled", oldSystemEnabled, "requestsOpen", oldRequestsOpen),
+                Map.of(
+                        "systemEnabled", constraintSettingsService.isUnavailabilitySystemEnabled(),
+                        "requestsOpen", constraintSettingsService.isUnavailabilityRequestsOpen()),
+                "Updated availability request settings");
         return ResponseEntity.ok(Map.of(
                 "systemEnabled", constraintSettingsService.isUnavailabilitySystemEnabled(),
                 "requestsOpen", constraintSettingsService.isUnavailabilityRequestsOpen(),
@@ -78,6 +93,16 @@ public class AvailabilityChangeRequestController {
 
         // Block if requests are closed
         if (!constraintSettingsService.isUnavailabilityRequestsOpen()) {
+            auditLogService.logActionSync(
+                    AuditAction.CREATE,
+                    "AvailabilityChangeRequest",
+                    null,
+                    "Submission",
+                    null,
+                    null,
+                    "Failed to submit availability request: submissions closed",
+                    false,
+                    "REQUESTS_CLOSED");
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "REQUESTS_CLOSED",
                     "message", "Unavailability request submissions are currently closed"));
@@ -90,6 +115,16 @@ public class AvailabilityChangeRequestController {
         if (currentUser.getRole().name().equals("LECTURER")) {
             if (currentUser.getLecturer() == null ||
                     !currentUser.getLecturer().getId().equals(lecturer.getId())) {
+                auditLogService.logActionSync(
+                        AuditAction.CREATE,
+                        "AvailabilityChangeRequest",
+                        null,
+                        "Submission",
+                        null,
+                        null,
+                        "Failed to submit availability request: lecturer identity mismatch",
+                        false,
+                        "FORBIDDEN");
                 return ResponseEntity.status(403).body(Map.of(
                         "error", "FORBIDDEN",
                         "message", "Lecturers can only submit requests for their own availability"));
@@ -105,9 +140,26 @@ public class AvailabilityChangeRequestController {
                     LocalTime.parse(dto.endTime),
                     AvailabilityStatus.valueOf(dto.newStatus.toUpperCase()),
                     dto.reason);
-
+            auditLogService.logAction(
+                    AuditAction.CREATE,
+                    "AvailabilityChangeRequest",
+                    String.valueOf(request.getId()),
+                    lecturer.getName(),
+                    null,
+                    toDTO(request),
+                    "Submitted availability change request");
             return ResponseEntity.ok(toDTO(request));
         } catch (IllegalArgumentException e) {
+            auditLogService.logActionSync(
+                    AuditAction.CREATE,
+                    "AvailabilityChangeRequest",
+                    null,
+                    "Submission",
+                    null,
+                    null,
+                    "Failed to submit availability request",
+                    false,
+                    e.getMessage());
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "VALIDATION_ERROR",
                     "message", e.getMessage()));
@@ -225,8 +277,26 @@ public class AvailabilityChangeRequestController {
 
         try {
             AvailabilityChangeRequest request = requestService.approveRequest(id, reviewer, notes);
+            auditLogService.logAction(
+                    AuditAction.UPDATE,
+                    "AvailabilityChangeRequest",
+                    String.valueOf(request.getId()),
+                    request.getLecturer().getName(),
+                    null,
+                    toDTO(request),
+                    "Approved availability change request");
             return ResponseEntity.ok(toDTO(request));
         } catch (IllegalArgumentException | IllegalStateException e) {
+            auditLogService.logActionSync(
+                    AuditAction.UPDATE,
+                    "AvailabilityChangeRequest",
+                    String.valueOf(id),
+                    "Approval",
+                    null,
+                    null,
+                    "Failed to approve availability request",
+                    false,
+                    e.getMessage());
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "APPROVAL_FAILED",
                     "message", e.getMessage()));
@@ -253,8 +323,26 @@ public class AvailabilityChangeRequestController {
 
         try {
             AvailabilityChangeRequest request = requestService.rejectRequest(id, reviewer, dto.notes);
+            auditLogService.logAction(
+                    AuditAction.UPDATE,
+                    "AvailabilityChangeRequest",
+                    String.valueOf(request.getId()),
+                    request.getLecturer().getName(),
+                    null,
+                    toDTO(request),
+                    "Rejected availability change request");
             return ResponseEntity.ok(toDTO(request));
         } catch (IllegalArgumentException | IllegalStateException e) {
+            auditLogService.logActionSync(
+                    AuditAction.UPDATE,
+                    "AvailabilityChangeRequest",
+                    String.valueOf(id),
+                    "Rejection",
+                    null,
+                    null,
+                    "Failed to reject availability request",
+                    false,
+                    e.getMessage());
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "REJECTION_FAILED",
                     "message", e.getMessage()));
@@ -281,8 +369,26 @@ public class AvailabilityChangeRequestController {
 
         try {
             AvailabilityChangeRequest request = requestService.returnRequest(id, reviewer, dto.notes);
+            auditLogService.logAction(
+                    AuditAction.UPDATE,
+                    "AvailabilityChangeRequest",
+                    String.valueOf(request.getId()),
+                    request.getLecturer().getName(),
+                    null,
+                    toDTO(request),
+                    "Returned availability change request");
             return ResponseEntity.ok(toDTO(request));
         } catch (IllegalArgumentException | IllegalStateException e) {
+            auditLogService.logActionSync(
+                    AuditAction.UPDATE,
+                    "AvailabilityChangeRequest",
+                    String.valueOf(id),
+                    "Return",
+                    null,
+                    null,
+                    "Failed to return availability request",
+                    false,
+                    e.getMessage());
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "RETURN_FAILED",
                     "message", e.getMessage()));
@@ -311,9 +417,26 @@ public class AvailabilityChangeRequestController {
                     LocalTime.parse(dto.endTime),
                     AvailabilityStatus.valueOf(dto.newStatus.toUpperCase()),
                     dto.reason);
-
+            auditLogService.logAction(
+                    AuditAction.UPDATE,
+                    "AvailabilityChangeRequest",
+                    String.valueOf(request.getId()),
+                    request.getLecturer().getName(),
+                    null,
+                    toDTO(request),
+                    "Resubmitted availability change request");
             return ResponseEntity.ok(toDTO(request));
         } catch (IllegalArgumentException | IllegalStateException e) {
+            auditLogService.logActionSync(
+                    AuditAction.UPDATE,
+                    "AvailabilityChangeRequest",
+                    String.valueOf(id),
+                    "Resubmission",
+                    null,
+                    null,
+                    "Failed to resubmit availability request",
+                    false,
+                    e.getMessage());
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "RESUBMIT_FAILED",
                     "message", e.getMessage()));
@@ -341,8 +464,26 @@ public class AvailabilityChangeRequestController {
 
         try {
             AvailabilityChangeRequest request = requestService.revokeRequest(id, reviewer, dto.notes);
+            auditLogService.logAction(
+                    AuditAction.UPDATE,
+                    "AvailabilityChangeRequest",
+                    String.valueOf(request.getId()),
+                    request.getLecturer().getName(),
+                    null,
+                    toDTO(request),
+                    "Revoked availability change request");
             return ResponseEntity.ok(toDTO(request));
         } catch (IllegalArgumentException | IllegalStateException e) {
+            auditLogService.logActionSync(
+                    AuditAction.UPDATE,
+                    "AvailabilityChangeRequest",
+                    String.valueOf(id),
+                    "Revocation",
+                    null,
+                    null,
+                    "Failed to revoke availability request",
+                    false,
+                    e.getMessage());
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "REVOKE_FAILED",
                     "message", e.getMessage()));

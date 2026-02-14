@@ -1,0 +1,45 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+SENG101,Introduction to Software Engineering,3,abulimensamuel+ada.soyinka@gmail.com,SENG 100 LEVEL (GRP A),false,PROJECTOR,MAIN ACADEMIC BLOCK|ICT COMPLEX
+SENG101,Introduction to Software Engineering,3,abulimensamuel+femi.balogun@gmail.com,SENG 100 LEVEL (GRP B),false,PROJECTOR,MAIN ACADEMIC BLOCK|ICT COMPLEX
+SENG103,Software Development Tools,2,abulimensamuel+femi.balogun@gmail.com,SENG 100 LEVEL (GRP A),false,PROJECTOR,MAIN ACADEMIC BLOCK|ICT COMPLEX
+SENG103,Software Development Tools,2,abulimensamuel+femi.balogun@gmail.com,SENG 100 LEVEL (GRP B),false,PROJECTOR,MAIN ACADEMIC BLOCK|ICT COMPLEX
+SENG104,Logic and Problem Solving,3,abulimensamuel+ifeoma.nwosu@gmail.com,SENG 100 LEVEL (GRP A),false,,
+SENG104,Logic and Problem Solving,3,abulimensamuel+ifeoma.nwosu@gmail.com,SENG 100 LEVEL (GRP B),false,,
+MTH101,Elementary Algebra for Computing,2,abulimensamuel+emeka.okafor@gmail.com,SENG 100 LEVEL (GRP A),false,,
+MTH101,Elementary Algebra for Computing,2,abulimensamuel+emeka.okafor@gmail.com,SENG 100 LEVEL (GRP B),false,,
+GST111,Use of English and Communication,2,abulimensamuel+chioma.adebayo@gmail.com,SENG 100 LEVEL (GRP A)|SENG 100 LEVEL (GRP B),true,,
+CSC101,Introduction to Computing Systems,3,abulimensamuel+david.olumide@gmail.com,SENG 100 LEVEL (GRP A),false,PROJECTOR,MAIN ACADEMIC BLOCK|ICT COMPLEX
+CSC101,Introduction to Computing Systems,3,abulimensamuel+ada.soyinka@gmail.com,SENG 100 LEVEL (GRP B),false,PROJECTOR,MAIN ACADEMIC BLOCK|ICT COMPLEX
+SENG201,Software Design Patterns,3,abulimensamuel+ada.soyinka@gmail.com,SENG 200 LEVEL (GRP A),false,PROJECTOR,MAIN ACADEMIC BLOCK|ICT COMPLEX
+SENG201,Software Design Patterns,3,abulimensamuel+ada.soyinka@gmail.com,SENG 200 LEVEL (GRP B),false,PROJECTOR,MAIN ACADEMIC BLOCK|ICT COMPLEX
+SENG202,Web Development,4,abulimensamuel+femi.balogun@gmail.com,SENG 200 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX
+SENG202,Web Development,4,abulimensamuel+loretta.eze@gmail.com,SENG 200 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX
+SENG203,Mobile App Development,3,abulimensamuel+ifeoma.nwosu@gmail.com,SENG 200 LEVEL (GRP A),false,COMPUTER LAB,ICT COMPLEX|INNOVATION HUB
+SENG203,Mobile App Development,3,abulimensamuel+khalid.usman@gmail.com,SENG 200 LEVEL (GRP B),false,COMPUTER LAB,ICT COMPLEX|INNOVATION HUB
+SENG204,Software Testing and QA,3,abulimensamuel+khalid.usman@gmail.com,SENG 200 LEVEL (GRP A),false,PROJECTOR,MAIN ACADEMIC BLOCK|ICT COMPLEX
+SENG204,Software Testing and QA,3,abulimensamuel+khalid.usman@gmail.com,SENG 200 LEVEL (GRP B),false,PROJECTOR,MAIN ACADEMIC BLOCK|ICT COMPLEX
+MTH202,Discrete Mathematics II,2,abulimensamuel+emeka.okafor@gmail.com,SENG 200 LEVEL (GRP A),false,,
+MTH202,Discrete Mathematics II,2,abulimensamuel+emeka.okafor@gmail.com,SENG 200 LEVEL (GRP B),false,,
+GST212,Philosophy and Human Existence,2,abulimensamuel+chioma.adebayo@gmail.com,SENG 200 LEVEL (GRP A)|SENG 200 LEVEL (GRP B),true,,
+SENG301,Agile Methodologies,3,abulimensamuel+tobi.alade@gmail.com,SENG 300 LEVEL (GRP A),false,PROJECTOR,MAIN ACADEMIC BLOCK|ICT COMPLEX
+SENG301,Agile Methodologies,3,abulimensamuel+tobi.alade@gmail.com,SENG 300 LEVEL (GRP B),false,PROJECTOR,MAIN ACADEMIC BLOCK|ICT COMPLEX
+SENG302,DevOps and CI CD,3,abulimensamuel+loretta.eze@gmail.com,SENG 300 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG302,DevOps and CI CD,3,abulimensamuel+david.olumide@gmail.com,SENG 300 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG303,Software Architecture,3,abulimensamuel+tobi.alade@gmail.com,SENG 300 LEVEL (GRP A),false,PROJECTOR,MAIN ACADEMIC BLOCK|ICT COMPLEX
+SENG303,Software Architecture,3,abulimensamuel+mina.obi@gmail.com,SENG 300 LEVEL (GRP B),false,PROJECTOR,MAIN ACADEMIC BLOCK|ICT COMPLEX
+SENG304,Human Computer Interaction,2,abulimensamuel+mina.obi@gmail.com,SENG 300 LEVEL (GRP A),false,SMART BOARD|PROJECTOR,MAIN ACADEMIC BLOCK|INNOVATION HUB
+SENG304,Human Computer Interaction,2,abulimensamuel+loretta.eze@gmail.com,SENG 300 LEVEL (GRP B),false,SMART BOARD|PROJECTOR,MAIN ACADEMIC BLOCK|INNOVATION HUB
+BU-GST322,Citizenship Orientation,1,abulimensamuel+chioma.adebayo@gmail.com,SENG 300 LEVEL (GRP A)|SENG 300 LEVEL (GRP B),true,,
+ENT301,Entrepreneurship for Engineers,2,abulimensamuel+gabriel.ike@gmail.com,SENG 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+ENT301,Entrepreneurship for Engineers,2,abulimensamuel+gabriel.ike@gmail.com,SENG 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+SENG401,Capstone Project I,4,abulimensamuel+tobi.alade@gmail.com,SENG 400 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,INNOVATION HUB|ICT COMPLEX
+SENG401,Capstone Project I,4,abulimensamuel+loretta.eze@gmail.com,SENG 400 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,INNOVATION HUB|ICT COMPLEX
+SENG402,Capstone Project II,4,abulimensamuel+loretta.eze@gmail.com,SENG 400 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,INNOVATION HUB|ICT COMPLEX
+SENG402,Capstone Project II,4,abulimensamuel+tobi.alade@gmail.com,SENG 400 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,INNOVATION HUB|ICT COMPLEX
+SENG403,Enterprise Software Development,3,abulimensamuel+mina.obi@gmail.com,SENG 400 LEVEL (GRP A),false,PROJECTOR,MAIN ACADEMIC BLOCK|ICT COMPLEX
+SENG403,Enterprise Software Development,3,abulimensamuel+mina.obi@gmail.com,SENG 400 LEVEL (GRP B),false,PROJECTOR,MAIN ACADEMIC BLOCK|ICT COMPLEX
+SENG404,Software Security Engineering,3,abulimensamuel+khalid.usman@gmail.com,SENG 400 LEVEL (GRP A),false,PROJECTOR,MAIN ACADEMIC BLOCK|ICT COMPLEX
+SENG404,Software Security Engineering,3,abulimensamuel+david.olumide@gmail.com,SENG 400 LEVEL (GRP B),false,PROJECTOR,MAIN ACADEMIC BLOCK|ICT COMPLEX
+SENG405,Cloud Native Systems,3,abulimensamuel+david.olumide@gmail.com,SENG 400 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG405,Cloud Native Systems,3,abulimensamuel+ifeoma.nwosu@gmail.com,SENG 400 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+chioma.adebayo@gmail.com,SENG 400 LEVEL (GRP A)|SENG 400 LEVEL (GRP B),true,,

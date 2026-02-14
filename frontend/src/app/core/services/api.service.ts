@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { toApiUrl } from '../config/api-base-url';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ApiService {
-    private baseUrl = 'http://localhost:8080/api/v1';
+    private baseUrl = toApiUrl('/api/v1');
 
     constructor(private http: HttpClient) { }
 
@@ -143,6 +144,10 @@ export class ApiService {
         return this.http.get<TimetableEntry[]>(`${this.baseUrl}/timetable`, { params: params as any });
     }
 
+    getActiveSpecialEvents(): Observable<SpecialEventEntry[]> {
+        return this.http.get<SpecialEventEntry[]>(`${this.baseUrl}/special-events/active`);
+    }
+
     // Lessons
     updateLesson(id: number, data: { assignedTimeslotId?: number; assignedRoomId?: number; pinned?: boolean }): Observable<TimetableEntry> {
         return this.http.patch<TimetableEntry>(`${this.baseUrl}/lessons/${id}`, data);
@@ -159,6 +164,16 @@ export class ApiService {
 
     terminateSolver(): Observable<SolverStatus> {
         return this.http.post<SolverStatus>(`${this.baseUrl}/solver/terminate`, {});
+    }
+
+    clearCurrentTimetable(): Observable<{ status: string; message: string; lessonsCleared: number }> {
+        return this.http.post<{ status: string; message: string; lessonsCleared: number }>(
+            `${this.baseUrl}/solver/clear-timetable`,
+            {
+                confirmationToken: 'CLEAR_TIMETABLE',
+                secondConfirmationToken: 'CONFIRM_CLEAR'
+            }
+        );
     }
 
     getSolverAnalysis(): Observable<SolverAnalysis> {
@@ -185,6 +200,37 @@ export class ApiService {
 
     archiveSemester(data: { code: string; name?: string; academicYear?: string; semesterNumber?: number }): Observable<any> {
         return this.http.post(`${this.baseUrl}/semesters/archive`, data);
+    }
+
+    getArchivedSemesterTimetable(code: string): Observable<TimetableEntry[]> {
+        return this.http.get<TimetableEntry[]>(`${this.baseUrl}/semesters/${code}/timetable`);
+    }
+
+    getArchivedSemesterGroups(code: string): Observable<StudentGroup[]> {
+        return this.http.get<StudentGroup[]>(`${this.baseUrl}/semesters/${code}/groups`);
+    }
+
+    getArchivedSemesterSpecialEvents(code: string): Observable<SpecialEventEntry[]> {
+        return this.http.get<SpecialEventEntry[]>(`${this.baseUrl}/semesters/${code}/special-events`);
+    }
+
+    exportArchivedSemesterTimetable(code: string): Observable<Blob> {
+        return this.http.get(`${this.baseUrl}/semesters/${code}/export`, {
+            responseType: 'blob'
+        });
+    }
+
+    exportArchivedTimetable(format: 'excel' | 'pdf', code: string, payload: ExportRequest): Observable<Blob> {
+        return this.http.post(`${this.baseUrl}/semesters/${code}/export/${format}`, payload, {
+            responseType: 'blob'
+        });
+    }
+
+    restoreSemesterArchive(code: string): Observable<{ restoredFrom: string; backupCode: string; restoredTableCount: number }> {
+        return this.http.post<{ restoredFrom: string; backupCode: string; restoredTableCount: number }>(
+            `${this.baseUrl}/semesters/${code}/restore`,
+            {}
+        );
     }
 
     deleteSemesterArchive(code: string): Observable<void> {
@@ -374,6 +420,10 @@ export interface LecturerInsightsSummary {
     unassignedCount: number;
     overloadedCount: number;
     overloadThreshold: number;
+    densityStartTime?: string;
+    densityEndTime?: string;
+    densitySlotHours?: number;
+    densitySlots?: string[];
     unavailabilityDensity: Record<string, number>;
 }
 
@@ -519,10 +569,29 @@ export interface TimetableEntry {
     online: boolean;
 }
 
+export interface SpecialEventEntry {
+    id: number;
+    name: string;
+    description: string | null;
+    dayOfWeek: string;
+    startTime: string;
+    endTime: string;
+    durationHours: number;
+    roomId: number | null;
+    roomName: string | null;
+    lecturerId: number | null;
+    lecturerName: string | null;
+    online: boolean;
+    active: boolean;
+    studentGroupIds: number[];
+    studentGroupNames: string[];
+}
+
 export interface SolverStatus {
     jobId: string;
     state: string;
     score: string;
+    durationMs?: number | null;
 }
 
 export interface SolverAnalysis {

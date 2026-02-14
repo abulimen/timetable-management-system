@@ -27,6 +27,16 @@ interface Lecturer {
   email: string;
 }
 
+interface LecturerUnavailability {
+  id: number;
+  lecturerId: number;
+  lecturerName: string;
+  lecturerEmail: string;
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
+}
+
 @Component({
   selector: 'app-availability-requests',
   standalone: true,
@@ -43,6 +53,7 @@ interface Lecturer {
           Pending <span class="badge" *ngIf="pendingCount > 0">{{ pendingCount }}</span>
         </button>
         <button [class.active]="activeTab === 'all'" (click)="activeTab = 'all'; loadAll()">All Requests</button>
+        <button [class.active]="activeTab === 'manage'" (click)="activeTab = 'manage'; loadLecturers(); loadUnavailabilities()">Manage Slots</button>
         <button [class.active]="activeTab === 'create'" (click)="activeTab = 'create'; loadLecturers()">+ Create Request</button>
       </div>
 
@@ -85,6 +96,75 @@ interface Lecturer {
             {{ creating ? 'Creating...' : 'Create Request' }}
           </button>
           <span *ngIf="createMessage" class="create-message" [class.success]="createSuccess">{{ createMessage }}</span>
+        </div>
+      </div>
+
+      <!-- Manage Unavailability Slots -->
+      <div *ngIf="activeTab === 'manage'" class="create-form-container">
+        <div class="create-form">
+          <h3>Directly Manage Lecturer Unavailability Slots</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Lecturer</label>
+              <select [(ngModel)]="newSlot.lecturerId">
+                <option [ngValue]="null">-- Select Lecturer --</option>
+                <option *ngFor="let lec of lecturers" [ngValue]="lec.id">{{ lec.name }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Day</label>
+              <select [(ngModel)]="newSlot.dayOfWeek">
+                <option value="MONDAY">Monday</option>
+                <option value="TUESDAY">Tuesday</option>
+                <option value="WEDNESDAY">Wednesday</option>
+                <option value="THURSDAY">Thursday</option>
+                <option value="FRIDAY">Friday</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Start Time</label>
+              <input type="time" [(ngModel)]="newSlot.startTime">
+            </div>
+            <div class="form-group">
+              <label>End Time</label>
+              <input type="time" [(ngModel)]="newSlot.endTime">
+            </div>
+          </div>
+          <button class="btn-create" (click)="addSlot()"
+                  [disabled]="addingSlot || !newSlot.lecturerId || !newSlot.startTime || !newSlot.endTime">
+            {{ addingSlot ? 'Adding...' : 'Add Unavailability Slot' }}
+          </button>
+          <span *ngIf="slotMessage" class="create-message" [class.success]="slotSuccess">{{ slotMessage }}</span>
+        </div>
+
+        <div class="requests-table" style="margin-top: 1rem;">
+          <table>
+            <thead>
+              <tr>
+                <th>Lecturer</th>
+                <th>Email</th>
+                <th>Day</th>
+                <th>Time</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let u of unavailabilities">
+                <td>{{ u.lecturerName }}</td>
+                <td>{{ u.lecturerEmail }}</td>
+                <td>{{ u.dayOfWeek }}</td>
+                <td>{{ u.startTime }} - {{ u.endTime }}</td>
+                <td class="actions">
+                  <button class="btn-revoke" (click)="deleteSlot(u)" [disabled]="deletingSlotId === u.id">
+                    {{ deletingSlotId === u.id ? 'Deleting...' : 'Delete Slot' }}
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="!loadingUnavailabilities && unavailabilities.length === 0">
+                <td colspan="5" class="empty">No unavailability slots found.</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -508,8 +588,10 @@ interface Lecturer {
 })
 export class AvailabilityRequestsComponent implements OnInit {
   requests: AvailabilityRequest[] = [];
+  unavailabilities: LecturerUnavailability[] = [];
   loading = true;
-  activeTab = 'pending';
+  loadingUnavailabilities = false;
+  activeTab: 'pending' | 'all' | 'create' | 'manage' = 'pending';
   pendingCount = 0;
 
   showModal = false;
@@ -533,6 +615,16 @@ export class AvailabilityRequestsComponent implements OnInit {
   creating = false;
   createMessage = '';
   createSuccess = false;
+  newSlot = {
+    lecturerId: null as number | null,
+    dayOfWeek: 'MONDAY',
+    startTime: '08:00',
+    endTime: '10:00'
+  };
+  addingSlot = false;
+  deletingSlotId: number | null = null;
+  slotMessage = '';
+  slotSuccess = false;
 
   // Stats for modal
   lecturerStats: { approved: number; pending: number; rejected: number; total: number } | null = null;
@@ -645,6 +737,64 @@ export class AvailabilityRequestsComponent implements OnInit {
         this.creating = false;
         this.createSuccess = false;
         this.createMessage = err.error?.message || 'Failed to create request';
+      }
+    });
+  }
+
+  loadUnavailabilities(): void {
+    this.loadingUnavailabilities = true;
+    this.http.get<LecturerUnavailability[]>('http://localhost:8080/api/v1/lecturers/unavailabilities').subscribe({
+      next: (data) => {
+        this.unavailabilities = data;
+        this.loadingUnavailabilities = false;
+      },
+      error: () => {
+        this.unavailabilities = [];
+        this.loadingUnavailabilities = false;
+      }
+    });
+  }
+
+  addSlot(): void {
+    if (this.addingSlot || !this.newSlot.lecturerId) return;
+    this.addingSlot = true;
+    this.slotMessage = '';
+    const payload = {
+      dayOfWeek: this.newSlot.dayOfWeek,
+      startTime: this.newSlot.startTime,
+      endTime: this.newSlot.endTime
+    };
+    this.http.post(`http://localhost:8080/api/v1/lecturers/${this.newSlot.lecturerId}/unavailability`, payload).subscribe({
+      next: () => {
+        this.addingSlot = false;
+        this.slotSuccess = true;
+        this.slotMessage = 'Unavailability slot added successfully.';
+        this.loadUnavailabilities();
+        setTimeout(() => this.slotMessage = '', 3000);
+      },
+      error: (err) => {
+        this.addingSlot = false;
+        this.slotSuccess = false;
+        this.slotMessage = err.error?.message || 'Failed to add slot';
+      }
+    });
+  }
+
+  deleteSlot(slot: LecturerUnavailability): void {
+    if (this.deletingSlotId) return;
+    this.deletingSlotId = slot.id;
+    this.http.delete(`http://localhost:8080/api/v1/lecturers/${slot.lecturerId}/unavailability/${slot.id}`).subscribe({
+      next: () => {
+        this.deletingSlotId = null;
+        this.slotSuccess = true;
+        this.slotMessage = 'Unavailability slot deleted.';
+        this.loadUnavailabilities();
+        setTimeout(() => this.slotMessage = '', 3000);
+      },
+      error: (err) => {
+        this.deletingSlotId = null;
+        this.slotSuccess = false;
+        this.slotMessage = err.error?.message || 'Failed to delete slot';
       }
     });
   }

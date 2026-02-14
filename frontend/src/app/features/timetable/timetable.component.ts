@@ -1,11 +1,26 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ApiService, TimetableEntry, StudentGroup, Lecturer, Room } from '../../core/services/api.service';
+import { ActivatedRoute } from '@angular/router';
+import { forkJoin } from 'rxjs';
+import {
+  ApiService,
+  TimetableEntry,
+  StudentGroup,
+  Lecturer,
+  Room,
+  SpecialEventEntry,
+  Setting
+} from '../../core/services/api.service';
 
 interface PositionedEntry extends TimetableEntry {
   column: number;
   totalColumns: number;
+}
+
+interface VisibleEvent extends SpecialEventEntry {
+  topPx: number;
+  heightPx: number;
 }
 
 @Component({
@@ -15,7 +30,9 @@ interface PositionedEntry extends TimetableEntry {
   template: `
     <div class="space-y-6">
       <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold text-secondary-900 dark:text-white">Timetable</h1>
+        <h1 class="text-2xl font-bold text-secondary-900 dark:text-white">
+          {{ isArchiveMode ? ('Archived Timetable: ' + archiveCode) : 'Timetable' }}
+        </h1>
       </div>
 
       <!-- Filters -->
@@ -23,21 +40,21 @@ interface PositionedEntry extends TimetableEntry {
         <div class="flex gap-4 items-end flex-wrap">
           <div>
             <label class="label">Student Group</label>
-            <select [(ngModel)]="filters.studentGroupId" (change)="loadTimetable()" class="input w-48">
+            <select [(ngModel)]="filters.studentGroupId" (change)="onFilterChange()" class="input w-48">
               <option [ngValue]="undefined">All Groups</option>
               <option *ngFor="let g of studentGroups" [ngValue]="g.id">{{ g.name }}</option>
             </select>
           </div>
           <div>
             <label class="label">Lecturer</label>
-            <select [(ngModel)]="filters.lecturerId" (change)="loadTimetable()" class="input w-48">
+            <select [(ngModel)]="filters.lecturerId" (change)="onFilterChange()" class="input w-48">
               <option [ngValue]="undefined">All Lecturers</option>
               <option *ngFor="let l of lecturers" [ngValue]="l.id">{{ l.name }}</option>
             </select>
           </div>
           <div>
             <label class="label">Room</label>
-            <select [(ngModel)]="filters.roomId" (change)="loadTimetable()" class="input w-48">
+            <select [(ngModel)]="filters.roomId" (change)="onFilterChange()" class="input w-48">
               <option [ngValue]="undefined">All Rooms</option>
               <option *ngFor="let r of rooms" [ngValue]="r.id">{{ r.name }}</option>
             </select>
@@ -52,9 +69,11 @@ interface PositionedEntry extends TimetableEntry {
           <!-- Time column (fixed width) -->
           <div class="flex-shrink-0 w-16 bg-secondary-100 dark:bg-secondary-800">
             <div class="h-12 p-2 font-medium text-center text-sm border-b border-secondary-200 dark:border-secondary-700">Time</div>
-            <div *ngFor="let hour of hours" 
-                 class="h-20 p-2 text-sm text-secondary-500 text-center border-b border-secondary-200 dark:border-secondary-700 flex items-start justify-center">
-              {{ hour }}:00
+            <div *ngFor="let hour of hours"
+                 class="h-20 p-2 text-sm text-secondary-500 text-center border-b border-secondary-200 dark:border-secondary-700 flex flex-col items-center justify-center"
+                 [ngClass]="isLunchHour(hour) ? 'bg-amber-100/80 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200' : ''">
+              <span>{{ hour }}:00</span>
+              <span *ngIf="isLunchHour(hour)" class="text-[10px] font-semibold">Lunch</span>
             </div>
           </div>
           
@@ -70,9 +89,31 @@ interface PositionedEntry extends TimetableEntry {
             <!-- Day content with lessons -->
             <div class="relative bg-white dark:bg-secondary-800 h-full">
               <!-- Hour grid lines -->
-              <div *ngFor="let hour of hours" class="h-20 border-b border-secondary-200 dark:border-secondary-700"></div>
+              <div *ngFor="let hour of hours"
+                   class="h-20 border-b border-secondary-200 dark:border-secondary-700 relative"
+                   [ngClass]="isLunchHour(hour) ? 'bg-amber-50/80 dark:bg-amber-900/20' : ''">
+                <div *ngIf="isLunchHour(hour)"
+                     class="absolute inset-0 flex items-center justify-center text-[10px] font-semibold text-amber-700/70 dark:text-amber-200/60 pointer-events-none">
+                  LUNCH BREAK
+                </div>
+              </div>
               
               <!-- Lessons - use percentage-based positioning -->
+              <ng-container *ngFor="let event of getVisibleEventsForDay(day)">
+                <div
+                  class="absolute p-2 rounded text-xs overflow-hidden z-0 border border-red-200 bg-red-100/90 text-red-900"
+                  [style.top.px]="event.topPx"
+                  [style.height.px]="event.heightPx"
+                  [style.left]="'2px'"
+                  [style.right]="'2px'"
+                  [title]="getEventTooltip(event)">
+                  <div class="font-bold text-[11px] leading-tight truncate">📌 {{ event.name }}</div>
+                  <div class="truncate text-[10px]">
+                    {{ event.online ? '🌐 Online Event' : (event.roomName || 'No Location') }}
+                  </div>
+                </div>
+              </ng-container>
+
               <ng-container *ngFor="let entry of getPositionedLessonsForDay(day)">
                 <div 
                   class="absolute p-2 rounded text-xs cursor-pointer hover:opacity-90 overflow-hidden z-10 border border-white/20"
@@ -112,8 +153,11 @@ interface PositionedEntry extends TimetableEntry {
 })
 export class TimetableComponent implements OnInit {
   private api = inject(ApiService);
+  private route = inject(ActivatedRoute);
 
   entries: TimetableEntry[] = [];
+  activeEvents: SpecialEventEntry[] = [];
+  allStudentGroups: StudentGroup[] = [];
   studentGroups: StudentGroup[] = [];
   lecturers: Lecturer[] = [];
   rooms: Room[] = [];
@@ -123,25 +167,64 @@ export class TimetableComponent implements OnInit {
   hourHeight = 80;
   minColumnWidth = 120; // Minimum width per lesson column to ensure readability
   filters = { studentGroupId: undefined as number | undefined, lecturerId: undefined as number | undefined, roomId: undefined as number | undefined };
+  archiveCode: string | null = null;
+  isArchiveMode = false;
+  lunchBreakStartHour = 12;
+  lunchBreakEndHour = 13;
+  lunchBreakConfigured = true;
 
   private positionCache: Map<string, PositionedEntry[]> = new Map();
   private maxColumnsCache: Map<string, number> = new Map();
 
   ngOnInit() {
+    this.archiveCode = this.route.snapshot.queryParamMap.get('archiveCode');
+    this.isArchiveMode = !!this.archiveCode;
+    this.loadLunchBreakSettings();
     this.loadTimetable();
-    this.api.getStudentGroups().subscribe({ next: (g) => this.studentGroups = g });
-    this.api.getLecturers().subscribe({ next: (l) => this.lecturers = l });
-    this.api.getRooms().subscribe({ next: (r) => this.rooms = r });
   }
 
   loadTimetable() {
+    if (this.isArchiveMode && this.archiveCode) {
+      forkJoin({
+        entries: this.api.getArchivedSemesterTimetable(this.archiveCode),
+        events: this.api.getArchivedSemesterSpecialEvents(this.archiveCode),
+        groups: this.api.getArchivedSemesterGroups(this.archiveCode)
+      }).subscribe({
+        next: ({ entries, events, groups }) => {
+          this.entries = entries || [];
+          this.activeEvents = events || [];
+          this.allStudentGroups = groups || [];
+          this.studentGroups = this.allStudentGroups
+            .filter(group => group.parentGroupId !== null)
+            .sort((a, b) => a.name.localeCompare(b.name));
+          this.updateArchiveFilterOptions();
+          this.positionCache.clear();
+          this.maxColumnsCache.clear();
+        }
+      });
+      return;
+    }
+
     const params: any = {};
     if (this.filters.studentGroupId) params.student_group_id = this.filters.studentGroupId;
     if (this.filters.lecturerId) params.lecturer_id = this.filters.lecturerId;
     if (this.filters.roomId) params.room_id = this.filters.roomId;
-    this.api.getTimetable(params).subscribe({
-      next: (e) => {
-        this.entries = e;
+    forkJoin({
+      entries: this.api.getTimetable(params),
+      events: this.api.getActiveSpecialEvents(),
+      groups: this.api.getStudentGroups(),
+      lecturers: this.api.getLecturers(),
+      rooms: this.api.getRooms()
+    }).subscribe({
+      next: ({ entries, events, groups, lecturers, rooms }) => {
+        this.entries = entries;
+        this.activeEvents = events || [];
+        this.allStudentGroups = groups || [];
+        this.studentGroups = this.allStudentGroups
+          .filter(group => group.parentGroupId !== null)
+          .sort((a, b) => a.name.localeCompare(b.name));
+        this.lecturers = lecturers || [];
+        this.rooms = rooms || [];
         this.positionCache.clear();
         this.maxColumnsCache.clear();
       }
@@ -153,7 +236,7 @@ export class TimetableComponent implements OnInit {
       return this.positionCache.get(day)!;
     }
 
-    const dayLessons = this.entries.filter(e => e.dayOfWeek === day);
+    const dayLessons = this.getFilteredEntries().filter(e => e.dayOfWeek === day);
 
     // Sort by start time, then by duration (longer first)
     dayLessons.sort((a, b) => {
@@ -219,6 +302,25 @@ export class TimetableComponent implements OnInit {
     return Math.max(1, this.maxColumnsCache.get(day) || 1);
   }
 
+  getVisibleEventsForDay(day: string): VisibleEvent[] {
+    const selectedGroupId = this.filters.studentGroupId;
+    const selectedLecturerId = this.filters.lecturerId;
+    const selectedRoomId = this.filters.roomId;
+    return this.activeEvents
+      .filter((event) => event.dayOfWeek === day)
+      .filter((event) => {
+        if (selectedLecturerId && event.lecturerId !== selectedLecturerId) return false;
+        if (selectedRoomId && event.roomId !== selectedRoomId) return false;
+        if (selectedGroupId && !this.eventTouchesGroup(event, selectedGroupId)) return false;
+        return true;
+      })
+      .map((event) => ({
+        ...event,
+        topPx: this.getTopPosition(event),
+        heightPx: this.getHeight(event)
+      }));
+  }
+
   getDayMinWidth(day: string): number {
     const cols = this.getMaxColumnsForDay(day);
     return cols * this.minColumnWidth;
@@ -238,14 +340,14 @@ export class TimetableComponent implements OnInit {
     return hours * 60 + (minutes || 0);
   }
 
-  getTopPosition(entry: TimetableEntry): number {
+  getTopPosition(entry: { startTime: string }): number {
     const startHour = parseInt(entry.startTime?.split(':')[0] || '0');
     const startMinute = parseInt(entry.startTime?.split(':')[1] || '0');
     const hoursFromStart = (startHour - this.hours[0]) + (startMinute / 60);
     return hoursFromStart * this.hourHeight;
   }
 
-  getHeight(entry: TimetableEntry): number {
+  getHeight(entry: { durationHours: number }): number {
     return (entry.durationHours || 1) * this.hourHeight - 4;
   }
 
@@ -270,6 +372,56 @@ export class TimetableComponent implements OnInit {
     return tooltip;
   }
 
+  getEventTooltip(event: SpecialEventEntry): string {
+    let tooltip = `Special Event: ${event.name}\n`;
+    tooltip += `${event.startTime} - ${event.endTime} (${event.durationHours}hr)\n`;
+    tooltip += event.online ? 'Online Event' : `Location: ${event.roomName || 'N/A'}`;
+    if (event.lecturerName) {
+      tooltip += `\nLecturer: ${event.lecturerName}`;
+    }
+    const displayGroups = this.getDisplayGroupNamesForEvent(event);
+    if (displayGroups.length) {
+      tooltip += `\nGroups: ${displayGroups.join(', ')}`;
+    }
+    return tooltip;
+  }
+
+  private eventTouchesGroup(event: SpecialEventEntry, selectedGroupId: number): boolean {
+    return (event.studentGroupIds || []).some((eventGroupId) => this.groupsConflict(eventGroupId, selectedGroupId));
+  }
+
+  private groupsConflict(groupAId: number, groupBId: number): boolean {
+    if (groupAId === groupBId) return true;
+    const groupA = this.allStudentGroups.find((g) => g.id === groupAId);
+    const groupB = this.allStudentGroups.find((g) => g.id === groupBId);
+    if (!groupA || !groupB) return false;
+    return groupA.parentGroupId === groupB.id || groupB.parentGroupId === groupA.id;
+  }
+
+  private getDisplayGroupNamesForEvent(event: SpecialEventEntry): string[] {
+    const names = new Set<string>();
+    const ids = event.studentGroupIds || [];
+    for (const id of ids) {
+      const group = this.allStudentGroups.find(g => g.id === id);
+      if (!group) {
+        continue;
+      }
+      if (group.parentGroupId !== null) {
+        names.add(group.name);
+        continue;
+      }
+      const children = this.allStudentGroups.filter(child => child.parentGroupId === group.id);
+      if (children.length > 0) {
+        for (const child of children) {
+          names.add(child.name);
+        }
+      } else {
+        names.add(group.name);
+      }
+    }
+    return Array.from(names).sort((a, b) => a.localeCompare(b));
+  }
+
   togglePin(entry: TimetableEntry) {
     this.api.updateLesson(entry.lessonId, { pinned: !entry.pinned }).subscribe({
       next: () => this.loadTimetable()
@@ -278,6 +430,15 @@ export class TimetableComponent implements OnInit {
 
   clearFilters() {
     this.filters = { studentGroupId: undefined, lecturerId: undefined, roomId: undefined };
+    this.onFilterChange();
+  }
+
+  onFilterChange() {
+    if (this.isArchiveMode) {
+      this.positionCache.clear();
+      this.maxColumnsCache.clear();
+      return;
+    }
     this.loadTimetable();
   }
 
@@ -286,5 +447,113 @@ export class TimetableComponent implements OnInit {
     let hash = 0;
     for (let i = 0; i < code.length; i++) hash = code.charCodeAt(i) + ((hash << 5) - hash);
     return colors[Math.abs(hash) % colors.length];
+  }
+
+  isLunchHour(hour: number): boolean {
+    if (!this.lunchBreakConfigured) {
+      return false;
+    }
+    return hour >= this.lunchBreakStartHour && hour < this.lunchBreakEndHour;
+  }
+
+  private getFilteredEntries(): TimetableEntry[] {
+    if (!this.isArchiveMode) {
+      return this.entries;
+    }
+    return this.entries.filter(entry => {
+      if (this.filters.lecturerId && entry.lecturerId !== this.filters.lecturerId) return false;
+      if (this.filters.roomId && entry.roomId !== this.filters.roomId) return false;
+      if (this.filters.studentGroupId) {
+        const selectedGroupId = this.filters.studentGroupId;
+        const matchesPrimary = entry.studentGroupId && this.groupsConflict(entry.studentGroupId, selectedGroupId);
+        const matchesCombined = (entry.combinedGroupNames || []).some(name => {
+          const group = this.allStudentGroups.find(g => g.name === name);
+          return group ? this.groupsConflict(group.id, selectedGroupId) : false;
+        });
+        if (!matchesPrimary && !matchesCombined) return false;
+      }
+      return true;
+    });
+  }
+
+  private updateArchiveFilterOptions() {
+    const lecturerMap = new Map<number, Lecturer>();
+    const roomMap = new Map<number, Room>();
+    for (const entry of this.entries) {
+      if (entry.lecturerId && !lecturerMap.has(entry.lecturerId)) {
+        lecturerMap.set(entry.lecturerId, { id: entry.lecturerId, name: entry.lecturerName, email: '', unavailabilities: [] });
+      }
+      if (entry.roomId && !roomMap.has(entry.roomId)) {
+        roomMap.set(entry.roomId, {
+          id: entry.roomId,
+          name: entry.roomName,
+          capacity: entry.roomCapacity || 0,
+          zoneId: 0,
+          zoneName: '',
+          features: [],
+          featureIds: []
+        });
+      }
+    }
+    for (const event of this.activeEvents) {
+      if (event.lecturerId && !lecturerMap.has(event.lecturerId)) {
+        lecturerMap.set(event.lecturerId, { id: event.lecturerId, name: event.lecturerName || 'Unknown', email: '', unavailabilities: [] });
+      }
+      if (event.roomId && !roomMap.has(event.roomId)) {
+        roomMap.set(event.roomId, {
+          id: event.roomId,
+          name: event.roomName || 'Unknown',
+          capacity: 0,
+          zoneId: 0,
+          zoneName: '',
+          features: [],
+          featureIds: []
+        });
+      }
+    }
+    this.lecturers = Array.from(lecturerMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+    this.rooms = Array.from(roomMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  private loadLunchBreakSettings() {
+    this.api.getSettings().subscribe({
+      next: (settings) => this.applyLunchSettings(settings),
+      error: () => {
+        // Keep defaults when settings API fails.
+      }
+    });
+  }
+
+  private applyLunchSettings(settings: Setting[]) {
+    const startRaw = this.findSettingValue(settings, 'lunch_break_start');
+    const endRaw = this.findSettingValue(settings, 'lunch_break_end');
+    const startHour = this.parseHour(startRaw);
+    const endHour = this.parseHour(endRaw);
+
+    if (startHour === null || endHour === null || endHour <= startHour) {
+      this.lunchBreakConfigured = false;
+      return;
+    }
+
+    this.lunchBreakStartHour = startHour;
+    this.lunchBreakEndHour = endHour;
+    this.lunchBreakConfigured = true;
+  }
+
+  private findSettingValue(settings: Setting[], key: string): string | null {
+    const found = settings.find(s => s.key === key);
+    return found?.value ?? null;
+  }
+
+  private parseHour(timeValue: string | null): number | null {
+    if (!timeValue) {
+      return null;
+    }
+    const [hourRaw] = timeValue.split(':');
+    const hour = Number(hourRaw);
+    if (!Number.isFinite(hour) || hour < 0 || hour > 23) {
+      return null;
+    }
+    return hour;
   }
 }

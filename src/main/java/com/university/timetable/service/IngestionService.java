@@ -318,13 +318,6 @@ public class IngestionService {
             if (!valid)
                 continue;
 
-            // Check for duplicate course code
-            if (courseRepository.existsByCode(code)) {
-                result.addError(row.getRowNum(), "code",
-                        "Course code '" + code + "' already exists", "DUPLICATE_CODE");
-                continue;
-            }
-
             Course course = new Course(code, validationService.sanitizeString(name),
                     weeklyHours != null ? weeklyHours : 0);
 
@@ -335,9 +328,28 @@ public class IngestionService {
             }
 
             // Set student group
+            StudentGroup assignedGroup = null;
             if (studentGroupName != null && !studentGroupName.isEmpty()) {
-                studentGroupRepository.findByName(validationService.sanitizeString(studentGroupName))
-                        .ifPresent(course::setStudentGroup);
+                assignedGroup = studentGroupRepository.findByName(validationService.sanitizeString(studentGroupName))
+                        .orElse(null);
+                if (assignedGroup != null) {
+                    course.setStudentGroup(assignedGroup);
+                    course.setStudentGroups(java.util.Set.of(assignedGroup));
+                }
+            }
+
+            // Prevent duplicate code + overlapping group assignment across course entries
+            if (assignedGroup != null) {
+                Long groupId = assignedGroup.getId();
+                boolean hasOverlap = courseRepository.findByCode(code).stream()
+                        .anyMatch(existing -> existing.getAllStudentGroups().stream()
+                                .anyMatch(group -> group.getId() != null && group.getId().equals(groupId)));
+                if (hasOverlap) {
+                    result.addError(row.getRowNum(), "studentGroupName",
+                            "Duplicate course-group assignment: code '" + code + "' already has group '" + assignedGroup.getName() + "'",
+                            "DUPLICATE_COURSE_GROUP");
+                    continue;
+                }
             }
 
             // Set allowed zones

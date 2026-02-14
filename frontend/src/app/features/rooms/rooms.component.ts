@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService, Room, Zone, Feature } from '../../core/services/api.service';
 import { DataQueryToolbarComponent, QuerySortOption, QueryViewOption } from '../../core/query/data-query-toolbar.component';
+import { DataPaginationComponent } from '../../core/query/data-pagination.component';
 import { DataQueryState, DEFAULT_QUERY_STATE } from '../../core/query/query-state.model';
 import { parseQueryStateFromParams, serializeQueryStateToParams } from '../../core/query/query-state-url.util';
 import { QueryViewsService } from '../../core/query/query-views.service';
@@ -19,7 +20,7 @@ interface RoomQueryViewPayload {
 @Component({
   selector: 'app-rooms',
   standalone: true,
-  imports: [CommonModule, FormsModule, DataQueryToolbarComponent, KpiCardRowComponent],
+  imports: [CommonModule, FormsModule, DataQueryToolbarComponent, DataPaginationComponent, KpiCardRowComponent],
   template: `
     <div class="space-y-6">
       <div class="flex items-center justify-between">
@@ -37,7 +38,7 @@ interface RoomQueryViewPayload {
         [sortOptions]="sortOptions"
         [savedViews]="savedViewOptions"
         [selectedViewId]="selectedViewId"
-        [resultCount]="displayedRooms.length"
+        [resultCount]="filteredRooms.length"
         [totalCount]="rooms.length"
         searchPlaceholder="Search by room, zone, or feature"
         (searchChange)="onSearchChange($event)"
@@ -48,6 +49,16 @@ interface RoomQueryViewPayload {
         (filtersClick)="onFiltersClick()"
         (resetClick)="resetQuery()">
       </app-data-query-toolbar>
+      <app-data-pagination
+        [page]="queryState.pagination.page"
+        [pageSize]="queryState.pagination.size"
+        [totalItems]="filteredRooms.length"
+        (pageSizeChange)="onPageSizeChange($event)"
+        (firstPage)="goToFirstPage()"
+        (prevPage)="goToPrevPage()"
+        (nextPage)="goToNextPage()"
+        (lastPage)="goToLastPage()">
+      </app-data-pagination>
 
       <app-kpi-card-row [items]="kpiCards"></app-kpi-card-row>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -89,7 +100,7 @@ interface RoomQueryViewPayload {
               </button>
             </div>
             <p class="text-xs text-secondary-500 mt-2">
-              Will update {{ bulkFeaturePreviewCount }} of {{ displayedRooms.length }} visible rooms.
+              Will update {{ bulkFeaturePreviewCount }} of {{ filteredRooms.length }} filtered rooms.
             </p>
           </div>
           <div class="border border-secondary-200 dark:border-secondary-700 rounded-lg p-3">
@@ -333,7 +344,7 @@ export class RoomsComponent implements OnInit {
   bulkCapacityDelta: number | null = null;
   bulkApplying = false;
   bulkActionSummary = '';
-  queryState: DataQueryState = { ...DEFAULT_QUERY_STATE, pagination: { page: 1, size: 1000 } };
+  queryState: DataQueryState = { ...DEFAULT_QUERY_STATE };
   activeSortKey = '';
   showFiltersPanel = false;
   filterDraft = {
@@ -361,7 +372,7 @@ export class RoomsComponent implements OnInit {
   savedViewOptions: QueryViewOption[] = [];
   selectedViewId = '';
 
-  get displayedRooms(): Room[] {
+  get filteredRooms(): Room[] {
     const search = this.queryState.search.trim().toLowerCase();
     let rows = this.rooms;
     if (search) {
@@ -377,8 +388,16 @@ export class RoomsComponent implements OnInit {
     return [...rows].sort((a, b) => this.compareBySortStack(a, b, sortStack));
   }
 
+  get displayedRooms(): Room[] {
+    const rows = this.filteredRooms;
+    const page = this.queryState.pagination.page;
+    const size = this.queryState.pagination.size;
+    const start = (page - 1) * size;
+    return rows.slice(start, start + size);
+  }
+
   get kpiCards(): KpiCardItem[] {
-    const displayed = this.displayedRooms;
+    const displayed = this.filteredRooms;
     const total = displayed.length;
     const totalCapacity = displayed.reduce((sum, room) => sum + room.capacity, 0);
     const noFeatures = displayed.filter(room => (room.features || []).length === 0).length;
@@ -399,7 +418,7 @@ export class RoomsComponent implements OnInit {
     if (!this.bulkFeatureName) {
       return 0;
     }
-    return this.displayedRooms.filter(room => {
+    return this.filteredRooms.filter(room => {
       const hasFeature = (room.features || []).includes(this.bulkFeatureName);
       return this.bulkFeatureAction === 'add' ? !hasFeature : hasFeature;
     }).length;
@@ -409,11 +428,11 @@ export class RoomsComponent implements OnInit {
     if (!this.bulkCapacityDelta) {
       return 0;
     }
-    return this.displayedRooms.filter(room => Math.max(1, room.capacity + Number(this.bulkCapacityDelta)) !== room.capacity).length;
+    return this.filteredRooms.filter(room => Math.max(1, room.capacity + Number(this.bulkCapacityDelta)) !== room.capacity).length;
   }
 
   get capacityBuckets(): Array<{ label: string; count: number }> {
-    const displayed = this.displayedRooms;
+    const displayed = this.filteredRooms;
     return [
       { label: '0-49', count: displayed.filter(room => room.capacity <= 49).length },
       { label: '50-99', count: displayed.filter(room => room.capacity >= 50 && room.capacity <= 99).length },
@@ -424,7 +443,7 @@ export class RoomsComponent implements OnInit {
 
   get zoneDistribution(): Array<{ name: string; count: number }> {
     const counts = new Map<string, number>();
-    for (const room of this.displayedRooms) {
+    for (const room of this.filteredRooms) {
       const zoneName = room.zoneName || 'Unassigned';
       counts.set(zoneName, (counts.get(zoneName) || 0) + 1);
     }
@@ -446,7 +465,7 @@ export class RoomsComponent implements OnInit {
   loadFeatures() { this.api.getFeatures().subscribe({ next: (features) => this.features = features }); }
 
   onSearchChange(value: string) {
-    this.queryState = { ...this.queryState, search: value };
+    this.queryState = { ...this.queryState, search: value, pagination: { ...this.queryState.pagination, page: 1 } };
     this.syncQueryStateToUrl();
   }
 
@@ -454,7 +473,8 @@ export class RoomsComponent implements OnInit {
     this.activeSortKey = key;
     this.queryState = {
       ...this.queryState,
-      sort: this.parseSortStack([key])
+      sort: this.parseSortStack([key]),
+      pagination: { ...this.queryState.pagination, page: 1 }
     };
     this.hydrateSortDraftFromQuerySort();
     this.syncQueryStateToUrl();
@@ -465,7 +485,7 @@ export class RoomsComponent implements OnInit {
   }
 
   resetQuery() {
-    this.queryState = { ...DEFAULT_QUERY_STATE, pagination: { page: 1, size: 1000 } };
+    this.queryState = { ...DEFAULT_QUERY_STATE };
     this.activeSortKey = '';
     this.selectedViewId = '';
     this.hydrateSortDraftFromQuerySort();
@@ -487,8 +507,7 @@ export class RoomsComponent implements OnInit {
 
     this.queryState = {
       ...DEFAULT_QUERY_STATE,
-      ...savedView.payload.queryState,
-      pagination: { page: 1, size: 1000 }
+      ...savedView.payload.queryState
     };
     this.activeSortKey = savedView.payload.activeSortKey || '';
     this.hydrateFilterDraftFromQueryFilters();
@@ -561,7 +580,7 @@ export class RoomsComponent implements OnInit {
     if (!this.bulkFeatureName) {
       return;
     }
-    const targetRooms = this.displayedRooms.filter(room => {
+    const targetRooms = this.filteredRooms.filter(room => {
       const hasFeature = (room.features || []).includes(this.bulkFeatureName);
       return this.bulkFeatureAction === 'add' ? !hasFeature : hasFeature;
     });
@@ -596,7 +615,7 @@ export class RoomsComponent implements OnInit {
       return;
     }
     const delta = Number(this.bulkCapacityDelta);
-    const targetRooms = this.displayedRooms.filter(room => Math.max(1, room.capacity + delta) !== room.capacity);
+    const targetRooms = this.filteredRooms.filter(room => Math.max(1, room.capacity + delta) !== room.capacity);
     if (targetRooms.length === 0) {
       return;
     }
@@ -724,7 +743,13 @@ export class RoomsComponent implements OnInit {
       filters.push({ field: featureField, operator: 'in', value: [...this.filterDraft.featureNames], exclude: this.filterDraft.featureExclude });
     }
     const sort = this.parseSortStack(this.sortDraft);
-    this.queryState = { ...this.queryState, filters, matchMode: this.filterDraft.matchMode, sort };
+    this.queryState = {
+      ...this.queryState,
+      filters,
+      matchMode: this.filterDraft.matchMode,
+      sort,
+      pagination: { ...this.queryState.pagination, page: 1 }
+    };
     this.activeSortKey = sort[0] ? `${sort[0].field}:${sort[0].direction}` : '';
     this.syncQueryStateToUrl();
   }
@@ -732,7 +757,13 @@ export class RoomsComponent implements OnInit {
   clearFilters() {
     this.resetFilterDraft();
     this.sortDraft = ['', '', ''];
-    this.queryState = { ...this.queryState, filters: [], matchMode: 'all', sort: [] };
+    this.queryState = {
+      ...this.queryState,
+      filters: [],
+      matchMode: 'all',
+      sort: [],
+      pagination: { ...this.queryState.pagination, page: 1 }
+    };
     this.activeSortKey = '';
     this.syncQueryStateToUrl();
   }
@@ -744,7 +775,8 @@ export class RoomsComponent implements OnInit {
       search: parsed.search,
       filters: parsed.filters,
       matchMode: parsed.matchMode,
-      sort: parsed.sort
+      sort: parsed.sort,
+      pagination: parsed.pagination
     };
     const firstSort = parsed.sort[0];
     this.activeSortKey = firstSort ? `${firstSort.field}:${firstSort.direction}` : '';
@@ -928,6 +960,35 @@ export class RoomsComponent implements OnInit {
       }
     }
     return 0;
+  }
+
+  onPageSizeChange(size: number) {
+    this.queryState = { ...this.queryState, pagination: { page: 1, size } };
+    this.syncQueryStateToUrl();
+  }
+
+  goToFirstPage() {
+    this.queryState = { ...this.queryState, pagination: { ...this.queryState.pagination, page: 1 } };
+    this.syncQueryStateToUrl();
+  }
+
+  goToPrevPage() {
+    const page = Math.max(1, this.queryState.pagination.page - 1);
+    this.queryState = { ...this.queryState, pagination: { ...this.queryState.pagination, page } };
+    this.syncQueryStateToUrl();
+  }
+
+  goToNextPage() {
+    const totalPages = Math.max(1, Math.ceil(this.filteredRooms.length / this.queryState.pagination.size));
+    const page = Math.min(totalPages, this.queryState.pagination.page + 1);
+    this.queryState = { ...this.queryState, pagination: { ...this.queryState.pagination, page } };
+    this.syncQueryStateToUrl();
+  }
+
+  goToLastPage() {
+    const totalPages = Math.max(1, Math.ceil(this.filteredRooms.length / this.queryState.pagination.size));
+    this.queryState = { ...this.queryState, pagination: { ...this.queryState.pagination, page: totalPages } };
+    this.syncQueryStateToUrl();
   }
 
   private hydrateSortDraftFromQuerySort() {

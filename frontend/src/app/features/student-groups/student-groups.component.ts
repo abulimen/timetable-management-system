@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService, StudentGroup } from '../../core/services/api.service';
 import { DataQueryToolbarComponent, QuerySortOption, QueryViewOption } from '../../core/query/data-query-toolbar.component';
+import { DataPaginationComponent } from '../../core/query/data-pagination.component';
 import { DataQueryState, DEFAULT_QUERY_STATE } from '../../core/query/query-state.model';
 import { parseQueryStateFromParams, serializeQueryStateToParams } from '../../core/query/query-state-url.util';
 import { QueryViewsService } from '../../core/query/query-views.service';
@@ -26,7 +27,7 @@ interface StudentGroupTreeRow {
 @Component({
   selector: 'app-student-groups',
   standalone: true,
-  imports: [CommonModule, FormsModule, DataQueryToolbarComponent, KpiCardRowComponent],
+  imports: [CommonModule, FormsModule, DataQueryToolbarComponent, DataPaginationComponent, KpiCardRowComponent],
   template: `
     <div class="space-y-6">
       <div class="flex items-center justify-between">
@@ -44,7 +45,7 @@ interface StudentGroupTreeRow {
         [sortOptions]="sortOptions"
         [savedViews]="savedViewOptions"
         [selectedViewId]="selectedViewId"
-        [resultCount]="displayedRows.length"
+        [resultCount]="filteredRows.length"
         [totalCount]="groups.length"
         searchPlaceholder="Search by name, base name, level, or parent"
         (searchChange)="onSearchChange($event)"
@@ -55,6 +56,16 @@ interface StudentGroupTreeRow {
         (filtersClick)="onFiltersClick()"
         (resetClick)="resetQuery()">
       </app-data-query-toolbar>
+      <app-data-pagination
+        [page]="queryState.pagination.page"
+        [pageSize]="queryState.pagination.size"
+        [totalItems]="filteredRows.length"
+        (pageSizeChange)="onPageSizeChange($event)"
+        (firstPage)="goToFirstPage()"
+        (prevPage)="goToPrevPage()"
+        (nextPage)="goToNextPage()"
+        (lastPage)="goToLastPage()">
+      </app-data-pagination>
       <div class="flex items-center justify-between">
         <p class="text-xs text-secondary-500">View Mode</p>
         <div class="inline-flex rounded-lg border border-secondary-300 dark:border-secondary-600 overflow-hidden">
@@ -371,7 +382,7 @@ export class StudentGroupsComponent implements OnInit {
   showDeleteAllConfirm = false;
   deleting = false;
   importing = false;
-  queryState: DataQueryState = { ...DEFAULT_QUERY_STATE, pagination: { page: 1, size: 1000 } };
+  queryState: DataQueryState = { ...DEFAULT_QUERY_STATE };
   activeSortKey = '';
   showFiltersPanel = false;
   filterDraft = {
@@ -434,7 +445,7 @@ export class StudentGroupsComponent implements OnInit {
   }
 
   get warningCounts(): { orphanChild: number; parentWithoutChildren: number; oversizedChild: number; totalRowsWithWarnings: number } {
-    const rows = this.displayedRows;
+    const rows = this.filteredRows;
     const orphanChild = rows.filter(row => this.groupWarnings(row.group).includes('orphan-child')).length;
     const parentWithoutChildren = rows.filter(row => this.groupWarnings(row.group).includes('parent-without-children')).length;
     const oversizedChild = rows.filter(row => this.groupWarnings(row.group).includes('oversized-child')).length;
@@ -458,7 +469,7 @@ export class StudentGroupsComponent implements OnInit {
     return [...rows].sort((a, b) => this.compareBySortStack(a, b, sortStack));
   }
 
-  get displayedRows(): StudentGroupTreeRow[] {
+  get filteredRows(): StudentGroupTreeRow[] {
     if (this.viewMode === 'flat') {
       return this.displayedGroups.map(group => ({
         group,
@@ -553,6 +564,14 @@ export class StudentGroupsComponent implements OnInit {
     return rows;
   }
 
+  get displayedRows(): StudentGroupTreeRow[] {
+    const rows = this.filteredRows;
+    const page = this.queryState.pagination.page;
+    const size = this.queryState.pagination.size;
+    const start = (page - 1) * size;
+    return rows.slice(start, start + size);
+  }
+
   toggleParentExpanded(groupId: number) {
     if (this.expandedParentIds.has(groupId)) {
       this.expandedParentIds.delete(groupId);
@@ -602,13 +621,17 @@ export class StudentGroupsComponent implements OnInit {
   loadGroups() { this.api.getStudentGroups().subscribe({ next: (g) => this.groups = g }); }
 
   onSearchChange(value: string) {
-    this.queryState = { ...this.queryState, search: value };
+    this.queryState = { ...this.queryState, search: value, pagination: { ...this.queryState.pagination, page: 1 } };
     this.syncQueryStateToUrl();
   }
 
   onSortChange(key: string) {
     this.activeSortKey = key;
-    this.queryState = { ...this.queryState, sort: this.parseSortStack([key]) };
+    this.queryState = {
+      ...this.queryState,
+      sort: this.parseSortStack([key]),
+      pagination: { ...this.queryState.pagination, page: 1 }
+    };
     this.hydrateSortDraftFromQuerySort();
     this.syncQueryStateToUrl();
   }
@@ -618,7 +641,7 @@ export class StudentGroupsComponent implements OnInit {
   }
 
   resetQuery() {
-    this.queryState = { ...DEFAULT_QUERY_STATE, pagination: { page: 1, size: 1000 } };
+    this.queryState = { ...DEFAULT_QUERY_STATE };
     this.activeSortKey = '';
     this.selectedViewId = '';
     this.hydrateSortDraftFromQuerySort();
@@ -640,8 +663,7 @@ export class StudentGroupsComponent implements OnInit {
 
     this.queryState = {
       ...DEFAULT_QUERY_STATE,
-      ...savedView.payload.queryState,
-      pagination: { page: 1, size: 1000 }
+      ...savedView.payload.queryState
     };
     this.activeSortKey = savedView.payload.activeSortKey || '';
     this.hydrateFilterDraftFromQueryFilters();
@@ -816,7 +838,13 @@ export class StudentGroupsComponent implements OnInit {
       filters.push({ field: 'childCount', operator: 'lte', value: Number(this.filterDraft.maxChildCount) });
     }
     const sort = this.parseSortStack(this.sortDraft);
-    this.queryState = { ...this.queryState, filters, matchMode: this.filterDraft.matchMode, sort };
+    this.queryState = {
+      ...this.queryState,
+      filters,
+      matchMode: this.filterDraft.matchMode,
+      sort,
+      pagination: { ...this.queryState.pagination, page: 1 }
+    };
     this.activeSortKey = sort[0] ? `${sort[0].field}:${sort[0].direction}` : '';
     this.syncQueryStateToUrl();
   }
@@ -824,7 +852,13 @@ export class StudentGroupsComponent implements OnInit {
   clearFilters() {
     this.resetFilterDraft();
     this.sortDraft = ['', '', ''];
-    this.queryState = { ...this.queryState, filters: [], matchMode: 'all', sort: [] };
+    this.queryState = {
+      ...this.queryState,
+      filters: [],
+      matchMode: 'all',
+      sort: [],
+      pagination: { ...this.queryState.pagination, page: 1 }
+    };
     this.activeSortKey = '';
     this.syncQueryStateToUrl();
   }
@@ -836,7 +870,8 @@ export class StudentGroupsComponent implements OnInit {
       search: parsed.search,
       filters: parsed.filters,
       matchMode: parsed.matchMode,
-      sort: parsed.sort
+      sort: parsed.sort,
+      pagination: parsed.pagination
     };
     const firstSort = parsed.sort[0];
     this.activeSortKey = firstSort ? `${firstSort.field}:${firstSort.direction}` : '';
@@ -1030,6 +1065,35 @@ export class StudentGroupsComponent implements OnInit {
       if (value !== 0) return value;
     }
     return 0;
+  }
+
+  onPageSizeChange(size: number) {
+    this.queryState = { ...this.queryState, pagination: { page: 1, size } };
+    this.syncQueryStateToUrl();
+  }
+
+  goToFirstPage() {
+    this.queryState = { ...this.queryState, pagination: { ...this.queryState.pagination, page: 1 } };
+    this.syncQueryStateToUrl();
+  }
+
+  goToPrevPage() {
+    const page = Math.max(1, this.queryState.pagination.page - 1);
+    this.queryState = { ...this.queryState, pagination: { ...this.queryState.pagination, page } };
+    this.syncQueryStateToUrl();
+  }
+
+  goToNextPage() {
+    const totalPages = Math.max(1, Math.ceil(this.filteredRows.length / this.queryState.pagination.size));
+    const page = Math.min(totalPages, this.queryState.pagination.page + 1);
+    this.queryState = { ...this.queryState, pagination: { ...this.queryState.pagination, page } };
+    this.syncQueryStateToUrl();
+  }
+
+  goToLastPage() {
+    const totalPages = Math.max(1, Math.ceil(this.filteredRows.length / this.queryState.pagination.size));
+    this.queryState = { ...this.queryState, pagination: { ...this.queryState.pagination, page: totalPages } };
+    this.syncQueryStateToUrl();
   }
 
   private hydrateSortDraftFromQuerySort() {

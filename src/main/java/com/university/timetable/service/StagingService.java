@@ -36,6 +36,7 @@ public class StagingService {
     private final ImportBatchRepository importBatchRepository;
     private final BulkImportService bulkImportService;
     private final UserRepository userRepository;
+    private static final int PREVIEW_MAX_VALID_ROWS = 500;
 
     // Header mappings for conflict resolution
     private static final Map<String, String[]> HEADER_MAPPINGS = Map.of(
@@ -52,6 +53,7 @@ public class StagingService {
     @Transactional(rollbackFor = Exception.class)
     public BulkImportResult approveBatch(Long batchId, User approver, Map<Integer, String> resolutionsMap)
             throws Exception {
+        long startMs = System.currentTimeMillis();
         ImportBatch batch = importBatchRepository.findById(batchId)
                 .orElseThrow(() -> new IllegalArgumentException("Batch not found"));
 
@@ -84,8 +86,10 @@ public class StagingService {
         batch.setApprovedBy(approver);
         batch.setApprovalDate(LocalDateTime.now());
         importBatchRepository.save(batch);
+        log.info("approveBatch(batchId={}, entityType={}) completed in {} ms", batchId, batch.getEntityType(),
+                System.currentTimeMillis() - startMs);
 
-        return result;
+        return compactResultForApproval(result);
     }
 
     private List<Map<String, String>> mapRowsToHeaders(List<String[]> csvRows, String entityType) {
@@ -165,7 +169,8 @@ public class StagingService {
             case "COURSES" -> bulkImportService.importCoursesWithResolutions(request);
             case "ZONES" -> bulkImportService.importZonesWithResolutions(request);
             case "FEATURES" -> bulkImportService.importFeaturesWithResolutions(request);
-            case "LECTURERS" -> bulkImportService.importLecturersWithResolutions(request);
+            case "LECTURERS" -> throw new IllegalStateException(
+                    "Lecturers CSV import has been retired. Use users import with LECTURER role.");
             case "ROOMS" -> bulkImportService.importRoomsWithResolutions(request);
             case "STUDENT-GROUPS", "STUDENTGROUPS" -> bulkImportService.importStudentGroupsWithResolutions(request);
             default -> throw new IllegalArgumentException("Resolutions not supported for: " + entityType);
@@ -311,14 +316,20 @@ public class StagingService {
      */
     @Transactional(readOnly = true)
     public BulkImportResult previewBatch(Long batchId) throws Exception {
+        long startMs = System.currentTimeMillis();
         ImportBatch batch = importBatchRepository.findById(batchId)
                 .orElseThrow(() -> new IllegalArgumentException("Batch not found"));
 
         List<String[]> rows = parseBytes(batch.getFileData());
         try {
-            return executeImport(rows, batch.getEntityType(), true, batch.getOriginalFilename());
+            BulkImportResult result = executeImport(rows, batch.getEntityType(), true, batch.getOriginalFilename());
+            log.info("previewBatch(batchId={}, entityType={}, rows={}) completed in {} ms", batchId,
+                    batch.getEntityType(), rows.size(), System.currentTimeMillis() - startMs);
+            return compactResultForPreview(result);
         } catch (com.university.timetable.service.BulkImportService.BulkImportException e) {
-            return e.getResult();
+            log.info("previewBatch(batchId={}, entityType={}, rows={}) completed with validation errors in {} ms",
+                    batchId, batch.getEntityType(), rows.size(), System.currentTimeMillis() - startMs);
+            return compactResultForPreview(e.getResult());
         }
     }
 
@@ -336,7 +347,8 @@ public class StagingService {
     private BulkImportResult executeImport(List<String[]> rows, String entityType, boolean dryRun,
             String originalFilename) throws Exception {
         return switch (entityType.toUpperCase()) {
-            case "LECTURERS" -> bulkImportService.importLecturers(rows, dryRun, originalFilename);
+            case "LECTURERS" -> throw new IllegalStateException(
+                    "Lecturers CSV import has been retired. Use users import with LECTURER role.");
             case "ROOMS" -> bulkImportService.importRooms(rows, dryRun, originalFilename);
             case "STUDENT-GROUPS", "STUDENTGROUPS" ->
                 bulkImportService.importStudentGroups(rows, dryRun, originalFilename);
@@ -431,6 +443,7 @@ public class StagingService {
 
     @Transactional
     public void submitDraft(Long id, User user) throws Exception {
+        long startMs = System.currentTimeMillis();
         ImportBatch draft = getDraft(id, user);
 
         // Validate before submitting (throws exception if invalid)
@@ -443,11 +456,32 @@ public class StagingService {
                                                  // prefer updated time.
         draft.setSubmissionNote("Submitted from Draft");
         importBatchRepository.save(draft);
+        log.info("submitDraft(id={}, entityType={}, user={}) completed in {} ms",
+                id, draft.getEntityType(), user.getEmail(), System.currentTimeMillis() - startMs);
     }
 
     private List<String[]> parseBytes(byte[] data) throws Exception {
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(new ByteArrayInputStream(data), StandardCharsets.UTF_8));
         return bulkImportService.parseCsv(reader);
+    }
+
+    private BulkImportResult compactResultForApproval(BulkImportResult result) {
+        // Approval UI only needs summary counts, not per-row payloads.
+        result.setValidRows(new ArrayList<>());
+        result.setWarningRows(new ArrayList<>());
+        result.setConflicts(new ArrayList<>());
+        result.setGeneratedCsv(null);
+        return result;
+    }
+
+    private BulkImportResult compactResultForPreview(BulkImportResult result) {
+        if (result.getValidRows() != null && result.getValidRows().size() > PREVIEW_MAX_VALID_ROWS) {
+            int total = result.getValidRows().size();
+            result.setValidRows(new ArrayList<>(result.getValidRows().subList(0, PREVIEW_MAX_VALID_ROWS)));
+            result.getGlobalErrors().add("Preview truncated to first " + PREVIEW_MAX_VALID_ROWS + " valid rows out of "
+                    + total + " rows for performance.");
+        }
+        return result;
     }
 }

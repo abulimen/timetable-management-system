@@ -38,6 +38,9 @@ import {
             
             <!-- Standard Score Display -->
             <p *ngIf="status?.state !== 'ERROR'" class="text-secondary-500 mt-1">Score: {{ status?.score || 'N/A' }}</p>
+            <p *ngIf="status?.durationMs != null" class="text-secondary-500 mt-1">
+              Solve time: {{ formatDuration(status?.durationMs ?? 0) }}
+            </p>
             
             <!-- Error Alert -->
             <div *ngIf="status?.state === 'ERROR'" class="mt-4 p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-200 rounded-lg flex items-start gap-3 max-w-xl">
@@ -68,6 +71,12 @@ import {
               [disabled]="!isSolving"
               class="btn btn-danger disabled:opacity-50">
               Stop
+            </button>
+            <button
+              (click)="clearCurrentTimetable()"
+              [disabled]="isSolving"
+              class="btn btn-danger disabled:opacity-50">
+              Clear Timetable
             </button>
           </div>
         </div>
@@ -111,7 +120,13 @@ import {
         <div *ngIf="featureDiagnostics?.items?.length" class="mb-5">
           <h3 class="font-medium mb-2">Top Feature Risks</h3>
           <div *ngFor="let item of (featureDiagnostics?.items || []).slice(0, 5)" class="p-3 mb-2 rounded-lg bg-secondary-100 dark:bg-secondary-700">
-            <p class="font-medium">{{ item.name }} <span class="text-xs ml-2">({{ item.risk }})</span></p>
+            <p class="font-medium">
+              {{ item.name }}
+              <span class="ml-2 px-2 py-0.5 rounded text-xs font-semibold border"
+                [ngClass]="riskBadgeClass(item.risk)">
+                {{ normalizeRisk(item.risk) }}
+              </span>
+            </p>
             <p class="text-xs text-secondary-500">Demand {{ item.demandCount }} / Supply {{ item.supplyCount }} / Scarcity {{ item.scarcityRatio ?? 'INF' }}</p>
           </div>
         </div>
@@ -119,7 +134,13 @@ import {
         <div *ngIf="lecturerDiagnostics?.items?.length">
           <h3 class="font-medium mb-2">Top Lecturer Load Risks</h3>
           <div *ngFor="let item of (lecturerDiagnostics?.items || []).slice(0, 5)" class="p-3 mb-2 rounded-lg bg-secondary-100 dark:bg-secondary-700">
-            <p class="font-medium">{{ item.name }} <span class="text-xs ml-2">({{ item.risk }})</span></p>
+            <p class="font-medium">
+              {{ item.name }}
+              <span class="ml-2 px-2 py-0.5 rounded text-xs font-semibold border"
+                [ngClass]="riskBadgeClass(item.risk)">
+                {{ normalizeRisk(item.risk) }}
+              </span>
+            </p>
             <p class="text-xs text-secondary-500">Assigned {{ item.assignedHours }}h / Available {{ item.availableHours }}h / Ratio {{ (item.loadRatio * 100).toFixed(0) }}%</p>
           </div>
         </div>
@@ -273,6 +294,33 @@ export class SolverComponent implements OnInit, OnDestroy {
     });
   }
 
+  clearCurrentTimetable() {
+    const first = window.confirm(
+      'This will clear ALL current lesson assignments (timeslot/room) and unpin lessons. Imported data remains. Continue?'
+    );
+    if (!first) {
+      return;
+    }
+
+    const second = window.confirm(
+      'Final confirmation: clear the current timetable now? This action cannot be undone.'
+    );
+    if (!second) {
+      return;
+    }
+
+    this.api.clearCurrentTimetable().subscribe({
+      next: (res) => {
+        alert(`Timetable cleared. Lessons updated: ${res.lessonsCleared}`);
+        this.loadStatus();
+      },
+      error: (err) => {
+        const message = err?.error?.message || 'Failed to clear timetable.';
+        alert(message);
+      }
+    });
+  }
+
 
   checkFeasibility() {
     this.api.getFeasibility().subscribe({ next: (f) => this.feasibility = f });
@@ -286,5 +334,34 @@ export class SolverComponent implements OnInit, OnDestroy {
     this.api.getCourseFeasibilityDiagnostics().subscribe({ next: (d) => this.courseDiagnostics = d });
     this.api.getFeatureScarcityDiagnostics().subscribe({ next: (d) => this.featureDiagnostics = d });
     this.api.getLecturerLoadDiagnostics().subscribe({ next: (d) => this.lecturerDiagnostics = d });
+  }
+
+  normalizeRisk(risk: string | null | undefined): string {
+    return (risk || 'LOW').toUpperCase();
+  }
+
+  riskBadgeClass(risk: string | null | undefined): string {
+    const level = this.normalizeRisk(risk);
+    if (level === 'CRITICAL') return 'bg-red-100 text-red-800 border-red-300 dark:bg-red-900/30 dark:text-red-200 dark:border-red-700';
+    if (level === 'HIGH') return 'bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-900/30 dark:text-orange-200 dark:border-orange-700';
+    if (level === 'MEDIUM') return 'bg-yellow-100 text-yellow-800 border-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-200 dark:border-yellow-700';
+    return 'bg-green-100 text-green-800 border-green-300 dark:bg-green-900/30 dark:text-green-200 dark:border-green-700';
+  }
+
+  formatDuration(durationMs: number): string {
+    if (!Number.isFinite(durationMs) || durationMs < 0) {
+      return 'N/A';
+    }
+    const totalSeconds = Math.floor(durationMs / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    const millis = durationMs % 1000;
+    if (minutes > 0) {
+      return `${minutes}m ${seconds}s`;
+    }
+    if (seconds > 0) {
+      return `${seconds}.${Math.floor(millis / 100)}s`;
+    }
+    return `${durationMs}ms`;
   }
 }

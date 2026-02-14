@@ -34,8 +34,8 @@ export const routes: Routes = [
     },
     {
         path: 'lecturer-unavailabilities',
-        loadComponent: () => import('./features/lecturer-unavailabilities/lecturer-unavailabilities.component').then(m => m.LecturerUnavailabilitiesComponent),
-        canActivate: [authGuard, coordinatorGuard]
+        redirectTo: 'availability-requests',
+        pathMatch: 'full'
     },
     {
         path: 'zones',

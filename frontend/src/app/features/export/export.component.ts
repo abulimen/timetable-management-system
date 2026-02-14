@@ -1,7 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ApiService, ExportDepartment, StudentGroup } from '../../core/services/api.service';
+import { ActivatedRoute } from '@angular/router';
+import { ApiService, StudentGroup } from '../../core/services/api.service';
 
 @Component({
     selector: 'app-export',
@@ -12,7 +13,9 @@ import { ApiService, ExportDepartment, StudentGroup } from '../../core/services/
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold text-secondary-900 dark:text-white">Export Timetable</h1>
-          <p class="text-sm text-secondary-500 mt-1">Download timetables as PDF or Excel files</p>
+          <p class="text-sm text-secondary-500 mt-1">
+            {{ archiveCode ? ('Download archived timetable: ' + archiveCode) : 'Download timetables as PDF or Excel files' }}
+          </p>
         </div>
       </div>
 
@@ -36,35 +39,14 @@ import { ApiService, ExportDepartment, StudentGroup } from '../../core/services/
                 <span class="ml-2 text-sm">🏫 Whole School (All Groups)</span>
               </label>
               <label class="inline-flex items-center cursor-pointer">
-                <input type="radio" name="scope" value="DEPARTMENTS" [(ngModel)]="scope" class="w-4 h-4 text-primary-600">
-                <span class="ml-2 text-sm">🏢 Select Departments</span>
-              </label>
-              <label class="inline-flex items-center cursor-pointer">
                 <input type="radio" name="scope" value="GROUPS" [(ngModel)]="scope" class="w-4 h-4 text-primary-600">
                 <span class="ml-2 text-sm">👥 Select Specific Groups</span>
               </label>
             </div>
 
-            <!-- Department Selection -->
-            <div *ngIf="scope === 'DEPARTMENTS'" class="border border-secondary-300 dark:border-secondary-600 rounded-lg p-4">
-              <p class="text-sm text-secondary-500 mb-3">Select departments (includes all child groups):</p>
-              <div class="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
-                <label *ngFor="let d of departments" 
-                       class="inline-flex items-center px-3 py-2 rounded-lg border cursor-pointer transition-all"
-                       [class.bg-primary-100]="isSelected(d.id)"
-                       [class.border-primary-500]="isSelected(d.id)"
-                       [class.dark:bg-primary-900]="isSelected(d.id)"
-                       [class.border-secondary-300]="!isSelected(d.id)"
-                       [class.dark:border-secondary-600]="!isSelected(d.id)">
-                  <input type="checkbox" [checked]="isSelected(d.id)" (change)="toggleSelection(d.id)" class="mr-2">
-                  <span class="text-sm">{{ d.name }} <span class="text-secondary-400">({{ d.childCount }} groups)</span></span>
-                </label>
-              </div>
-            </div>
-
             <!-- Group Selection -->
             <div *ngIf="scope === 'GROUPS'" class="border border-secondary-300 dark:border-secondary-600 rounded-lg p-4">
-              <p class="text-sm text-secondary-500 mb-3">Select specific student groups:</p>
+              <p class="text-sm text-secondary-500 mb-3">Select child student groups:</p>
               <div class="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
                 <label *ngFor="let g of studentGroups" 
                        class="inline-flex items-center px-3 py-2 rounded-lg border cursor-pointer transition-all"
@@ -84,7 +66,7 @@ import { ApiService, ExportDepartment, StudentGroup } from '../../core/services/
           <div *ngIf="scope !== 'ALL' && selectedIds.length > 0" 
                class="bg-primary-50 dark:bg-primary-900/30 p-4 rounded-lg">
             <p class="text-sm text-primary-700 dark:text-primary-300">
-              <strong>{{ selectedIds.length }}</strong> {{ scope === 'DEPARTMENTS' ? 'departments' : 'groups' }} selected
+              <strong>{{ selectedIds.length }}</strong> groups selected
             </p>
           </div>
 
@@ -117,9 +99,8 @@ import { ApiService, ExportDepartment, StudentGroup } from '../../core/services/
         <div class="text-sm text-secondary-600 dark:text-secondary-400 space-y-1">
           <p><strong>Title:</strong> {{ exportTitle || 'Timetable Export' }}</p>
           <p><strong>Scope:</strong> 
-            <span *ngIf="scope === 'ALL'">All student groups</span>
-            <span *ngIf="scope === 'DEPARTMENTS'">{{ selectedIds.length }} department(s) + children</span>
-            <span *ngIf="scope === 'GROUPS'">{{ selectedIds.length }} specific group(s)</span>
+            <span *ngIf="scope === 'ALL'">All child student groups</span>
+            <span *ngIf="scope === 'GROUPS'">{{ selectedIds.length }} specific child group(s)</span>
           </p>
           <p><strong>Excel Format:</strong> One sheet per group with weekly timetable grid</p>
           <p><strong>PDF Format:</strong> Landscape A4, one page per group</p>
@@ -130,24 +111,31 @@ import { ApiService, ExportDepartment, StudentGroup } from '../../core/services/
 })
 export class ExportComponent implements OnInit {
     private api = inject(ApiService);
+    private route = inject(ActivatedRoute);
 
-    scope: 'ALL' | 'DEPARTMENTS' | 'GROUPS' = 'ALL';
+    scope: 'ALL' | 'GROUPS' = 'ALL';
     exportTitle = '';
     selectedIds: number[] = [];
-    departments: ExportDepartment[] = [];
     studentGroups: StudentGroup[] = [];
     exporting = false;
+    archiveCode: string | null = null;
 
     ngOnInit() {
+        this.archiveCode = this.route.snapshot.queryParamMap.get('archiveCode');
+        if (this.archiveCode) {
+            this.exportTitle = `Archived Timetable - ${this.archiveCode}`;
+        }
         this.loadData();
     }
 
     loadData() {
-        this.api.getExportDepartments().subscribe({
-            next: (deps) => this.departments = deps.filter(d => d.isParent || d.childCount > 0)
-        });
-        this.api.getStudentGroups().subscribe({
+        const request$ = this.archiveCode
+            ? this.api.getArchivedSemesterGroups(this.archiveCode)
+            : this.api.getStudentGroups();
+        request$.subscribe({
             next: (groups) => this.studentGroups = groups
+                .filter(group => group.parentGroupId !== null)
+                .sort((a, b) => a.name.localeCompare(b.name))
         });
     }
 
@@ -177,16 +165,20 @@ export class ExportComponent implements OnInit {
 
         const payload = {
             groupIds: this.scope === 'ALL' ? [] : this.selectedIds,
-            title: this.exportTitle || 'Timetable Export'
+            title: this.exportTitle || (this.archiveCode ? 'Archived Timetable Export' : 'Timetable Export')
         };
 
-        this.api.exportTimetable(format, payload).subscribe({
+        const request$ = this.archiveCode
+            ? this.api.exportArchivedTimetable(format, this.archiveCode, payload)
+            : this.api.exportTimetable(format, payload);
+        request$.subscribe({
             next: (blob) => {
                 this.exporting = false;
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `timetable_${new Date().toISOString().slice(0, 10)}.${extension}`;
+                const prefix = this.archiveCode ? `archived_timetable_${this.archiveCode}` : `timetable_${new Date().toISOString().slice(0, 10)}`;
+                a.download = `${prefix}.${extension}`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);

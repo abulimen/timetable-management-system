@@ -101,4 +101,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * Count active users.
      */
     long countByActiveTrue();
+
+    /**
+     * Get all user identifiers (email, phone) for validation.
+     */
+    @Query("SELECT new com.university.timetable.dto.UserIdentifierDTO(u.email, u.phone) FROM User u")
+    List<com.university.timetable.dto.UserIdentifierDTO> findAllIdentifiers();
 }

@@ -83,6 +83,25 @@ npm start
 - **Frontend:** http://localhost:4200
 - **Backend API:** http://localhost:8080/api/v1
 
+### 5. Production Configuration
+
+Backend (`SPRING_PROFILES_ACTIVE=prod`) required environment variables:
+
+- `DB_URL`
+- `DB_USERNAME`
+- `DB_PASSWORD`
+- `JWT_SECRET`
+- `BREVO_API_KEY`
+- `BREVO_SENDER_EMAIL`
+- `APP_LOGIN_URL`
+- `APP_CORS_ALLOWED_ORIGINS` (comma-separated, e.g. `https://app.example.com,https://admin.example.com`)
+
+Frontend runtime API base URL:
+
+- Set `window.__BUTMS_CONFIG__.apiBaseUrl` in `frontend/src/assets/runtime-config.js`
+- Example value: `https://api.example.com`
+- This avoids rebuilding Angular for each environment.
+
 ---
 
 ## 📚 Documentation

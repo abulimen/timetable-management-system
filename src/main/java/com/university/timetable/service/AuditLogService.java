@@ -48,7 +48,13 @@ public class AuditLogService {
             String entityName, Object previousValue, Object newValue,
             String description) {
         try {
-            logActionSync(action, entityType, entityId, entityName, previousValue, newValue, description, true, null);
+            String userId = AuditRequestContext.getCurrentUserId();
+            String userName = getUserName(userId);
+            String ipAddress = AuditRequestContext.getClientIpAddress();
+            String sessionId = AuditRequestContext.getSessionId();
+            String requestId = AuditRequestContext.getOrCreateRequestId();
+            persistAuditLog(action, entityType, entityId, entityName, previousValue, newValue, description, true, null,
+                    userId, userName, ipAddress, sessionId, requestId);
         } catch (Exception e) {
             log.error("Failed to log audit action: {}", e.getMessage(), e);
         }
@@ -66,29 +72,9 @@ public class AuditLogService {
             String userName = getUserName(userId);
             String ipAddress = AuditRequestContext.getClientIpAddress();
             String sessionId = AuditRequestContext.getSessionId();
-
-            AuditLog auditLog = AuditLog.builder()
-                    .timestamp(LocalDateTime.now())
-                    .actorType(userId != null ? ActorType.USER : ActorType.SYSTEM)
-                    .actorId(userId)
-                    .actorName(userName)
-                    .actorIpAddress(ipAddress)
-                    .action(action)
-                    .entityType(entityType)
-                    .entityId(entityId)
-                    .entityName(entityName)
-                    .previousValue(toJson(previousValue))
-                    .newValue(toJson(newValue))
-                    .changedFields(getChangedFields(previousValue, newValue))
-                    .description(description)
-                    .requestId(UUID.randomUUID().toString().substring(0, 8))
-                    .sessionId(sessionId)
-                    .success(success)
-                    .errorMessage(errorMessage)
-                    .build();
-
-            auditLogRepository.save(auditLog);
-            log.debug("Audit logged: {} {} {} by {}", action, entityType, entityId, userId);
+            String requestId = AuditRequestContext.getOrCreateRequestId();
+            persistAuditLog(action, entityType, entityId, entityName, previousValue, newValue, description, success,
+                    errorMessage, userId, userName, ipAddress, sessionId, requestId);
         } catch (Exception e) {
             log.error("Failed to save audit log: {}", e.getMessage(), e);
         }
@@ -107,7 +93,7 @@ public class AuditLogService {
                     .actorName("System")
                     .action(AuditAction.SYSTEM_ACTION)
                     .description(description)
-                    .requestId(UUID.randomUUID().toString().substring(0, 8))
+                    .requestId(AuditRequestContext.getOrCreateRequestId())
                     .success(success)
                     .errorMessage(errorMessage)
                     .build();
@@ -136,7 +122,7 @@ public class AuditLogService {
                     .actorIpAddress(AuditRequestContext.getClientIpAddress())
                     .action(AuditAction.SYSTEM_ACTION)
                     .description(description)
-                    .requestId(UUID.randomUUID().toString().substring(0, 8))
+                    .requestId(AuditRequestContext.getOrCreateRequestId())
                     .success(success)
                     .build();
 
@@ -279,6 +265,34 @@ public class AuditLogService {
         }
     }
 
+    private void persistAuditLog(AuditAction action, String entityType, String entityId,
+            String entityName, Object previousValue, Object newValue, String description,
+            boolean success, String errorMessage, String userId, String userName, String ipAddress,
+            String sessionId, String requestId) {
+        AuditLog auditLog = AuditLog.builder()
+                .timestamp(LocalDateTime.now())
+                .actorType(userId != null ? ActorType.USER : ActorType.SYSTEM)
+                .actorId(userId)
+                .actorName(userName)
+                .actorIpAddress(ipAddress)
+                .action(action)
+                .entityType(entityType)
+                .entityId(entityId)
+                .entityName(entityName)
+                .previousValue(toJson(previousValue))
+                .newValue(toJson(newValue))
+                .changedFields(getChangedFields(previousValue, newValue))
+                .description(description)
+                .requestId(requestId)
+                .sessionId(sessionId)
+                .success(success)
+                .errorMessage(errorMessage)
+                .build();
+
+        auditLogRepository.save(auditLog);
+        log.debug("Audit logged: {} {} {} by {} (requestId={})", action, entityType, entityId, userId, requestId);
+    }
+
     private String toJson(Object obj) {
         if (obj == null) {
             return null;
@@ -295,8 +309,109 @@ public class AuditLogService {
         if (previous == null || current == null) {
             return null;
         }
-        // For simplicity, return null - could implement field comparison if needed
-        return null;
+
+        try {
+            Map<String, Object> previousMap = toComparableMap(previous);
+            Map<String, Object> currentMap = toComparableMap(current);
+            if (previousMap.isEmpty() || currentMap.isEmpty()) {
+                return null;
+            }
+
+            Set<String> keys = new TreeSet<>();
+            keys.addAll(previousMap.keySet());
+            keys.addAll(currentMap.keySet());
+
+            List<String> changed = new ArrayList<>();
+            for (String key : keys) {
+                if (!Objects.equals(normalizeValue(previousMap.get(key)), normalizeValue(currentMap.get(key)))) {
+                    changed.add(key);
+                }
+            }
+
+            if (changed.isEmpty()) {
+                return null;
+            }
+
+            String joined = String.join(",", changed);
+            if (joined.length() <= 1000) {
+                return joined;
+            }
+
+            // Keep only as many field names as fit the DB column.
+            StringBuilder limited = new StringBuilder();
+            int omitted = 0;
+            for (String field : changed) {
+                String next = limited.isEmpty() ? field : "," + field;
+                if (limited.length() + next.length() > 980) {
+                    omitted++;
+                    continue;
+                }
+                limited.append(next);
+            }
+            if (omitted > 0) {
+                limited.append("...+").append(omitted).append(" more");
+            }
+            return limited.toString();
+        } catch (Exception e) {
+            log.debug("Could not compute changedFields diff: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> toComparableMap(Object value) {
+        if (value == null) {
+            return Collections.emptyMap();
+        }
+        if (value instanceof String s) {
+            try {
+                return objectMapper.readValue(s, Map.class);
+            } catch (Exception ignored) {
+                // Not JSON map string; fall through to conversion.
+            }
+        }
+
+        Object converted = objectMapper.convertValue(value, Object.class);
+        if (converted instanceof Map<?, ?> map) {
+            Map<String, Object> normalized = new LinkedHashMap<>();
+            map.forEach((k, v) -> {
+                if (k != null) {
+                    normalized.put(String.valueOf(k), v);
+                }
+            });
+            return normalized;
+        }
+        return Collections.emptyMap();
+    }
+
+    private Object normalizeValue(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof Map<?, ?> map) {
+            Map<String, Object> normalized = new TreeMap<>();
+            map.forEach((k, v) -> normalized.put(String.valueOf(k), normalizeValue(v)));
+            return normalized;
+        }
+        if (value instanceof Collection<?> collection) {
+            List<Object> normalizedItems = collection.stream()
+                    .map(this::normalizeValue)
+                    .map(item -> item != null ? item.toString() : "null")
+                    .sorted()
+                    .collect(Collectors.toList());
+            return normalizedItems;
+        }
+        if (value.getClass().isArray()) {
+            int length = java.lang.reflect.Array.getLength(value);
+            List<String> normalizedItems = new ArrayList<>(length);
+            for (int i = 0; i < length; i++) {
+                Object item = java.lang.reflect.Array.get(value, i);
+                normalizedItems.add(item != null ? normalizeValue(item).toString() : "null");
+            }
+            Collections.sort(normalizedItems);
+            return normalizedItems;
+        }
+        return value;
     }
 
     private String nullSafe(Object obj) {

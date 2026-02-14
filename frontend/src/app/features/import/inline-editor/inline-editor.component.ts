@@ -342,6 +342,10 @@ function multiValuePillRenderer(
           </div>
           <div class="toolbar-right">
             <span class="row-count">{{ rowCount }} rows</span>
+            <span class="validation-summary">
+              <span class="required-note">* Required</span>
+              <span class="optional-note">Optional = can be empty</span>
+            </span>
             <span *ngIf="referenceMismatchCount > 0" class="validation-summary has-errors">
               <span class="error-count">🔴 {{ referenceMismatchCount }} mismatches</span>
             </span>
@@ -373,7 +377,7 @@ function multiValuePillRenderer(
           </div>
           <div class="footer-right">
             <button class="btn btn-ghost" (click)="requestClose()">Cancel</button>
-            <button class="btn btn-primary" (click)="saveAndClose()">
+            <button class="btn btn-primary" (click)="saveAndClose()" [disabled]="!!validationSummary && validationSummary.errorCount > 0">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
               Save and Close
             </button>
@@ -512,6 +516,17 @@ function multiValuePillRenderer(
 
     .error-count {
       color: #dc2626;
+    }
+
+    .required-note {
+      color: #1d4ed8;
+      font-weight: 600;
+      margin-right: 8px;
+    }
+
+    .optional-note {
+      color: #64748b;
+      font-size: 0.85em;
     }
 
     /* Loading Overlay */
@@ -818,8 +833,8 @@ export class InlineEditorComponent implements OnInit, AfterViewInit, OnChanges, 
       if (col.autocompleteValues) {
         config.type = 'autocomplete';
         config.source = col.autocompleteValues();
-        config.strict = false;
-        config.allowInvalid = true;
+        config.strict = !!col.strictAutocomplete;
+        config.allowInvalid = !col.strictAutocomplete;
       }
 
       return config;
@@ -833,10 +848,17 @@ export class InlineEditorComponent implements OnInit, AfterViewInit, OnChanges, 
         const header = colDef?.headerName || this.headers[colIndex] || '';
         const count = this.columnErrorCounts.get(colIndex) || 0;
         const supportsMultiple = colDef?.supportsMultiple || false;
+        const required = colDef?.required === true;
+        const optional = colDef?.required === false;
 
         let headerHtml = header;
+        if (required) {
+          headerHtml = `${headerHtml} <span style="color:#1d4ed8;font-size:0.75em;font-weight:600;">[Required]</span>`;
+        } else if (optional) {
+          headerHtml = `${headerHtml} <span style="color:#6b7280;font-size:0.75em;font-weight:500;">[Optional]</span>`;
+        }
         if (supportsMultiple) {
-          headerHtml = `${header} <span style="color: #6b7280; font-size: 0.75em; font-weight: normal;">(use | for multiple)</span>`;
+          headerHtml = `${headerHtml} <span style="color: #6b7280; font-size: 0.75em; font-weight: normal;">(use | for multiple)</span>`;
         }
 
         if (count > 0) {
@@ -909,7 +931,8 @@ export class InlineEditorComponent implements OnInit, AfterViewInit, OnChanges, 
           } else {
             config.type = 'autocomplete';
             config.source = colDef.autocompleteValues();
-            config.strict = false;
+            config.strict = !!colDef.strictAutocomplete;
+            config.allowInvalid = !colDef.strictAutocomplete;
             config.renderer = this.getErrorRenderer('autocomplete');
           }
         } else {
@@ -1203,6 +1226,9 @@ export class InlineEditorComponent implements OnInit, AfterViewInit, OnChanges, 
    * Save data and close the modal.
    */
   saveAndClose() {
+    if (this.validationSummary?.errorCount && this.validationSummary.errorCount > 0) {
+      return;
+    }
     const data = this.getData();
     this.saveData.emit(data);
     this.closeModal.emit();

@@ -6,8 +6,10 @@ import com.university.timetable.domain.User;
 import com.university.timetable.service.BulkImportService;
 import com.university.timetable.service.ConstraintSettingsService;
 import com.university.timetable.service.DataWipeService;
+import com.university.timetable.service.AuditLogService;
 import com.university.timetable.service.ImportHistoryService;
 import com.university.timetable.service.StagingService;
+import com.university.timetable.domain.AuditAction;
 import com.university.timetable.repository.UserRepository;
 import com.university.timetable.dto.BulkImportResult;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +42,7 @@ public class BulkOperationsController {
     private final ConstraintSettingsService constraintSettingsService;
     private final StagingService stagingService;
     private final UserRepository userRepository;
+    private final AuditLogService auditLogService;
 
     /**
      * DELETE /api/v1/bulk/system-wipe
@@ -53,6 +56,16 @@ public class BulkOperationsController {
 
         if (!"DELETE".equals(token)) {
             log.warn("System wipe rejected - invalid confirmation token");
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "BulkOperation",
+                    "system-wipe",
+                    "System Wipe",
+                    null,
+                    null,
+                    "System wipe rejected due to invalid confirmation token",
+                    false,
+                    "CONFIRMATION_REQUIRED");
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "CONFIRMATION_REQUIRED",
                     "message", "You must provide confirmationToken: 'DELETE' to proceed"));
@@ -62,6 +75,14 @@ public class BulkOperationsController {
         Map<String, Long> deletedCounts = dataWipeService.wipeAllData();
 
         long totalDeleted = deletedCounts.values().stream().mapToLong(Long::longValue).sum();
+        auditLogService.logAction(
+                AuditAction.SYSTEM_ACTION,
+                "BulkOperation",
+                "system-wipe",
+                "System Wipe",
+                null,
+                Map.of("totalDeleted", totalDeleted, "breakdown", deletedCounts),
+                "System wipe completed");
 
         return ResponseEntity.ok(Map.of(
                 "status", "WIPED",
@@ -89,12 +110,30 @@ public class BulkOperationsController {
 
         try {
             long deleted = dataWipeService.deleteAllOfType(entity);
+            auditLogService.logAction(
+                    AuditAction.SYSTEM_ACTION,
+                    "BulkOperation",
+                    entity,
+                    "Delete All",
+                    null,
+                    Map.of("entity", entity, "deleted", deleted),
+                    "Bulk delete-all completed for " + entity);
             return ResponseEntity.ok(Map.of(
                     "status", "DELETED",
                     "entity", entity,
                     "deleted", deleted,
                     "message", String.format("Deleted %d %s records", deleted, entity)));
         } catch (IllegalArgumentException e) {
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "BulkOperation",
+                    entity,
+                    "Delete All",
+                    null,
+                    null,
+                    "Bulk delete-all failed for " + entity,
+                    false,
+                    e.getMessage());
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "INVALID_ENTITY",
                     "message", e.getMessage()));
@@ -106,11 +145,11 @@ public class BulkOperationsController {
      * Import records from CSV file.
      * 
      * Formats:
-     * - lecturers: name,email
      * - rooms: name,capacity,zoneName
      * - student-groups: name,size,parentGroupName
      * - zones: name
      * - courses: code,name,weeklyHours,lecturerEmail,studentGroupName
+     * - users: email,first_name,last_name,role,department,phone (staging workflow only)
      */
     @PostMapping("/{entity}/import")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
@@ -127,30 +166,85 @@ public class BulkOperationsController {
 
         log.info("Importing {} from CSV file: {} (dryRun={})", entity, file.getOriginalFilename(), dryRun);
 
+        // Enforce long-term import model:
+        // - Users imports go through staging/draft approval only
+        // - Lecturers CSV import is retired (use users import with LECTURER role)
+        if ("users".equalsIgnoreCase(entity)) {
+            return ResponseEntity.status(409).body(Map.of(
+                    "error", "USE_STAGING_IMPORT",
+                    "message", "Direct users import is disabled. Use Data Imports draft/staging workflow."));
+        }
+        if ("lecturers".equalsIgnoreCase(entity)) {
+            return ResponseEntity.status(410).body(Map.of(
+                    "error", "ENTITY_IMPORT_RETIRED",
+                    "message", "Lecturers CSV import has been retired. Import users with role=LECTURER instead."));
+        }
+
         try {
             BulkImportResult result = switch (entity.toLowerCase()) {
-                case "lecturers" -> bulkImportService.importLecturers(file, dryRun);
                 case "rooms" -> bulkImportService.importRooms(file, dryRun);
                 case "student-groups", "studentgroups" -> bulkImportService.importStudentGroups(file, dryRun);
                 case "zones" -> bulkImportService.importZones(file, dryRun);
                 case "features" -> bulkImportService.importFeatures(file, dryRun);
                 case "courses" -> bulkImportService.importCourses(file, dryRun);
-                case "users" -> bulkImportService.importUsers(file, dryRun);
                 default -> throw new IllegalArgumentException("Unknown entity type: " + entity);
             };
+            auditLogService.logAction(
+                    AuditAction.SYSTEM_ACTION,
+                    "BulkImport",
+                    entity,
+                    file.getOriginalFilename(),
+                    null,
+                    Map.of(
+                            "dryRun", dryRun,
+                            "createdCount", result.getCreatedCount(),
+                            "updatedCount", result.getUpdatedCount(),
+                            "skippedCount", result.getSkippedCount(),
+                            "errorCount", result.getErrorCount()),
+                    "Bulk import completed for " + entity);
 
             return ResponseEntity.ok(result);
 
         } catch (BulkImportService.BulkImportException e) {
             // Atomic import validation failed - return detailed result
             log.warn("Bulk import validation failed for {} with {} errors", entity, e.getResult().getErrorCount());
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "BulkImport",
+                    entity,
+                    file.getOriginalFilename(),
+                    null,
+                    null,
+                    "Bulk import validation failed for " + entity,
+                    false,
+                    "errorCount=" + e.getResult().getErrorCount());
             return ResponseEntity.unprocessableEntity().body(e.getResult());
         } catch (IllegalArgumentException e) {
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "BulkImport",
+                    entity,
+                    file.getOriginalFilename(),
+                    null,
+                    null,
+                    "Bulk import failed for " + entity,
+                    false,
+                    e.getMessage());
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "INVALID_ENTITY",
                     "message", e.getMessage()));
         } catch (Exception e) {
             log.error("Import failed", e);
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "BulkImport",
+                    entity,
+                    file.getOriginalFilename(),
+                    null,
+                    null,
+                    "Bulk import failed for " + entity,
+                    false,
+                    e.getMessage());
             return ResponseEntity.badRequest().body(Map.of(
                     "error", "IMPORT_FAILED",
                     "message", "Import failed: " + e.getMessage()));
@@ -184,14 +278,15 @@ public class BulkOperationsController {
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
     public ResponseEntity<Map<String, Object>> getImportFormats() {
         return ResponseEntity.ok(Map.of(
-                "lecturers", Map.of("format", "name,email", "example", "John Smith,john@uni.edu"),
                 "rooms", Map.of("format", "name,capacity,zone_name", "example", "Room A101,50,Building A"),
                 "student-groups", Map.of("format", "name,size,parent_group_name", "example", "COSC_1A,40,COSC_Year1"),
                 "zones", Map.of("format", "name", "example", "Building A"),
                 "courses",
                 Map.of("format", "code,name,weekly_hours,lecturer_email,student_group_name", "example",
                         "COSC101,Intro to Programming,3,john@uni.edu,COSC_1A"),
-                "importOrder", "1. Zones → 2. Lecturers → 3. Student Groups → 4. Rooms → 5. Courses"));
+                "users", Map.of("format", "email,first_name,last_name,role,department,phone", "example",
+                        "john@uni.edu,John,Doe,LECTURER,Computer Science,+1234567890"),
+                "importOrder", "1. Users → 2. Zones → 3. Student Groups → 4. Rooms → 5. Features → 6. Courses"));
     }
 
     // ==================== IMPORT HISTORY ENDPOINTS ====================
@@ -255,17 +350,45 @@ public class BulkOperationsController {
                 stagingService.restoreBatchFromHistory(id);
 
                 log.info("Import {} successfully rolled back by {}", id, userDetails.getUsername());
+                auditLogService.logAction(
+                        AuditAction.SYSTEM_ACTION,
+                        "BulkImportRollback",
+                        String.valueOf(id),
+                        "Import Rollback",
+                        null,
+                        Map.of("rolledBack", true),
+                        "Rolled back import history id " + id);
                 return ResponseEntity.ok(Map.of(
                         "status", "ROLLED_BACK",
                         "message", "Import has been successfully rolled back",
                         "importId", id));
             } else {
+                auditLogService.logActionSync(
+                        AuditAction.SYSTEM_ACTION,
+                        "BulkImportRollback",
+                        String.valueOf(id),
+                        "Import Rollback",
+                        null,
+                        null,
+                        "Rollback operation returned unsuccessful result",
+                        false,
+                        "ROLLBACK_FAILED");
                 return ResponseEntity.badRequest().body(Map.of(
                         "error", "ROLLBACK_FAILED",
                         "message", "Rollback operation failed"));
             }
         } catch (Exception e) {
             log.error("Rollback failed for import {}", id, e);
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "BulkImportRollback",
+                    String.valueOf(id),
+                    "Import Rollback",
+                    null,
+                    null,
+                    "Rollback failed for import " + id,
+                    false,
+                    e.getMessage());
             return ResponseEntity.internalServerError().body(Map.of(
                     "error", "ROLLBACK_ERROR",
                     "message", "An error occurred during rollback: " + e.getMessage()));
@@ -287,18 +410,52 @@ public class BulkOperationsController {
             @AuthenticationPrincipal UserDetails userDetails) {
 
         try {
+            if ("lecturers".equalsIgnoreCase(entityType)) {
+                return ResponseEntity.status(410).body(Map.of(
+                        "error", "ENTITY_IMPORT_RETIRED",
+                        "message", "Lecturers CSV import has been retired. Import users with role=LECTURER instead."));
+            }
+
             User uploader = userRepository.findByEmailIgnoreCase(userDetails.getUsername())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             var batch = stagingService.createBatch(file, entityType, uploader, note);
+            auditLogService.logAction(
+                    AuditAction.SYSTEM_ACTION,
+                    "ImportStaging",
+                    String.valueOf(batch.getId()),
+                    file.getOriginalFilename(),
+                    null,
+                    Map.of("entityType", entityType, "status", "SUBMITTED"),
+                    "Submitted file for approval workflow");
 
             return ResponseEntity.ok(Map.of(
                     "status", "SUBMITTED",
                     "message", "File submitted for approval",
                     "batchId", batch.getId()));
         } catch (com.university.timetable.service.BulkImportService.BulkImportException e) {
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "ImportStaging",
+                    entityType,
+                    file.getOriginalFilename(),
+                    null,
+                    null,
+                    "Submit for approval failed (validation errors)",
+                    false,
+                    "errorCount=" + e.getResult().getErrorCount());
             return ResponseEntity.unprocessableEntity().body(e.getResult());
         } catch (Exception e) {
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "ImportStaging",
+                    entityType,
+                    file.getOriginalFilename(),
+                    null,
+                    null,
+                    "Submit for approval failed",
+                    false,
+                    e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
@@ -354,8 +511,31 @@ public class BulkOperationsController {
             }
 
             BulkImportResult result = stagingService.approveBatch(batchId, approver, resolutions);
+            auditLogService.logAction(
+                    AuditAction.SYSTEM_ACTION,
+                    "ImportStaging",
+                    String.valueOf(batchId),
+                    "Batch Approval",
+                    null,
+                    Map.of(
+                            "approved", true,
+                            "createdCount", result.getCreatedCount(),
+                            "updatedCount", result.getUpdatedCount(),
+                            "skippedCount", result.getSkippedCount(),
+                            "errorCount", result.getErrorCount()),
+                    "Approved staged import batch");
             return ResponseEntity.ok(result);
         } catch (Exception e) {
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "ImportStaging",
+                    String.valueOf(batchId),
+                    "Batch Approval",
+                    null,
+                    null,
+                    "Batch approval failed",
+                    false,
+                    e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
@@ -376,8 +556,26 @@ public class BulkOperationsController {
 
             String reason = body != null ? body.get("reason") : null;
             stagingService.rejectBatch(batchId, rejector, reason);
+            auditLogService.logAction(
+                    AuditAction.SYSTEM_ACTION,
+                    "ImportStaging",
+                    String.valueOf(batchId),
+                    "Batch Rejection",
+                    null,
+                    Map.of("rejected", true, "reason", reason != null ? reason : ""),
+                    "Rejected staged import batch");
             return ResponseEntity.ok(Map.of("status", "REJECTED"));
         } catch (Exception e) {
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "ImportStaging",
+                    String.valueOf(batchId),
+                    "Batch Rejection",
+                    null,
+                    null,
+                    "Batch rejection failed",
+                    false,
+                    e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
@@ -396,10 +594,38 @@ public class BulkOperationsController {
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             ImportBatch newDraft = stagingService.revertToDraft(batchId, user);
+            auditLogService.logAction(
+                    AuditAction.SYSTEM_ACTION,
+                    "ImportDraft",
+                    String.valueOf(newDraft.getId()),
+                    "Revert To Draft",
+                    null,
+                    Map.of("sourceBatchId", batchId, "status", "DRAFT"),
+                    "Reverted rejected batch to draft");
             return ResponseEntity.ok(Map.of("status", "DRAFT", "id", newDraft.getId()));
         } catch (SecurityException e) {
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "ImportDraft",
+                    String.valueOf(batchId),
+                    "Revert To Draft",
+                    null,
+                    null,
+                    "Revert to draft forbidden",
+                    false,
+                    e.getMessage());
             return ResponseEntity.status(403).body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "ImportDraft",
+                    String.valueOf(batchId),
+                    "Revert To Draft",
+                    null,
+                    null,
+                    "Revert to draft failed",
+                    false,
+                    e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
@@ -417,14 +643,38 @@ public class BulkOperationsController {
             @RequestParam("file") MultipartFile file,
             @AuthenticationPrincipal UserDetails userDetails) {
         try {
+            if ("lecturers".equalsIgnoreCase(entityType)) {
+                return ResponseEntity.status(410).body(Map.of(
+                        "error", "ENTITY_IMPORT_RETIRED",
+                        "message", "Lecturers CSV import has been retired. Import users with role=LECTURER instead."));
+            }
+
             User uploader = userRepository.findByEmailIgnoreCase(userDetails.getUsername())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             var batch = stagingService.createDraft(file, entityType, uploader);
+            auditLogService.logAction(
+                    AuditAction.SYSTEM_ACTION,
+                    "ImportDraft",
+                    String.valueOf(batch.getId()),
+                    file.getOriginalFilename(),
+                    null,
+                    Map.of("entityType", entityType, "status", "DRAFT_CREATED"),
+                    "Created import draft");
             return ResponseEntity.ok(Map.of(
                     "status", "DRAFT_CREATED",
                     "draftId", batch.getId()));
         } catch (Exception e) {
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "ImportDraft",
+                    entityType,
+                    file.getOriginalFilename(),
+                    null,
+                    null,
+                    "Create draft failed",
+                    false,
+                    e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
@@ -501,8 +751,26 @@ public class BulkOperationsController {
                 throw new IllegalArgumentException("Content required");
 
             stagingService.updateDraft(id, user, content);
+            auditLogService.logAction(
+                    AuditAction.SYSTEM_ACTION,
+                    "ImportDraft",
+                    String.valueOf(id),
+                    "Draft Update",
+                    null,
+                    Map.of("updated", true),
+                    "Updated import draft content");
             return ResponseEntity.ok(Map.of("status", "UPDATED"));
         } catch (Exception e) {
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "ImportDraft",
+                    String.valueOf(id),
+                    "Draft Update",
+                    null,
+                    null,
+                    "Update draft failed",
+                    false,
+                    e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
@@ -521,14 +789,52 @@ public class BulkOperationsController {
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             stagingService.submitDraft(id, user);
+            auditLogService.logAction(
+                    AuditAction.SYSTEM_ACTION,
+                    "ImportDraft",
+                    String.valueOf(id),
+                    "Draft Submit",
+                    null,
+                    Map.of("submitted", true),
+                    "Submitted draft for approval");
             return ResponseEntity.ok(Map.of("status", "SUBMITTED"));
         } catch (IllegalArgumentException e) {
             // Validation error often comes as IllegalArgumentException from
             // BulkImportService
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "ImportDraft",
+                    String.valueOf(id),
+                    "Draft Submit",
+                    null,
+                    null,
+                    "Submit draft failed",
+                    false,
+                    e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (com.university.timetable.service.BulkImportService.BulkImportException e) {
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "ImportDraft",
+                    String.valueOf(id),
+                    "Draft Submit",
+                    null,
+                    null,
+                    "Submit draft failed (validation errors)",
+                    false,
+                    "errorCount=" + e.getResult().getErrorCount());
             return ResponseEntity.unprocessableEntity().body(e.getResult());
         } catch (Exception e) {
+            auditLogService.logActionSync(
+                    AuditAction.SYSTEM_ACTION,
+                    "ImportDraft",
+                    String.valueOf(id),
+                    "Draft Submit",
+                    null,
+                    null,
+                    "Submit draft failed",
+                    false,
+                    e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
@@ -547,8 +853,26 @@ public class BulkOperationsController {
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             stagingService.deleteDraft(id, user);
+            auditLogService.logAction(
+                    AuditAction.DELETE,
+                    "ImportDraft",
+                    String.valueOf(id),
+                    "Draft Delete",
+                    null,
+                    null,
+                    "Deleted import draft");
             return ResponseEntity.ok(Map.of("status", "DELETED"));
         } catch (Exception e) {
+            auditLogService.logActionSync(
+                    AuditAction.DELETE,
+                    "ImportDraft",
+                    String.valueOf(id),
+                    "Draft Delete",
+                    null,
+                    null,
+                    "Delete draft failed",
+                    false,
+                    e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }

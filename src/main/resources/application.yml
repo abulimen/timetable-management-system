@@ -53,6 +53,12 @@ optaplanner:
     # OPTIMIZATION: Use all CPU cores for parallel move evaluation
     move-thread-count: AUTO
 
+# Solver runtime tuning
+solver:
+  persistence:
+    min-interval-ms: ${SOLVER_PERSISTENCE_MIN_INTERVAL_MS:5000}
+    every-n-improvements: ${SOLVER_PERSISTENCE_EVERY_N_IMPROVEMENTS:10}
+
 # Server Configuration
 server:
   port: 8080
@@ -67,22 +73,30 @@ logging:
     org.optaplanner.core.impl.solver: INFO
     org.optaplanner.core.impl.localsearch: INFO
     com.university.timetable: INFO
-    com.university.timetable.security: DEBUG
+    com.university.timetable.controller.SolverController: ${LOG_LEVEL_SOLVER_CONTROLLER:INFO}
+    com.university.timetable.service.SolverService: ${LOG_LEVEL_SOLVER_SERVICE:INFO}
+    com.university.timetable.service.InfeasibilityChecker: ${LOG_LEVEL_INFEASIBILITY_CHECKER:INFO}
+    com.university.timetable.service.TimeslotService: ${LOG_LEVEL_TIMESLOT_SERVICE:INFO}
+    com.university.timetable.service.SolutionSaver: ${LOG_LEVEL_SOLUTION_SAVER:INFO}
+    com.university.timetable.solver.TimetableConstraintProvider: ${LOG_LEVEL_CONSTRAINT_PROVIDER:INFO}
+    com.university.timetable.security: INFO
     org.hibernate.SQL: WARN
 
 # JWT Configuration
 jwt:
-  secret: babcock-timetable-jwt-secret-key-256-bits-minimum-length-for-security
+  secret: ${JWT_SECRET:dev-only-change-me-to-a-secure-env-secret}
   access-token-expiration: 3600000      # 1 hour in milliseconds
   refresh-token-expiration: 604800000  # 7 days in milliseconds
 
 # Brevo (Sendinblue) Email Configuration
 brevo:
-  api-key: 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
+  api-key: ${BREVO_API_KEY:}
   sender-email: noreply@babcock.edu.ng
   sender-name: University Timetable
 
 # Application Settings
 app:
   name: University Timetable System
-  login-url: http://localhost:4200/login
+  login-url: ${APP_LOGIN_URL:http://localhost:4200/login}
+  cors:
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:4200,http://localhost:3000,http://127.0.0.1:4200}

@@ -1,7 +1,9 @@
 package com.university.timetable.service;
 
 import com.university.timetable.domain.Timeslot;
+import com.university.timetable.repository.LessonRepository;
 import com.university.timetable.repository.TimeslotRepository;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +32,12 @@ class TimeslotServiceTest {
 
     @Mock
     private TimeslotRepository timeslotRepository;
+    @Mock
+    private LessonRepository lessonRepository;
+    @Mock
+    private ConstraintSettingsService settingsService;
+    @Mock
+    private EntityManager entityManager;
 
     @InjectMocks
     private TimeslotService timeslotService;
@@ -36,6 +45,13 @@ class TimeslotServiceTest {
     @BeforeEach
     void setUp() {
         when(timeslotRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(lessonRepository.findAll()).thenReturn(Collections.emptyList());
+        when(lessonRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(settingsService.getEarliestStartTime()).thenReturn(LocalTime.of(7, 0));
+        when(settingsService.getLatestEndTime()).thenReturn(LocalTime.of(18, 0));
+        when(settingsService.getLunchBreakStart()).thenReturn(LocalTime.of(12, 0));
+        when(settingsService.getLunchBreakEnd()).thenReturn(LocalTime.of(13, 0));
+        when(settingsService.getFridayLatestEndTime()).thenReturn(LocalTime.of(12, 0));
     }
 
     @Test

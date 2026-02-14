@@ -34,11 +34,15 @@ public class InfeasibilityChecker {
      */
     @Transactional
     public InfeasibilityReport checkFeasibility() {
+        long startNanos = System.nanoTime();
         log.info("Running pre-solve feasibility checks...");
 
-        // Auto-regenerate timeslots from current settings
-        log.info("Auto-regenerating timeslots from current settings before feasibility check...");
-        List<Timeslot> regeneratedTimeslots = timeslotService.regenerateTimeslots();
+        // Ensure timeslots align with current settings; regenerate only if mismatch
+        long regenerateStart = System.nanoTime();
+        log.info("Ensuring timeslots match current settings before feasibility check...");
+        List<Timeslot> regeneratedTimeslots = timeslotService.ensureTimeslotsMatchSettings();
+        log.debug("Timeslot ensure/regeneration finished in {} ms ({} timeslots)",
+                elapsedMs(regenerateStart), regeneratedTimeslots.size());
 
         List<Lesson> lessons = lessonRepository.findAll();
         List<Timeslot> timeslots = regeneratedTimeslots;
@@ -49,16 +53,30 @@ public class InfeasibilityChecker {
                 lessons.size(), timeslots.size(), rooms.size());
 
         // Run all checks
+        long checkStart = System.nanoTime();
         checkRoomSlotCapacity(report, lessons, timeslots, rooms);
+        log.debug("Feasibility check 'roomSlotCapacity' completed in {} ms", elapsedMs(checkStart));
+        checkStart = System.nanoTime();
         checkLargestGroupFits(report, courses, rooms);
+        log.debug("Feasibility check 'largestGroupFits' completed in {} ms", elapsedMs(checkStart));
+        checkStart = System.nanoTime();
         checkFeatureAvailability(report, courses, rooms);
+        log.debug("Feasibility check 'featureAvailability' completed in {} ms", elapsedMs(checkStart));
+        checkStart = System.nanoTime();
         checkLecturerOverload(report, lessons, timeslots);
+        log.debug("Feasibility check 'lecturerOverload' completed in {} ms", elapsedMs(checkStart));
+        checkStart = System.nanoTime();
         checkZoneCompatibility(report, courses, rooms);
+        log.debug("Feasibility check 'zoneCompatibility' completed in {} ms", elapsedMs(checkStart));
 
-        log.info("Feasibility check complete: feasible={}, blocking={}, warnings={}",
-                report.isFeasible(), report.getBlockingCount(), report.getWarningCount());
+        log.info("Feasibility check complete in {} ms: feasible={}, blocking={}, warnings={}",
+                elapsedMs(startNanos), report.isFeasible(), report.getBlockingCount(), report.getWarningCount());
 
         return report;
+    }
+
+    private long elapsedMs(long startNanos) {
+        return (System.nanoTime() - startNanos) / 1_000_000;
     }
 
     /**

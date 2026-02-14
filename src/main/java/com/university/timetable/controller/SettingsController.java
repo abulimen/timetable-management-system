@@ -1,9 +1,11 @@
 package com.university.timetable.controller;
 
+import com.university.timetable.domain.AuditAction;
 import com.university.timetable.domain.ConstraintSetting;
 import com.university.timetable.domain.ConstraintSetting.Category;
 import com.university.timetable.domain.Timeslot;
 import com.university.timetable.dto.ConstraintSettingDTO;
+import com.university.timetable.service.AuditLogService;
 import com.university.timetable.service.ConstraintSettingsService;
 import com.university.timetable.service.TimeslotService;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class SettingsController {
 
     private final ConstraintSettingsService settingsService;
     private final TimeslotService timeslotService;
+    private final AuditLogService auditLogService;
 
     /**
      * Get all constraint settings.
@@ -88,7 +91,16 @@ public class SettingsController {
         }
 
         log.info("Updating setting {} = {}", key, value);
+        ConstraintSetting previous = settingsService.getSetting(key);
         ConstraintSetting updated = settingsService.updateSetting(key, value);
+        auditLogService.logAction(
+                AuditAction.UPDATE,
+                "ConstraintSetting",
+                key,
+                key,
+                ConstraintSettingDTO.fromEntity(previous),
+                ConstraintSettingDTO.fromEntity(updated),
+                "Updated setting " + key);
         return ResponseEntity.ok(ConstraintSettingDTO.fromEntity(updated));
     }
 
@@ -100,6 +112,14 @@ public class SettingsController {
     public ResponseEntity<Map<String, String>> refreshCache() {
         log.info("Refreshing settings cache");
         settingsService.refreshCache();
+        auditLogService.logAction(
+                AuditAction.SYSTEM_ACTION,
+                "ConstraintSetting",
+                null,
+                "Settings Cache",
+                null,
+                Map.of("cacheRefreshed", true),
+                "Refreshed constraint settings cache");
         return ResponseEntity.ok(Map.of("status", "Cache refreshed"));
     }
 
@@ -112,6 +132,14 @@ public class SettingsController {
     public ResponseEntity<Map<String, Object>> regenerateTimeslots() {
         log.info("Regenerating timeslots from current settings");
         List<Timeslot> timeslots = timeslotService.regenerateTimeslots();
+        auditLogService.logAction(
+                AuditAction.SYSTEM_ACTION,
+                "Timeslot",
+                null,
+                "Timeslot Regeneration",
+                null,
+                Map.of("count", timeslots.size()),
+                "Regenerated timeslots from current settings");
         return ResponseEntity.ok(Map.of(
                 "status", "Timeslots regenerated",
                 "count", timeslots.size(),

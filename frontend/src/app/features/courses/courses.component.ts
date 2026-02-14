@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService, Course, Lecturer, StudentGroup, Zone, Feature, Room } from '../../core/services/api.service';
 import { DataQueryToolbarComponent, QuerySortOption, QueryViewOption } from '../../core/query/data-query-toolbar.component';
+import { DataPaginationComponent } from '../../core/query/data-pagination.component';
 import { DataQueryState, DEFAULT_QUERY_STATE } from '../../core/query/query-state.model';
 import { parseQueryStateFromParams, serializeQueryStateToParams } from '../../core/query/query-state-url.util';
 import { QueryViewsService } from '../../core/query/query-views.service';
@@ -18,7 +19,7 @@ interface CourseQueryViewPayload {
 @Component({
   selector: 'app-courses',
   standalone: true,
-  imports: [CommonModule, FormsModule, DataQueryToolbarComponent, KpiCardRowComponent],
+  imports: [CommonModule, FormsModule, DataQueryToolbarComponent, DataPaginationComponent, KpiCardRowComponent],
   template: `
     <div class="space-y-6">
       <div class="flex items-center justify-between">
@@ -36,7 +37,7 @@ interface CourseQueryViewPayload {
         [sortOptions]="sortOptions"
         [savedViews]="savedViewOptions"
         [selectedViewId]="selectedViewId"
-        [resultCount]="displayedCourses.length"
+        [resultCount]="filteredCourses.length"
         [totalCount]="courses.length"
         searchPlaceholder="Search by code, name, lecturer, or group"
         (searchChange)="onSearchChange($event)"
@@ -47,6 +48,16 @@ interface CourseQueryViewPayload {
         (filtersClick)="onFiltersClick()"
         (resetClick)="resetQuery()">
       </app-data-query-toolbar>
+      <app-data-pagination
+        [page]="queryState.pagination.page"
+        [pageSize]="queryState.pagination.size"
+        [totalItems]="filteredCourses.length"
+        (pageSizeChange)="onPageSizeChange($event)"
+        (firstPage)="goToFirstPage()"
+        (prevPage)="goToPrevPage()"
+        (nextPage)="goToNextPage()"
+        (lastPage)="goToLastPage()">
+      </app-data-pagination>
 
       <app-kpi-card-row [items]="kpiCards"></app-kpi-card-row>
       <div *ngIf="queryState.sort.length > 1" class="text-xs text-secondary-500">
@@ -370,6 +381,7 @@ interface CourseQueryViewPayload {
                 <div class="mt-1 flex flex-wrap gap-1 text-xs" *ngIf="!course.online">
                   <span
                     class="px-2 py-0.5 rounded-full"
+                    [title]="getRiskPillTooltip(course)"
                     [ngClass]="{
                       'bg-red-100 text-red-700': getCourseRiskLevel(course) === 'high',
                       'bg-amber-100 text-amber-700': getCourseRiskLevel(course) === 'medium',
@@ -377,14 +389,29 @@ interface CourseQueryViewPayload {
                     }">
                     {{ getCourseRiskLevel(course) | uppercase }} RISK
                   </span>
-                  <span class="px-2 py-0.5 rounded-full bg-secondary-100 text-secondary-700">
+                  <span class="px-2 py-0.5 rounded-full bg-secondary-100 text-secondary-700"
+                    [title]="getCandidateRoomsTooltip(course)">
                     {{ getCandidateRoomCount(course) }} candidate rooms
                   </span>
-                  <span *ngIf="populationExceedsAnyRoom(course)" class="px-2 py-0.5 rounded-full bg-red-100 text-red-700">
+                  <span *ngIf="populationExceedsAnyRoom(course)" class="px-2 py-0.5 rounded-full bg-red-100 text-red-700"
+                    title="Combined student population is larger than every available room capacity.">
                     Group size exceeds every room
                   </span>
-                  <span *ngIf="requiredFeaturesHaveNoRoomCoverage(course)" class="px-2 py-0.5 rounded-full bg-red-100 text-red-700">
-                    Required feature has no room match
+                  <span *ngIf="requiredFeaturesHaveNoRoomCoverage(course)" class="px-2 py-0.5 rounded-full bg-red-100 text-red-700"
+                    title="At least one required feature is not available in any room.">
+                    Required feature(s) has no room match
+                  </span>
+                  <span *ngIf="hasConstraintDensityHigh(course)" class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800"
+                    title="This course has many hard constraints (capacity, feature, and zone restrictions), so small data changes can make it unschedulable.">
+                    Constraint density high
+                  </span>
+                  <span *ngIf="hasSingleRoomDependency(course)" class="px-2 py-0.5 rounded-full bg-red-100 text-red-700"
+                    title="Only one feasible room currently matches this course. If that room is occupied, this course may fail scheduling.">
+                    Single-room dependency
+                  </span>
+                  <span *ngIf="hasLowRoomDiversity(course)" class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800"
+                    title="Only a few rooms match this course, increasing timetable collision risk.">
+                    Low room diversity
                   </span>
                 </div>
               </td>
@@ -448,7 +475,7 @@ export class CoursesComponent implements OnInit {
   batchLecturerId: number | null = null;
   batchHours = 2;
   batchUpdating = false;
-  queryState: DataQueryState = { ...DEFAULT_QUERY_STATE, pagination: { page: 1, size: 1000 } };
+  queryState: DataQueryState = { ...DEFAULT_QUERY_STATE };
   activeSortKey = '';
   showFiltersPanel = false;
   filterDraft = {
@@ -481,10 +508,11 @@ export class CoursesComponent implements OnInit {
   selectedViewId = '';
 
   get allSelected(): boolean {
-    return this.displayedCourses.length > 0 && this.selectedIds.size === this.displayedCourses.length;
+    const ids = this.filteredCourses.map(course => course.id);
+    return ids.length > 0 && ids.every(id => this.selectedIds.has(id));
   }
 
-  get displayedCourses(): Course[] {
+  get filteredCourses(): Course[] {
     const search = this.queryState.search.trim().toLowerCase();
     let rows = this.courses;
     if (search) {
@@ -500,8 +528,16 @@ export class CoursesComponent implements OnInit {
     return [...rows].sort((a, b) => this.compareBySortStack(a, b, sortStack));
   }
 
+  get displayedCourses(): Course[] {
+    const rows = this.filteredCourses;
+    const page = this.queryState.pagination.page;
+    const size = this.queryState.pagination.size;
+    const start = (page - 1) * size;
+    return rows.slice(start, start + size);
+  }
+
   get kpiCards(): KpiCardItem[] {
-    const displayed = this.displayedCourses;
+    const displayed = this.filteredCourses;
     const total = displayed.length;
     const online = displayed.filter(course => Boolean(course.online)).length;
     const noLecturer = displayed.filter(course => course.lecturerId === null).length;
@@ -541,9 +577,9 @@ export class CoursesComponent implements OnInit {
 
   toggleSelectAll() {
     if (this.allSelected) {
-      this.selectedIds.clear();
+      this.filteredCourses.forEach(c => this.selectedIds.delete(c.id));
     } else {
-      this.displayedCourses.forEach(c => this.selectedIds.add(c.id));
+      this.filteredCourses.forEach(c => this.selectedIds.add(c.id));
     }
   }
 
@@ -552,7 +588,7 @@ export class CoursesComponent implements OnInit {
   }
 
   onSearchChange(value: string) {
-    this.queryState = { ...this.queryState, search: value };
+    this.queryState = { ...this.queryState, search: value, pagination: { ...this.queryState.pagination, page: 1 } };
     this.clearSelection();
     this.syncQueryStateToUrl();
   }
@@ -561,7 +597,8 @@ export class CoursesComponent implements OnInit {
     this.activeSortKey = key;
     this.queryState = {
       ...this.queryState,
-      sort: this.parseSortStack([key])
+      sort: this.parseSortStack([key]),
+      pagination: { ...this.queryState.pagination, page: 1 }
     };
     this.hydrateSortDraftFromQuerySort();
     this.clearSelection();
@@ -569,7 +606,7 @@ export class CoursesComponent implements OnInit {
   }
 
   resetQuery() {
-    this.queryState = { ...DEFAULT_QUERY_STATE, pagination: { page: 1, size: 1000 } };
+    this.queryState = { ...DEFAULT_QUERY_STATE };
     this.activeSortKey = '';
     this.selectedViewId = '';
     this.hydrateSortDraftFromQuerySort();
@@ -591,8 +628,7 @@ export class CoursesComponent implements OnInit {
 
     this.queryState = {
       ...DEFAULT_QUERY_STATE,
-      ...savedView.payload.queryState,
-      pagination: { page: 1, size: 1000 }
+      ...savedView.payload.queryState
     };
     this.activeSortKey = savedView.payload.activeSortKey || '';
     this.hydrateFilterDraftFromQueryFilters();
@@ -632,7 +668,8 @@ export class CoursesComponent implements OnInit {
       ...this.queryState,
       filters: [],
       matchMode: 'all',
-      sort: []
+      sort: [],
+      pagination: { ...this.queryState.pagination, page: 1 }
     };
 
     if (preset === 'no-lecturer') {
@@ -782,13 +819,13 @@ export class CoursesComponent implements OnInit {
     const zoneIds = (c.allowedZoneIds && c.allowedZoneIds.length > 0)
       ? [...c.allowedZoneIds]
       : this.zones
-          .filter(z => (c.allowedZones || []).includes(z.name))
-          .map(z => z.id);
+        .filter(z => (c.allowedZones || []).includes(z.name))
+        .map(z => z.id);
     const featureIds = (c.requiredFeatureIds && c.requiredFeatureIds.length > 0)
       ? [...c.requiredFeatureIds]
       : this.features
-          .filter(f => (c.requiredFeatures || []).includes(f.name))
-          .map(f => f.id);
+        .filter(f => (c.requiredFeatures || []).includes(f.name))
+        .map(f => f.id);
     this.formData = {
       code: c.code,
       name: c.name,
@@ -901,7 +938,8 @@ export class CoursesComponent implements OnInit {
       search: parsed.search,
       filters: parsed.filters,
       matchMode: parsed.matchMode,
-      sort: parsed.sort
+      sort: parsed.sort,
+      pagination: parsed.pagination
     };
     const firstSort = parsed.sort[0];
     this.activeSortKey = firstSort ? `${firstSort.field}:${firstSort.direction}` : '';
@@ -961,7 +999,13 @@ export class CoursesComponent implements OnInit {
     }
 
     const sort = this.parseSortStack(this.sortDraft);
-    this.queryState = { ...this.queryState, filters, matchMode: this.filterDraft.matchMode, sort };
+    this.queryState = {
+      ...this.queryState,
+      filters,
+      matchMode: this.filterDraft.matchMode,
+      sort,
+      pagination: { ...this.queryState.pagination, page: 1 }
+    };
     this.activeSortKey = sort[0] ? `${sort[0].field}:${sort[0].direction}` : '';
     this.clearSelection();
     this.syncQueryStateToUrl();
@@ -982,7 +1026,13 @@ export class CoursesComponent implements OnInit {
       allowedZone: ''
     };
     this.sortDraft = ['', '', ''];
-    this.queryState = { ...this.queryState, filters: [], matchMode: 'all', sort: [] };
+    this.queryState = {
+      ...this.queryState,
+      filters: [],
+      matchMode: 'all',
+      sort: [],
+      pagination: { ...this.queryState.pagination, page: 1 }
+    };
     this.activeSortKey = '';
     this.clearSelection();
     this.syncQueryStateToUrl();
@@ -1121,9 +1171,9 @@ export class CoursesComponent implements OnInit {
     return 0;
   }
 
-  getCandidateRoomCount(course: Course): number {
+  private getCandidateRooms(course: Course): Room[] {
     if (course.online) {
-      return 0;
+      return [];
     }
     const requiredFeatures = (course.requiredFeatures || []).map(value => value.toLowerCase());
     const allowedZones = (course.allowedZones || []).map(value => value.toLowerCase());
@@ -1146,7 +1196,37 @@ export class CoursesComponent implements OnInit {
         }
       }
       return true;
-    }).length;
+    });
+  }
+
+  getCandidateRoomCount(course: Course): number {
+    return this.getCandidateRooms(course).length;
+  }
+
+  getCandidateRoomsTooltip(course: Course): string {
+    if (course.online) {
+      return 'Online course: no physical room required.';
+    }
+    const rooms = this.getCandidateRooms(course);
+    if (rooms.length === 0) {
+      return 'No feasible candidate rooms.';
+    }
+    const names = rooms.map(room => room.name).filter(Boolean);
+    return `Candidate rooms (${rooms.length}): ${names.join(', ')}`;
+  }
+
+  getRiskPillTooltip(course: Course): string {
+    const risk = this.getCourseRiskLevel(course);
+    if (course.online) {
+      return 'Low risk: online course, no room allocation needed.';
+    }
+    if (risk === 'high') {
+      return 'High risk: zero feasible candidate rooms.';
+    }
+    if (risk === 'medium') {
+      return 'Medium risk: limited room options.';
+    }
+    return 'Low risk: healthy number of candidate rooms.';
   }
 
   getCourseRiskLevel(course: Course): 'high' | 'medium' | 'low' {
@@ -1182,6 +1262,37 @@ export class CoursesComponent implements OnInit {
     });
   }
 
+  hasConstraintDensityHigh(course: Course): boolean {
+    if (course.online) {
+      return false;
+    }
+
+    const requiredFeatureCount = (course.requiredFeatures || []).length;
+    const hasAllowedZoneConstraint = (course.allowedZones || []).length > 0;
+    const hasCapacityConstraint = this.getCoursePopulation(course) > 0;
+
+    // Course is brittle when multiple hard constraints stack up.
+    const densityScore = (requiredFeatureCount >= 2 ? 2 : requiredFeatureCount > 0 ? 1 : 0)
+      + (hasAllowedZoneConstraint ? 1 : 0)
+      + (hasCapacityConstraint ? 1 : 0);
+    return densityScore >= 4;
+  }
+
+  hasSingleRoomDependency(course: Course): boolean {
+    if (course.online) {
+      return false;
+    }
+    return this.getCandidateRoomCount(course) === 1;
+  }
+
+  hasLowRoomDiversity(course: Course): boolean {
+    if (course.online) {
+      return false;
+    }
+    const candidateCount = this.getCandidateRoomCount(course);
+    return candidateCount > 1 && candidateCount <= 2;
+  }
+
   private parseSortStack(keys: string[]): DataQueryState['sort'] {
     const seen = new Set<string>();
     const stack: DataQueryState['sort'] = [];
@@ -1211,6 +1322,36 @@ export class CoursesComponent implements OnInit {
       }
     }
     return 0;
+  }
+
+  onPageSizeChange(size: number) {
+    this.queryState = { ...this.queryState, pagination: { page: 1, size } };
+    this.clearSelection();
+    this.syncQueryStateToUrl();
+  }
+
+  goToFirstPage() {
+    this.queryState = { ...this.queryState, pagination: { ...this.queryState.pagination, page: 1 } };
+    this.syncQueryStateToUrl();
+  }
+
+  goToPrevPage() {
+    const page = Math.max(1, this.queryState.pagination.page - 1);
+    this.queryState = { ...this.queryState, pagination: { ...this.queryState.pagination, page } };
+    this.syncQueryStateToUrl();
+  }
+
+  goToNextPage() {
+    const totalPages = Math.max(1, Math.ceil(this.filteredCourses.length / this.queryState.pagination.size));
+    const page = Math.min(totalPages, this.queryState.pagination.page + 1);
+    this.queryState = { ...this.queryState, pagination: { ...this.queryState.pagination, page } };
+    this.syncQueryStateToUrl();
+  }
+
+  goToLastPage() {
+    const totalPages = Math.max(1, Math.ceil(this.filteredCourses.length / this.queryState.pagination.size));
+    this.queryState = { ...this.queryState, pagination: { ...this.queryState.pagination, page: totalPages } };
+    this.syncQueryStateToUrl();
   }
 
   private hydrateSortDraftFromQuerySort() {

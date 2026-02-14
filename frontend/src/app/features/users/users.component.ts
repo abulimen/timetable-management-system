@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
 interface User {
@@ -35,7 +36,7 @@ interface UserForm {
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   template: `
     <div class="container">
       <div class="header">
@@ -65,34 +66,20 @@ interface UserForm {
         </div>
       </div>
 
-      <!-- Bulk Import Section -->
       <div class="import-section">
-        <div class="import-header" (click)="showImportSection = !showImportSection">
+        <div class="import-header">
           <h3>📥 Bulk Import Users</h3>
-          <span class="toggle-icon">{{ showImportSection ? '▼' : '▶' }}</span>
         </div>
-        <div *ngIf="showImportSection" class="import-content">
-          <p class="import-desc">Import multiple users from a CSV file. Passwords will be auto-generated and emailed to each user.</p>
+        <div class="import-content">
+          <p class="import-desc">
+            User CSV import has been centralized under Data Imports for draft validation, approvals, and unified audit history.
+          </p>
           <div class="import-format">
-            <strong>Format:</strong> email, first_name, last_name, role, department, phone<br>
-            <strong>Roles:</strong> ADMIN, COORDINATOR, LECTURER, VIEWER<br>
-            <small>⚠️ SUPER_ADMIN cannot be created via import</small>
+            <strong>Use Entity Type:</strong> <code>Users</code><br>
+            <strong>Path:</strong> Data Imports → Create New Draft → Users
           </div>
           <div class="import-actions">
-            <button class="btn btn-secondary" (click)="downloadTemplate()">📄 Download Template</button>
-            <label class="btn btn-primary file-input-label">
-              📤 Select CSV File
-              <input type="file" accept=".csv" (change)="onFileSelected($event)" hidden>
-            </label>
-          </div>
-          <div *ngIf="importFile" class="import-file-info">
-            <span>📎 {{ importFile.name }}</span>
-            <button class="btn btn-primary btn-sm" (click)="importUsers()" [disabled]="importing">
-              {{ importing ? 'Importing...' : 'Import Users' }}
-            </button>
-          </div>
-          <div *ngIf="importResult" class="import-result" [class.success]="importResult.success" [class.error]="!importResult.success">
-            {{ importResult.message }}
+            <a routerLink="/data-imports" class="btn btn-primary">Open Data Imports</a>
           </div>
         </div>
       </div>
@@ -280,19 +267,12 @@ interface UserForm {
 
     /* Import Section */
     .import-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 1rem; }
-    .import-header { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; cursor: pointer; }
+    .import-header { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; }
     .import-header h3 { margin: 0; font-size: 1rem; color: #1e293b; }
-    .toggle-icon { color: #64748b; }
     .import-content { padding: 1rem; border-top: 1px solid #e2e8f0; }
     .import-desc { margin: 0 0 0.75rem; color: #475569; font-size: 0.875rem; }
     .import-format { background: #e0e7ff; padding: 0.75rem; border-radius: 6px; font-size: 0.8rem; color: #3730a3; margin-bottom: 1rem; }
-    .import-format small { display: block; margin-top: 0.5rem; color: #dc2626; }
     .import-actions { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
-    .file-input-label { cursor: pointer; }
-    .import-file-info { display: flex; align-items: center; gap: 1rem; padding: 0.75rem; background: #f0fdf4; border-radius: 6px; }
-    .import-result { padding: 0.75rem; border-radius: 6px; margin-top: 0.75rem; }
-    .import-result.success { background: #d1fae5; color: #059669; }
-    .import-result.error { background: #fee2e2; color: #dc2626; }
 
     .loading, .error, .empty { text-align: center; padding: 2rem; color: #6b7280; }
     .error { color: #dc2626; }
@@ -319,10 +299,6 @@ export class UsersComponent implements OnInit {
   processing = false;
   showModal = false;
   showDeleteAllConfirm = false;
-  showImportSection = false;
-  importFile: File | null = null;
-  importing = false;
-  importResult: { success: boolean; message: string } | null = null;
   editingUser: User | null = null;
   currentUser = this.authService.getCurrentUser();
 
@@ -531,53 +507,4 @@ export class UsersComponent implements OnInit {
     });
   }
 
-  // Bulk Import Methods
-  downloadTemplate(): void {
-    const template = 'email,first_name,last_name,role,department,phone\njohn@example.com,John,Doe,LECTURER,Computer Science,+1234567890';
-    const blob = new Blob([template], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'users_template.csv';
-    a.click();
-    window.URL.revokeObjectURL(url);
-  }
-
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      this.importFile = input.files[0];
-      this.importResult = null;
-    }
-  }
-
-  importUsers(): void {
-    if (!this.importFile) return;
-
-    this.importing = true;
-    this.importResult = null;
-
-    const formData = new FormData();
-    formData.append('file', this.importFile);
-
-    this.http.post<any>('http://localhost:8080/api/v1/bulk/users/import', formData).subscribe({
-      next: (response) => {
-        this.importing = false;
-        this.importFile = null;
-        this.importResult = {
-          success: true,
-          message: `✅ Successfully imported ${response.created} users. Welcome emails have been sent.`
-        };
-        this.loadUsers();
-      },
-      error: (err) => {
-        this.importing = false;
-        const errors = err.error?.errors || [];
-        const message = errors.length > 0
-          ? `❌ Import failed:\n${errors.slice(0, 5).join('\n')}${errors.length > 5 ? `\n...and ${errors.length - 5} more errors` : ''}`
-          : `❌ Import failed: ${err.error?.message || 'Unknown error'}`;
-        this.importResult = { success: false, message };
-      }
-    });
-  }
 }

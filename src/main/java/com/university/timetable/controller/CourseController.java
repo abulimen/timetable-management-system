@@ -10,6 +10,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -45,9 +48,10 @@ public class CourseController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
-    public ResponseEntity<CourseDTO> create(@RequestBody CourseCreateDTO dto) {
+    public ResponseEntity<?> create(@RequestBody CourseCreateDTO dto) {
         Course course = new Course();
-        course.setCode(dto.code);
+        String normalizedCode = dto.code != null ? dto.code.trim().toUpperCase() : null;
+        course.setCode(normalizedCode);
         course.setName(dto.name);
         course.setTotalWeeklyHours(dto.totalWeeklyHours);
         course.setOnline(dto.online != null && dto.online);
@@ -56,20 +60,18 @@ public class CourseController {
             lecturerRepository.findById(dto.lecturerId).ifPresent(course::setLecturer);
         }
 
-        // Handle multi-group (preferred) OR single group (legacy)
-        if (dto.studentGroupIds != null && !dto.studentGroupIds.isEmpty()) {
-            Set<StudentGroup> groups = dto.studentGroupIds.stream()
-                    .map(studentGroupRepository::findById)
-                    .filter(java.util.Optional::isPresent)
-                    .map(java.util.Optional::get)
-                    .collect(Collectors.toSet());
+        Set<StudentGroup> groups = resolveStudentGroups(dto);
+        if (!groups.isEmpty()) {
             course.setStudentGroups(groups);
-            // Also set legacy field to first group for compatibility
-            if (!groups.isEmpty()) {
-                course.setStudentGroup(groups.iterator().next());
-            }
-        } else if (dto.studentGroupId != null) {
-            studentGroupRepository.findById(dto.studentGroupId).ifPresent(course::setStudentGroup);
+            course.setStudentGroup(groups.iterator().next());
+        } else {
+            course.setStudentGroups(new HashSet<>());
+            course.setStudentGroup(null);
+        }
+
+        String overlapError = validateNoCourseGroupOverlap(normalizedCode, groups, null);
+        if (overlapError != null) {
+            return ResponseEntity.badRequest().body(Map.of("message", overlapError));
         }
 
         if (dto.requiredFeatureIds != null && !dto.requiredFeatureIds.isEmpty()) {
@@ -107,10 +109,12 @@ public class CourseController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
-    public ResponseEntity<CourseDTO> update(@PathVariable Long id, @RequestBody CourseCreateDTO dto) {
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody CourseCreateDTO dto) {
         return courseRepository.findById(id)
                 .map(course -> {
-                    course.setCode(dto.code);
+                    CourseDTO previousState = toDTO(course);
+                    String normalizedCode = dto.code != null ? dto.code.trim().toUpperCase() : null;
+                    course.setCode(normalizedCode);
                     course.setName(dto.name);
                     course.setTotalWeeklyHours(dto.totalWeeklyHours);
                     course.setOnline(dto.online != null && dto.online);
@@ -121,24 +125,18 @@ public class CourseController {
                         course.setLecturer(null);
                     }
 
-                    // Handle multi-group (preferred) OR single group (legacy)
-                    if (dto.studentGroupIds != null && !dto.studentGroupIds.isEmpty()) {
-                        Set<StudentGroup> groups = dto.studentGroupIds.stream()
-                                .map(studentGroupRepository::findById)
-                                .filter(java.util.Optional::isPresent)
-                                .map(java.util.Optional::get)
-                                .collect(Collectors.toSet());
+                    Set<StudentGroup> groups = resolveStudentGroups(dto);
+                    if (!groups.isEmpty()) {
                         course.setStudentGroups(groups);
-                        // Also set legacy field to first group for compatibility
-                        if (!groups.isEmpty()) {
-                            course.setStudentGroup(groups.iterator().next());
-                        }
-                    } else if (dto.studentGroupId != null) {
-                        studentGroupRepository.findById(dto.studentGroupId).ifPresent(course::setStudentGroup);
-                        course.setStudentGroups(Set.of());
+                        course.setStudentGroup(groups.iterator().next());
                     } else {
                         course.setStudentGroup(null);
-                        course.setStudentGroups(Set.of());
+                        course.setStudentGroups(new HashSet<>());
+                    }
+
+                    String overlapError = validateNoCourseGroupOverlap(normalizedCode, groups, course.getId());
+                    if (overlapError != null) {
+                        return ResponseEntity.badRequest().body(Map.of("message", overlapError));
                     }
 
                     if (dto.requiredFeatureIds != null) {
@@ -159,7 +157,6 @@ public class CourseController {
                         course.setAllowedZones(zones);
                     }
 
-                    CourseDTO previousState = toDTO(course);
                     Course updated = courseRepository.save(course);
 
                     // Audit logging
@@ -170,6 +167,51 @@ public class CourseController {
                     return ResponseEntity.ok(toDTO(updated));
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    private Set<StudentGroup> resolveStudentGroups(CourseCreateDTO dto) {
+        Set<StudentGroup> groups = new HashSet<>();
+        if (dto.studentGroupIds != null && !dto.studentGroupIds.isEmpty()) {
+            groups.addAll(dto.studentGroupIds.stream()
+                    .map(studentGroupRepository::findById)
+                    .filter(java.util.Optional::isPresent)
+                    .map(java.util.Optional::get)
+                    .collect(Collectors.toSet()));
+        }
+        if (dto.studentGroupId != null) {
+            studentGroupRepository.findById(dto.studentGroupId).ifPresent(groups::add);
+        }
+        return groups;
+    }
+
+    private String validateNoCourseGroupOverlap(String code, Set<StudentGroup> incomingGroups, Long currentCourseId) {
+        if (code == null || code.isBlank() || incomingGroups == null || incomingGroups.isEmpty()) {
+            return null;
+        }
+
+        Set<Long> incomingIds = incomingGroups.stream()
+                .map(StudentGroup::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        for (Course existing : courseRepository.findByCode(code)) {
+            if (currentCourseId != null && Objects.equals(existing.getId(), currentCourseId)) {
+                continue;
+            }
+
+            Set<StudentGroup> existingGroups = existing.getAllStudentGroups();
+            Set<String> overlapNames = existingGroups.stream()
+                    .filter(group -> incomingIds.contains(group.getId()))
+                    .map(StudentGroup::getName)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toCollection(java.util.TreeSet::new));
+
+            if (!overlapNames.isEmpty()) {
+                return "Duplicate course-group assignment: course code '" + code + "' already has group(s) "
+                        + String.join(", ", overlapNames) + " in another course entry.";
+            }
+        }
+        return null;
     }
 
     @DeleteMapping("/{id}")
@@ -196,6 +238,14 @@ public class CourseController {
         return courseRepository.findById(id)
                 .map(course -> {
                     lessonService.generateLessons(course);
+                    auditLogService.logAction(
+                            AuditAction.SYSTEM_ACTION,
+                            "Course",
+                            String.valueOf(course.getId()),
+                            course.getCode() + " - " + course.getName(),
+                            null,
+                            Map.of("lessonsGenerated", true),
+                            "Generated lessons for course " + course.getCode());
                     return ResponseEntity.ok(toDTO(course));
                 })
                 .orElse(ResponseEntity.notFound().build());

@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { ApiService, ImportBatch, BulkImportResult, ImportConflict } from '../../../core/services/api.service';
+import { ApiService, ImportBatch, BulkImportResult, ImportConflict, ImportRowError } from '../../../core/services/api.service';
 import { FormsModule } from '@angular/forms';
 import { ConflictResolutionComponent } from '../conflict-resolution/conflict-resolution.component';
 
@@ -166,6 +166,37 @@ import { ConflictResolutionComponent } from '../conflict-resolution/conflict-res
                 <ul class="list-disc list-inside text-sm text-red-600 dark:text-red-300">
                   <li *ngFor="let err of previewResult.globalErrors">{{ err }}</li>
                 </ul>
+              </div>
+
+              <!-- Row Errors Table -->
+              <div *ngIf="previewResult.rowErrors?.length" class="mb-6">
+                <div class="flex items-center justify-between mb-2">
+                    <h4 class="font-bold text-red-700 dark:text-red-400 text-sm">Row Errors ({{previewResult.rowErrors.length}})</h4>
+                </div>
+                <div class="overflow-x-auto border border-red-200 dark:border-red-800 rounded-lg max-h-[300px] overflow-y-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-red-50 dark:bg-red-900/50 sticky top-0">
+                            <tr>
+                                <th class="px-3 py-2 text-left text-xs font-semibold text-red-600 dark:text-red-400 uppercase w-16">Row</th>
+                                <th class="px-3 py-2 text-left text-xs font-semibold text-red-600 dark:text-red-400 uppercase">Error Message</th>
+                                <th class="px-3 py-2 text-left text-xs font-semibold text-red-600 dark:text-red-400 uppercase">Raw Data</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-red-100 dark:divide-red-800/50 bg-white dark:bg-secondary-800">
+                            <tr *ngFor="let err of previewResult.rowErrors" class="hover:bg-red-50 dark:hover:bg-red-900/10">
+                                <td class="px-3 py-2 font-mono text-xs text-red-500">
+                                    {{ err.rowNumber }}
+                                </td>
+                                <td class="px-3 py-2 text-red-600 dark:text-red-300 font-medium">
+                                    {{ err.message }}
+                                </td>
+                                <td class="px-3 py-2 text-xs text-secondary-500 font-mono">
+                                    {{ err.rawData | json }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
               </div>
 
               <!-- Data Table -->

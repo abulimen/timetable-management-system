@@ -34,11 +34,15 @@ public class SolutionSaver {
      */
     @Transactional
     public void saveSolution(TimeTable solution) {
+        long startNanos = System.nanoTime();
         log.info("Saving solution with score {} and {} lessons",
                 solution.getScore(), solution.getLessons().size());
 
         int saved = 0;
+        int missingTimeslots = 0;
+        int missingRooms = 0;
 
+        long lookupAndSaveStart = System.nanoTime();
         for (Lesson lesson : solution.getLessons()) {
             Timeslot solverTimeslot = lesson.getTimeslot();
             Room solverRoom = lesson.getRoom();
@@ -51,6 +55,7 @@ public class SolutionSaver {
                         solverTimeslot.getStartTime()).orElse(null);
 
                 if (dbTimeslot == null) {
+                    missingTimeslots++;
                     log.warn("Timeslot not found in DB: {} {}",
                             solverTimeslot.getDayOfWeek(), solverTimeslot.getStartTime());
                 }
@@ -61,6 +66,7 @@ public class SolutionSaver {
             if (solverRoom != null) {
                 dbRoom = roomRepository.findById(solverRoom.getId()).orElse(null);
                 if (dbRoom == null) {
+                    missingRooms++;
                     log.warn("Room not found in DB: {}", solverRoom.getId());
                 }
             }
@@ -77,6 +83,11 @@ public class SolutionSaver {
             saved++;
         }
 
-        log.info("Saved {} lessons successfully", saved);
+        log.info("Saved {} lessons successfully in {} ms (lookup+update {} ms, missingTimeslots={}, missingRooms={})",
+                saved, elapsedMs(startNanos), elapsedMs(lookupAndSaveStart), missingTimeslots, missingRooms);
+    }
+
+    private long elapsedMs(long startNanos) {
+        return (System.nanoTime() - startNanos) / 1_000_000;
     }
 }

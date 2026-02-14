@@ -133,6 +133,25 @@ export function roleValidator(value: any): CellValidation {
 }
 
 /**
+ * Validates phone format.
+ * Allows digits, spaces, +, -, (, )
+ */
+export function phoneValidator(value: any): CellValidation {
+    if (!value || String(value).trim() === '') {
+        return { valid: true, status: 'valid' }; // Optional field
+    }
+    const phone = String(value).trim();
+    if (!/^[0-9+\-()\s]+$/.test(phone)) {
+        return { valid: false, status: 'error', message: 'Phone contains invalid characters' };
+    }
+    const digitsOnly = phone.replace(/\D/g, '');
+    if (digitsOnly.length < 7 || digitsOnly.length > 15) {
+        return { valid: false, status: 'error', message: 'Phone must have 7-15 digits' };
+    }
+    return { valid: true, status: 'valid' };
+}
+
+/**
  * Creates a validator that checks if a value exists in reference data.
  */
 export function createForeignKeyValidator(
@@ -215,9 +234,9 @@ export function createForeignKeyValidator(
  * Combines multiple validators into one.
  */
 export function combineValidators(...validators: CellValidator[]): CellValidator {
-    return (value: any, rowData?: any): CellValidation => {
+    return (value: any, rowData?: any, allRows?: any[]): CellValidation => {
         for (const validator of validators) {
-            const result = validator(value, rowData);
+            const result = validator(value, rowData, allRows);
             if (!result.valid) {
                 return result;
             }

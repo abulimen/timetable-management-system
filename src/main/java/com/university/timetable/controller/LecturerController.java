@@ -7,6 +7,7 @@ import com.university.timetable.repository.LessonRepository;
 import com.university.timetable.repository.UserRepository;
 import com.university.timetable.service.AuditLogService;
 import com.university.timetable.service.AuthService;
+import com.university.timetable.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,6 +34,7 @@ public class LecturerController {
     private final UserRepository userRepository;
     private final AuthService authService;
     private final AuditLogService auditLogService;
+    private final EmailService emailService;
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
@@ -203,13 +205,34 @@ public class LecturerController {
     public ResponseEntity<LecturerDTO> addUnavailability(@PathVariable Long id, @RequestBody UnavailabilityDTO dto) {
         return lecturerRepository.findById(id)
                 .map(lecturer -> {
+                    LecturerDTO previousState = toDTO(lecturer);
                     LecturerUnavailability unavailability = new LecturerUnavailability();
                     unavailability.setLecturer(lecturer);
                     unavailability.setDayOfWeek(DayOfWeek.valueOf(dto.dayOfWeek.toUpperCase()));
                     unavailability.setStartTime(LocalTime.parse(dto.startTime));
                     unavailability.setEndTime(LocalTime.parse(dto.endTime));
                     lecturer.getUnavailabilities().add(unavailability);
-                    return ResponseEntity.ok(toDTO(lecturerRepository.save(lecturer)));
+                    Lecturer updated = lecturerRepository.save(lecturer);
+                    LecturerDTO updatedDto = toDTO(updated);
+                    auditLogService.logAction(
+                            AuditAction.UPDATE,
+                            "Lecturer",
+                            String.valueOf(updated.getId()),
+                            updated.getName(),
+                            previousState,
+                            updatedDto,
+                            "Added lecturer unavailability");
+                    if (updated.getEmail() != null && !updated.getEmail().isBlank()) {
+                        emailService.sendAvailabilityNotification(
+                                updated.getEmail(),
+                                updated.getName(),
+                                "CREATED",
+                                unavailability.getDayOfWeek(),
+                                unavailability.getStartTime() != null ? unavailability.getStartTime().toString() : null,
+                                unavailability.getEndTime() != null ? unavailability.getEndTime().toString() : null,
+                                "An administrator added an unavailability timeslot.");
+                    }
+                    return ResponseEntity.ok(updatedDto);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -220,8 +243,33 @@ public class LecturerController {
             @PathVariable Long unavailabilityId) {
         return lecturerRepository.findById(id)
                 .map(lecturer -> {
+                    LecturerDTO previousState = toDTO(lecturer);
+                    Optional<LecturerUnavailability> removedSlot = lecturer.getUnavailabilities().stream()
+                            .filter(u -> u.getId().equals(unavailabilityId))
+                            .findFirst();
                     lecturer.getUnavailabilities().removeIf(u -> u.getId().equals(unavailabilityId));
-                    return ResponseEntity.ok(toDTO(lecturerRepository.save(lecturer)));
+                    Lecturer updated = lecturerRepository.save(lecturer);
+                    LecturerDTO updatedDto = toDTO(updated);
+                    auditLogService.logAction(
+                            AuditAction.UPDATE,
+                            "Lecturer",
+                            String.valueOf(updated.getId()),
+                            updated.getName(),
+                            previousState,
+                            updatedDto,
+                            "Removed lecturer unavailability");
+                    if (removedSlot.isPresent() && updated.getEmail() != null && !updated.getEmail().isBlank()) {
+                        LecturerUnavailability slot = removedSlot.get();
+                        emailService.sendAvailabilityNotification(
+                                updated.getEmail(),
+                                updated.getName(),
+                                "DELETED",
+                                slot.getDayOfWeek(),
+                                slot.getStartTime() != null ? slot.getStartTime().toString() : null,
+                                slot.getEndTime() != null ? slot.getEndTime().toString() : null,
+                                "An administrator removed an unavailability timeslot.");
+                    }
+                    return ResponseEntity.ok(updatedDto);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }

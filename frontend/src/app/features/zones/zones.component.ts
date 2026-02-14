@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService, Room, Zone, ZoneInsightsSummary } from '../../core/services/api.service';
 import { DataQueryToolbarComponent, QuerySortOption, QueryViewOption } from '../../core/query/data-query-toolbar.component';
+import { DataPaginationComponent } from '../../core/query/data-pagination.component';
 import { DataQueryState, DEFAULT_QUERY_STATE } from '../../core/query/query-state.model';
 import { parseQueryStateFromParams, serializeQueryStateToParams } from '../../core/query/query-state-url.util';
 import { QueryViewsService } from '../../core/query/query-views.service';
@@ -17,7 +18,7 @@ interface ZoneQueryViewPayload {
 @Component({
   selector: 'app-zones',
   standalone: true,
-  imports: [CommonModule, FormsModule, DataQueryToolbarComponent],
+  imports: [CommonModule, FormsModule, DataQueryToolbarComponent, DataPaginationComponent],
   template: `
     <div class="space-y-6">
       <div class="flex items-center justify-between">
@@ -35,7 +36,7 @@ interface ZoneQueryViewPayload {
         [sortOptions]="sortOptions"
         [savedViews]="savedViewOptions"
         [selectedViewId]="selectedViewId"
-        [resultCount]="displayedZones.length"
+        [resultCount]="filteredZones.length"
         [totalCount]="zones.length"
         searchPlaceholder="Search zones by name"
         (searchChange)="onSearchChange($event)"
@@ -46,6 +47,16 @@ interface ZoneQueryViewPayload {
         (filtersClick)="onFiltersClick()"
         (resetClick)="resetQuery()">
       </app-data-query-toolbar>
+      <app-data-pagination
+        [page]="queryState.pagination.page"
+        [pageSize]="queryState.pagination.size"
+        [totalItems]="filteredZones.length"
+        (pageSizeChange)="onPageSizeChange($event)"
+        (firstPage)="goToFirstPage()"
+        (prevPage)="goToPrevPage()"
+        (nextPage)="goToNextPage()"
+        (lastPage)="goToLastPage()">
+      </app-data-pagination>
       <div *ngIf="queryState.sort.length > 1" class="text-xs text-secondary-500">
         Sort priority:
         <span *ngFor="let sort of queryState.sort; let i = index" class="mr-2">
@@ -210,7 +221,7 @@ export class ZonesComponent implements OnInit {
   showDeleteAllConfirm = false;
   deleting = false;
   importing = false;
-  queryState: DataQueryState = { ...DEFAULT_QUERY_STATE, pagination: { page: 1, size: 1000 } };
+  queryState: DataQueryState = { ...DEFAULT_QUERY_STATE };
   activeSortKey = '';
   showFiltersPanel = false;
   filterDraft = {
@@ -237,7 +248,7 @@ export class ZonesComponent implements OnInit {
   savedViewOptions: QueryViewOption[] = [];
   selectedViewId = '';
 
-  get displayedZones(): Zone[] {
+  get filteredZones(): Zone[] {
     const search = this.queryState.search.trim().toLowerCase();
     let rows = this.zones;
     if (search) {
@@ -253,11 +264,19 @@ export class ZonesComponent implements OnInit {
     return [...rows].sort((a, b) => this.compareBySortStack(a, b, sortStack));
   }
 
+  get displayedZones(): Zone[] {
+    const rows = this.filteredZones;
+    const page = this.queryState.pagination.page;
+    const size = this.queryState.pagination.size;
+    const start = (page - 1) * size;
+    return rows.slice(start, start + size);
+  }
+
   get activeZoneSnapshot(): ZoneInsightsSummary | null {
     if (this.shouldUseServerSnapshot() && this.zoneInsights) {
       return this.zoneInsights;
     }
-    const visible = this.displayedZones;
+    const visible = this.filteredZones;
     const usedZones = visible.filter(zone => this.getZoneRoomCount(zone.id) > 0).length;
     const totalRooms = visible.reduce((sum, zone) => sum + this.getZoneRoomCount(zone.id), 0);
     const totalCapacity = visible.reduce((sum, zone) => sum + this.getZoneCapacity(zone.id), 0);
@@ -299,13 +318,17 @@ export class ZonesComponent implements OnInit {
   }
 
   onSearchChange(value: string) {
-    this.queryState = { ...this.queryState, search: value };
+    this.queryState = { ...this.queryState, search: value, pagination: { ...this.queryState.pagination, page: 1 } };
     this.syncQueryStateToUrl();
   }
 
   onSortChange(key: string) {
     this.activeSortKey = key;
-    this.queryState = { ...this.queryState, sort: this.parseSortStack([key]) };
+    this.queryState = {
+      ...this.queryState,
+      sort: this.parseSortStack([key]),
+      pagination: { ...this.queryState.pagination, page: 1 }
+    };
     this.hydrateSortDraftFromQuerySort();
     this.syncQueryStateToUrl();
   }
@@ -315,7 +338,7 @@ export class ZonesComponent implements OnInit {
   }
 
   resetQuery() {
-    this.queryState = { ...DEFAULT_QUERY_STATE, pagination: { page: 1, size: 1000 } };
+    this.queryState = { ...DEFAULT_QUERY_STATE };
     this.activeSortKey = '';
     this.selectedViewId = '';
     this.hydrateSortDraftFromQuerySort();
@@ -337,8 +360,7 @@ export class ZonesComponent implements OnInit {
 
     this.queryState = {
       ...DEFAULT_QUERY_STATE,
-      ...savedView.payload.queryState,
-      pagination: { page: 1, size: 1000 }
+      ...savedView.payload.queryState
     };
     this.activeSortKey = savedView.payload.activeSortKey || '';
     this.hydrateFilterDraftFromFilters();
@@ -454,7 +476,13 @@ export class ZonesComponent implements OnInit {
       filters.push({ field: 'roomCount', operator: 'lte', value: Number(this.filterDraft.maxRoomCount) });
     }
     const sort = this.parseSortStack(this.sortDraft);
-    this.queryState = { ...this.queryState, filters, matchMode: this.filterDraft.matchMode, sort };
+    this.queryState = {
+      ...this.queryState,
+      filters,
+      matchMode: this.filterDraft.matchMode,
+      sort,
+      pagination: { ...this.queryState.pagination, page: 1 }
+    };
     this.activeSortKey = sort[0] ? `${sort[0].field}:${sort[0].direction}` : '';
     this.syncQueryStateToUrl();
   }
@@ -462,7 +490,13 @@ export class ZonesComponent implements OnInit {
   clearFilters() {
     this.resetFilterDraft();
     this.sortDraft = ['', '', ''];
-    this.queryState = { ...this.queryState, filters: [], matchMode: 'all', sort: [] };
+    this.queryState = {
+      ...this.queryState,
+      filters: [],
+      matchMode: 'all',
+      sort: [],
+      pagination: { ...this.queryState.pagination, page: 1 }
+    };
     this.activeSortKey = '';
     this.syncQueryStateToUrl();
   }
@@ -487,7 +521,8 @@ export class ZonesComponent implements OnInit {
       search: parsed.search,
       filters: parsed.filters,
       matchMode: parsed.matchMode,
-      sort: parsed.sort
+      sort: parsed.sort,
+      pagination: parsed.pagination
     };
     const firstSort = parsed.sort[0];
     this.activeSortKey = firstSort ? `${firstSort.field}:${firstSort.direction}` : '';
@@ -603,6 +638,35 @@ export class ZonesComponent implements OnInit {
       if (value !== 0) return value;
     }
     return 0;
+  }
+
+  onPageSizeChange(size: number) {
+    this.queryState = { ...this.queryState, pagination: { page: 1, size } };
+    this.syncQueryStateToUrl();
+  }
+
+  goToFirstPage() {
+    this.queryState = { ...this.queryState, pagination: { ...this.queryState.pagination, page: 1 } };
+    this.syncQueryStateToUrl();
+  }
+
+  goToPrevPage() {
+    const page = Math.max(1, this.queryState.pagination.page - 1);
+    this.queryState = { ...this.queryState, pagination: { ...this.queryState.pagination, page } };
+    this.syncQueryStateToUrl();
+  }
+
+  goToNextPage() {
+    const totalPages = Math.max(1, Math.ceil(this.filteredZones.length / this.queryState.pagination.size));
+    const page = Math.min(totalPages, this.queryState.pagination.page + 1);
+    this.queryState = { ...this.queryState, pagination: { ...this.queryState.pagination, page } };
+    this.syncQueryStateToUrl();
+  }
+
+  goToLastPage() {
+    const totalPages = Math.max(1, Math.ceil(this.filteredZones.length / this.queryState.pagination.size));
+    this.queryState = { ...this.queryState, pagination: { ...this.queryState.pagination, page: totalPages } };
+    this.syncQueryStateToUrl();
   }
 
   private hydrateSortDraftFromQuerySort() {

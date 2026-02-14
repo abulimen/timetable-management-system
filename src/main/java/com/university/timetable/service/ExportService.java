@@ -10,6 +10,9 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import com.university.timetable.domain.*;
+import com.university.timetable.dto.ArchivedSpecialEventDTO;
+import com.university.timetable.dto.ArchivedStudentGroupDTO;
+import com.university.timetable.dto.TimetableViewDTO;
 import com.university.timetable.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,9 +52,11 @@ import java.util.stream.Collectors;
 public class ExportService {
 
     private final LessonRepository lessonRepository;
+    private final SpecialEventRepository specialEventRepository;
     private final StudentGroupRepository studentGroupRepository;
     private final TimeslotRepository timeslotRepository;
     private final ConstraintSettingsService settingsService;
+    private final SemesterArchiveService semesterArchiveService;
 
     private static final DayOfWeek[] WEEKDAYS = {
             DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY,
@@ -68,6 +73,7 @@ public class ExportService {
     public byte[] exportToExcel(List<Long> groupIds, String title) throws Exception {
         List<StudentGroup> groups = resolveGroups(groupIds);
         List<Lesson> allLessons = lessonRepository.findAll();
+        List<SpecialEvent> allEvents = specialEventRepository.findByActiveTrue();
         List<Timeslot> timeslots = timeslotRepository.findAll();
 
         // Sort timeslots by time
@@ -87,8 +93,10 @@ public class ExportService {
             // One sheet per group
             for (StudentGroup group : groups) {
                 List<Lesson> groupLessons = filterLessonsByGroup(allLessons, group);
+                List<SpecialEvent> groupEvents = filterEventsByGroup(allEvents, group);
                 createGroupSheet(workbook, group, groupLessons, timeslots,
-                        headerStyle, timeStyle, lessonStyle, emptyStyle, lunchBreakStyle);
+                        groupEvents, headerStyle, timeStyle, lessonStyle, emptyStyle, lunchBreakStyle,
+                        createSpecialEventStyle(workbook));
             }
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -105,6 +113,7 @@ public class ExportService {
     public byte[] exportToPdf(List<Long> groupIds, String title) throws Exception {
         List<StudentGroup> groups = resolveGroups(groupIds);
         List<Lesson> allLessons = lessonRepository.findAll();
+        List<SpecialEvent> allEvents = specialEventRepository.findByActiveTrue();
         List<Timeslot> timeslots = timeslotRepository.findAll();
         timeslots.sort(Comparator.comparing(Timeslot::getStartTime));
 
@@ -131,6 +140,7 @@ public class ExportService {
         for (int i = 0; i < groups.size(); i++) {
             StudentGroup group = groups.get(i);
             List<Lesson> groupLessons = filterLessonsByGroup(allLessons, group);
+            List<SpecialEvent> groupEvents = filterEventsByGroup(allEvents, group);
 
             if (i > 0) {
                 document.newPage();
@@ -143,12 +153,107 @@ public class ExportService {
             document.add(groupPara);
 
             // Timetable grid
-            PdfPTable table = createPdfTable(groupLessons, timeslots);
+            PdfPTable table = createPdfTable(groupLessons, groupEvents, timeslots);
             document.add(table);
         }
 
         document.close();
         log.info("Generated PDF export with {} groups", groups.size());
+        return out.toByteArray();
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] exportArchivedToExcel(String archiveCode, List<Long> groupIds, String title) throws Exception {
+        List<ArchivedStudentGroupDTO> allGroups = semesterArchiveService.getArchivedStudentGroups(archiveCode);
+        List<ArchivedStudentGroupDTO> groups = resolveArchivedGroups(allGroups, groupIds);
+        List<TimetableViewDTO> allLessons = semesterArchiveService.getArchivedTimetable(archiveCode);
+        List<ArchivedSpecialEventDTO> allEvents = semesterArchiveService.getArchivedSpecialEvents(archiveCode);
+
+        Map<Long, ArchivedStudentGroupDTO> groupsById = allGroups.stream()
+                .collect(Collectors.toMap(ArchivedStudentGroupDTO::getId, g -> g, (a, b) -> a));
+        Map<String, ArchivedStudentGroupDTO> groupsByName = allGroups.stream()
+                .collect(Collectors.toMap(ArchivedStudentGroupDTO::getName, g -> g, (a, b) -> a));
+
+        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+            CellStyle headerStyle = createHeaderStyle(workbook);
+            CellStyle timeStyle = createTimeStyle(workbook);
+            CellStyle lessonStyle = createLessonStyle(workbook);
+            CellStyle emptyStyle = createEmptyStyle(workbook);
+            CellStyle lunchBreakStyle = createLunchBreakStyle(workbook);
+            CellStyle eventStyle = createSpecialEventStyle(workbook);
+
+            createArchivedOverviewSheet(workbook, groups, title, headerStyle);
+
+            for (ArchivedStudentGroupDTO group : groups) {
+                List<TimetableViewDTO> groupLessons = filterArchivedLessonsByGroup(allLessons, group, groupsById, groupsByName);
+                List<ArchivedSpecialEventDTO> groupEvents = filterArchivedEventsByGroup(allEvents, group, groupsById, groupsByName);
+                createArchivedGroupSheet(
+                        workbook,
+                        group,
+                        groupLessons,
+                        groupEvents,
+                        headerStyle,
+                        timeStyle,
+                        lessonStyle,
+                        emptyStyle,
+                        lunchBreakStyle,
+                        eventStyle
+                );
+            }
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            workbook.write(out);
+            return out.toByteArray();
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] exportArchivedToPdf(String archiveCode, List<Long> groupIds, String title) throws Exception {
+        List<ArchivedStudentGroupDTO> allGroups = semesterArchiveService.getArchivedStudentGroups(archiveCode);
+        List<ArchivedStudentGroupDTO> groups = resolveArchivedGroups(allGroups, groupIds);
+        List<TimetableViewDTO> allLessons = semesterArchiveService.getArchivedTimetable(archiveCode);
+        List<ArchivedSpecialEventDTO> allEvents = semesterArchiveService.getArchivedSpecialEvents(archiveCode);
+
+        Map<Long, ArchivedStudentGroupDTO> groupsById = allGroups.stream()
+                .collect(Collectors.toMap(ArchivedStudentGroupDTO::getId, g -> g, (a, b) -> a));
+        Map<String, ArchivedStudentGroupDTO> groupsByName = allGroups.stream()
+                .collect(Collectors.toMap(ArchivedStudentGroupDTO::getName, g -> g, (a, b) -> a));
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Document document = new Document(PageSize.A4.rotate(), 20, 20, 30, 30);
+        PdfWriter.getInstance(document, out);
+        document.open();
+
+        Font titleFont = new Font(Font.HELVETICA, 18, Font.BOLD);
+        Paragraph titlePara = new Paragraph(title != null ? title : "Archived Timetable Export", titleFont);
+        titlePara.setAlignment(Element.ALIGN_CENTER);
+        document.add(titlePara);
+
+        Font smallFont = new Font(Font.HELVETICA, 10);
+        Paragraph datePara = new Paragraph("Generated: " + LocalDate.now() + " | Groups: " + groups.size(), smallFont);
+        datePara.setAlignment(Element.ALIGN_CENTER);
+        document.add(datePara);
+        document.add(new Paragraph("\n"));
+
+        for (int i = 0; i < groups.size(); i++) {
+            ArchivedStudentGroupDTO group = groups.get(i);
+            if (i > 0) {
+                document.newPage();
+            }
+
+            List<TimetableViewDTO> groupLessons = filterArchivedLessonsByGroup(allLessons, group, groupsById, groupsByName);
+            List<ArchivedSpecialEventDTO> groupEvents = filterArchivedEventsByGroup(allEvents, group, groupsById, groupsByName);
+
+            Font groupFont = new Font(Font.HELVETICA, 14, Font.BOLD);
+            Paragraph groupPara = new Paragraph(group.getName() + " (" + group.getSize() + " students)", groupFont);
+            groupPara.setSpacingBefore(10);
+            document.add(groupPara);
+
+            PdfPTable table = createArchivedPdfTable(groupLessons, groupEvents);
+            document.add(table);
+        }
+
+        document.close();
         return out.toByteArray();
     }
 
@@ -158,30 +263,38 @@ public class ExportService {
     @Transactional(readOnly = true)
     public List<StudentGroup> resolveGroups(List<Long> groupIds) {
         if (groupIds == null || groupIds.isEmpty()) {
-            // Return all groups if none specified
-            return studentGroupRepository.findAll();
+            // Return only child groups if none specified
+            return studentGroupRepository.findAll().stream()
+                    .filter(this::isChildGroup)
+                    .sorted(Comparator.comparing(StudentGroup::getName))
+                    .toList();
         }
 
         Set<StudentGroup> result = new LinkedHashSet<>();
         for (Long id : groupIds) {
             studentGroupRepository.findById(id).ifPresent(group -> {
-                result.add(group);
                 // If this is a parent group, add all children
                 if (group.getChildren() != null && !group.getChildren().isEmpty()) {
                     result.addAll(group.getChildren());
+                } else {
+                    result.add(group);
                 }
             });
         }
-        return new ArrayList<>(result);
+        return result.stream()
+                .filter(this::isChildGroup)
+                .sorted(Comparator.comparing(StudentGroup::getName))
+                .toList();
     }
 
     /**
-     * Get only parent groups (departments) for UI selection.
+     * Backward-compatible endpoint data. Returns child groups for UI selection.
      */
     @Transactional(readOnly = true)
     public List<StudentGroup> getDepartments() {
         return studentGroupRepository.findAll().stream()
-                .filter(g -> g.getParentGroup() == null || g.getChildren().size() > 0)
+                .filter(this::isChildGroup)
+                .sorted(Comparator.comparing(StudentGroup::getName))
                 .collect(Collectors.toList());
     }
 
@@ -234,9 +347,9 @@ public class ExportService {
     }
 
     private void createGroupSheet(XSSFWorkbook workbook, StudentGroup group,
-            List<Lesson> lessons, List<Timeslot> timeslots,
+            List<Lesson> lessons, List<Timeslot> timeslots, List<SpecialEvent> events,
             CellStyle headerStyle, CellStyle timeStyle,
-            CellStyle lessonStyle, CellStyle emptyStyle, CellStyle lunchBreakStyle) {
+            CellStyle lessonStyle, CellStyle emptyStyle, CellStyle lunchBreakStyle, CellStyle eventStyle) {
         // Sanitize sheet name (max 31 chars, no special chars)
         String sheetName = group.getName().replaceAll("[\\[\\]*/\\\\?:]", "_");
         if (sheetName.length() > 31)
@@ -279,6 +392,15 @@ public class ExportService {
             }
         }
 
+        Map<String, SpecialEvent> eventMap = new HashMap<>();
+        for (SpecialEvent event : events) {
+            if (event == null || event.getDayOfWeek() == null || event.getStartTime() == null) {
+                continue;
+            }
+            String key = event.getDayOfWeek() + "_" + event.getStartTime();
+            eventMap.put(key, event);
+        }
+
         // Track which cells are already covered by multi-hour lessons
         Set<String> coveredCells = new HashSet<>();
 
@@ -319,8 +441,40 @@ public class ExportService {
 
                 String key = WEEKDAYS[d] + "_" + time;
                 Lesson lesson = lessonMap.get(key);
+                SpecialEvent event = eventMap.get(key);
 
-                if (lesson != null) {
+                if (event != null) {
+                    int duration = Math.max(1, event.getDurationHours());
+                    StringBuilder content = new StringBuilder("EVENT: ").append(event.getName());
+                    if (event.isOnline()) {
+                        content.append("\nOnline");
+                    } else if (event.getRoom() != null) {
+                        content.append("\n").append(event.getRoom().getName());
+                    }
+                    if (event.getLecturer() != null) {
+                        content.append("\n").append(event.getLecturer().getName());
+                    }
+                    if (lesson != null && lesson.getCourse() != null) {
+                        content.append("\nCONFLICT: ").append(lesson.getCourse().getCode());
+                    }
+                    cell.setCellValue(content.toString());
+                    cell.setCellStyle(eventStyle);
+
+                    if (duration > 1 && timeIdx + duration <= allHours.size()) {
+                        int endRow = excelRowNum + duration - 1;
+                        sheet.addMergedRegion(new CellRangeAddress(excelRowNum, endRow, d + 1, d + 1));
+                        for (int h = 1; h < duration; h++) {
+                            coveredCells.add(WEEKDAYS[d] + "_" + (timeIdx + h));
+                        }
+                        for (int h = 1; h < duration && (timeIdx + h) < allHours.size(); h++) {
+                            Row futureRow = sheet.getRow(excelRowNum + h);
+                            if (futureRow != null) {
+                                Cell futureCell = futureRow.createCell(d + 1);
+                                futureCell.setCellStyle(eventStyle);
+                            }
+                        }
+                    }
+                } else if (lesson != null) {
                     // Build content - Check online FIRST
                     String content = lesson.getCourse().getCode();
                     int duration = lesson.getDurationHours();
@@ -389,9 +543,437 @@ public class ExportService {
                 .filter(l -> {
                     if (l.getCourse() == null)
                         return false;
-                    return l.getCourse().getAllStudentGroups().contains(group);
+                    return l.getCourse().getAllStudentGroups().stream()
+                            .anyMatch(courseGroup -> courseGroup != null && courseGroup.hasConflictWith(group));
                 })
                 .collect(Collectors.toList());
+    }
+
+    private List<SpecialEvent> filterEventsByGroup(List<SpecialEvent> events, StudentGroup group) {
+        return events.stream()
+                .filter(Objects::nonNull)
+                .filter(e -> e.isActive() && e.affectsStudentGroup(group))
+                .collect(Collectors.toList());
+    }
+
+    private List<ArchivedStudentGroupDTO> resolveArchivedGroups(List<ArchivedStudentGroupDTO> allGroups, List<Long> groupIds) {
+        List<ArchivedStudentGroupDTO> childGroups = allGroups.stream()
+                .filter(g -> g.getParentGroupId() != null)
+                .sorted(Comparator.comparing(ArchivedStudentGroupDTO::getName))
+                .toList();
+        if (groupIds == null || groupIds.isEmpty()) {
+            return childGroups;
+        }
+        Set<Long> selected = new HashSet<>(groupIds);
+        return childGroups.stream()
+                .filter(g -> selected.contains(g.getId()))
+                .toList();
+    }
+
+    private List<TimetableViewDTO> filterArchivedLessonsByGroup(
+            List<TimetableViewDTO> lessons,
+            ArchivedStudentGroupDTO group,
+            Map<Long, ArchivedStudentGroupDTO> groupsById,
+            Map<String, ArchivedStudentGroupDTO> groupsByName) {
+        return lessons.stream()
+                .filter(lesson -> archivedLessonTouchesGroup(lesson, group, groupsById, groupsByName))
+                .toList();
+    }
+
+    private List<ArchivedSpecialEventDTO> filterArchivedEventsByGroup(
+            List<ArchivedSpecialEventDTO> events,
+            ArchivedStudentGroupDTO group,
+            Map<Long, ArchivedStudentGroupDTO> groupsById,
+            Map<String, ArchivedStudentGroupDTO> groupsByName) {
+        return events.stream()
+                .filter(Objects::nonNull)
+                .filter(event -> Boolean.TRUE.equals(event.getActive()))
+                .filter(event -> archivedEventTouchesGroup(event, group, groupsById, groupsByName))
+                .toList();
+    }
+
+    private boolean archivedLessonTouchesGroup(
+            TimetableViewDTO lesson,
+            ArchivedStudentGroupDTO target,
+            Map<Long, ArchivedStudentGroupDTO> groupsById,
+            Map<String, ArchivedStudentGroupDTO> groupsByName) {
+        if (lesson.getStudentGroupId() != null) {
+            ArchivedStudentGroupDTO primary = groupsById.get(lesson.getStudentGroupId());
+            if (primary != null && archivedGroupsConflict(primary, target, groupsById)) {
+                return true;
+            }
+        }
+        if (lesson.getCombinedGroupNames() != null) {
+            for (String name : lesson.getCombinedGroupNames()) {
+                ArchivedStudentGroupDTO grp = groupsByName.get(name);
+                if (grp != null && archivedGroupsConflict(grp, target, groupsById)) {
+                    return true;
+                }
+                if (target.getName().equalsIgnoreCase(name)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean archivedEventTouchesGroup(
+            ArchivedSpecialEventDTO event,
+            ArchivedStudentGroupDTO target,
+            Map<Long, ArchivedStudentGroupDTO> groupsById,
+            Map<String, ArchivedStudentGroupDTO> groupsByName) {
+        if (event.getStudentGroupIds() != null) {
+            for (Long id : event.getStudentGroupIds()) {
+                ArchivedStudentGroupDTO grp = groupsById.get(id);
+                if (grp != null && archivedGroupsConflict(grp, target, groupsById)) {
+                    return true;
+                }
+            }
+        }
+        if (event.getStudentGroupNames() != null) {
+            for (String name : event.getStudentGroupNames()) {
+                ArchivedStudentGroupDTO grp = groupsByName.get(name);
+                if (grp != null && archivedGroupsConflict(grp, target, groupsById)) {
+                    return true;
+                }
+                if (target.getName().equalsIgnoreCase(name)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean archivedGroupsConflict(
+            ArchivedStudentGroupDTO a,
+            ArchivedStudentGroupDTO b,
+            Map<Long, ArchivedStudentGroupDTO> groupsById) {
+        if (a == null || b == null) {
+            return false;
+        }
+        if (Objects.equals(a.getId(), b.getId())) {
+            return true;
+        }
+        if (Objects.equals(a.getParentGroupId(), b.getId()) || Objects.equals(b.getParentGroupId(), a.getId())) {
+            return true;
+        }
+        ArchivedStudentGroupDTO aParent = a.getParentGroupId() != null ? groupsById.get(a.getParentGroupId()) : null;
+        ArchivedStudentGroupDTO bParent = b.getParentGroupId() != null ? groupsById.get(b.getParentGroupId()) : null;
+        return aParent != null && bParent != null && Objects.equals(aParent.getId(), bParent.getId());
+    }
+
+    private void createArchivedOverviewSheet(
+            XSSFWorkbook workbook,
+            List<ArchivedStudentGroupDTO> groups,
+            String title,
+            CellStyle headerStyle) {
+        XSSFSheet sheet = workbook.createSheet("Overview");
+        int rowNum = 0;
+
+        Row titleRow = sheet.createRow(rowNum++);
+        Cell titleCell = titleRow.createCell(0);
+        titleCell.setCellValue(title != null ? title : "Archived Timetable Export");
+        titleCell.setCellStyle(headerStyle);
+        sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 2));
+
+        rowNum++;
+        Row dateRow = sheet.createRow(rowNum++);
+        dateRow.createCell(0).setCellValue("Generated:");
+        dateRow.createCell(1).setCellValue(LocalDate.now().toString());
+
+        Row countRow = sheet.createRow(rowNum++);
+        countRow.createCell(0).setCellValue("Groups Included:");
+        countRow.createCell(1).setCellValue(groups.size());
+
+        rowNum++;
+        Row listHeader = sheet.createRow(rowNum++);
+        listHeader.createCell(0).setCellValue("Group Name");
+        listHeader.createCell(1).setCellValue("Size");
+        listHeader.createCell(2).setCellValue("Department");
+        listHeader.getCell(0).setCellStyle(headerStyle);
+        listHeader.getCell(1).setCellStyle(headerStyle);
+        listHeader.getCell(2).setCellStyle(headerStyle);
+
+        for (ArchivedStudentGroupDTO group : groups) {
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(group.getName());
+            row.createCell(1).setCellValue(group.getSize() != null ? group.getSize() : 0);
+            row.createCell(2).setCellValue(group.getParentGroupName() != null ? group.getParentGroupName() : "(Top Level)");
+        }
+
+        sheet.autoSizeColumn(0);
+        sheet.autoSizeColumn(1);
+        sheet.autoSizeColumn(2);
+    }
+
+    private void createArchivedGroupSheet(
+            XSSFWorkbook workbook,
+            ArchivedStudentGroupDTO group,
+            List<TimetableViewDTO> lessons,
+            List<ArchivedSpecialEventDTO> events,
+            CellStyle headerStyle,
+            CellStyle timeStyle,
+            CellStyle lessonStyle,
+            CellStyle emptyStyle,
+            CellStyle lunchBreakStyle,
+            CellStyle eventStyle) {
+        String sheetName = group.getName().replaceAll("[\\[\\]*/\\\\?:]", "_");
+        if (sheetName.length() > 31) {
+            sheetName = sheetName.substring(0, 31);
+        }
+        XSSFSheet sheet = workbook.createSheet(sheetName);
+
+        LocalTime earliestStart = settingsService.getEarliestStartTime();
+        LocalTime latestEnd = LocalTime.of(18, 0);
+        LocalTime lunchStart = settingsService.getLunchBreakStart();
+        LocalTime lunchEnd = settingsService.getLunchBreakEnd();
+
+        List<LocalTime> allHours = new ArrayList<>();
+        LocalTime current = earliestStart;
+        while (!current.isAfter(latestEnd.minusHours(1))) {
+            allHours.add(current);
+            current = current.plusHours(1);
+        }
+
+        Row headerRow = sheet.createRow(0);
+        headerRow.createCell(0).setCellValue("Time");
+        headerRow.getCell(0).setCellStyle(headerStyle);
+        for (int d = 0; d < WEEKDAYS.length; d++) {
+            Cell cell = headerRow.createCell(d + 1);
+            cell.setCellValue(WEEKDAYS[d].toString());
+            cell.setCellStyle(headerStyle);
+        }
+
+        Map<String, TimetableViewDTO> lessonMap = new HashMap<>();
+        for (TimetableViewDTO lesson : lessons) {
+            if (lesson.getDayOfWeek() == null || lesson.getStartTime() == null) continue;
+            lessonMap.put(lesson.getDayOfWeek() + "_" + lesson.getStartTime(), lesson);
+        }
+
+        Map<String, ArchivedSpecialEventDTO> eventMap = new HashMap<>();
+        for (ArchivedSpecialEventDTO event : events) {
+            if (event == null || event.getDayOfWeek() == null || event.getStartTime() == null) continue;
+            eventMap.put(event.getDayOfWeek() + "_" + event.getStartTime(), event);
+        }
+
+        Set<String> coveredCells = new HashSet<>();
+        for (int i = 0; i <= allHours.size(); i++) {
+            sheet.createRow(i + 1);
+        }
+
+        int excelRowNum = 1;
+        for (int timeIdx = 0; timeIdx < allHours.size(); timeIdx++) {
+            LocalTime time = allHours.get(timeIdx);
+            Row row = sheet.getRow(excelRowNum);
+            boolean isLunchHour = !time.isBefore(lunchStart) && time.isBefore(lunchEnd);
+
+            Cell timeCell = row.createCell(0);
+            timeCell.setCellValue(time.format(TIME_FORMATTER));
+            timeCell.setCellStyle(isLunchHour ? lunchBreakStyle : timeStyle);
+
+            for (int d = 0; d < WEEKDAYS.length; d++) {
+                String cellKey = WEEKDAYS[d] + "_" + timeIdx;
+                if (coveredCells.contains(cellKey)) {
+                    continue;
+                }
+
+                Cell cell = row.createCell(d + 1);
+                if (isLunchHour) {
+                    cell.setCellValue("LUNCH BREAK");
+                    cell.setCellStyle(lunchBreakStyle);
+                    continue;
+                }
+
+                String key = WEEKDAYS[d] + "_" + time;
+                TimetableViewDTO lesson = lessonMap.get(key);
+                ArchivedSpecialEventDTO event = eventMap.get(key);
+
+                if (event != null) {
+                    int duration = Math.max(1, event.getDurationHours() != null ? event.getDurationHours() : 1);
+                    StringBuilder content = new StringBuilder("EVENT: ").append(event.getName());
+                    if (Boolean.TRUE.equals(event.getOnline())) {
+                        content.append("\nOnline");
+                    } else if (event.getRoomName() != null) {
+                        content.append("\n").append(event.getRoomName());
+                    }
+                    if (event.getLecturerName() != null) {
+                        content.append("\n").append(event.getLecturerName());
+                    }
+                    if (lesson != null && lesson.getCourseCode() != null) {
+                        content.append("\nCONFLICT: ").append(lesson.getCourseCode());
+                    }
+                    cell.setCellValue(content.toString());
+                    cell.setCellStyle(eventStyle);
+
+                    if (duration > 1 && timeIdx + duration <= allHours.size()) {
+                        int endRow = excelRowNum + duration - 1;
+                        sheet.addMergedRegion(new CellRangeAddress(excelRowNum, endRow, d + 1, d + 1));
+                        for (int h = 1; h < duration; h++) {
+                            coveredCells.add(WEEKDAYS[d] + "_" + (timeIdx + h));
+                        }
+                        for (int h = 1; h < duration && (timeIdx + h) < allHours.size(); h++) {
+                            Row futureRow = sheet.getRow(excelRowNum + h);
+                            if (futureRow != null) {
+                                Cell futureCell = futureRow.createCell(d + 1);
+                                futureCell.setCellStyle(eventStyle);
+                            }
+                        }
+                    }
+                } else if (lesson != null) {
+                    String content = lesson.getCourseCode();
+                    int duration = lesson.getDurationHours();
+                    if (duration > 1) {
+                        content += " (" + duration + "h)";
+                    }
+                    content += "\n" + (lesson.isOnline() ? "Online" : (lesson.getRoomName() != null ? lesson.getRoomName() : ""));
+                    if (lesson.getLecturerName() != null) {
+                        content += "\n" + lesson.getLecturerName();
+                    }
+
+                    cell.setCellValue(content);
+                    cell.setCellStyle(lessonStyle);
+
+                    if (duration > 1 && timeIdx + duration <= allHours.size()) {
+                        int endRow = excelRowNum + duration - 1;
+                        sheet.addMergedRegion(new CellRangeAddress(excelRowNum, endRow, d + 1, d + 1));
+                        for (int h = 1; h < duration; h++) {
+                            coveredCells.add(WEEKDAYS[d] + "_" + (timeIdx + h));
+                        }
+                        for (int h = 1; h < duration && (timeIdx + h) < allHours.size(); h++) {
+                            Row futureRow = sheet.getRow(excelRowNum + h);
+                            if (futureRow != null) {
+                                Cell futureCell = futureRow.createCell(d + 1);
+                                futureCell.setCellStyle(lessonStyle);
+                            }
+                        }
+                    }
+                } else {
+                    cell.setCellStyle(emptyStyle);
+                }
+            }
+            excelRowNum++;
+        }
+
+        for (int i = 1; i <= allHours.size(); i++) {
+            Row row = sheet.getRow(i);
+            if (row != null) row.setHeightInPoints(45);
+        }
+        sheet.setColumnWidth(0, 3000);
+        for (int d = 0; d < WEEKDAYS.length; d++) {
+            sheet.setColumnWidth(d + 1, 5500);
+        }
+    }
+
+    private PdfPTable createArchivedPdfTable(List<TimetableViewDTO> lessons, List<ArchivedSpecialEventDTO> events) {
+        PdfPTable table = new PdfPTable(6);
+        table.setWidthPercentage(100);
+        table.setSpacingBefore(10);
+
+        try {
+            table.setWidths(new float[] { 1f, 2f, 2f, 2f, 2f, 2f });
+        } catch (Exception e) {
+            log.warn("Could not set table widths", e);
+        }
+
+        Font headerFont = new Font(Font.HELVETICA, 10, Font.BOLD, Color.WHITE);
+        addPdfCell(table, "Time", headerFont, new Color(0, 51, 102), 1);
+        for (DayOfWeek day : WEEKDAYS) {
+            addPdfCell(table, day.toString(), headerFont, new Color(0, 51, 102), 1);
+        }
+
+        LocalTime earliestStart = settingsService.getEarliestStartTime();
+        LocalTime latestEnd = LocalTime.of(18, 0);
+        LocalTime lunchStart = settingsService.getLunchBreakStart();
+        LocalTime lunchEnd = settingsService.getLunchBreakEnd();
+
+        List<LocalTime> allHours = new ArrayList<>();
+        LocalTime current = earliestStart;
+        while (!current.isAfter(latestEnd.minusHours(1))) {
+            allHours.add(current);
+            current = current.plusHours(1);
+        }
+
+        Font lunchFont = new Font(Font.HELVETICA, 9, Font.BOLD, Color.WHITE);
+        Color lunchColor = new Color(255, 140, 0);
+        Font timeFont = new Font(Font.HELVETICA, 9, Font.BOLD);
+        Font lessonFont = new Font(Font.HELVETICA, 8);
+
+        Map<String, TimetableViewDTO> lessonMap = new HashMap<>();
+        for (TimetableViewDTO lesson : lessons) {
+            if (lesson.getDayOfWeek() == null || lesson.getStartTime() == null) continue;
+            lessonMap.put(lesson.getDayOfWeek() + "_" + lesson.getStartTime(), lesson);
+        }
+        Map<String, ArchivedSpecialEventDTO> eventMap = new HashMap<>();
+        for (ArchivedSpecialEventDTO event : events) {
+            if (event == null || event.getDayOfWeek() == null || event.getStartTime() == null) continue;
+            eventMap.put(event.getDayOfWeek() + "_" + event.getStartTime(), event);
+        }
+
+        Set<String> coveredCells = new HashSet<>();
+        for (int timeIdx = 0; timeIdx < allHours.size(); timeIdx++) {
+            LocalTime time = allHours.get(timeIdx);
+            boolean isLunchHour = !time.isBefore(lunchStart) && time.isBefore(lunchEnd);
+
+            addPdfCell(table, time.format(TIME_FORMATTER), isLunchHour ? lunchFont : timeFont, isLunchHour ? lunchColor : new Color(240, 240, 240), 1);
+
+            for (int d = 0; d < WEEKDAYS.length; d++) {
+                DayOfWeek day = WEEKDAYS[d];
+                String cellKey = day + "_" + timeIdx;
+                if (coveredCells.contains(cellKey)) continue;
+                if (isLunchHour) {
+                    addPdfCell(table, "LUNCH BREAK", lunchFont, lunchColor, 1);
+                    continue;
+                }
+
+                String key = day + "_" + time;
+                TimetableViewDTO lesson = lessonMap.get(key);
+                ArchivedSpecialEventDTO event = eventMap.get(key);
+
+                if (event != null) {
+                    int duration = Math.max(1, event.getDurationHours() != null ? event.getDurationHours() : 1);
+                    int rowSpan = Math.min(duration, allHours.size() - timeIdx);
+                    StringBuilder content = new StringBuilder("EVENT: ").append(event.getName());
+                    if (Boolean.TRUE.equals(event.getOnline())) {
+                        content.append("\nOnline");
+                    } else if (event.getRoomName() != null) {
+                        content.append("\n").append(event.getRoomName());
+                    }
+                    if (event.getLecturerName() != null) {
+                        content.append("\n").append(event.getLecturerName());
+                    }
+                    if (lesson != null && lesson.getCourseCode() != null) {
+                        content.append("\nCONFLICT: ").append(lesson.getCourseCode());
+                    }
+                    Font eventFont = new Font(Font.HELVETICA, 8, Font.BOLD, new Color(120, 20, 20));
+                    addPdfCell(table, content.toString(), eventFont, new Color(255, 230, 230), rowSpan);
+                    for (int h = 1; h < rowSpan; h++) {
+                        coveredCells.add(day + "_" + (timeIdx + h));
+                    }
+                } else if (lesson != null) {
+                    int duration = Math.max(1, lesson.getDurationHours());
+                    int rowSpan = Math.min(duration, allHours.size() - timeIdx);
+                    String content = lesson.getCourseCode();
+                    if (duration > 1) {
+                        content += " (" + duration + "h)";
+                    }
+                    content += "\n" + (lesson.isOnline() ? "Online" : (lesson.getRoomName() != null ? lesson.getRoomName() : ""));
+                    if (lesson.getLecturerName() != null) {
+                        content += "\n" + lesson.getLecturerName();
+                    }
+                    addPdfCell(table, content, lessonFont, new Color(200, 255, 200), rowSpan);
+                    for (int h = 1; h < rowSpan; h++) {
+                        coveredCells.add(day + "_" + (timeIdx + h));
+                    }
+                } else {
+                    addPdfCell(table, "", lessonFont, Color.WHITE, 1);
+                }
+            }
+        }
+        return table;
+    }
+
+    private boolean isChildGroup(StudentGroup group) {
+        return group != null && group.getParentGroup() != null;
     }
 
     private CellStyle createHeaderStyle(XSSFWorkbook workbook) {
@@ -436,6 +1018,24 @@ public class ExportService {
         return style;
     }
 
+    private CellStyle createSpecialEventStyle(XSSFWorkbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        XSSFFont font = workbook.createFont();
+        font.setBold(true);
+        font.setColor(IndexedColors.DARK_RED.getIndex());
+        style.setFont(font);
+        style.setFillForegroundColor(IndexedColors.ROSE.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setWrapText(true);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        return style;
+    }
+
     private CellStyle createEmptyStyle(XSSFWorkbook workbook) {
         CellStyle style = workbook.createCellStyle();
         style.setBorderBottom(BorderStyle.THIN);
@@ -464,7 +1064,7 @@ public class ExportService {
 
     // ========== PDF HELPERS ==========
 
-    private PdfPTable createPdfTable(List<Lesson> lessons, List<Timeslot> timeslots) {
+    private PdfPTable createPdfTable(List<Lesson> lessons, List<SpecialEvent> events, List<Timeslot> timeslots) {
         PdfPTable table = new PdfPTable(6); // Time + 5 days
         table.setWidthPercentage(100);
         table.setSpacingBefore(10);
@@ -509,6 +1109,14 @@ public class ExportService {
                 lessonMap.put(key, lesson);
             }
         }
+        Map<String, SpecialEvent> eventMap = new HashMap<>();
+        for (SpecialEvent event : events) {
+            if (event == null || event.getDayOfWeek() == null || event.getStartTime() == null) {
+                continue;
+            }
+            String key = event.getDayOfWeek() + "_" + event.getStartTime();
+            eventMap.put(key, event);
+        }
 
         // Track covered cells for multi-hour lessons
         Set<String> coveredCells = new HashSet<>();
@@ -547,8 +1155,29 @@ public class ExportService {
 
                 String key = day + "_" + time;
                 Lesson lesson = lessonMap.get(key);
+                SpecialEvent event = eventMap.get(key);
 
-                if (lesson != null) {
+                if (event != null) {
+                    int duration = Math.max(1, event.getDurationHours());
+                    int rowSpan = Math.min(duration, allHours.size() - timeIdx);
+                    StringBuilder content = new StringBuilder("EVENT: ").append(event.getName());
+                    if (event.isOnline()) {
+                        content.append("\nOnline");
+                    } else if (event.getRoom() != null) {
+                        content.append("\n").append(event.getRoom().getName());
+                    }
+                    if (event.getLecturer() != null) {
+                        content.append("\n").append(event.getLecturer().getName());
+                    }
+                    if (lesson != null && lesson.getCourse() != null) {
+                        content.append("\nCONFLICT: ").append(lesson.getCourse().getCode());
+                    }
+                    Font eventFont = new Font(Font.HELVETICA, 8, Font.BOLD, new Color(120, 20, 20));
+                    addPdfCell(table, content.toString(), eventFont, new Color(255, 230, 230), rowSpan);
+                    for (int h = 1; h < rowSpan; h++) {
+                        coveredCells.add(day + "_" + (timeIdx + h));
+                    }
+                } else if (lesson != null) {
                     int duration = lesson.getDurationHours();
 
                     // Build content - Check online FIRST

@@ -1,11 +1,13 @@
 package com.university.timetable.controller;
 
+import com.university.timetable.domain.AuditAction;
 import com.university.timetable.domain.Lesson;
 import com.university.timetable.dto.LessonUpdateDTO;
 import com.university.timetable.dto.TimetableViewDTO;
 import com.university.timetable.repository.LessonRepository;
 import com.university.timetable.repository.RoomRepository;
 import com.university.timetable.repository.TimeslotRepository;
+import com.university.timetable.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,7 @@ public class LessonController {
     private final LessonRepository lessonRepository;
     private final TimeslotRepository timeslotRepository;
     private final RoomRepository roomRepository;
+    private final AuditLogService auditLogService;
 
     /**
      * PATCH /api/v1/lessons/{id}
@@ -43,6 +46,7 @@ public class LessonController {
 
         Lesson lesson = lessonRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Lesson not found: " + id));
+        TimetableViewDTO previousState = toDTO(lesson);
 
         // Update timeslot if provided
         if (updateDTO.getAssignedTimeslotId() != null) {
@@ -65,8 +69,17 @@ public class LessonController {
 
         Lesson saved = lessonRepository.save(lesson);
         log.info("Updated lesson: {}", saved);
+        TimetableViewDTO updatedState = toDTO(saved);
+        auditLogService.logAction(
+                AuditAction.UPDATE,
+                "Lesson",
+                String.valueOf(saved.getId()),
+                saved.getCourse() != null ? saved.getCourse().getCode() : "Lesson " + saved.getId(),
+                previousState,
+                updatedState,
+                "Updated lesson assignment/pin state");
 
-        return ResponseEntity.ok(toDTO(saved));
+        return ResponseEntity.ok(updatedState);
     }
 
     /**

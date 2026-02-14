@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiService, Course, Lecturer, LecturerInsightsSummary } from '../../core/services/api.service';
+import { ApiService, Course, Lecturer, LecturerInsightsSummary, Setting } from '../../core/services/api.service';
 import { DataQueryToolbarComponent, QuerySortOption, QueryViewOption } from '../../core/query/data-query-toolbar.component';
+import { DataPaginationComponent } from '../../core/query/data-pagination.component';
 import { DataQueryState, DEFAULT_QUERY_STATE } from '../../core/query/query-state.model';
 import { parseQueryStateFromParams, serializeQueryStateToParams } from '../../core/query/query-state-url.util';
 import { QueryViewsService } from '../../core/query/query-views.service';
@@ -18,7 +19,7 @@ interface LecturerQueryViewPayload {
 @Component({
   selector: 'app-lecturers',
   standalone: true,
-  imports: [CommonModule, FormsModule, DataQueryToolbarComponent, KpiCardRowComponent],
+  imports: [CommonModule, FormsModule, DataQueryToolbarComponent, DataPaginationComponent, KpiCardRowComponent],
   template: `
     <div class="space-y-6">
       <div class="flex items-center justify-between">
@@ -36,7 +37,7 @@ interface LecturerQueryViewPayload {
         [sortOptions]="sortOptions"
         [savedViews]="savedViewOptions"
         [selectedViewId]="selectedViewId"
-        [resultCount]="displayedLecturers.length"
+        [resultCount]="filteredLecturers.length"
         [totalCount]="lecturers.length"
         searchPlaceholder="Search by lecturer, email, or assignment load"
         (searchChange)="onSearchChange($event)"
@@ -47,6 +48,16 @@ interface LecturerQueryViewPayload {
         (filtersClick)="onFiltersClick()"
         (resetClick)="resetQuery()">
       </app-data-query-toolbar>
+      <app-data-pagination
+        [page]="queryState.pagination.page"
+        [pageSize]="queryState.pagination.size"
+        [totalItems]="filteredLecturers.length"
+        (pageSizeChange)="onPageSizeChange($event)"
+        (firstPage)="goToFirstPage()"
+        (prevPage)="goToPrevPage()"
+        (nextPage)="goToNextPage()"
+        (lastPage)="goToLastPage()">
+      </app-data-pagination>
       <div *ngIf="queryState.sort.length > 1" class="text-xs text-secondary-500">
         Sort priority:
         <span *ngFor="let sort of queryState.sort; let i = index" class="mr-2">
@@ -71,17 +82,17 @@ interface LecturerQueryViewPayload {
             <thead>
               <tr class="text-secondary-500">
                 <th class="text-left px-2 py-1">Day</th>
-                <th *ngFor="let slot of heatmapSlots" class="text-center px-2 py-1">{{ slot }}</th>
+                <th *ngFor="let slot of heatmapSlots" class="text-center px-2 py-1">{{ heatmapSlotLabel(slot) }}</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let day of heatmapDays" class="border-t border-secondary-200 dark:border-secondary-700">
-                <td class="px-2 py-1 font-medium">{{ day }}</td>
+                <td class="px-2 py-1 font-medium">{{ day | titlecase }}</td>
                 <td *ngFor="let slot of heatmapSlots" class="px-2 py-1">
                   <div
                     class="rounded px-1 py-0.5 text-center"
-                    [ngClass]="densityToneClass(activeUnavailabilityDensity[day + '|' + slot])">
-                    {{ activeUnavailabilityDensity[day + '|' + slot] || 0 }}
+                    [ngClass]="densityToneClass(activeUnavailabilityDensity[densityKey(day, slot)])">
+                    {{ activeUnavailabilityDensity[densityKey(day, slot)] || 0 }}
                   </div>
                 </td>
               </tr>
@@ -271,7 +282,7 @@ export class LecturersComponent implements OnInit {
   deleting = false;
   importing = false;
   importResult: any = null;
-  queryState: DataQueryState = { ...DEFAULT_QUERY_STATE, pagination: { page: 1, size: 1000 } };
+  queryState: DataQueryState = { ...DEFAULT_QUERY_STATE };
   activeSortKey = '';
   showFiltersPanel = false;
   filterDraft = {
@@ -300,10 +311,11 @@ export class LecturersComponent implements OnInit {
   heavyUnavailabilityThreshold = 3;
   heavyAssignmentThreshold = 4;
   overloadedAssignmentThreshold = 5;
-  readonly heatmapDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-  readonly heatmapSlots = ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00'];
+  readonly heatmapDays = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+  heatmapSlots: string[] = this.generateHeatmapSlots('07:00', '18:00', 1);
+  heatmapSlotHours = 1;
 
-  get displayedLecturers(): Lecturer[] {
+  get filteredLecturers(): Lecturer[] {
     const search = this.queryState.search.trim().toLowerCase();
     let rows = this.lecturers;
     if (search) {
@@ -319,8 +331,16 @@ export class LecturersComponent implements OnInit {
     return [...rows].sort((a, b) => this.compareBySortStack(a, b, sortStack));
   }
 
+  get displayedLecturers(): Lecturer[] {
+    const rows = this.filteredLecturers;
+    const page = this.queryState.pagination.page;
+    const size = this.queryState.pagination.size;
+    const start = (page - 1) * size;
+    return rows.slice(start, start + size);
+  }
+
   get kpiCards(): KpiCardItem[] {
-    const visible = this.displayedLecturers;
+    const visible = this.filteredLecturers;
     const noEmail = visible.filter(lecturer => !(lecturer.email || '').trim()).length;
     const unassigned = visible.filter(lecturer => this.getAssignedCourseCount(lecturer.id) === 0).length;
     const overloaded = visible.filter(lecturer => this.getAssignedCourseCount(lecturer.id) >= this.overloadedAssignmentThreshold).length;
@@ -336,18 +356,18 @@ export class LecturersComponent implements OnInit {
     const density: Record<string, number> = {};
     for (const day of this.heatmapDays) {
       for (const slot of this.heatmapSlots) {
-        density[`${day}|${slot}`] = 0;
+        density[this.densityKey(day, slot)] = 0;
       }
     }
-    for (const lecturer of this.displayedLecturers) {
+    for (const lecturer of this.filteredLecturers) {
       for (const entry of lecturer.unavailabilities || []) {
-        const day = entry.dayOfWeek;
+        const day = (entry.dayOfWeek || '').toUpperCase();
         if (!this.heatmapDays.includes(day)) {
           continue;
         }
         for (const slot of this.heatmapSlots) {
           if (this.isSlotCovered(entry.startTime, entry.endTime, slot)) {
-            const key = `${day}|${slot}`;
+            const key = this.densityKey(day, slot);
             density[key] = (density[key] || 0) + 1;
           }
         }
@@ -368,6 +388,7 @@ export class LecturersComponent implements OnInit {
     this.loadSavedViews();
     this.loadLecturers();
     this.loadCourses();
+    this.loadHeatmapRangeFromSettings();
     this.loadLecturerInsights();
   }
 
@@ -380,7 +401,12 @@ export class LecturersComponent implements OnInit {
   }
 
   loadLecturerInsights() {
-    this.api.getLecturerInsights().subscribe({ next: (summary) => this.lecturerInsights = summary });
+    this.api.getLecturerInsights().subscribe({
+      next: (summary) => {
+        this.lecturerInsights = summary;
+        this.syncHeatmapSlotsFromInsights(summary);
+      }
+    });
   }
 
   getAssignedCourseCount(lecturerId: number): number {
@@ -388,13 +414,17 @@ export class LecturersComponent implements OnInit {
   }
 
   onSearchChange(value: string) {
-    this.queryState = { ...this.queryState, search: value };
+    this.queryState = { ...this.queryState, search: value, pagination: { ...this.queryState.pagination, page: 1 } };
     this.syncQueryStateToUrl();
   }
 
   onSortChange(key: string) {
     this.activeSortKey = key;
-    this.queryState = { ...this.queryState, sort: this.parseSortStack([key]) };
+    this.queryState = {
+      ...this.queryState,
+      sort: this.parseSortStack([key]),
+      pagination: { ...this.queryState.pagination, page: 1 }
+    };
     this.hydrateSortDraftFromQuerySort();
     this.syncQueryStateToUrl();
   }
@@ -404,7 +434,7 @@ export class LecturersComponent implements OnInit {
   }
 
   resetQuery() {
-    this.queryState = { ...DEFAULT_QUERY_STATE, pagination: { page: 1, size: 1000 } };
+    this.queryState = { ...DEFAULT_QUERY_STATE };
     this.activeSortKey = '';
     this.selectedViewId = '';
     this.hydrateSortDraftFromQuerySort();
@@ -426,8 +456,7 @@ export class LecturersComponent implements OnInit {
 
     this.queryState = {
       ...DEFAULT_QUERY_STATE,
-      ...savedView.payload.queryState,
-      pagination: { page: 1, size: 1000 }
+      ...savedView.payload.queryState
     };
     this.activeSortKey = savedView.payload.activeSortKey || '';
     this.hydrateFilterDraftFromFilters();
@@ -575,7 +604,13 @@ export class LecturersComponent implements OnInit {
     }
 
     const sort = this.parseSortStack(this.sortDraft);
-    this.queryState = { ...this.queryState, filters, matchMode: this.filterDraft.matchMode, sort };
+    this.queryState = {
+      ...this.queryState,
+      filters,
+      matchMode: this.filterDraft.matchMode,
+      sort,
+      pagination: { ...this.queryState.pagination, page: 1 }
+    };
     this.activeSortKey = sort[0] ? `${sort[0].field}:${sort[0].direction}` : '';
     this.syncQueryStateToUrl();
   }
@@ -583,7 +618,13 @@ export class LecturersComponent implements OnInit {
   clearFilters() {
     this.resetFilterDraft();
     this.sortDraft = ['', '', ''];
-    this.queryState = { ...this.queryState, filters: [], matchMode: 'all', sort: [] };
+    this.queryState = {
+      ...this.queryState,
+      filters: [],
+      matchMode: 'all',
+      sort: [],
+      pagination: { ...this.queryState.pagination, page: 1 }
+    };
     this.activeSortKey = '';
     this.syncQueryStateToUrl();
   }
@@ -608,7 +649,8 @@ export class LecturersComponent implements OnInit {
       search: parsed.search,
       filters: parsed.filters,
       matchMode: parsed.matchMode,
-      sort: parsed.sort
+      sort: parsed.sort,
+      pagination: parsed.pagination
     };
     const firstSort = parsed.sort[0];
     this.activeSortKey = firstSort ? `${firstSort.field}:${firstSort.direction}` : '';
@@ -757,6 +799,35 @@ export class LecturersComponent implements OnInit {
     return 0;
   }
 
+  onPageSizeChange(size: number) {
+    this.queryState = { ...this.queryState, pagination: { page: 1, size } };
+    this.syncQueryStateToUrl();
+  }
+
+  goToFirstPage() {
+    this.queryState = { ...this.queryState, pagination: { ...this.queryState.pagination, page: 1 } };
+    this.syncQueryStateToUrl();
+  }
+
+  goToPrevPage() {
+    const page = Math.max(1, this.queryState.pagination.page - 1);
+    this.queryState = { ...this.queryState, pagination: { ...this.queryState.pagination, page } };
+    this.syncQueryStateToUrl();
+  }
+
+  goToNextPage() {
+    const totalPages = Math.max(1, Math.ceil(this.filteredLecturers.length / this.queryState.pagination.size));
+    const page = Math.min(totalPages, this.queryState.pagination.page + 1);
+    this.queryState = { ...this.queryState, pagination: { ...this.queryState.pagination, page } };
+    this.syncQueryStateToUrl();
+  }
+
+  goToLastPage() {
+    const totalPages = Math.max(1, Math.ceil(this.filteredLecturers.length / this.queryState.pagination.size));
+    this.queryState = { ...this.queryState, pagination: { ...this.queryState.pagination, page: totalPages } };
+    this.syncQueryStateToUrl();
+  }
+
   private hydrateSortDraftFromQuerySort() {
     const sortKeys = this.queryState.sort.map(sort => `${sort.field}:${sort.direction}`);
     this.sortDraft = [sortKeys[0] || '', sortKeys[1] || '', sortKeys[2] || ''];
@@ -787,6 +858,9 @@ export class LecturersComponent implements OnInit {
     const start = this.timeToMinutes(startTime);
     const end = this.timeToMinutes(endTime);
     const point = this.timeToMinutes(slot);
+    if (!Number.isFinite(start) || !Number.isFinite(end) || !Number.isFinite(point) || end <= start) {
+      return false;
+    }
     return point >= start && point < end;
   }
 
@@ -797,7 +871,83 @@ export class LecturersComponent implements OnInit {
   }
 
   private timeToMinutes(value: string): number {
-    const [h, m] = value.split(':').map(Number);
-    return (h || 0) * 60 + (m || 0);
+    if (!value || typeof value !== 'string') {
+      return NaN;
+    }
+    const [hRaw, mRaw] = value.split(':');
+    const hours = Number(hRaw);
+    const minutes = Number(mRaw);
+    if (!Number.isFinite(hours) || !Number.isFinite(minutes)) {
+      return NaN;
+    }
+    return (hours * 60) + minutes;
+  }
+
+  private syncHeatmapSlotsFromInsights(summary: LecturerInsightsSummary) {
+    const interval = Number(summary.densitySlotHours);
+    this.heatmapSlotHours = Number.isFinite(interval) && interval > 0 ? interval : 1;
+    if (summary.densitySlots?.length) {
+      this.heatmapSlots = summary.densitySlots;
+      return;
+    }
+    if (summary.densityStartTime && summary.densityEndTime) {
+      this.heatmapSlots = this.generateHeatmapSlots(
+        summary.densityStartTime,
+        summary.densityEndTime,
+        this.heatmapSlotHours
+      );
+    }
+  }
+
+  private loadHeatmapRangeFromSettings() {
+    this.api.getSettings().subscribe({
+      next: (settings) => {
+        const start = this.readSetting(settings, 'earliest_start_time', '07:00');
+        const end = this.readSetting(settings, 'latest_end_time', '18:00');
+        this.heatmapSlotHours = 1;
+        this.heatmapSlots = this.generateHeatmapSlots(start, end, 1);
+      }
+    });
+  }
+
+  private readSetting(settings: Setting[], key: string, fallback: string): string {
+    const setting = settings.find(item => item.key === key);
+    const value = (setting?.value || '').trim();
+    return value || fallback;
+  }
+
+  private generateHeatmapSlots(startTime: string, endTime: string, intervalHours: number): string[] {
+    const start = this.timeToMinutes(startTime);
+    const end = this.timeToMinutes(endTime);
+    if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start || intervalHours <= 0) {
+      return ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
+    }
+    const interval = intervalHours * 60;
+    const slots: string[] = [];
+    for (let cursor = start; cursor < end; cursor += interval) {
+      slots.push(this.minutesToTime(cursor));
+    }
+    return slots;
+  }
+
+  private minutesToTime(totalMinutes: number): string {
+    const normalized = Math.max(0, totalMinutes);
+    const hours = Math.floor(normalized / 60);
+    const minutes = normalized % 60;
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+  }
+
+  heatmapSlotLabel(slot: string): string {
+    const start = this.timeToMinutes(slot);
+    if (!Number.isFinite(start)) {
+      return slot;
+    }
+    const durationMinutes = Math.max(1, this.heatmapSlotHours) * 60;
+    const end = start + durationMinutes;
+    return `${this.minutesToTime(start)}-${this.minutesToTime(end)}`;
+  }
+
+  densityKey(day: string, slot: string): string {
+    return `${day.toUpperCase()}|${slot}`;
   }
 }

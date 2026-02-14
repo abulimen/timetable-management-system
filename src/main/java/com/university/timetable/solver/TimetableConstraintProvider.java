@@ -6,6 +6,8 @@ import com.university.timetable.domain.StudentGroup;
 import com.university.timetable.service.ConstraintSettingsService;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 import org.optaplanner.core.api.score.stream.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -18,6 +20,7 @@ import java.util.Objects;
  * repeated lookups during constraint evaluation.
  */
 public class TimetableConstraintProvider implements ConstraintProvider {
+    private static final Logger log = LoggerFactory.getLogger(TimetableConstraintProvider.class);
 
     // Cached settings - loaded once on first access
     private volatile boolean settingsInitialized = false;
@@ -35,6 +38,7 @@ public class TimetableConstraintProvider implements ConstraintProvider {
     private int cachedWeightStudentFatigue;
     private int cachedWeightEarlyMorning;
     private int cachedMaxLecturerConsecutiveHours;
+    private boolean cachedUnavailabilitySystemEnabled;
 
     /**
      * Initialize all settings from the service.
@@ -55,7 +59,7 @@ public class TimetableConstraintProvider implements ConstraintProvider {
 
             ConstraintSettingsService svc = SpringContextHolder.getBean(ConstraintSettingsService.class);
             if (svc != null) {
-                System.out.println("[ConstraintProvider] Loading settings from DB via service...");
+                log.info("Loading solver constraint settings from DB cache...");
                 cachedLunchBreakStart = svc.getLunchBreakStart();
                 cachedLunchBreakEnd = svc.getLunchBreakEnd();
                 cachedLatestEndTime = svc.getLatestEndTime();
@@ -63,6 +67,7 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 cachedLunchBreakEnforced = svc.isLunchBreakEnforced();
                 cachedSameCourseSameDayAllowed = svc.isSameCourseSameDayAllowed();
                 cachedDayBalanceEnforced = svc.isDayBalanceEnforced();
+                cachedUnavailabilitySystemEnabled = svc.isUnavailabilitySystemEnabled();
                 cachedWeightRoomCapacity = svc.getWeightRoomCapacity();
                 cachedWeightDayBalance = svc.getWeightDayBalance();
                 cachedWeightLecturerTransition = svc.getWeightLecturerTransition();
@@ -70,12 +75,13 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 cachedWeightEarlyMorning = svc.getInt("weight_early_morning", 3);
                 cachedMaxLecturerConsecutiveHours = svc.getMaxLecturerConsecutiveHours();
                 loadedFromDb = true;
-                System.out.println("[ConstraintProvider] Loaded from DB: lunchBreakEnd=" + cachedLunchBreakEnd +
-                        ", latestEndTime=" + cachedLatestEndTime + ", fridayEndTime=" + cachedFridayLatestEndTime);
+                log.info(
+                        "Constraint settings loaded: lunchBreakEnd={}, latestEndTime={}, fridayEndTime={}, unavailabilityEnabled={}",
+                        cachedLunchBreakEnd, cachedLatestEndTime, cachedFridayLatestEndTime,
+                        cachedUnavailabilitySystemEnabled);
             } else if (!settingsInitialized) {
                 // Only set defaults if we haven't set anything yet
-                System.err.println(
-                        "[ConstraintProvider] WARNING: Service is null! Using hardcoded defaults (will retry later).");
+                log.warn("ConstraintSettingsService unavailable; using defaults until service is ready.");
                 cachedLunchBreakStart = LocalTime.of(12, 0);
                 cachedLunchBreakEnd = LocalTime.of(14, 0);
                 cachedLatestEndTime = LocalTime.of(18, 0);
@@ -83,6 +89,7 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 cachedLunchBreakEnforced = true;
                 cachedSameCourseSameDayAllowed = false;
                 cachedDayBalanceEnforced = true;
+                cachedUnavailabilitySystemEnabled = false;
                 cachedWeightRoomCapacity = 1;
                 cachedWeightDayBalance = 2;
                 cachedWeightLecturerTransition = 5;
@@ -274,8 +281,8 @@ public class TimetableConstraintProvider implements ConstraintProvider {
     }
 
     private boolean isUnavailabilitySystemEnabled() {
-        ConstraintSettingsService svc = SpringContextHolder.getBean(ConstraintSettingsService.class);
-        return svc != null && svc.isUnavailabilitySystemEnabled();
+        initializeSettings();
+        return cachedUnavailabilitySystemEnabled;
     }
 
     /**

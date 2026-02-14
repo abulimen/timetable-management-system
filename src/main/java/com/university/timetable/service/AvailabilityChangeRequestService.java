@@ -30,6 +30,7 @@ public class AvailabilityChangeRequestService {
     private final LecturerRepository lecturerRepository;
     private final LessonRepository lessonRepository;
     private final ConstraintSettingsService settingsService;
+    private final EmailService emailService;
 
     /**
      * Create a new availability change request.
@@ -71,8 +72,9 @@ public class AvailabilityChangeRequestService {
 
         log.info("Created availability change request for lecturer {}: {} {}-{} -> {}, {} affected lessons",
                 lecturer.getName(), dayOfWeek, startTime, endTime, newStatus, affectedLessons.size());
-
-        return requestRepository.save(request);
+        AvailabilityChangeRequest saved = requestRepository.save(request);
+        notifyLecturer(lecturer, "CREATED", dayOfWeek, startTime, endTime, "Request submitted for review.");
+        return saved;
     }
 
     /**
@@ -97,7 +99,10 @@ public class AvailabilityChangeRequestService {
 
         log.info("Approved availability change request {} by {}", requestId, reviewer.getEmail());
 
-        return requestRepository.save(request);
+        AvailabilityChangeRequest saved = requestRepository.save(request);
+        notifyLecturer(request.getLecturer(), "UPDATED", request.getDayOfWeek(), request.getStartTime(),
+                request.getEndTime(), "Request approved. Unavailability is active.");
+        return saved;
     }
 
     /**
@@ -118,7 +123,10 @@ public class AvailabilityChangeRequestService {
 
         log.info("Rejected availability change request {} by {}: {}", requestId, reviewer.getEmail(), reviewNotes);
 
-        return requestRepository.save(request);
+        AvailabilityChangeRequest saved = requestRepository.save(request);
+        notifyLecturer(request.getLecturer(), "UPDATED", request.getDayOfWeek(), request.getStartTime(),
+                request.getEndTime(), "Request rejected. " + safeNotes(reviewNotes));
+        return saved;
     }
 
     /**
@@ -139,7 +147,10 @@ public class AvailabilityChangeRequestService {
 
         log.info("Returned availability change request {} for more info by {}", requestId, reviewer.getEmail());
 
-        return requestRepository.save(request);
+        AvailabilityChangeRequest saved = requestRepository.save(request);
+        notifyLecturer(request.getLecturer(), "UPDATED", request.getDayOfWeek(), request.getStartTime(),
+                request.getEndTime(), "Request returned for more information. " + safeNotes(reviewNotes));
+        return saved;
     }
 
     /**
@@ -163,9 +174,13 @@ public class AvailabilityChangeRequestService {
         request.setReviewedAt(LocalDateTime.now());
         request.setReviewNotes("REVOKED: " + reviewNotes);
 
-        log.info("Revoked approval for request {} by {}: {}", requestId, reviewer.getEmail(), reviewNotes);
+        removeAppliedAvailabilitySlot(request);
 
-        return requestRepository.save(request);
+        log.info("Revoked approval for request {} by {}: {}", requestId, reviewer.getEmail(), reviewNotes);
+        AvailabilityChangeRequest saved = requestRepository.save(request);
+        notifyLecturer(request.getLecturer(), "REVOKED", request.getDayOfWeek(), request.getStartTime(),
+                request.getEndTime(), "Approved request was revoked. Unavailability slot removed. " + safeNotes(reviewNotes));
+        return saved;
     }
 
     /**
@@ -225,7 +240,10 @@ public class AvailabilityChangeRequestService {
         log.info("Resubmitted availability change request {} for lecturer {}", requestId,
                 request.getLecturer().getName());
 
-        return requestRepository.save(request);
+        AvailabilityChangeRequest saved = requestRepository.save(request);
+        notifyLecturer(request.getLecturer(), "UPDATED", request.getDayOfWeek(), request.getStartTime(),
+                request.getEndTime(), "Request resubmitted and is pending review.");
+        return saved;
     }
 
     /**
@@ -348,5 +366,41 @@ public class AvailabilityChangeRequestService {
         log.info("Applied availability change for lecturer {}: {} {}-{} = {}",
                 lecturer.getName(), request.getDayOfWeek(),
                 request.getStartTime(), request.getEndTime(), request.getNewStatus());
+    }
+
+    private void removeAppliedAvailabilitySlot(AvailabilityChangeRequest request) {
+        Lecturer lecturer = request.getLecturer();
+        int before = lecturer.getUnavailabilities().size();
+        lecturer.getUnavailabilities().removeIf(u ->
+                u.getDayOfWeek() == request.getDayOfWeek()
+                        && u.getStartTime().equals(request.getStartTime())
+                        && u.getEndTime().equals(request.getEndTime()));
+        int removed = before - lecturer.getUnavailabilities().size();
+        if (removed > 0) {
+            lecturerRepository.save(lecturer);
+            log.info("Removed {} applied unavailability slot(s) for lecturer {} during revocation of request {}",
+                    removed, lecturer.getName(), request.getId());
+        } else {
+            log.info("No matching unavailability slot found to remove for request {}", request.getId());
+        }
+    }
+
+    private void notifyLecturer(Lecturer lecturer, String action, DayOfWeek dayOfWeek, LocalTime startTime,
+            LocalTime endTime, String notes) {
+        if (lecturer == null || lecturer.getEmail() == null || lecturer.getEmail().isBlank()) {
+            return;
+        }
+        emailService.sendAvailabilityNotification(
+                lecturer.getEmail(),
+                lecturer.getName(),
+                action,
+                dayOfWeek,
+                startTime != null ? startTime.toString() : null,
+                endTime != null ? endTime.toString() : null,
+                notes);
+    }
+
+    private String safeNotes(String notes) {
+        return notes != null ? notes : "";
     }
 }
