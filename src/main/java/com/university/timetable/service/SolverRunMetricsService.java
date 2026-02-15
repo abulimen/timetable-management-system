@@ -66,6 +66,9 @@ public class SolverRunMetricsService {
             row.put("bestHardScore", run.getBestHardScore());
             row.put("bestSoftScore", run.getBestSoftScore());
             row.put("durationMs", run.getDurationMs());
+            row.put("impactedLessonsCount", run.getImpactedLessonsCount());
+            row.put("lockedLessonsCount", run.getLockedLessonsCount());
+            row.put("changedLessonsCount", run.getChangedLessonsCount());
             row.put("timeToFirstBestMs", run.getTimeToFirstBestMs());
             row.put("improvementCount", run.getImprovementCount());
             row.put("persistenceCount", run.getPersistenceCount());

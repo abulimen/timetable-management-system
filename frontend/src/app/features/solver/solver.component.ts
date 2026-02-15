@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import {
   ApiService,
   SolverStatus,
+  TimetableChangeStatus,
   SolverAnalysis,
   FeasibilityCheck,
   CourseFeasibilityDiagnostics,
@@ -41,6 +42,13 @@ import {
             <p *ngIf="status?.durationMs != null" class="text-secondary-500 mt-1">
               Solve time: {{ formatDuration(status?.durationMs ?? 0) }}
             </p>
+            <div *ngIf="status?.pendingChanges" class="mt-2 text-xs text-amber-700 bg-amber-100 rounded px-2 py-1 inline-block">
+              Pending timetable changes not yet replanned: {{ status?.pendingChangeReason || 'Unknown reason' }}
+            </div>
+            <div class="mt-2 text-xs inline-block px-2 py-1 rounded"
+              [ngClass]="editingStatus?.editingEnabled ? 'bg-emerald-100 text-emerald-800' : 'bg-secondary-200 text-secondary-700'">
+              Editing mode: {{ editingStatus?.editingEnabled ? 'ENABLED' : 'LOCKED' }}
+            </div>
             
             <!-- Error Alert -->
             <div *ngIf="status?.state === 'ERROR'" class="mt-4 p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-200 rounded-lg flex items-start gap-3 max-w-xl">
@@ -77,6 +85,18 @@ import {
               [disabled]="isSolving"
               class="btn btn-danger disabled:opacity-50">
               Clear Timetable
+            </button>
+            <button
+              *ngIf="!editingStatus?.editingEnabled"
+              (click)="enableEditingMode()"
+              class="btn btn-warning">
+              Enable Editing
+            </button>
+            <button
+              *ngIf="editingStatus?.editingEnabled"
+              (click)="disableEditingMode()"
+              class="btn btn-secondary">
+              Lock Editing
             </button>
           </div>
         </div>
@@ -198,6 +218,7 @@ import {
 export class SolverComponent implements OnInit, OnDestroy {
   private api = inject(ApiService);
   status: SolverStatus | null = null;
+  editingStatus: TimetableChangeStatus | null = null;
   analysis: SolverAnalysis | null = null;
   feasibility: FeasibilityCheck | null = null;
   courseDiagnostics: CourseFeasibilityDiagnostics | null = null;
@@ -219,6 +240,7 @@ export class SolverComponent implements OnInit, OnDestroy {
     this.api.getSolverStatus().subscribe({
       next: (s) => {
         this.status = s;
+        this.refreshEditingStatus();
         // Start polling if solver is already active on page load
         if (this.isSolving && !this.pollInterval) {
           this.startPolling();
@@ -233,6 +255,7 @@ export class SolverComponent implements OnInit, OnDestroy {
       this.api.getSolverStatus().subscribe({
         next: (st) => {
           this.status = st;
+          this.refreshEditingStatus();
           if (!this.isSolving) {
             this.stopPolling();
           }
@@ -317,6 +340,36 @@ export class SolverComponent implements OnInit, OnDestroy {
       error: (err) => {
         const message = err?.error?.message || 'Failed to clear timetable.';
         alert(message);
+      }
+    });
+  }
+
+  enableEditingMode() {
+    const confirmed = window.confirm(
+      'Enable editing mode? Any changes you make will require running FULL REPLAN to generate a new timetable.'
+    );
+    if (!confirmed) {
+      return;
+    }
+    this.api.enableEditingMode().subscribe({
+      next: (status) => {
+        this.editingStatus = status;
+      }
+    });
+  }
+
+  disableEditingMode() {
+    this.api.disableEditingMode().subscribe({
+      next: (status) => {
+        this.editingStatus = status;
+      }
+    });
+  }
+
+  private refreshEditingStatus() {
+    this.api.getTimetableChangeStatus().subscribe({
+      next: (status) => {
+        this.editingStatus = status;
       }
     });
   }

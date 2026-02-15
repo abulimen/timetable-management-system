@@ -3,10 +3,12 @@ package com.university.timetable.controller;
 import com.university.timetable.domain.*;
 import com.university.timetable.repository.*;
 import com.university.timetable.service.AuditLogService;
+import com.university.timetable.service.TimetableChangeTrackerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -25,6 +27,7 @@ public class SpecialEventController {
     private final RoomRepository roomRepository;
     private final LecturerRepository lecturerRepository;
     private final AuditLogService auditLogService;
+    private final TimetableChangeTrackerService timetableChangeTrackerService;
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
@@ -51,11 +54,13 @@ public class SpecialEventController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    @Transactional
     public ResponseEntity<SpecialEventDTO> create(@RequestBody SpecialEventCreateDTO dto) {
         SpecialEvent event = new SpecialEvent();
         updateFromDTO(event, dto);
         SpecialEvent saved = specialEventRepository.save(event);
+        timetableChangeTrackerService.markDirty("Special event created: " + saved.getName());
         auditLogService.logAction(
                 AuditAction.CREATE,
                 "SpecialEvent",
@@ -68,13 +73,15 @@ public class SpecialEventController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    @Transactional
     public ResponseEntity<SpecialEventDTO> update(@PathVariable Long id, @RequestBody SpecialEventCreateDTO dto) {
         return specialEventRepository.findById(id)
                 .map(event -> {
                     SpecialEventDTO previousState = toDTO(event);
                     updateFromDTO(event, dto);
                     SpecialEvent saved = specialEventRepository.save(event);
+                    timetableChangeTrackerService.markDirty("Special event updated: " + saved.getName());
                     auditLogService.logAction(
                             AuditAction.UPDATE,
                             "SpecialEvent",
@@ -95,6 +102,7 @@ public class SpecialEventController {
                 .map(event -> {
                     SpecialEventDTO previousState = toDTO(event);
                     specialEventRepository.deleteById(id);
+                    timetableChangeTrackerService.markDirty("Special event deleted: " + event.getName());
                     auditLogService.logAction(
                             AuditAction.DELETE,
                             "SpecialEvent",
@@ -109,13 +117,14 @@ public class SpecialEventController {
     }
 
     @PutMapping("/{id}/toggle-active")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<SpecialEventDTO> toggleActive(@PathVariable Long id) {
         return specialEventRepository.findById(id)
                 .map(event -> {
                     SpecialEventDTO previousState = toDTO(event);
                     event.setActive(!event.isActive());
                     SpecialEvent saved = specialEventRepository.save(event);
+                    timetableChangeTrackerService.markDirty("Special event toggled: " + saved.getName());
                     auditLogService.logAction(
                             AuditAction.UPDATE,
                             "SpecialEvent",
@@ -242,4 +251,5 @@ public class SpecialEventController {
         public Boolean active;
         public List<Long> studentGroupIds;
     }
+
 }

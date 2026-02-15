@@ -6,6 +6,7 @@ import com.university.timetable.service.ConstraintJustificationService;
 import com.university.timetable.service.InfeasibilityChecker;
 import com.university.timetable.service.SolverRunMetricsService;
 import com.university.timetable.service.SolverService;
+import com.university.timetable.service.TimetableChangeTrackerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,7 @@ public class SolverController {
     private final ConstraintJustificationService justificationService;
     private final AuditLogService auditLogService;
     private final SolverRunMetricsService solverRunMetricsService;
+    private final TimetableChangeTrackerService timetableChangeTrackerService;
 
     /**
      * POST /api/v1/solver/solve
@@ -44,8 +46,7 @@ public class SolverController {
      */
     @PostMapping("/solve")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
-    public ResponseEntity<?> startSolving(
-            @RequestBody(required = false) SolveRequestDTO request) {
+    public ResponseEntity<?> startSolving(@RequestBody(required = false) SolveRequestDTO request) {
 
         long requestStart = System.nanoTime();
         String mode = (request != null && request.getMode() != null)
@@ -75,7 +76,7 @@ public class SolverController {
         // STEP 3: Start solver
         try {
             long solveStart = System.nanoTime();
-            SolverStatusDTO status = solverService.startSolving(mode);
+            SolverStatusDTO status = solverService.startSolving(request);
             log.info("Solver start API call completed in {} ms (total request {} ms)",
                     elapsedMs(solveStart), elapsedMs(requestStart));
 
@@ -102,6 +103,36 @@ public class SolverController {
     public ResponseEntity<SolverStatusDTO> getStatus() {
         SolverStatusDTO status = solverService.getStatus();
         return ResponseEntity.ok(status);
+    }
+
+    @GetMapping("/change-status")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<TimetableChangeStatusDTO> getChangeStatus() {
+        return ResponseEntity.ok(timetableChangeTrackerService.getStatus());
+    }
+
+    @PostMapping("/editing/enable")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<?> enableEditingMode(@RequestBody(required = false) Map<String, String> body) {
+        String token = body != null ? body.get("confirmationToken") : null;
+        if (!"ENABLE_EDITING_FULL_REPLAN_REQUIRED".equals(token)) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "CONFIRMATION_REQUIRED",
+                    "message",
+                    "confirmationToken='ENABLE_EDITING_FULL_REPLAN_REQUIRED' is required to enable editing mode."));
+        }
+        timetableChangeTrackerService.enableEditing(
+                "Editing mode enabled by admin. Any data updates now require FULL_REPLAN before final use.");
+        auditLogService.logSchedulerAction("Editing mode enabled", true);
+        return ResponseEntity.ok(timetableChangeTrackerService.getStatus());
+    }
+
+    @PostMapping("/editing/disable")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<TimetableChangeStatusDTO> disableEditingMode() {
+        timetableChangeTrackerService.lockEditing("Editing mode disabled by admin.");
+        auditLogService.logSchedulerAction("Editing mode disabled", true);
+        return ResponseEntity.ok(timetableChangeTrackerService.getStatus());
     }
 
     /**

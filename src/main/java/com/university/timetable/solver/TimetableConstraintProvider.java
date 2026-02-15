@@ -377,12 +377,20 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                     if (lesson.getTimeslot() == null || !event.isActive()) {
                         return false;
                     }
-                    // Check if lesson overlaps with special event time
-                    if (!event.overlapsWithTimeslot(lesson.getTimeslot())) {
+                    // Check overlap against the full lesson interval (not just the 1-hour start slot).
+                    if (event.getDayOfWeek() != lesson.getTimeslot().getDayOfWeek()) {
+                        return false;
+                    }
+                    LocalTime lessonStart = lesson.getTimeslot().getStartTime();
+                    LocalTime lessonEnd = lesson.getEndTime();
+                    LocalTime eventStart = event.getStartTime();
+                    LocalTime eventEnd = event.getEndTime();
+                    boolean overlaps = lessonStart.isBefore(eventEnd) && eventStart.isBefore(lessonEnd);
+                    if (!overlaps) {
                         return false;
                     }
                     // Check if any of the lesson's student groups are affected
-                    for (StudentGroup lessonGroup : lesson.getCourse().getAllStudentGroups()) {
+                    for (StudentGroup lessonGroup : lesson.getStudentGroups()) {
                         if (event.affectsStudentGroup(lessonGroup)) {
                             return true;
                         }

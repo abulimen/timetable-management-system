@@ -9,6 +9,7 @@ import com.university.timetable.domain.SpecialEvent;
 import com.university.timetable.domain.StudentGroup;
 import com.university.timetable.domain.TimeTable;
 import com.university.timetable.domain.Timeslot;
+import com.university.timetable.dto.SolveRequestDTO;
 import com.university.timetable.dto.SolverStatusDTO;
 import com.university.timetable.repository.CourseRepository;
 import com.university.timetable.repository.LecturerRepository;
@@ -30,7 +31,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -56,12 +62,17 @@ public class SolverService {
     private final SolutionSaver solutionSaver;
     private final ConstraintSettingsService constraintSettingsService;
     private final SolverRunMetricsService solverRunMetricsService;
+    private final TimetableChangeTrackerService timetableChangeTrackerService;
+    private final AuditLogService auditLogService;
 
     @Value("${solver.persistence.min-interval-ms:5000}")
     private long persistenceMinIntervalMs;
 
     @Value("${solver.persistence.every-n-improvements:10}")
     private int persistenceEveryNImprovements;
+
+    @Value("${solver.scoped.max-impact-ratio:0.25}")
+    private double scopedMaxImpactRatio;
 
     private static final Long PROBLEM_ID = 1L;
 
@@ -74,6 +85,9 @@ public class SolverService {
     private volatile int currentLessonsCount;
     private volatile int currentTimeslotsCount;
     private volatile int currentRoomsCount;
+    private volatile int currentImpactedLessonsCount;
+    private volatile int currentLockedLessonsCount;
+    private volatile int currentChangedLockedLessonsCount;
     private volatile LocalDateTime currentRunStartedAt;
     private volatile Long lastRunDurationMs;
 
@@ -84,6 +98,7 @@ public class SolverService {
     private final AtomicLong lastPersistedAtMs = new AtomicLong(0L);
     private final AtomicLong persistedBestCount = new AtomicLong(0L);
     private final AtomicLong persistedBestTotalMs = new AtomicLong(0L);
+    private final AtomicLong feasibleBestCount = new AtomicLong(0L);
     private final AtomicBoolean runFinalized = new AtomicBoolean(true);
     private volatile HardSoftScore lastPersistedScore;
 
@@ -96,9 +111,23 @@ public class SolverService {
      * Start the solver with specified mode.
      */
     public SolverStatusDTO startSolving(String mode) {
+        SolveRequestDTO request = new SolveRequestDTO();
+        request.setMode(mode);
+        return startSolving(request);
+    }
+
+    /**
+     * Start the solver with request payload.
+     */
+    public SolverStatusDTO startSolving(SolveRequestDTO request) {
         long startNanos = System.nanoTime();
+        String mode = request != null ? request.getMode() : null;
         String normalizedMode = (mode == null || mode.isBlank()) ? "FULL_REPLAN" : mode.trim().toUpperCase();
         log.info("Starting solver in {} mode", normalizedMode);
+        if ("SCOPED_REPLAN".equalsIgnoreCase(normalizedMode)) {
+            throw new IllegalStateException(
+                    "Scoped replan is discontinued. Enable editing mode, apply your changes, then run FULL_REPLAN.");
+        }
 
         SolverStatus currentStatus = solverManager.getSolverStatus(PROBLEM_ID);
         if (currentStatus == SolverStatus.SOLVING_ACTIVE) {
@@ -132,6 +161,9 @@ public class SolverService {
         currentLessonsCount = problem.getLessons().size();
         currentTimeslotsCount = problem.getTimeslots().size();
         currentRoomsCount = problem.getRooms().size();
+        currentImpactedLessonsCount = 0;
+        currentLockedLessonsCount = 0;
+        currentChangedLockedLessonsCount = 0;
 
         log.info("Loaded problem: {} lessons, {} timeslots, {} rooms",
                 currentLessonsCount, currentTimeslotsCount, currentRoomsCount);
@@ -151,6 +183,17 @@ public class SolverService {
         if ("STABILITY".equalsIgnoreCase(normalizedMode)) {
             prepareStabilityMode(problem);
         }
+        Map<Long, String> lockedAssignmentBaseline = Map.of();
+        Set<Long> scopedImpactedIds = Set.of();
+        if ("SCOPED_REPLAN".equalsIgnoreCase(normalizedMode)) {
+            SolveRequestDTO.SolveScopeDTO scope = request != null ? request.getScope() : null;
+            boolean allowLargeScope = request != null && Boolean.TRUE.equals(request.getAllowLargeScope());
+            scopedImpactedIds = applyScopedReplanMode(problem, scope, allowLargeScope);
+            lockedAssignmentBaseline = captureLockedAssignments(problem, scopedImpactedIds);
+            currentImpactedLessonsCount = scopedImpactedIds.size();
+            currentLockedLessonsCount = Math.max(0, problem.getLessons().size() - scopedImpactedIds.size());
+            log.info("Scoped replan prepared: impacted={}, locked={}", currentImpactedLessonsCount, currentLockedLessonsCount);
+        }
 
         currentJobId = UUID.randomUUID().toString();
         currentMode = normalizedMode;
@@ -169,9 +212,13 @@ public class SolverService {
         lastPersistedAtMs.set(0L);
         persistedBestCount.set(0L);
         persistedBestTotalMs.set(0L);
+        feasibleBestCount.set(0L);
         lastPersistedScore = null;
         runFinalized.set(false);
+        timetableChangeTrackerService.lockEditing("Solver run in progress. Editing is locked.");
 
+        final Map<Long, String> finalLockedAssignmentBaseline = lockedAssignmentBaseline;
+        final Set<Long> finalScopedImpactedIds = scopedImpactedIds;
         log.info("Starting async solver with problem ID: {}", PROBLEM_ID);
         solverManager.solveAndListen(PROBLEM_ID,
                 id -> {
@@ -193,9 +240,23 @@ public class SolverService {
                     if (score != null) {
                         currentBestHardScore = score.hardScore();
                         currentBestSoftScore = score.softScore();
+                        if (score.hardScore() >= 0) {
+                            feasibleBestCount.incrementAndGet();
+                        }
                     }
                     currentBestScore = String.valueOf(score);
                     int assignedLessons = countAssignedLessons(bestSolution);
+
+                    if ("SCOPED_REPLAN".equalsIgnoreCase(currentMode) && !finalLockedAssignmentBaseline.isEmpty()) {
+                        long changedLocked = countChangedLockedAssignments(bestSolution, finalLockedAssignmentBaseline);
+                        currentChangedLockedLessonsCount = (int) changedLocked;
+                        if (changedLocked > 0) {
+                            currentRunError = "Scoped replan modified locked lessons (" + changedLocked + ").";
+                            log.error("Scoped replan breach: {} locked lessons changed. Terminating run.", changedLocked);
+                            solverManager.terminateEarly(PROBLEM_ID);
+                            return;
+                        }
+                    }
 
                     if (improvementIndex == 1) {
                         log.info("First best solution in {} ms | score={} | assignedLessons={}/{}",
@@ -224,7 +285,12 @@ public class SolverService {
                             log.error("Failed to save solution: {}", e.getMessage(), e);
                         }
                     } else {
-                        log.debug("Skipped persistence for best solution #{} (throttled)", improvementIndex);
+                        if (score != null && score.hardScore() < 0) {
+                            log.debug("Skipped persistence for best solution #{} (hard-infeasible score={})",
+                                    improvementIndex, score);
+                        } else {
+                            log.debug("Skipped persistence for best solution #{} (throttled)", improvementIndex);
+                        }
                     }
                 },
                 (problemId, exception) -> {
@@ -240,7 +306,20 @@ public class SolverService {
                 });
 
         log.info("Solver started with job ID: {}", currentJobId);
-        return new SolverStatusDTO(currentJobId, "SOLVING", currentBestScore, null);
+        if ("SCOPED_REPLAN".equalsIgnoreCase(currentMode)) {
+            auditLogService.logSystemAction(
+                    "SCOPED_REPLAN_STARTED: runId=" + currentJobId
+                            + ", impacted=" + currentImpactedLessonsCount
+                            + ", locked=" + currentLockedLessonsCount
+                            + ", reason=" + (request != null && request.getScope() != null ? request.getScope().getReason() : "n/a"),
+                    true,
+                    null);
+        }
+        SolverStatusDTO status = new SolverStatusDTO(currentJobId, "SOLVING", currentBestScore, null);
+        status.setImpactedLessonsCount(currentImpactedLessonsCount);
+        status.setLockedLessonsCount(currentLockedLessonsCount);
+        status.setChangedLockedLessonsCount(currentChangedLockedLessonsCount);
+        return enrichWithPendingChangeStatus(status);
     }
 
     /**
@@ -249,6 +328,9 @@ public class SolverService {
     public SolverStatusDTO getStatus() {
         SolverStatus status = solverManager.getSolverStatus(PROBLEM_ID);
         if (status == SolverStatus.NOT_SOLVING) {
+            if (currentRunError == null && currentBestHardScore != null && currentBestHardScore < 0) {
+                currentRunError = "Solver finished without a hard-feasible timetable. No invalid assignments were applied.";
+            }
             String finalStatus = currentRunError == null ? "COMPLETED" : "FAILED";
             finalizeRunIfNeeded(finalStatus, currentRunError);
         }
@@ -263,7 +345,11 @@ public class SolverService {
         } else if (solveStartedAtMs.get() > 0L) {
             durationMs = Math.max(0L, System.currentTimeMillis() - solveStartedAtMs.get());
         }
-        return new SolverStatusDTO(currentJobId, status.name(), score, durationMs);
+        SolverStatusDTO dto = new SolverStatusDTO(currentJobId, status.name(), score, durationMs);
+        dto.setImpactedLessonsCount(currentImpactedLessonsCount);
+        dto.setLockedLessonsCount(currentLockedLessonsCount);
+        dto.setChangedLockedLessonsCount(currentChangedLockedLessonsCount);
+        return enrichWithPendingChangeStatus(dto);
     }
 
     /**
@@ -277,7 +363,11 @@ public class SolverService {
         long elapsed = solveStartedAtMs.get() == 0L ? 0L : (System.currentTimeMillis() - solveStartedAtMs.get());
         log.info("Solver terminated after {} ms with {} improvements; latest score={}",
                 elapsed, bestSolutionCount.get(), currentBestScore);
-        return new SolverStatusDTO(currentJobId, "TERMINATED", currentBestScore, elapsed);
+        SolverStatusDTO dto = new SolverStatusDTO(currentJobId, "TERMINATED", currentBestScore, elapsed);
+        dto.setImpactedLessonsCount(currentImpactedLessonsCount);
+        dto.setLockedLessonsCount(currentLockedLessonsCount);
+        dto.setChangedLockedLessonsCount(currentChangedLockedLessonsCount);
+        return enrichWithPendingChangeStatus(dto);
     }
 
     /**
@@ -330,6 +420,7 @@ public class SolverService {
             finalizeRunIfNeeded("TERMINATED", "Terminated due to timetable clear operation.");
         }
         int updated = lessonRepository.clearAllAssignmentsAndPins();
+        timetableChangeTrackerService.markDirty("Manual timetable clear");
         log.warn("Cleared timetable assignments for {} lesson(s)", updated);
         return updated;
     }
@@ -352,7 +443,89 @@ public class SolverService {
         }
     }
 
+    private Set<Long> applyScopedReplanMode(
+            TimeTable problem,
+            SolveRequestDTO.SolveScopeDTO scope,
+            boolean allowLargeScope) {
+        if (scope == null || scope.getImpactedLessonIds() == null || scope.getImpactedLessonIds().isEmpty()) {
+            throw new IllegalStateException("Scoped replan requires non-empty scope.impactedLessonIds.");
+        }
+
+        Set<Long> impacted = scope.getImpactedLessonIds().stream()
+                .filter(Objects::nonNull)
+                .collect(java.util.stream.Collectors.toCollection(HashSet::new));
+        if (scope.getExcludedLessonIds() != null) {
+            impacted.removeAll(scope.getExcludedLessonIds().stream().filter(Objects::nonNull).toList());
+        }
+        if (impacted.isEmpty()) {
+            throw new IllegalStateException("Scoped replan scope is empty after exclusions.");
+        }
+
+        Set<Long> availableIds = problem.getLessons().stream()
+                .map(Lesson::getId)
+                .filter(Objects::nonNull)
+                .collect(java.util.stream.Collectors.toSet());
+        List<Long> missingIds = impacted.stream()
+                .filter(id -> !availableIds.contains(id))
+                .sorted()
+                .toList();
+        if (!missingIds.isEmpty()) {
+            throw new IllegalStateException("Scoped replan contains invalid lesson IDs: " + missingIds);
+        }
+
+        int total = Math.max(1, problem.getLessons().size());
+        double ratio = (double) impacted.size() / (double) total;
+        if (!allowLargeScope && ratio > scopedMaxImpactRatio) {
+            throw new IllegalStateException(String.format(
+                    "Scoped replan too large: %d/%d lessons (%.1f%%). Use full replan or allowLargeScope=true.",
+                    impacted.size(), total, ratio * 100.0));
+        }
+
+        for (Lesson lesson : problem.getLessons()) {
+            Long lessonId = lesson.getId();
+            boolean isImpacted = lessonId != null && impacted.contains(lessonId);
+            lesson.setPinned(!isImpacted);
+        }
+
+        return impacted;
+    }
+
+    private Map<Long, String> captureLockedAssignments(TimeTable problem, Set<Long> impactedIds) {
+        Map<Long, String> baseline = new HashMap<>();
+        for (Lesson lesson : problem.getLessons()) {
+            if (lesson.getId() == null || impactedIds.contains(lesson.getId())) {
+                continue;
+            }
+            baseline.put(lesson.getId(), assignmentSignature(lesson));
+        }
+        return baseline;
+    }
+
+    private long countChangedLockedAssignments(TimeTable solution, Map<Long, String> baseline) {
+        long changed = 0L;
+        for (Lesson lesson : solution.getLessons()) {
+            if (lesson.getId() == null || !baseline.containsKey(lesson.getId())) {
+                continue;
+            }
+            String expected = baseline.get(lesson.getId());
+            String actual = assignmentSignature(lesson);
+            if (!Objects.equals(expected, actual)) {
+                changed++;
+            }
+        }
+        return changed;
+    }
+
+    private String assignmentSignature(Lesson lesson) {
+        Long timeslotId = lesson.getTimeslot() != null ? lesson.getTimeslot().getId() : null;
+        Long roomId = lesson.getRoom() != null ? lesson.getRoom().getId() : null;
+        return timeslotId + "|" + roomId;
+    }
+
     private boolean shouldPersistBestSolution(long improvementIndex, HardSoftScore score, long nowMs) {
+        if (score != null && score.hardScore() < 0) {
+            return false;
+        }
         if (improvementIndex == 1) {
             return true;
         }
@@ -397,6 +570,9 @@ public class SolverService {
         runMetric.setLessonsCount(currentLessonsCount);
         runMetric.setTimeslotsCount(currentTimeslotsCount);
         runMetric.setRoomsCount(currentRoomsCount);
+        runMetric.setImpactedLessonsCount(currentImpactedLessonsCount);
+        runMetric.setLockedLessonsCount(currentLockedLessonsCount);
+        runMetric.setChangedLessonsCount(currentChangedLockedLessonsCount);
         runMetric.setImprovementCount(bestSolutionCount.get());
         runMetric.setPersistenceCount(persistenceCount);
         runMetric.setAvgPersistenceMs(avgPersistence);
@@ -416,6 +592,34 @@ public class SolverService {
                 "Solver run finalized: runId={}, status={}, mode={}, durationMs={}, firstBestMs={}, improvements={}, persistenceCount={}, bestScore={}",
                 currentJobId, status, currentMode, durationMs, firstBestDelay, bestSolutionCount.get(),
                 persistenceCount, currentBestScore);
+
+        if ("SCOPED_REPLAN".equalsIgnoreCase(currentMode)) {
+            boolean success = "COMPLETED".equalsIgnoreCase(status);
+            String eventType = success ? "SCOPED_REPLAN_COMPLETED" : "SCOPED_REPLAN_FAILED";
+            auditLogService.logSystemAction(
+                    eventType + ": runId=" + currentJobId
+                            + ", status=" + status
+                            + ", impacted=" + currentImpactedLessonsCount
+                            + ", locked=" + currentLockedLessonsCount
+                            + ", changedLocked=" + currentChangedLockedLessonsCount
+                            + ", durationMs=" + durationMs,
+                    success,
+                    success ? null : reason);
+        }
+
+        if ("COMPLETED".equals(status)) {
+            timetableChangeTrackerService.clear("Timetable solved (" + currentMode + ")");
+            timetableChangeTrackerService
+                    .lockEditing("Timetable generated. Editing is now locked until admin enables editing mode.");
+        }
+    }
+
+    private SolverStatusDTO enrichWithPendingChangeStatus(SolverStatusDTO status) {
+        var changeStatus = timetableChangeTrackerService.getStatus();
+        status.setPendingChanges(changeStatus.isPendingChanges());
+        status.setPendingChangeReason(changeStatus.getReason());
+        status.setPendingChangeSince(changeStatus.getChangedAt());
+        return status;
     }
 
     private LocalDateTime toLocalDateTime(long epochMs) {

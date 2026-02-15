@@ -4,6 +4,7 @@ import com.university.timetable.domain.*;
 import com.university.timetable.repository.*;
 import com.university.timetable.service.AuditLogService;
 import com.university.timetable.service.LessonService;
+import com.university.timetable.service.TimetableChangeTrackerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,8 +28,10 @@ public class CourseController {
     private final StudentGroupRepository studentGroupRepository;
     private final FeatureRepository featureRepository;
     private final ZoneRepository zoneRepository;
+    private final LessonRepository lessonRepository;
     private final LessonService lessonService;
     private final AuditLogService auditLogService;
+    private final TimetableChangeTrackerService timetableChangeTrackerService;
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
@@ -94,17 +97,20 @@ public class CourseController {
 
         Course saved = courseRepository.save(course);
 
-        // Auto-generate lessons for new course
-        if (dto.generateLessons != null && dto.generateLessons) {
+        // Always generate lessons for new courses with weekly hours > 0 (post-generation safe default).
+        if (saved.getTotalWeeklyHours() > 0 && lessonRepository.countByCourse(saved) == 0) {
             lessonService.generateLessons(saved);
         }
+
+        CourseDTO response = toDTO(saved);
+        timetableChangeTrackerService.markDirty("Late course creation: " + saved.getCode());
 
         // Audit logging
         auditLogService.logAction(AuditAction.CREATE, "Course", saved.getId().toString(),
                 saved.getCode() + " - " + saved.getName(), null, toDTO(saved),
-                "Created course " + saved.getCode());
+                "COURSE_CREATED_POST_GENERATION: Created course " + saved.getCode());
 
-        return ResponseEntity.ok(toDTO(saved));
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
@@ -158,6 +164,16 @@ public class CourseController {
                     }
 
                     Course updated = courseRepository.save(course);
+
+                    // Keep lesson lecturer aligned for permanent course-wide lecturer changes.
+                    List<Lesson> lessons = lessonRepository.findByCourse(updated);
+                    if (!lessons.isEmpty()) {
+                        for (Lesson lesson : lessons) {
+                            lesson.setLecturer(updated.getLecturer());
+                        }
+                        lessonRepository.saveAll(lessons);
+                    }
+                    timetableChangeTrackerService.markDirty("Course updated: " + updated.getCode());
 
                     // Audit logging
                     auditLogService.logAction(AuditAction.UPDATE, "Course", updated.getId().toString(),
@@ -221,6 +237,7 @@ public class CourseController {
                 .map(course -> {
                     CourseDTO previousState = toDTO(course);
                     courseRepository.deleteById(id);
+                    timetableChangeTrackerService.markDirty("Course deleted: " + course.getCode());
 
                     // Audit logging
                     auditLogService.logAction(AuditAction.DELETE, "Course", id.toString(),
@@ -238,6 +255,7 @@ public class CourseController {
         return courseRepository.findById(id)
                 .map(course -> {
                     lessonService.generateLessons(course);
+                    timetableChangeTrackerService.markDirty("Lessons regenerated for " + course.getCode());
                     auditLogService.logAction(
                             AuditAction.SYSTEM_ACTION,
                             "Course",
@@ -249,6 +267,24 @@ public class CourseController {
                     return ResponseEntity.ok(toDTO(course));
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{id}/cancel")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<?> cancelCourse(@PathVariable Long id) {
+        return ResponseEntity.status(410).body(Map.of(
+                "error", "DISCONTINUED",
+                "message",
+                "Course cancel scoped workflow is discontinued. Use normal course delete while editing mode is enabled, then run FULL_REPLAN."));
+    }
+
+    @PostMapping("/{id}/reassign-lecturer")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<?> reassignLecturer(@PathVariable Long id, @RequestBody ReassignLecturerRequest request) {
+        return ResponseEntity.status(410).body(Map.of(
+                "error", "DISCONTINUED",
+                "message",
+                "Course reassign scoped workflow is discontinued. Edit the course lecturer in normal edit mode, then run FULL_REPLAN."));
     }
 
     // ==================== BATCH OPERATIONS ====================
@@ -294,6 +330,7 @@ public class CourseController {
 
                 courseRepository.save(course);
                 updated++;
+                timetableChangeTrackerService.markDirty("Batch course update");
 
                 // Audit log
                 auditLogService.logAction(AuditAction.UPDATE, "Course", id.toString(),
@@ -335,6 +372,7 @@ public class CourseController {
                 String code = course.getCode();
                 courseRepository.deleteById(id);
                 deleted++;
+                timetableChangeTrackerService.markDirty("Batch course delete");
 
                 // Audit log
                 auditLogService.logAction(AuditAction.DELETE, "Course", id.toString(),
@@ -425,6 +463,10 @@ public class CourseController {
         public Long lecturerId; // null = don't change, -1 = clear
         public Integer totalWeeklyHours;
         public Boolean online;
+    }
+
+    public static class ReassignLecturerRequest {
+        public Long lecturerId;
     }
 
     public static class BatchDeleteRequest {

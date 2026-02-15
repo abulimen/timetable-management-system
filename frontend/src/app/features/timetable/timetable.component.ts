@@ -10,7 +10,9 @@ import {
   Lecturer,
   Room,
   SpecialEventEntry,
-  Setting
+  Setting,
+  ImpactPreviewResponse,
+  TimetableChangeStatus
 } from '../../core/services/api.service';
 
 interface PositionedEntry extends TimetableEntry {
@@ -33,6 +35,77 @@ interface VisibleEvent extends SpecialEventEntry {
         <h1 class="text-2xl font-bold text-secondary-900 dark:text-white">
           {{ isArchiveMode ? ('Archived Timetable: ' + archiveCode) : 'Timetable' }}
         </h1>
+      </div>
+
+      <div *ngIf="!isArchiveMode && changeStatus?.pendingChanges" class="card p-4 border border-amber-300 bg-amber-50/80">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <div>
+            <p class="text-sm font-medium text-amber-900">Unreplanned timetable changes detected</p>
+            <p class="text-xs text-amber-800">
+              {{ changeStatus?.reason || 'Post-generation changes pending replan.' }}
+              <span *ngIf="changeStatus?.changedAt">({{ changeStatus?.changedAt | date:'medium' }})</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="showScopedReplanModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" (click)="closeScopedReplanModal()">
+        <div class="card w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6" (click)="$event.stopPropagation()">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold">Scoped Replan (Timetable)</h2>
+            <button type="button" class="btn btn-secondary btn-sm" (click)="closeScopedReplanModal()">Close</button>
+          </div>
+
+          <div *ngIf="scopedPreview" class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+            <div class="p-3 rounded bg-secondary-100">
+              <p class="text-xs text-secondary-500">Total Lessons</p>
+              <p class="font-semibold">{{ scopedPreview.summary.totalLessons }}</p>
+            </div>
+            <div class="p-3 rounded bg-primary-50">
+              <p class="text-xs text-secondary-500">Movable (Impacted)</p>
+              <p class="font-semibold">{{ scopedPreview.summary.impactedCount }}</p>
+            </div>
+            <div class="p-3 rounded bg-secondary-100">
+              <p class="text-xs text-secondary-500">Locked</p>
+              <p class="font-semibold">{{ scopedPreview.summary.lockedCount }}</p>
+            </div>
+          </div>
+
+          <div *ngIf="scopedPreview?.warnings?.length" class="mb-4">
+            <div *ngFor="let warning of scopedPreview?.warnings" class="text-xs px-2 py-1 rounded bg-amber-100 text-amber-800 mb-1">
+              {{ warning }}
+            </div>
+          </div>
+
+          <label class="label">Reason</label>
+          <input class="input mb-3" [(ngModel)]="scopedReason" placeholder="Why are we running localized replan?">
+          <label class="inline-flex items-center gap-2 text-sm mb-3">
+            <input type="checkbox" [(ngModel)]="scopedAllowLargeScope">
+            Allow large scope override
+          </label>
+
+          <div class="max-h-72 overflow-y-auto border border-secondary-200 rounded mb-4" *ngIf="scopedPreview">
+            <div *ngFor="let lesson of scopedPreview.impactedLessons" class="flex items-center gap-3 px-3 py-2 border-b border-secondary-100">
+              <input
+                type="checkbox"
+                [checked]="scopedSelectedIds.has(lesson.lessonId)"
+                (change)="toggleScopedLesson(lesson.lessonId)">
+              <div class="text-sm">
+                <div class="font-medium">{{ lesson.courseCode }} - {{ lesson.courseName }}</div>
+                <div class="text-xs text-secondary-500">
+                  {{ lesson.dayOfWeek }} {{ lesson.startTime || '--' }} | {{ lesson.lecturerName }} | {{ lesson.roomName }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <button class="btn btn-primary" [disabled]="scopedBusy || scopedSelectedIds.size === 0" (click)="runScopedReplan()">
+              {{ scopedBusy ? 'Starting...' : 'Run Scoped Replan' }}
+            </button>
+            <button class="btn btn-secondary" [disabled]="scopedBusy" (click)="closeScopedReplanModal()">Cancel</button>
+          </div>
+        </div>
       </div>
 
       <!-- Filters -->
@@ -172,6 +245,13 @@ export class TimetableComponent implements OnInit {
   lunchBreakStartHour = 12;
   lunchBreakEndHour = 13;
   lunchBreakConfigured = true;
+  changeStatus: TimetableChangeStatus | null = null;
+  showScopedReplanModal = false;
+  scopedPreview: ImpactPreviewResponse | null = null;
+  scopedSelectedIds = new Set<number>();
+  scopedReason = 'Manual timetable scoped replan';
+  scopedBusy = false;
+  scopedAllowLargeScope = false;
 
   private positionCache: Map<string, PositionedEntry[]> = new Map();
   private maxColumnsCache: Map<string, number> = new Map();
@@ -180,6 +260,7 @@ export class TimetableComponent implements OnInit {
     this.archiveCode = this.route.snapshot.queryParamMap.get('archiveCode');
     this.isArchiveMode = !!this.archiveCode;
     this.loadLunchBreakSettings();
+    this.refreshChangeStatus();
     this.loadTimetable();
   }
 
@@ -227,6 +308,7 @@ export class TimetableComponent implements OnInit {
         this.rooms = rooms || [];
         this.positionCache.clear();
         this.maxColumnsCache.clear();
+        this.refreshChangeStatus();
       }
     });
   }
@@ -555,5 +637,87 @@ export class TimetableComponent implements OnInit {
       return null;
     }
     return hour;
+  }
+
+  private refreshChangeStatus() {
+    if (this.isArchiveMode) {
+      this.changeStatus = null;
+      return;
+    }
+    this.api.getTimetableChangeStatus().subscribe({
+      next: status => this.changeStatus = status,
+      error: () => {
+        // Keep UI usable if status endpoint fails.
+      }
+    });
+  }
+
+  openScopedReplanFromTimetable() {
+    const impactedLessonIds = Array.from(new Set(
+      this.getFilteredEntries()
+        .map(entry => Number(entry.lessonId))
+        .filter(id => Number.isFinite(id))
+    ));
+    if (impactedLessonIds.length === 0) {
+      alert('No visible lessons available for scoped replan.');
+      return;
+    }
+    this.api.getImpactPreview({
+      changeType: 'MANUAL',
+      options: { impactedLessonIds }
+    }).subscribe({
+      next: preview => {
+        this.scopedPreview = preview;
+        this.scopedSelectedIds = new Set((preview.impactedLessonIds || []).map(id => Number(id)).filter(id => Number.isFinite(id)));
+        this.scopedReason = this.changeStatus?.reason || 'Manual timetable scoped replan';
+        this.scopedAllowLargeScope = false;
+        this.showScopedReplanModal = true;
+      },
+      error: (err) => alert('Failed to load impact preview: ' + (err.error?.message || 'Unknown error'))
+    });
+  }
+
+  closeScopedReplanModal() {
+    this.showScopedReplanModal = false;
+    this.scopedPreview = null;
+    this.scopedSelectedIds = new Set<number>();
+    this.scopedReason = 'Manual timetable scoped replan';
+    this.scopedAllowLargeScope = false;
+  }
+
+  toggleScopedLesson(lessonId: number) {
+    if (this.scopedSelectedIds.has(lessonId)) {
+      this.scopedSelectedIds.delete(lessonId);
+    } else {
+      this.scopedSelectedIds.add(lessonId);
+    }
+  }
+
+  runScopedReplan() {
+    if (!this.scopedPreview) {
+      return;
+    }
+    const impacted = Array.from(this.scopedSelectedIds);
+    if (impacted.length === 0) {
+      alert('Select at least one lesson.');
+      return;
+    }
+    const excluded = (this.scopedPreview.impactedLessonIds || []).filter(id => !this.scopedSelectedIds.has(id));
+    this.scopedBusy = true;
+    this.api.startScopedReplan({
+      impactedLessonIds: impacted,
+      excludedLessonIds: excluded,
+      reason: this.scopedReason || 'Manual timetable scoped replan'
+    }, this.scopedAllowLargeScope).subscribe({
+      next: (status) => {
+        this.scopedBusy = false;
+        this.closeScopedReplanModal();
+        alert(`Scoped replan started (${status.jobId || 'no job id'}).`);
+      },
+      error: (err) => {
+        this.scopedBusy = false;
+        alert('Scoped replan failed: ' + (err.error?.score || err.error?.message || 'Unknown error'));
+      }
+    });
   }
 }

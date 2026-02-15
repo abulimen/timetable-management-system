@@ -3,7 +3,16 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ApiService, Course, Lecturer, StudentGroup, Zone, Feature, Room } from '../../core/services/api.service';
+import {
+  ApiService,
+  Course,
+  Lecturer,
+  StudentGroup,
+  Zone,
+  Feature,
+  Room,
+  ImpactPreviewResponse
+} from '../../core/services/api.service';
 import { DataQueryToolbarComponent, QuerySortOption, QueryViewOption } from '../../core/query/data-query-toolbar.component';
 import { DataPaginationComponent } from '../../core/query/data-pagination.component';
 import { DataQueryState, DEFAULT_QUERY_STATE } from '../../core/query/query-state.model';
@@ -352,6 +361,94 @@ interface CourseQueryViewPayload {
         </div>
       </div>
 
+      <div *ngIf="showReassignDialog" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" (click)="closeReassignDialog()">
+        <div class="card w-full max-w-xl p-6" (click)="$event.stopPropagation()">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold">Reassign Lecturer</h2>
+            <button type="button" class="btn btn-secondary btn-sm" (click)="closeReassignDialog()">Close</button>
+          </div>
+          <p class="text-sm text-secondary-500 mb-3">
+            {{ reassignCourse?.code }} - {{ reassignCourse?.name }}
+          </p>
+          <label class="label">New Lecturer</label>
+          <select [(ngModel)]="reassignLecturerId" class="input">
+            <option [ngValue]="null">Select Lecturer</option>
+            <option *ngFor="let l of lecturers" [ngValue]="l.id">{{ l.name }}</option>
+          </select>
+          <div class="mt-4 flex gap-2">
+            <button class="btn btn-primary" [disabled]="!reassignLecturerId" (click)="confirmReassignLecturer()">
+              Apply Reassignment
+            </button>
+            <button class="btn btn-secondary" (click)="closeReassignDialog()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="showScopedReplanModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" (click)="closeScopedReplanModal()">
+        <div class="card w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6" (click)="$event.stopPropagation()">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold">Scoped Replan Impact</h2>
+            <button type="button" class="btn btn-secondary btn-sm" (click)="closeScopedReplanModal()">Close</button>
+          </div>
+          <p class="text-sm text-secondary-600 mb-2">{{ scopedSourceLabel }}</p>
+
+          <div *ngIf="scopedPreview" class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+            <div class="p-3 rounded bg-secondary-100">
+              <p class="text-xs text-secondary-500">Total Lessons</p>
+              <p class="font-semibold">{{ scopedPreview.summary.totalLessons }}</p>
+            </div>
+            <div class="p-3 rounded bg-primary-50">
+              <p class="text-xs text-secondary-500">Movable (Impacted)</p>
+              <p class="font-semibold">{{ scopedPreview.summary.impactedCount }}</p>
+            </div>
+            <div class="p-3 rounded bg-secondary-100">
+              <p class="text-xs text-secondary-500">Locked</p>
+              <p class="font-semibold">{{ scopedPreview.summary.lockedCount }}</p>
+            </div>
+          </div>
+
+          <div *ngIf="scopedPreview?.warnings?.length" class="mb-4">
+            <div *ngFor="let warning of scopedPreview?.warnings" class="text-xs px-2 py-1 rounded bg-amber-100 text-amber-800 mb-1">
+              {{ warning }}
+            </div>
+          </div>
+
+          <div *ngIf="scopedPreview" class="mb-4">
+            <div class="flex items-center justify-between mb-2">
+              <label class="label mb-0">Scoped replan reason</label>
+              <span class="text-xs text-secondary-500">{{ scopedSelectedIds.size }} selected</span>
+            </div>
+            <input class="input mb-3" [(ngModel)]="scopedReason" placeholder="Describe why this localized replan is needed">
+            <label class="inline-flex items-center gap-2 text-sm mb-3">
+              <input type="checkbox" [(ngModel)]="scopedAllowLargeScope">
+              Allow large scope override
+            </label>
+
+            <div class="max-h-72 overflow-y-auto border border-secondary-200 rounded">
+              <div *ngFor="let lesson of scopedPreview.impactedLessons" class="flex items-center gap-3 px-3 py-2 border-b border-secondary-100">
+                <input
+                  type="checkbox"
+                  [checked]="scopedSelectedIds.has(lesson.lessonId)"
+                  (change)="toggleScopedLesson(lesson.lessonId)">
+                <div class="text-sm">
+                  <div class="font-medium">{{ lesson.courseCode }} - {{ lesson.courseName }}</div>
+                  <div class="text-xs text-secondary-500">
+                    {{ lesson.dayOfWeek }} {{ lesson.startTime || '--' }} | {{ lesson.lecturerName }} | {{ lesson.roomName }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <button class="btn btn-primary" [disabled]="scopedBusy || scopedSelectedIds.size === 0" (click)="runScopedReplan()">
+              {{ scopedBusy ? 'Starting...' : 'Run Scoped Replan' }}
+            </button>
+            <button class="btn btn-secondary" [disabled]="scopedBusy" (click)="closeScopedReplanModal()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
       <div class="card overflow-hidden">
         <table class="w-full">
           <thead class="bg-secondary-100 dark:bg-secondary-700">
@@ -466,6 +563,17 @@ export class CoursesComponent implements OnInit {
   };
   showDeleteAllConfirm = false;
   deleting = false;
+  showReassignDialog = false;
+  reassignCourse: Course | null = null;
+  reassignLecturerId: number | null = null;
+
+  showScopedReplanModal = false;
+  scopedPreview: ImpactPreviewResponse | null = null;
+  scopedSelectedIds = new Set<number>();
+  scopedReason = '';
+  scopedBusy = false;
+  scopedAllowLargeScope = false;
+  scopedSourceLabel = '';
 
   // Batch operations state
   selectedIds = new Set<number>();
@@ -804,7 +912,10 @@ export class CoursesComponent implements OnInit {
       ? this.api.updateCourse(this.editingCourse.id, this.formData)
       : this.api.createCourse(this.formData);
     obs.subscribe({
-      next: () => { this.loadCourses(); this.cancelEdit(); },
+      next: () => {
+        this.loadCourses();
+        this.cancelEdit();
+      },
       error: (err) => {
         alert('Failed to save course: ' + (err.error?.message || 'Unknown error'));
       }
@@ -844,10 +955,110 @@ export class CoursesComponent implements OnInit {
     if (confirm('Delete?')) this.api.deleteCourse(id).subscribe({ next: () => this.loadCourses() });
   }
 
+  cancelCourse(course: Course) {
+    if (!confirm(`Cancel course ${course.code}? This will hard-delete the course assignment and related lessons.`)) {
+      return;
+    }
+    this.api.cancelCourse(course.id).subscribe({
+      next: (res) => {
+        this.loadCourses();
+        if (res.impactPreview) {
+          this.openScopedReplanModal(res.impactPreview, `COURSE_CANCELED_HARD_DELETE: ${course.code}`);
+        }
+      },
+      error: (err) => alert('Failed to cancel course: ' + (err.error?.message || 'Unknown error'))
+    });
+  }
+
   cancelEdit() {
     this.showAddForm = false;
     this.editingCourse = null;
     this.formData = { code: '', name: '', totalWeeklyHours: 2, lecturerId: null, studentGroupIds: [], allowedZoneIds: [], requiredFeatureIds: [], generateLessons: true, online: false };
+  }
+
+  openReassignDialog(course: Course) {
+    this.reassignCourse = course;
+    this.reassignLecturerId = course.lecturerId;
+    this.showReassignDialog = true;
+  }
+
+  closeReassignDialog() {
+    this.showReassignDialog = false;
+    this.reassignCourse = null;
+    this.reassignLecturerId = null;
+  }
+
+  confirmReassignLecturer() {
+    if (!this.reassignCourse || !this.reassignLecturerId) {
+      return;
+    }
+    this.api.reassignCourseLecturer(this.reassignCourse.id, this.reassignLecturerId).subscribe({
+      next: (res) => {
+        this.loadCourses();
+        this.closeReassignDialog();
+        if (res.impactPreview) {
+          this.openScopedReplanModal(
+            res.impactPreview,
+            `${res.changeNotice || 'COURSE_LECTURER_REASSIGNED'}: ${res.course.code}`
+          );
+        }
+      },
+      error: (err) => alert('Failed to reassign lecturer: ' + (err.error?.message || 'Unknown error'))
+    });
+  }
+
+  private openScopedReplanModal(preview: ImpactPreviewResponse, sourceLabel: string) {
+    this.scopedPreview = preview;
+    this.scopedSelectedIds = new Set((preview.impactedLessonIds || []).map(id => Number(id)).filter(id => Number.isFinite(id)));
+    this.scopedReason = sourceLabel || 'Post-generation local replan';
+    this.scopedSourceLabel = sourceLabel;
+    this.scopedAllowLargeScope = false;
+    this.showScopedReplanModal = true;
+  }
+
+  closeScopedReplanModal() {
+    this.showScopedReplanModal = false;
+    this.scopedPreview = null;
+    this.scopedSelectedIds = new Set<number>();
+    this.scopedReason = '';
+    this.scopedSourceLabel = '';
+    this.scopedAllowLargeScope = false;
+  }
+
+  toggleScopedLesson(lessonId: number) {
+    if (this.scopedSelectedIds.has(lessonId)) {
+      this.scopedSelectedIds.delete(lessonId);
+    } else {
+      this.scopedSelectedIds.add(lessonId);
+    }
+  }
+
+  runScopedReplan() {
+    if (!this.scopedPreview) {
+      return;
+    }
+    const selected = Array.from(this.scopedSelectedIds);
+    if (selected.length === 0) {
+      alert('Select at least one impacted lesson.');
+      return;
+    }
+    const excluded = (this.scopedPreview.impactedLessonIds || []).filter(id => !this.scopedSelectedIds.has(id));
+    this.scopedBusy = true;
+    this.api.startScopedReplan({
+      impactedLessonIds: selected,
+      excludedLessonIds: excluded,
+      reason: this.scopedReason || 'Scoped replan requested from courses page'
+    }, this.scopedAllowLargeScope).subscribe({
+      next: (status) => {
+        this.scopedBusy = false;
+        this.closeScopedReplanModal();
+        alert(`Scoped replan started (${status.jobId || 'no job id'}).`);
+      },
+      error: (err) => {
+        this.scopedBusy = false;
+        alert('Scoped replan failed: ' + (err.error?.score || err.error?.message || 'Unknown error'));
+      }
+    });
   }
 
   confirmDeleteAll() { this.showDeleteAllConfirm = true; }

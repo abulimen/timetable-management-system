@@ -55,6 +55,15 @@ public class SolverRunMetric {
     @Column(name = "duration_ms")
     private Long durationMs;
 
+    @Column(name = "impacted_lessons_count")
+    private Integer impactedLessonsCount;
+
+    @Column(name = "locked_lessons_count")
+    private Integer lockedLessonsCount;
+
+    @Column(name = "changed_lessons_count")
+    private Integer changedLessonsCount;
+
     @Column(name = "time_to_first_best_ms")
     private Long timeToFirstBestMs;
 

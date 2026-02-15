@@ -19,6 +19,7 @@ import java.util.Set;
 public interface LessonRepository extends JpaRepository<Lesson, Long> {
 
     List<Lesson> findByCourse(Course course);
+    List<Lesson> findByCourseId(Long courseId);
 
     List<Lesson> findByLecturer(Lecturer lecturer);
 
@@ -46,6 +47,8 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
 
     // Count lessons for a course
     long countByCourse(Course course);
+    long deleteByCourse(Course course);
+    long deleteByCourseId(Long courseId);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE Lesson l SET l.timeslot = null, l.room = null, l.pinned = false")

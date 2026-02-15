@@ -287,7 +287,10 @@ export class SpecialEventsComponent implements OnInit {
             : this.http.post<SpecialEvent>('http://localhost:8080/api/v1/special-events', payload);
 
         obs.subscribe({
-            next: () => { this.loadEvents(); this.cancelEdit(); },
+            next: () => {
+                this.loadEvents();
+                this.cancelEdit();
+            },
             error: (err) => alert('Failed: ' + (err.error?.message || 'Unknown error'))
         });
     }
