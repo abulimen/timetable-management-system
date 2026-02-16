@@ -13,6 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 public class SolveRequestDTO {
     private String mode = "FULL_REPLAN";
+    private String profile = "BALANCED";
+    private Boolean skipFeasibility = false;
     private SolveScopeDTO scope;
     private Boolean allowLargeScope = false;
 

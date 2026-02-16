@@ -4,6 +4,7 @@ import {
   ApiService,
   SolverStatus,
   TimetableChangeStatus,
+  SolverRuntimeDiagnostics,
   SolverAnalysis,
   FeasibilityCheck,
   CourseFeasibilityDiagnostics,
@@ -39,9 +40,48 @@ import {
             
             <!-- Standard Score Display -->
             <p *ngIf="status?.state !== 'ERROR'" class="text-secondary-500 mt-1">Score: {{ status?.score || 'N/A' }}</p>
+            <p *ngIf="status?.profile" class="text-secondary-500 mt-1">Profile: {{ status?.profile }}</p>
             <p *ngIf="status?.durationMs != null" class="text-secondary-500 mt-1">
               Solve time: {{ formatDuration(status?.durationMs ?? 0) }}
             </p>
+            <p *ngIf="runtime" class="text-secondary-500 mt-1">
+              Runtime: {{ runtime.moveThreadCount }} move threads • {{ runtime.environmentMode }} • {{ runtime.availableProcessors }} CPU cores
+            </p>
+            <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm" *ngIf="status">
+              <div class="p-2 rounded bg-secondary-100 dark:bg-secondary-700">
+                <span class="text-secondary-500">Time to first best:</span>
+                <span class="font-medium ml-1">{{ status.timeToFirstBestMs != null ? formatDuration(status.timeToFirstBestMs) : 'N/A' }}</span>
+              </div>
+              <div class="p-2 rounded bg-secondary-100 dark:bg-secondary-700">
+                <span class="text-secondary-500">Time to hard-feasible:</span>
+                <span class="font-medium ml-1">{{ status.timeToFirstFeasibleMs != null ? formatDuration(status.timeToFirstFeasibleMs) : 'N/A' }}</span>
+              </div>
+              <div class="p-2 rounded bg-secondary-100 dark:bg-secondary-700">
+                <span class="text-secondary-500">Improvements found:</span>
+                <span class="font-medium ml-1">{{ status.improvementCount ?? 0 }}</span>
+              </div>
+              <div class="p-2 rounded bg-secondary-100 dark:bg-secondary-700">
+                <span class="text-secondary-500">Checkpoint saves:</span>
+                <span class="font-medium ml-1">{{ status.persistenceCount ?? 0 }}</span>
+                <span class="text-secondary-500 ml-1" *ngIf="status.avgPersistenceMs != null">(avg {{ formatDuration(status.avgPersistenceMs) }})</span>
+              </div>
+              <div class="p-2 rounded bg-secondary-100 dark:bg-secondary-700">
+                <span class="text-secondary-500">Current hard score:</span>
+                <span class="font-medium ml-1">{{ status.bestHardScore ?? 'N/A' }}</span>
+              </div>
+              <div class="p-2 rounded bg-secondary-100 dark:bg-secondary-700">
+                <span class="text-secondary-500">Current soft score:</span>
+                <span class="font-medium ml-1">{{ status.bestSoftScore ?? 'N/A' }}</span>
+              </div>
+              <div class="p-2 rounded bg-secondary-100 dark:bg-secondary-700">
+                <span class="text-secondary-500">Loaded dataset:</span>
+                <span class="font-medium ml-1">{{ status.lessonsCount ?? 0 }} lessons • {{ status.timeslotsCount ?? 0 }} slots • {{ status.roomsCount ?? 0 }} rooms</span>
+              </div>
+              <div class="p-2 rounded bg-secondary-100 dark:bg-secondary-700">
+                <span class="text-secondary-500">Live runtime:</span>
+                <span class="font-medium ml-1">{{ status.moveThreadCount || runtime?.moveThreadCount || 'N/A' }} threads • {{ status.parallelSolverCount || runtime?.parallelSolverCount || 'N/A' }} jobs • {{ status.availableProcessors ?? runtime?.availableProcessors ?? 'N/A' }} cores</span>
+              </div>
+            </div>
             <div *ngIf="status?.pendingChanges" class="mt-2 text-xs text-amber-700 bg-amber-100 rounded px-2 py-1 inline-block">
               Pending timetable changes not yet replanned: {{ status?.pendingChangeReason || 'Unknown reason' }}
             </div>
@@ -61,43 +101,70 @@ import {
               </div>
             </div>
           </div>
-          <div class="flex gap-3">
-            <button 
-              (click)="startSolver('FULL_REPLAN')"
-              [disabled]="isSolving"
-              class="btn btn-primary disabled:opacity-50">
-              Full Replan
-            </button>
-            <button 
-              (click)="startSolver('STABILITY')"
-              [disabled]="isSolving"
-              class="btn btn-secondary disabled:opacity-50">
-              Stability Mode
-            </button>
-            <button 
-              (click)="terminateSolver()"
-              [disabled]="!isSolving"
-              class="btn btn-danger disabled:opacity-50">
-              Stop
-            </button>
-            <button
-              (click)="clearCurrentTimetable()"
-              [disabled]="isSolving"
-              class="btn btn-danger disabled:opacity-50">
-              Clear Timetable
-            </button>
-            <button
-              *ngIf="!editingStatus?.editingEnabled"
-              (click)="enableEditingMode()"
-              class="btn btn-warning">
-              Enable Editing
-            </button>
-            <button
-              *ngIf="editingStatus?.editingEnabled"
-              (click)="disableEditingMode()"
-              class="btn btn-secondary">
-              Lock Editing
-            </button>
+          <div class="flex flex-col gap-3 items-end">
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-secondary-500">Profile:</span>
+              <button
+                (click)="selectedProfile='FAST_FEASIBLE'"
+                class="px-2 py-1 rounded border text-xs"
+                [ngClass]="selectedProfile === 'FAST_FEASIBLE' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-secondary-700 border-secondary-300'">
+                Fast
+              </button>
+              <button
+                (click)="selectedProfile='BALANCED'"
+                class="px-2 py-1 rounded border text-xs"
+                [ngClass]="selectedProfile === 'BALANCED' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-secondary-700 border-secondary-300'">
+                Balanced
+              </button>
+              <button
+                (click)="selectedProfile='QUALITY'"
+                class="px-2 py-1 rounded border text-xs"
+                [ngClass]="selectedProfile === 'QUALITY' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-secondary-700 border-secondary-300'">
+                Quality
+              </button>
+            </div>
+            <label class="flex items-center gap-2 text-xs text-secondary-600">
+              <input type="checkbox" [checked]="skipFeasibility" (change)="skipFeasibility = !skipFeasibility" />
+              Skip feasibility pre-check
+            </label>
+            <div class="flex gap-3">
+              <button 
+                (click)="startSolver('FULL_REPLAN')"
+                [disabled]="isSolving"
+                class="btn btn-primary disabled:opacity-50">
+                Full Replan
+              </button>
+              <button 
+                (click)="startSolver('STABILITY')"
+                [disabled]="isSolving"
+                class="btn btn-secondary disabled:opacity-50">
+                Stability Mode
+              </button>
+              <button 
+                (click)="terminateSolver()"
+                [disabled]="!isSolving"
+                class="btn btn-danger disabled:opacity-50">
+                Stop
+              </button>
+              <button
+                (click)="clearCurrentTimetable()"
+                [disabled]="isSolving"
+                class="btn btn-danger disabled:opacity-50">
+                Clear Timetable
+              </button>
+              <button
+                *ngIf="!editingStatus?.editingEnabled"
+                (click)="enableEditingMode()"
+                class="btn btn-warning">
+                Enable Editing
+              </button>
+              <button
+                *ngIf="editingStatus?.editingEnabled"
+                (click)="disableEditingMode()"
+                class="btn btn-secondary">
+                Lock Editing
+              </button>
+            </div>
           </div>
         </div>
 
@@ -221,6 +288,9 @@ export class SolverComponent implements OnInit, OnDestroy {
   editingStatus: TimetableChangeStatus | null = null;
   analysis: SolverAnalysis | null = null;
   feasibility: FeasibilityCheck | null = null;
+  runtime: SolverRuntimeDiagnostics | null = null;
+  selectedProfile: 'FAST_FEASIBLE' | 'BALANCED' | 'QUALITY' = 'BALANCED';
+  skipFeasibility = false;
   courseDiagnostics: CourseFeasibilityDiagnostics | null = null;
   featureDiagnostics: FeatureScarcityDiagnostics | null = null;
   lecturerDiagnostics: LecturerLoadDiagnostics | null = null;
@@ -230,6 +300,7 @@ export class SolverComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadStatus();
+    this.loadRuntimeDiagnostics();
   }
 
   ngOnDestroy() {
@@ -276,7 +347,7 @@ export class SolverComponent implements OnInit, OnDestroy {
     // Clear any previous feasibility results
     this.feasibility = null;
 
-    this.api.startSolver(mode).subscribe({
+    this.api.startSolver({ mode, profile: this.selectedProfile, skipFeasibility: this.skipFeasibility }).subscribe({
       next: (s) => {
         this.status = s;
         this.startPolling();
@@ -303,6 +374,14 @@ export class SolverComponent implements OnInit, OnDestroy {
           const errorMsg = err.error?.score || err.error?.message || 'Failed to start';
           this.status = { jobId: '', state: 'ERROR', score: errorMsg };
         }
+      }
+    });
+  }
+
+  private loadRuntimeDiagnostics() {
+    this.api.getSolverRuntimeDiagnostics().subscribe({
+      next: (runtime) => {
+        this.runtime = runtime;
       }
     });
   }

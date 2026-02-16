@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * TimetableConstraintProvider - defines all constraints for the solver.
@@ -220,8 +221,8 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 Joiners.equal(lesson -> lesson.getTimeslot() != null ? lesson.getTimeslot().getDayOfWeek() : null))
                 .filter((lesson1, lesson2) -> lesson1.getTimeslot() != null &&
                         lesson2.getTimeslot() != null &&
-                        hasStudentGroupOverlap(lesson1, lesson2) &&
-                        intervalsOverlap(lesson1, lesson2))
+                        intervalsOverlap(lesson1, lesson2) &&
+                        hasStudentGroupOverlap(lesson1, lesson2))
                 .penalize(HardSoftScore.ONE_HARD)
                 .asConstraint("Student group conflict");
     }
@@ -231,11 +232,16 @@ public class TimetableConstraintProvider implements ConstraintProvider {
      * Handles both single and combined (multiple) groups.
      */
     private boolean hasStudentGroupOverlap(Lesson l1, Lesson l2) {
-        for (StudentGroup g1 : l1.getStudentGroups()) {
-            for (StudentGroup g2 : l2.getStudentGroups()) {
-                if (g1.hasConflictWith(g2)) {
-                    return true;
-                }
+        Set<Long> conflictIds1 = l1.getConflictGroupIds();
+        Set<Long> conflictIds2 = l2.getConflictGroupIds();
+        if (conflictIds1.isEmpty() || conflictIds2.isEmpty()) {
+            return false;
+        }
+        Set<Long> smaller = conflictIds1.size() <= conflictIds2.size() ? conflictIds1 : conflictIds2;
+        Set<Long> larger = smaller == conflictIds1 ? conflictIds2 : conflictIds1;
+        for (Long id : smaller) {
+            if (larger.contains(id)) {
+                return true;
             }
         }
         return false;
@@ -372,15 +378,15 @@ public class TimetableConstraintProvider implements ConstraintProvider {
      */
     private Constraint specialEventConflict(ConstraintFactory factory) {
         return factory.forEach(Lesson.class)
-                .join(SpecialEvent.class)
+                .join(SpecialEvent.class,
+                        Joiners.equal(
+                                lesson -> lesson.getTimeslot() != null ? lesson.getTimeslot().getDayOfWeek() : null,
+                                SpecialEvent::getDayOfWeek))
                 .filter((lesson, event) -> {
                     if (lesson.getTimeslot() == null || !event.isActive()) {
                         return false;
                     }
                     // Check overlap against the full lesson interval (not just the 1-hour start slot).
-                    if (event.getDayOfWeek() != lesson.getTimeslot().getDayOfWeek()) {
-                        return false;
-                    }
                     LocalTime lessonStart = lesson.getTimeslot().getStartTime();
                     LocalTime lessonEnd = lesson.getEndTime();
                     LocalTime eventStart = event.getStartTime();

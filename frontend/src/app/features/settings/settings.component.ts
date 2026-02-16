@@ -1,271 +1,761 @@
-import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { ApiService, Setting } from '../../core/services/api.service';
+
+type SettingSection = 'schedule' | 'quality' | 'solver' | 'operations' | 'advanced';
+type InputType = 'number' | 'time' | 'date' | 'boolean' | 'select' | 'text';
+
+const MOVE_THREAD_OPTIONS: Array<{ value: string; label: string }> = [
+  { value: 'AUTO', label: 'Auto (choose for me)' },
+  ...Array.from({ length: 32 }, (_, i) => {
+    const n = String(i + 1);
+    const label = i + 1 === 4 ? '4 threads (recommended)' : `${n} threads`;
+    return { value: n, label };
+  })
+];
+
+const PARALLEL_SOLVER_OPTIONS: Array<{ value: string; label: string }> = [
+  { value: 'AUTO', label: 'Auto (advanced)' },
+  ...Array.from({ length: 16 }, (_, i) => {
+    const n = String(i + 1);
+    const label = i + 1 === 1 ? '1 job (recommended)' : `${n} jobs`;
+    return { value: n, label };
+  })
+];
+
+interface SettingDescriptor {
+  label: string;
+  help: string;
+  section: SettingSection;
+  input: InputType;
+  placeholder?: string;
+  min?: number;
+  max?: number;
+  step?: number;
+  restartRequired?: boolean;
+  recommended?: string;
+  recommendedMin?: number;
+  recommendedMax?: number;
+  options?: Array<{ value: string; label: string }>;
+}
 
 @Component({
   selector: 'app-settings',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  template: `
-    <div class="space-y-6">
-      <h1 class="text-2xl font-bold text-secondary-900 dark:text-white">Settings</h1>
-
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div *ngFor="let category of categories" class="card p-6">
-          <h2 class="text-lg font-semibold mb-4 capitalize">{{ category }}</h2>
-          <div class="space-y-4">
-            <div *ngFor="let setting of getSettingsByCategory(category)" class="flex items-center justify-between">
-              <div class="flex-1">
-                <p class="font-medium text-sm">{{ setting.key }}</p>
-                <p class="text-xs text-secondary-500">{{ setting.description }}</p>
-              </div>
-              <input type="text" [ngModel]="setting.value" (blur)="updateSetting(setting.key, $event)" class="input w-32 text-right">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Unavailability System Controls -->
-      <div class="card p-6 border-2 border-purple-500/50 bg-purple-500/5">
-        <h2 class="text-lg font-bold text-purple-600 mb-4">🚫 Unavailability System</h2>
-        
-        <div class="space-y-4">
-          <div class="flex items-center justify-between p-4 bg-purple-500/10 rounded-lg">
-            <div>
-              <h3 class="font-semibold">System Enabled</h3>
-              <p class="text-sm text-secondary-500">When OFF, lecturers don't see the unavailability feature and solver ignores all unavailability records.</p>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" [checked]="unavailabilitySettings.systemEnabled" (change)="toggleSystemEnabled()">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-
-          <div class="flex items-center justify-between p-4 bg-purple-500/10 rounded-lg" [class.opacity-50]="!unavailabilitySettings.systemEnabled">
-            <div>
-              <h3 class="font-semibold">Requests Open</h3>
-              <p class="text-sm text-secondary-500">When ON, lecturers can submit unavailability requests. When OFF, no new requests can be created.</p>
-              <p *ngIf="unavailabilitySettings.requestsOpen && unavailabilitySettings.systemEnabled" class="text-xs text-orange-500 mt-1">⚠️ Solver cannot run while requests are open!</p>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" [checked]="unavailabilitySettings.requestsOpen" (change)="toggleRequestsOpen()" [disabled]="!unavailabilitySettings.systemEnabled">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-        </div>
-
-        <div *ngIf="unavailabilityMessage" class="mt-4 p-3 rounded-lg" [ngClass]="{'bg-green-500/20': unavailabilitySuccess, 'bg-red-500/20': !unavailabilitySuccess}">
-          {{ unavailabilityMessage }}
-        </div>
-      </div>
-
-      <div class="card p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="font-semibold text-lg">Apply Timing Changes</h3>
-            <p class="text-sm text-secondary-500">Click to regenerate timeslots from current settings.</p>
-          </div>
-          <button (click)="regenerateTimeslots()" [disabled]="regenerating" class="btn btn-primary">
-            {{ regenerating ? 'Regenerating...' : 'Regenerate Timeslots' }}
-          </button>
-        </div>
-        <div *ngIf="regenerateMessage" class="mt-4 p-3 rounded-lg" [ngClass]="{'bg-green-500/20': regenerateSuccess, 'bg-red-500/20': !regenerateSuccess}">
-          {{ regenerateMessage }}
-        </div>
-      </div>
-
-      <!-- DANGER ZONE -->
-      <div class="card p-6 border-2 border-red-500/50 bg-red-500/5">
-        <h2 class="text-lg font-bold text-red-500 mb-4">⚠️ Danger Zone</h2>
-        
-        <div class="space-y-4">
-          <div class="flex items-center justify-between p-4 bg-red-500/10 rounded-lg">
-            <div>
-              <h3 class="font-semibold">Wipe All Data</h3>
-              <p class="text-sm text-secondary-500">Delete all courses, lessons, lecturers, rooms, zones, and features. This cannot be undone!</p>
-            </div>
-            <button (click)="showWipeConfirmation = true" class="btn bg-red-600 hover:bg-red-700 text-white">
-              Wipe All Data
-            </button>
-          </div>
-        </div>
-
-        <!-- Confirmation Modal -->
-        <div *ngIf="showWipeConfirmation" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div class="bg-white dark:bg-secondary-800 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
-            <h3 class="text-xl font-bold text-red-500 mb-4">⚠️ Confirm System Wipe</h3>
-            <p class="text-secondary-600 dark:text-secondary-300 mb-4">
-              This will permanently delete ALL data including:
-            </p>
-            <ul class="list-disc list-inside text-sm text-secondary-500 mb-4">
-              <li>All lessons and timetable schedules</li>
-              <li>All courses and their configurations</li>
-              <li>All lecturers and student groups</li>
-              <li>All rooms, zones, and features</li>
-            </ul>
-            <p class="text-sm font-medium mb-2">Type <span class="text-red-500 font-bold">DELETE</span> to confirm:</p>
-            <input 
-              type="text" 
-              [(ngModel)]="wipeConfirmText" 
-              class="input w-full mb-4" 
-              placeholder="Type DELETE to confirm">
-            <div class="flex gap-3 justify-end">
-              <button (click)="cancelWipe()" class="btn btn-secondary">Cancel</button>
-              <button 
-                (click)="executeSystemWipe()" 
-                [disabled]="wipeConfirmText !== 'DELETE' || wiping"
-                class="btn bg-red-600 hover:bg-red-700 text-white disabled:opacity-50">
-                {{ wiping ? 'Wiping...' : 'Confirm Wipe' }}
-              </button>
-            </div>
-            <div *ngIf="wipeMessage" class="mt-4 p-3 rounded-lg" [ngClass]="{'bg-green-500/20': wipeSuccess, 'bg-red-500/20': !wipeSuccess}">
-              {{ wipeMessage }}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex gap-2">
-        <button (click)="loadSettings()" class="btn btn-secondary">Reload</button>
-      </div>
-    </div>
-  `
+  templateUrl: './settings.component.html',
+  styleUrls: ['./settings.component.css']
 })
 export class SettingsComponent implements OnInit {
   private api = inject(ApiService);
-  private http = inject(HttpClient);
+
   settings: Setting[] = [];
-  categories: string[] = [];
+  draftValues: Record<string, string> = {};
+  savingKeys = new Set<string>();
+  globalMessage = '';
+  globalSuccess = true;
+
   regenerating = false;
   regenerateMessage = '';
-  regenerateSuccess = false;
+  regenerateSuccess = true;
 
-  // Danger zone
   showWipeConfirmation = false;
   wipeConfirmText = '';
   wiping = false;
   wipeMessage = '';
   wipeSuccess = false;
 
-  // Unavailability system
   unavailabilitySettings = { systemEnabled: false, requestsOpen: false };
   unavailabilityMessage = '';
-  unavailabilitySuccess = false;
+  unavailabilitySuccess = true;
 
-  ngOnInit() {
-    this.loadSettings();
-    this.loadUnavailabilitySettings();
+  readonly sections: Array<{ key: SettingSection; title: string; subtitle: string }> = [
+    {
+      key: 'schedule',
+      title: 'Schedule Rules',
+      subtitle: 'Define teaching window and guardrails used when building timeslots.'
+    },
+    {
+      key: 'quality',
+      title: 'Timetable Quality Preferences',
+      subtitle: 'Control soft preferences such as fatigue reduction and day balance.'
+    },
+    {
+      key: 'solver',
+      title: 'Solver Speed And Accuracy',
+      subtitle: 'Tune solver runtime. Start with Balanced preset, then benchmark before major changes.'
+    },
+    {
+      key: 'operations',
+      title: 'Operational Controls',
+      subtitle: 'Controls for imports, request workflows and checkpoint persistence.'
+    },
+    {
+      key: 'advanced',
+      title: 'Additional Settings',
+      subtitle: 'Less common controls. Safe defaults are already applied.'
+    }
+  ];
+
+  readonly descriptors: Record<string, SettingDescriptor> = {
+    lunch_break_start: {
+      label: 'Lunch break start',
+      help: 'Classes cannot overlap lunch once lunch break enforcement is ON.',
+      section: 'schedule',
+      input: 'time'
+    },
+    lunch_break_end: {
+      label: 'Lunch break end',
+      help: 'End time for lunch block.',
+      section: 'schedule',
+      input: 'time'
+    },
+    earliest_start_time: {
+      label: 'Earliest class start',
+      help: 'First allowed timeslot start in the day.',
+      section: 'schedule',
+      input: 'time'
+    },
+    latest_end_time: {
+      label: 'Latest class end (Mon-Thu)',
+      help: 'Lessons ending later than this are hard-invalid.',
+      section: 'schedule',
+      input: 'time'
+    },
+    friday_latest_end_time: {
+      label: 'Latest class end (Friday)',
+      help: 'Separate end-time rule for Friday.',
+      section: 'schedule',
+      input: 'time'
+    },
+    max_lecturer_hours_per_day: {
+      label: 'Max lecturer hours per day',
+      help: 'Daily hard cap for lecturer teaching load.',
+      section: 'schedule',
+      input: 'number',
+      min: 1,
+      max: 12,
+      step: 1
+    },
+    max_student_consecutive_hours: {
+      label: 'Max student consecutive hours',
+      help: 'Soft fatigue rule for consecutive student lessons.',
+      section: 'quality',
+      input: 'number',
+      min: 1,
+      max: 8,
+      step: 1
+    },
+    max_lecturer_consecutive_hours: {
+      label: 'Max lecturer consecutive hours',
+      help: 'Guideline threshold for lecturer fatigue analysis.',
+      section: 'quality',
+      input: 'number',
+      min: 1,
+      max: 8,
+      step: 1
+    },
+    min_break_between_lessons: {
+      label: 'Minimum break between lecturer lessons (minutes)',
+      help: 'Minimum preferred gap between lecturer classes.',
+      section: 'quality',
+      input: 'number',
+      min: 0,
+      max: 180,
+      step: 5
+    },
+    weight_room_capacity: {
+      label: 'Room capacity efficiency weight',
+      help: 'Higher value favors tighter room-size fit and reduces wasted seats.',
+      section: 'quality',
+      input: 'number',
+      min: 0,
+      max: 20,
+      step: 1
+    },
+    weight_day_balance: {
+      label: 'Day balance weight',
+      help: 'Higher value spreads same-group lessons across days.',
+      section: 'quality',
+      input: 'number',
+      min: 0,
+      max: 20,
+      step: 1
+    },
+    weight_lecturer_transition: {
+      label: 'Lecturer room transition weight',
+      help: 'Higher value reduces consecutive room/zone switching for lecturers.',
+      section: 'quality',
+      input: 'number',
+      min: 0,
+      max: 20,
+      step: 1
+    },
+    weight_student_fatigue: {
+      label: 'Student fatigue weight',
+      help: 'Higher value penalizes back-to-back lessons for the same group.',
+      section: 'quality',
+      input: 'number',
+      min: 0,
+      max: 20,
+      step: 1
+    },
+    weight_early_morning: {
+      label: 'Early morning (7am) penalty weight',
+      help: 'Higher value avoids scheduling at 07:00 unless necessary.',
+      section: 'quality',
+      input: 'number',
+      min: 0,
+      max: 20,
+      step: 1
+    },
+    enforce_lunch_break: {
+      label: 'Enforce lunch break',
+      help: 'Turns lunch break into a hard blocker.',
+      section: 'schedule',
+      input: 'boolean'
+    },
+    enforce_day_balance: {
+      label: 'Enforce day balance preference',
+      help: 'Apply day-balance soft optimization.',
+      section: 'quality',
+      input: 'boolean'
+    },
+    same_course_same_day_allowed: {
+      label: 'Allow same course twice in one day',
+      help: 'If ON, two parts of the same course can be placed on one day.',
+      section: 'schedule',
+      input: 'boolean'
+    },
+    availability_deadline: {
+      label: 'Availability submission deadline',
+      help: 'Last date lecturers can submit availability. Leave empty if you do not want a deadline.',
+      section: 'operations',
+      input: 'date',
+      placeholder: 'YYYY-MM-DD'
+    },
+    solver_minutes_spent_limit: {
+      label: 'Solver max runtime (minutes)',
+      help: 'Hard cap on total solve duration. Lower values return faster.',
+      section: 'solver',
+      input: 'number',
+      min: 1,
+      max: 180,
+      recommendedMin: 10,
+      recommendedMax: 45,
+      step: 1,
+      restartRequired: true
+    },
+    solver_unimproved_seconds_spent_limit: {
+      label: 'Stop after no improvement (seconds)',
+      help: 'Stops early if score does not improve for this duration.',
+      section: 'solver',
+      input: 'number',
+      min: 5,
+      max: 1800,
+      recommendedMin: 20,
+      recommendedMax: 120,
+      step: 5,
+      restartRequired: true
+    },
+    solver_forager_accepted_count_limit: {
+      label: 'Search breadth per step',
+      help: 'Higher = better exploration/quality, lower = faster runtime.',
+      section: 'solver',
+      input: 'number',
+      min: 10,
+      max: 5000,
+      recommendedMin: 150,
+      recommendedMax: 1200,
+      step: 10,
+      restartRequired: true
+    },
+    solver_move_thread_count: {
+      label: 'CPU threads used by solver',
+      help: 'More threads can reduce solve time on multi-core machines.',
+      section: 'solver',
+      input: 'select',
+      options: MOVE_THREAD_OPTIONS,
+      recommended: 'Recommended: 4 for most servers. Increase only after benchmarking.',
+      restartRequired: true
+    },
+    solver_environment_mode: {
+      label: 'Solver execution mode',
+      help: 'REPRODUCIBLE is stable and recommended for production.',
+      section: 'solver',
+      input: 'select',
+      options: [
+        { value: 'REPRODUCIBLE', label: 'Reproducible (recommended)' },
+        { value: 'NON_REPRODUCIBLE', label: 'Non-reproducible (potentially faster)' }
+      ],
+      restartRequired: true
+    },
+    solver_parallel_solver_count: {
+      label: 'Parallel solve jobs',
+      help: 'How many separate solves can run at once. Keep 1 for this system.',
+      section: 'solver',
+      input: 'select',
+      options: PARALLEL_SOLVER_OPTIONS,
+      recommendedMin: 1,
+      recommendedMax: 4,
+      restartRequired: true
+    },
+    solver_checkpoint_enabled: {
+      label: 'Checkpoint intermediate best solutions',
+      help: 'ON saves intermediate best results during solve (more DB writes).',
+      section: 'operations',
+      input: 'boolean'
+    },
+    solver_checkpoint_min_interval_ms: {
+      label: 'Checkpoint min interval (ms)',
+      help: 'Minimum delay between checkpoint writes.',
+      section: 'operations',
+      input: 'number',
+      min: 1000,
+      max: 900000,
+      step: 1000
+    },
+    solver_checkpoint_every_n_improvements: {
+      label: 'Checkpoint every N improvements',
+      help: '0 disables this trigger. Use with interval for controlled persistence.',
+      section: 'operations',
+      input: 'number',
+      min: 0,
+      max: 1000,
+      step: 1
+    },
+    bulk_import_rollback_window_hours: {
+      label: 'Import rollback window (hours)',
+      help: 'How long after import rollback remains allowed. Use -1 for unlimited.',
+      section: 'operations',
+      input: 'number',
+      min: -1,
+      max: 168,
+      step: 1
+    },
+    unavailability_system_enabled: {
+      label: 'Unavailability system enabled',
+      help: 'When OFF, solver ignores lecturer unavailability records.',
+      section: 'operations',
+      input: 'boolean'
+    },
+    unavailability_requests_open: {
+      label: 'Unavailability requests open',
+      help: 'When ON, lecturers can submit requests. Solver is blocked while open.',
+      section: 'operations',
+      input: 'boolean'
+    }
+  };
+
+  ngOnInit(): void {
+    this.loadAll();
   }
 
-  loadSettings() {
-    this.api.getSettings().subscribe({
-      next: (s) => {
-        this.settings = s;
-        this.categories = [...new Set(s.map(st => st.category))];
+  async loadAll(): Promise<void> {
+    await Promise.all([this.loadSettings(), this.loadUnavailabilitySettings()]);
+  }
+
+  async loadSettings(): Promise<void> {
+    const settings = await firstValueFrom(this.api.getSettings());
+    this.settings = settings.sort((a, b) => a.key.localeCompare(b.key));
+    this.draftValues = {};
+    for (const s of this.settings) {
+      const normalizedValue = this.normalizeSelectValue(s, s.value);
+      s.value = normalizedValue;
+      this.draftValues[s.key] = normalizedValue;
+    }
+  }
+
+  async loadUnavailabilitySettings(): Promise<void> {
+    try {
+      this.unavailabilitySettings = await firstValueFrom(this.api.getUnavailabilitySystemSettings());
+    } catch {
+      this.showUnavailabilityMessage('Failed to load unavailability controls.', false);
+    }
+  }
+
+  getSectionSettings(section: SettingSection): Setting[] {
+    if (section === 'advanced') {
+      return this.settings.filter((s) => !this.descriptors[s.key]);
+    }
+    return this.settings.filter((s) => this.descriptors[s.key]?.section === section);
+  }
+
+  descriptorOf(setting: Setting): SettingDescriptor {
+    return this.descriptors[setting.key] ?? {
+      label: this.formatFallbackLabel(setting.key),
+      help: setting.description || 'No description provided.',
+      section: 'advanced',
+      input: this.inferInputType(setting)
+    };
+  }
+
+  inferInputType(setting: Setting): InputType {
+    const type = (setting.dataType || '').toUpperCase();
+    if (type === 'BOOLEAN') return 'boolean';
+    if (type === 'TIME') return 'time';
+    if (setting.key === 'availability_deadline') return 'date';
+    if (type === 'INTEGER') return 'number';
+    return 'text';
+  }
+
+  isDirty(setting: Setting): boolean {
+    return this.draftValues[setting.key] !== setting.value;
+  }
+
+  isSaving(settingKey: string): boolean {
+    return this.savingKeys.has(settingKey);
+  }
+
+  getRecommendedRangeWarning(setting: Setting): string | null {
+    const descriptor = this.descriptorOf(setting);
+    if (descriptor.section !== 'solver' || descriptor.input !== 'number') {
+      return null;
+    }
+
+    const rawValue = this.draftValues[setting.key];
+    const numericValue = Number(rawValue);
+    if (!Number.isFinite(numericValue)) {
+      return 'Enter a valid number.';
+    }
+
+    const min = descriptor.recommendedMin ?? descriptor.min;
+    const max = descriptor.recommendedMax ?? descriptor.max;
+    if (min == null || max == null) {
+      return null;
+    }
+
+    if (numericValue < min || numericValue > max) {
+      return `Recommended range: ${min} to ${max}.`;
+    }
+    return null;
+  }
+
+  getValidationError(setting: Setting): string | null {
+    return this.getValidationErrorForValue(setting, this.draftValues[setting.key] ?? '');
+  }
+
+  isInvalid(setting: Setting): boolean {
+    return this.getValidationError(setting) !== null;
+  }
+
+  private getValidationErrorForValue(setting: Setting, rawValue: string): string | null {
+    const descriptor = this.descriptorOf(setting);
+    const value = (rawValue ?? '').trim();
+
+    if (descriptor.input === 'boolean') {
+      if (value !== 'true' && value !== 'false') {
+        return 'Select On or Off.';
+      }
+      return null;
+    }
+
+    if (descriptor.input === 'select') {
+      const allowed = new Set(this.getSelectOptions(setting).map((o) => o.value.trim().toUpperCase()));
+      if (!allowed.has(value.toUpperCase())) {
+        return 'Please choose a value from the list.';
+      }
+      return null;
+    }
+
+    if (descriptor.input === 'number') {
+      if (!/^-?\d+$/.test(value)) {
+        return 'Enter a whole number.';
+      }
+      const num = Number(value);
+      if (descriptor.min != null && num < descriptor.min) {
+        return `Minimum allowed value is ${descriptor.min}.`;
+      }
+      if (descriptor.max != null && num > descriptor.max) {
+        return `Maximum allowed value is ${descriptor.max}.`;
+      }
+      return null;
+    }
+
+    if (descriptor.input === 'time') {
+      if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(value)) {
+        return 'Use 24-hour format HH:mm (example: 13:30).';
+      }
+      const crossFieldError = this.getTimeCrossFieldError(setting.key, value);
+      if (crossFieldError) {
+        return crossFieldError;
+      }
+      return null;
+    }
+
+    if (descriptor.input === 'date') {
+      if (!value) {
+        return null;
+      }
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+        return 'Use date format YYYY-MM-DD.';
+      }
+      const date = new Date(`${value}T00:00:00`);
+      if (Number.isNaN(date.getTime())) {
+        return 'Enter a valid date.';
+      }
+      return null;
+    }
+
+    return null;
+  }
+
+  private getTimeCrossFieldError(key: string, value: string): string | null {
+    const toMinutes = (time: string) => {
+      const [h, m] = time.split(':').map(Number);
+      return (h * 60) + m;
+    };
+    const current = toMinutes(value);
+    const lunchStart = this.draftValues['lunch_break_start'];
+    const lunchEnd = this.draftValues['lunch_break_end'];
+    const earliestStart = this.draftValues['earliest_start_time'];
+    const latestEnd = this.draftValues['latest_end_time'];
+
+    if (key === 'lunch_break_start' && lunchEnd && current >= toMinutes(lunchEnd)) {
+      return 'Lunch break start must be earlier than lunch break end.';
+    }
+    if (key === 'lunch_break_end' && lunchStart && current <= toMinutes(lunchStart)) {
+      return 'Lunch break end must be later than lunch break start.';
+    }
+    if (key === 'earliest_start_time' && latestEnd && current >= toMinutes(latestEnd)) {
+      return 'Earliest class start must be earlier than latest class end.';
+    }
+    if (key === 'latest_end_time' && earliestStart && current <= toMinutes(earliestStart)) {
+      return 'Latest class end must be later than earliest class start.';
+    }
+    return null;
+  }
+
+  private formatFallbackLabel(key: string): string {
+    const wordOverrides: Record<string, string> = {
+      api: 'API',
+      cpu: 'CPU',
+      ms: 'ms',
+      id: 'ID'
+    };
+    return key
+      .split('_')
+      .filter(Boolean)
+      .map((word) => {
+        const lowered = word.toLowerCase();
+        if (wordOverrides[lowered]) {
+          return wordOverrides[lowered];
+        }
+        return lowered.charAt(0).toUpperCase() + lowered.slice(1);
+      })
+      .join(' ');
+  }
+
+  getSelectOptions(setting: Setting): Array<{ value: string; label: string }> {
+    const descriptor = this.descriptorOf(setting);
+    const options = [...(descriptor.options || [])];
+    const current = (this.draftValues[setting.key] ?? '').trim();
+    if (!current) {
+      return options;
+    }
+
+    const hasCurrent = options.some((opt) => this.equalSelectValue(opt.value, current));
+    if (!hasCurrent) {
+      options.unshift({ value: current, label: `${current} (current value)` });
+    }
+    return options;
+  }
+
+  private normalizeSelectValue(setting: Setting, rawValue: string): string {
+    const descriptor = this.descriptorOf(setting);
+    if (descriptor.input !== 'select') {
+      return rawValue;
+    }
+
+    const normalized = (rawValue ?? '').trim();
+    if (!normalized) {
+      return normalized;
+    }
+
+    const matched = (descriptor.options || []).find((opt) => this.equalSelectValue(opt.value, normalized));
+    return matched ? matched.value : normalized;
+  }
+
+  private equalSelectValue(optionValue: string, currentValue: string): boolean {
+    return optionValue.trim().toUpperCase() === currentValue.trim().toUpperCase();
+  }
+
+  async saveSetting(setting: Setting): Promise<void> {
+    const key = setting.key;
+    const normalizedDraft = this.normalizeSelectValue(setting, this.draftValues[key] ?? '');
+    this.draftValues[key] = normalizedDraft;
+    const newValue = normalizedDraft.trim();
+    if (newValue === setting.value) {
+      return;
+    }
+
+    const validationError = this.getValidationErrorForValue(setting, newValue);
+    if (validationError) {
+      this.showMessage(`"${this.descriptorOf(setting).label}": ${validationError}`, false);
+      return;
+    }
+
+    this.savingKeys.add(key);
+    try {
+      const updated = await firstValueFrom(this.api.updateSetting(key, String(newValue)));
+      setting.value = updated.value;
+      this.draftValues[key] = updated.value;
+      this.showMessage(`Saved "${this.descriptorOf(setting).label}".`, true);
+    } catch {
+      this.draftValues[key] = setting.value;
+      this.showMessage(`Failed to save "${this.descriptorOf(setting).label}".`, false);
+    } finally {
+      this.savingKeys.delete(key);
+    }
+  }
+
+  async saveSection(section: SettingSection): Promise<void> {
+    const sectionSettings = this.getSectionSettings(section).filter((s) => this.isDirty(s));
+    if (!sectionSettings.length) {
+      this.showMessage('No pending changes in this section.', true);
+      return;
+    }
+
+    const invalidSetting = sectionSettings.find((s) => this.isInvalid(s));
+    if (invalidSetting) {
+      this.showMessage(`Fix "${this.descriptorOf(invalidSetting).label}" before saving this section.`, false);
+      return;
+    }
+
+    for (const setting of sectionSettings) {
+      await this.saveSetting(setting);
+    }
+  }
+
+  hasInvalidSettingsInSection(section: SettingSection): boolean {
+    return this.getSectionSettings(section).some((setting) => this.isInvalid(setting));
+  }
+
+  getPlaceholder(setting: Setting): string {
+    const descriptor = this.descriptorOf(setting);
+    if (descriptor.placeholder) {
+      return descriptor.placeholder;
+    }
+    if (descriptor.input === 'time') {
+      return 'HH:mm';
+    }
+    if (descriptor.input === 'date') {
+      return 'YYYY-MM-DD';
+    }
+    if (descriptor.input === 'number') {
+      if (descriptor.min != null && descriptor.max != null) {
+        return `${descriptor.min} to ${descriptor.max}`;
+      }
+      return 'Enter a number';
+    }
+    return '';
+  }
+
+  async applySolverPreset(preset: 'safe' | 'balanced' | 'fast'): Promise<void> {
+    const presets: Record<'safe' | 'balanced' | 'fast', Record<string, string>> = {
+      safe: {
+        solver_minutes_spent_limit: '45',
+        solver_unimproved_seconds_spent_limit: '90',
+        solver_forager_accepted_count_limit: '1200',
+        solver_move_thread_count: '4',
+        solver_environment_mode: 'REPRODUCIBLE'
+      },
+      balanced: {
+        solver_minutes_spent_limit: '30',
+        solver_unimproved_seconds_spent_limit: '45',
+        solver_forager_accepted_count_limit: '500',
+        solver_move_thread_count: '4',
+        solver_environment_mode: 'REPRODUCIBLE'
+      },
+      fast: {
+        solver_minutes_spent_limit: '20',
+        solver_unimproved_seconds_spent_limit: '30',
+        solver_forager_accepted_count_limit: '250',
+        solver_move_thread_count: '4',
+        solver_environment_mode: 'REPRODUCIBLE'
+      }
+    };
+
+    const overrides = presets[preset];
+    Object.entries(overrides).forEach(([key, value]) => {
+      if (this.draftValues[key] !== undefined) {
+        this.draftValues[key] = value;
       }
     });
+    this.showMessage(`Applied ${preset} preset. Click "Save Section" under Solver Speed And Accuracy.`, true);
   }
 
-  loadUnavailabilitySettings() {
-    this.http.get<any>('http://localhost:8080/api/v1/availability-requests/settings').subscribe({
-      next: (data) => this.unavailabilitySettings = data,
-      error: () => console.error('Failed to load unavailability settings')
-    });
-  }
-
-  toggleSystemEnabled() {
-    const newValue = !this.unavailabilitySettings.systemEnabled;
-    this.http.post<any>('http://localhost:8080/api/v1/availability-requests/settings', { systemEnabled: newValue }).subscribe({
-      next: (data) => {
-        this.unavailabilitySettings = data;
-        this.showUnavailabilityMessage(`System ${newValue ? 'enabled' : 'disabled'} successfully`, true);
-      },
-      error: () => this.showUnavailabilityMessage('Failed to update setting', false)
-    });
-  }
-
-  toggleRequestsOpen() {
-    const newValue = !this.unavailabilitySettings.requestsOpen;
-    this.http.post<any>('http://localhost:8080/api/v1/availability-requests/settings', { requestsOpen: newValue }).subscribe({
-      next: (data) => {
-        this.unavailabilitySettings = data;
-        this.showUnavailabilityMessage(`Requests ${newValue ? 'opened' : 'closed'} successfully`, true);
-      },
-      error: () => this.showUnavailabilityMessage('Failed to update setting', false)
-    });
-  }
-
-  private showUnavailabilityMessage(msg: string, success: boolean) {
-    this.unavailabilityMessage = msg;
-    this.unavailabilitySuccess = success;
-    setTimeout(() => this.unavailabilityMessage = '', 3000);
-  }
-
-  getSettingsByCategory(category: string): Setting[] {
-    return this.settings.filter(s => s.category === category);
-  }
-
-  updateSetting(key: string, event: Event) {
-    const value = (event.target as HTMLInputElement).value;
-    this.api.updateSetting(key, value).subscribe({
-      next: () => console.log('Setting updated'),
-      error: (err) => console.error('Failed to update setting', err)
-    });
-  }
-
-  regenerateTimeslots() {
+  async regenerateTimeslots(): Promise<void> {
     this.regenerating = true;
     this.regenerateMessage = '';
-    this.http.post<any>('http://localhost:8080/api/v1/settings/regenerate-timeslots', {}).subscribe({
-      next: (res) => {
-        this.regenerating = false;
-        this.regenerateSuccess = true;
-        this.regenerateMessage = `✓ ${res.message}`;
-      },
-      error: (err) => {
-        this.regenerating = false;
-        this.regenerateSuccess = false;
-        this.regenerateMessage = '✗ Failed to regenerate timeslots';
-        console.error('Failed to regenerate timeslots', err);
-      }
-    });
+    try {
+      const res = await firstValueFrom(this.api.regenerateTimeslots());
+      this.regenerateSuccess = true;
+      this.regenerateMessage = `✓ ${res.message}`;
+    } catch {
+      this.regenerateSuccess = false;
+      this.regenerateMessage = '✗ Failed to regenerate timeslots.';
+    } finally {
+      this.regenerating = false;
+    }
   }
 
-  cancelWipe() {
+  async toggleSystemEnabled(): Promise<void> {
+    const newValue = !this.unavailabilitySettings.systemEnabled;
+    try {
+      const data = await firstValueFrom(this.api.updateUnavailabilitySystemSettings({ systemEnabled: newValue }));
+      this.unavailabilitySettings = { systemEnabled: data.systemEnabled, requestsOpen: data.requestsOpen };
+      this.showUnavailabilityMessage(`Unavailability system ${newValue ? 'enabled' : 'disabled'}.`, true);
+    } catch {
+      this.showUnavailabilityMessage('Failed to update system status.', false);
+    }
+  }
+
+  async toggleRequestsOpen(): Promise<void> {
+    const newValue = !this.unavailabilitySettings.requestsOpen;
+    try {
+      const data = await firstValueFrom(this.api.updateUnavailabilitySystemSettings({ requestsOpen: newValue }));
+      this.unavailabilitySettings = { systemEnabled: data.systemEnabled, requestsOpen: data.requestsOpen };
+      this.showUnavailabilityMessage(`Requests ${newValue ? 'opened' : 'closed'}.`, true);
+    } catch {
+      this.showUnavailabilityMessage('Failed to update request window.', false);
+    }
+  }
+
+  private showUnavailabilityMessage(message: string, success: boolean): void {
+    this.unavailabilityMessage = message;
+    this.unavailabilitySuccess = success;
+    setTimeout(() => (this.unavailabilityMessage = ''), 3000);
+  }
+
+  showMessage(message: string, success: boolean): void {
+    this.globalMessage = message;
+    this.globalSuccess = success;
+    setTimeout(() => (this.globalMessage = ''), 3500);
+  }
+
+  cancelWipe(): void {
     this.showWipeConfirmation = false;
     this.wipeConfirmText = '';
     this.wipeMessage = '';
   }
 
-  executeSystemWipe() {
+  async executeSystemWipe(): Promise<void> {
     if (this.wipeConfirmText !== 'DELETE') return;
-
     this.wiping = true;
     this.wipeMessage = '';
-
-    this.http.delete<any>('http://localhost:8080/api/v1/bulk/system-wipe', {
-      body: { confirmationToken: 'DELETE' }
-    }).subscribe({
-      next: (res) => {
-        this.wiping = false;
-        this.wipeSuccess = true;
-        this.wipeMessage = `✓ ${res.message} (${res.totalDeleted} records deleted)`;
-        setTimeout(() => {
-          this.showWipeConfirmation = false;
-          this.wipeConfirmText = '';
-        }, 2000);
-      },
-      error: (err) => {
-        this.wiping = false;
-        this.wipeSuccess = false;
-        this.wipeMessage = '✗ Failed to wipe data: ' + (err.error?.message || 'Unknown error');
-        console.error('Failed to wipe data', err);
-      }
-    });
+    try {
+      const res = await firstValueFrom(this.api.wipeSystemData());
+      this.wipeSuccess = true;
+      this.wipeMessage = `✓ ${res.message} (${res.totalDeleted} records deleted).`;
+      setTimeout(() => this.cancelWipe(), 1800);
+    } catch (err: any) {
+      this.wipeSuccess = false;
+      this.wipeMessage = `✗ Failed to wipe data: ${err?.error?.message || 'Unknown error'}`;
+    } finally {
+      this.wiping = false;
+    }
   }
 }
-
-
-

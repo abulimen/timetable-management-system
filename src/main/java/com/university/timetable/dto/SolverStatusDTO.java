@@ -15,14 +15,33 @@ import java.time.LocalDateTime;
 public class SolverStatusDTO {
     private String jobId;
     private String state;
+    private String runOutcome;
     private String score;
+    private String profile;
     private Long durationMs;
+    private Integer bestHardScore;
+    private Integer bestSoftScore;
+    private Boolean feasible;
     private Integer impactedLessonsCount;
     private Integer lockedLessonsCount;
     private Integer changedLockedLessonsCount;
     private Boolean pendingChanges;
     private String pendingChangeReason;
     private LocalDateTime pendingChangeSince;
+    private LocalDateTime runStartedAt;
+    private LocalDateTime lastImprovementAt;
+    private Long timeToFirstBestMs;
+    private Long timeToFirstFeasibleMs;
+    private Long improvementCount;
+    private Long persistenceCount;
+    private Long avgPersistenceMs;
+    private Integer lessonsCount;
+    private Integer timeslotsCount;
+    private Integer roomsCount;
+    private String moveThreadCount;
+    private String environmentMode;
+    private String parallelSolverCount;
+    private Integer availableProcessors;
     
     public SolverStatusDTO(String state, String score) {
         this.state = state;

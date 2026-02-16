@@ -181,6 +181,14 @@ export class ApiService {
         return this.http.get<SolverStatus>(`${this.baseUrl}/solver/status`);
     }
 
+    getSolverRuntimeDiagnostics(): Observable<SolverRuntimeDiagnostics> {
+        return this.http.get<SolverRuntimeDiagnostics>(`${this.baseUrl}/solver/runtime`);
+    }
+
+    runSolverBenchmark(request: SolverBenchmarkRequest = {}): Observable<SolverBenchmarkResult> {
+        return this.http.post<SolverBenchmarkResult>(`${this.baseUrl}/solver/benchmark`, request);
+    }
+
     terminateSolver(): Observable<SolverStatus> {
         return this.http.post<SolverStatus>(`${this.baseUrl}/solver/terminate`, {});
     }
@@ -228,6 +236,32 @@ export class ApiService {
 
     updateSetting(key: string, value: string): Observable<Setting> {
         return this.http.put<Setting>(`${this.baseUrl}/settings/${key}`, { value });
+    }
+
+    regenerateTimeslots(): Observable<{ status: string; count: number; message: string }> {
+        return this.http.post<{ status: string; count: number; message: string }>(
+            `${this.baseUrl}/settings/regenerate-timeslots`,
+            {}
+        );
+    }
+
+    getUnavailabilitySystemSettings(): Observable<{ systemEnabled: boolean; requestsOpen: boolean }> {
+        return this.http.get<{ systemEnabled: boolean; requestsOpen: boolean }>(
+            `${this.baseUrl}/availability-requests/settings`
+        );
+    }
+
+    updateUnavailabilitySystemSettings(payload: { systemEnabled?: boolean; requestsOpen?: boolean }): Observable<{ systemEnabled: boolean; requestsOpen: boolean; message?: string }> {
+        return this.http.post<{ systemEnabled: boolean; requestsOpen: boolean; message?: string }>(
+            `${this.baseUrl}/availability-requests/settings`,
+            payload
+        );
+    }
+
+    wipeSystemData(): Observable<{ message: string; totalDeleted: number }> {
+        return this.http.delete<{ message: string; totalDeleted: number }>(`${this.baseUrl}/bulk/system-wipe`, {
+            body: { confirmationToken: 'DELETE' }
+        });
     }
 
     // Semesters
@@ -631,7 +665,25 @@ export interface SolverStatus {
     jobId: string;
     state: string;
     score: string;
+    profile?: string | null;
     durationMs?: number | null;
+    runStartedAt?: string | null;
+    lastImprovementAt?: string | null;
+    timeToFirstBestMs?: number | null;
+    timeToFirstFeasibleMs?: number | null;
+    improvementCount?: number | null;
+    persistenceCount?: number | null;
+    avgPersistenceMs?: number | null;
+    lessonsCount?: number | null;
+    timeslotsCount?: number | null;
+    roomsCount?: number | null;
+    moveThreadCount?: string | null;
+    environmentMode?: string | null;
+    parallelSolverCount?: string | null;
+    availableProcessors?: number | null;
+    bestHardScore?: number | null;
+    bestSoftScore?: number | null;
+    feasible?: boolean | null;
     impactedLessonsCount?: number | null;
     lockedLessonsCount?: number | null;
     changedLockedLessonsCount?: number | null;
@@ -650,8 +702,56 @@ export interface SolveScope {
 
 export interface SolveRequest {
     mode: SolveMode;
+    profile?: 'FAST_FEASIBLE' | 'BALANCED' | 'QUALITY';
+    skipFeasibility?: boolean;
     scope?: SolveScope;
     allowLargeScope?: boolean;
+}
+
+export interface SolverRuntimeDiagnostics {
+    availableProcessors: number;
+    moveThreadCount: string;
+    environmentMode: string;
+    parallelSolverCount: string;
+    reproducible: boolean;
+}
+
+export interface SolverBenchmarkRequest {
+    warmupRuns?: number;
+    measuredRuns?: number;
+    pollIntervalMs?: number;
+    perRunTimeoutSeconds?: number;
+    modes?: Array<'FULL_REPLAN' | 'STABILITY'>;
+    profiles?: Array<'FAST_FEASIBLE' | 'BALANCED' | 'QUALITY'>;
+    skipFeasibility?: boolean;
+}
+
+export interface SolverBenchmarkSample {
+    state: string;
+    score: string;
+    durationMs: number | null;
+}
+
+export interface SolverBenchmarkScenario {
+    mode: string;
+    profile: string;
+    warmupSamples: SolverBenchmarkSample[];
+    measuredSamples: SolverBenchmarkSample[];
+    minDurationMs: number | null;
+    p50DurationMs: number | null;
+    p95DurationMs: number | null;
+    maxDurationMs: number | null;
+    avgDurationMs: number | null;
+}
+
+export interface SolverBenchmarkResult {
+    startedAt: string;
+    finishedAt: string;
+    warmupRuns: number;
+    measuredRuns: number;
+    pollIntervalMs: number;
+    perRunTimeoutSeconds: number;
+    scenarios: SolverBenchmarkScenario[];
 }
 
 export interface TimetableChangeStatus {
@@ -758,6 +858,7 @@ export interface FeasibilityCheck {
 export interface Setting {
     key: string;
     value: string;
+    dataType: 'STRING' | 'INTEGER' | 'TIME' | 'BOOLEAN' | string;
     category: string;
     description: string;
 }

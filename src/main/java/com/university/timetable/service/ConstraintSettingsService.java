@@ -133,6 +133,42 @@ public class ConstraintSettingsService {
         return getInt("bulk_import_rollback_window_hours", 24);
     }
 
+    public String getSolverMoveThreadCount() {
+        return getString("solver_move_thread_count", "4");
+    }
+
+    public String getSolverEnvironmentMode() {
+        return getString("solver_environment_mode", "REPRODUCIBLE");
+    }
+
+    public String getSolverParallelSolverCount() {
+        return getString("solver_parallel_solver_count", "1");
+    }
+
+    public int getSolverMinutesSpentLimit() {
+        return getInt("solver_minutes_spent_limit", 30);
+    }
+
+    public int getSolverUnimprovedSecondsSpentLimit() {
+        return getInt("solver_unimproved_seconds_spent_limit", 60);
+    }
+
+    public int getSolverForagerAcceptedCountLimit() {
+        return getInt("solver_forager_accepted_count_limit", 1000);
+    }
+
+    public boolean isSolverCheckpointEnabled() {
+        return getBoolean("solver_checkpoint_enabled", false);
+    }
+
+    public int getSolverCheckpointMinIntervalMs() {
+        return getInt("solver_checkpoint_min_interval_ms", 120000);
+    }
+
+    public int getSolverCheckpointEveryNImprovements() {
+        return getInt("solver_checkpoint_every_n_improvements", 0);
+    }
+
     // ==================== AVAILABILITY SETTINGS ====================
 
     public boolean isUnavailabilitySystemEnabled() {

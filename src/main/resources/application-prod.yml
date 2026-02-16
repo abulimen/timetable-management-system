@@ -4,6 +4,18 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
+solver:
+  performance:
+    move-thread-count: ${SOLVER_MOVE_THREAD_COUNT:4}
+    environment-mode: ${SOLVER_ENVIRONMENT_MODE:REPRODUCIBLE}
+    parallel-solver-count: ${SOLVER_PARALLEL_SOLVER_COUNT:1}
+  feasibility:
+    run-on-dirty-only: ${SOLVER_FEASIBILITY_RUN_ON_DIRTY_ONLY:true}
+  persistence:
+    checkpoint-enabled: ${SOLVER_PERSISTENCE_CHECKPOINT_ENABLED:false}
+    checkpoint-min-interval-ms: ${SOLVER_PERSISTENCE_CHECKPOINT_MIN_INTERVAL_MS:120000}
+    checkpoint-every-n-improvements: ${SOLVER_PERSISTENCE_CHECKPOINT_EVERY_N_IMPROVEMENTS:0}
+
 logging:
   level:
     org.optaplanner: INFO

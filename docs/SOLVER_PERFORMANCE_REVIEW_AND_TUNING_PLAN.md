@@ -91,3 +91,56 @@
 - Added solver run-history metrics persistence and API:
   - stores mode/status/duration/first-best/improvements/persistence stats/final score,
   - exposes p50/p95 summary for duration and first-best latency.
+
+## Implemented In This Follow-up Iteration
+- Activated explicit runtime solver configuration in code path that builds `SolverFactory`:
+  - `solver.performance.move-thread-count`
+  - `solver.performance.environment-mode`
+  - `solver.performance.parallel-solver-count`
+- Added runtime diagnostics endpoint:
+  - `GET /api/v1/solver/runtime`
+- Extended solve request with:
+  - `profile` (`FAST_FEASIBLE`, `BALANCED`, `QUALITY`)
+  - `skipFeasibility`
+- Added profile visibility in solver status and solver UI.
+- Implemented `FAST_FEASIBLE` behavior:
+  - solver terminates early on first hard-feasible solution.
+- Shifted persistence strategy toward final-feasible save:
+  - captures latest feasible best solution and persists at completion.
+  - optional checkpoint persistence remains configurable via:
+    - `solver.persistence.checkpoint-enabled`
+    - `solver.persistence.checkpoint-min-interval-ms`
+    - `solver.persistence.checkpoint-every-n-improvements`
+- Optimized `SolutionSaver` persistence path:
+  - preloads timeslots/rooms/lessons once,
+  - updates only changed lessons,
+  - uses batched `saveAll(...)` instead of per-lesson lookup+save loops.
+- Added run-history metadata columns and metric payload fields:
+  - `profile`, `moveThreadCount`, `environmentMode`, `parallelSolverCount`, `availableProcessors`
+  - via migration `V39__add_solver_runtime_columns_to_solver_run_metric.sql`
+- Reduced constraint-stream overhead in hot paths:
+  - student-group overlap now uses cached conflict-group ID intersection instead of nested pair traversal.
+  - special-event constraint now joins by day-of-week to avoid broad lesson×event cross-join.
+- Added derived caching on `Lesson` for:
+  - resolved student groups,
+  - conflict group IDs,
+  - total student count.
+- Stabilized Maven compilation in this environment by enabling compiler forking in `pom.xml`.
+
+## Remaining High-Value Work
+1. Run benchmark matrix on representative datasets (software-only, medium multi-department, full-university) and commit measured baseline JSON output.
+2. Tune local-search knobs (forager accepted count / termination) using measured p50/p95 from the benchmark endpoint, then re-benchmark and lock final values.
+
+## Completed Since Initial Draft
+- Added benchmark harness endpoint and result model:
+  - `POST /api/v1/solver/benchmark`
+  - aggregates min/avg/p50/p95/max by `mode + profile`.
+- Added benchmark artifacts:
+  - `docs/benchmarks/README.md`
+  - `docs/benchmarks/latest_solver_benchmark.json` (baseline file target).
+- Activated nearby selection in `solver-config.xml` using existing:
+  - `TimeslotNearbyDistanceMeter`
+  - `RoomNearbyDistanceMeter`.
+- Added optional CI perf gate script and workflow hook:
+  - `scripts/solver_perf_gate.py`
+  - `.github/workflows/ci.yml` step validates p95 threshold when benchmark file exists.

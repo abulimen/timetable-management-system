@@ -5,10 +5,12 @@ import com.university.timetable.service.AuditLogService;
 import com.university.timetable.service.ConstraintJustificationService;
 import com.university.timetable.service.InfeasibilityChecker;
 import com.university.timetable.service.SolverRunMetricsService;
+import com.university.timetable.service.SolverBenchmarkService;
 import com.university.timetable.service.SolverService;
 import com.university.timetable.service.TimetableChangeTrackerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +37,12 @@ public class SolverController {
     private final ConstraintJustificationService justificationService;
     private final AuditLogService auditLogService;
     private final SolverRunMetricsService solverRunMetricsService;
+    private final SolverBenchmarkService solverBenchmarkService;
     private final TimetableChangeTrackerService timetableChangeTrackerService;
+    private final SolverRuntimeDiagnosticsDTO runtimeDiagnostics;
+
+    @Value("${solver.feasibility.run-on-dirty-only:true}")
+    private boolean runFeasibilityOnDirtyOnly;
 
     /**
      * POST /api/v1/solver/solve
@@ -52,37 +59,57 @@ public class SolverController {
         String mode = (request != null && request.getMode() != null)
                 ? request.getMode()
                 : "FULL_REPLAN";
+        SolverProfile profile = SolverProfile.fromNullable(request != null ? request.getProfile() : null);
+        boolean skipFeasibilityRequested = request != null && Boolean.TRUE.equals(request.getSkipFeasibility());
+        boolean hasPendingChanges = timetableChangeTrackerService.getStatus().isPendingChanges();
 
-        log.info("Solve requested with mode: {}. Running feasibility check first...", mode);
+        log.info("Solve requested with mode={}, profile={}, skipFeasibility={}, runOnDirtyOnly={}, pendingChanges={}",
+                mode, profile, skipFeasibilityRequested, runFeasibilityOnDirtyOnly, hasPendingChanges);
 
-        // STEP 1: Run feasibility check (this also regenerates timeslots from settings)
-        long feasibilityStart = System.nanoTime();
-        InfeasibilityReport feasibilityReport = infeasibilityChecker.checkFeasibility();
-        log.info("Feasibility check request duration: {} ms", elapsedMs(feasibilityStart));
-
-        // STEP 2: Check for blocking issues
-        if (!feasibilityReport.isFeasible()) {
-            log.warn("Solver NOT started - {} blocking issues found", feasibilityReport.getBlockingCount());
-            return ResponseEntity.badRequest().body(java.util.Map.of(
-                    "error", "FEASIBILITY_FAILED",
-                    "message", "Cannot start solver - blocking issues found. Fix the issues and try again.",
-                    "blockingCount", feasibilityReport.getBlockingCount(),
-                    "issues", feasibilityReport.getIssues()));
+        boolean shouldRunFeasibility = !skipFeasibilityRequested;
+        if (runFeasibilityOnDirtyOnly && !hasPendingChanges) {
+            shouldRunFeasibility = false;
         }
 
-        log.info("Feasibility check passed ({} slots, {} warnings). Starting solver...",
-                feasibilityReport.getTimeslotCount(), feasibilityReport.getWarningCount());
+        int timeslotCountForAudit = 0;
+        if (shouldRunFeasibility) {
+            // STEP 1: Run feasibility check (this also ensures timeslots align with settings)
+            long feasibilityStart = System.nanoTime();
+            InfeasibilityReport feasibilityReport = infeasibilityChecker.checkFeasibility();
+            long feasibilityMs = elapsedMs(feasibilityStart);
+            log.info("Feasibility check request duration: {} ms", feasibilityMs);
+
+            timeslotCountForAudit = feasibilityReport.getTimeslotCount();
+
+            // STEP 2: Check for blocking issues
+            if (!feasibilityReport.isFeasible()) {
+                log.warn("Solver NOT started - {} blocking issues found", feasibilityReport.getBlockingCount());
+                return ResponseEntity.badRequest().body(java.util.Map.of(
+                        "error", "FEASIBILITY_FAILED",
+                        "message", "Cannot start solver - blocking issues found. Fix the issues and try again.",
+                        "blockingCount", feasibilityReport.getBlockingCount(),
+                        "issues", feasibilityReport.getIssues()));
+            }
+
+            log.info("Feasibility check passed ({} slots, {} warnings). Starting solver...",
+                    feasibilityReport.getTimeslotCount(), feasibilityReport.getWarningCount());
+        } else {
+            log.info("Skipping feasibility check before solve (skipFeasibility={}, runOnDirtyOnly={}, pendingChanges={})",
+                    skipFeasibilityRequested, runFeasibilityOnDirtyOnly, hasPendingChanges);
+        }
 
         // STEP 3: Start solver
         try {
             long solveStart = System.nanoTime();
             SolverStatusDTO status = solverService.startSolving(request);
+            status.setProfile(profile.name());
             log.info("Solver start API call completed in {} ms (total request {} ms)",
                     elapsedMs(solveStart), elapsedMs(requestStart));
 
             // Audit logging
             auditLogService.logSchedulerAction(
-                    "Solver started in " + mode + " mode with " + feasibilityReport.getTimeslotCount() + " timeslots",
+                    "Solver started in " + mode + " mode with profile " + profile +
+                            (timeslotCountForAudit > 0 ? (" and " + timeslotCountForAudit + " timeslots") : ""),
                     true);
 
             return ResponseEntity.ok(status);
@@ -218,6 +245,20 @@ public class SolverController {
             @RequestParam(required = false) String mode,
             @RequestParam(defaultValue = "100") int limit) {
         return ResponseEntity.ok(solverRunMetricsService.getMetrics(mode, limit));
+    }
+
+    @GetMapping("/runtime")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<SolverRuntimeDiagnosticsDTO> getRuntimeDiagnostics() {
+        return ResponseEntity.ok(runtimeDiagnostics);
+    }
+
+    @PostMapping("/benchmark")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
+    public ResponseEntity<SolverBenchmarkResultDTO> runBenchmark(
+            @RequestBody(required = false) SolverBenchmarkRequestDTO request) {
+        SolverBenchmarkRequestDTO effective = request == null ? new SolverBenchmarkRequestDTO() : request;
+        return ResponseEntity.ok(solverBenchmarkService.runBenchmark(effective));
     }
 
     private long elapsedMs(long startNanos) {

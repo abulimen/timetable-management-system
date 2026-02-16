@@ -1,0 +1,156 @@
+<div class="settings-shell">
+  <div class="settings-header">
+    <div>
+      <h1>Settings</h1>
+      <p>Plain-language controls for schedule rules, solver speed, and operational safeguards.</p>
+    </div>
+    <button class="btn btn-secondary" (click)="loadAll()">Reload</button>
+  </div>
+
+  <div *ngIf="globalMessage" class="alert" [class.alert-success]="globalSuccess" [class.alert-error]="!globalSuccess">
+    {{ globalMessage }}
+  </div>
+
+  <section class="card accent-blue">
+    <h2>Solver Presets</h2>
+    <p>Pick a starting profile, then benchmark and adjust.</p>
+    <div class="preset-row">
+      <button class="btn btn-secondary" (click)="applySolverPreset('safe')">Safe Quality</button>
+      <button class="btn btn-secondary" (click)="applySolverPreset('balanced')">Balanced</button>
+      <button class="btn btn-secondary" (click)="applySolverPreset('fast')">Fast Turnaround</button>
+    </div>
+    <small>Presets update draft values only. Save in the solver section to apply.</small>
+  </section>
+
+  <section class="card accent-purple">
+    <h2>Unavailability Workflow</h2>
+    <div class="toggle-grid">
+      <div class="toggle-card">
+        <div>
+          <h3>System Enabled</h3>
+          <p>When OFF, unavailability is hidden and ignored by the solver.</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" [checked]="unavailabilitySettings.systemEnabled" (change)="toggleSystemEnabled()">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-card" [class.disabled]="!unavailabilitySettings.systemEnabled">
+        <div>
+          <h3>Requests Open</h3>
+          <p>When ON, lecturers can submit new requests. Keep OFF before solving.</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" [checked]="unavailabilitySettings.requestsOpen" (change)="toggleRequestsOpen()"
+            [disabled]="!unavailabilitySettings.systemEnabled">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+    <div *ngIf="unavailabilityMessage" class="alert mt-2" [class.alert-success]="unavailabilitySuccess"
+      [class.alert-error]="!unavailabilitySuccess">
+      {{ unavailabilityMessage }}
+    </div>
+  </section>
+
+  <section *ngFor="let section of sections" class="card">
+    <div class="section-head">
+      <div>
+        <h2>{{ section.title }}</h2>
+        <p>{{ section.subtitle }}</p>
+      </div>
+      <button class="btn btn-secondary" [disabled]="hasInvalidSettingsInSection(section.key)"
+        (click)="saveSection(section.key)">Save Section</button>
+    </div>
+
+    <div class="setting-grid">
+      <div class="setting-row" *ngFor="let setting of getSectionSettings(section.key)">
+        <div class="setting-copy">
+          <h3 [attr.title]="descriptorOf(setting).help">{{ descriptorOf(setting).label }}</h3>
+          <p>{{ descriptorOf(setting).help }}</p>
+          <small *ngIf="descriptorOf(setting).recommended">{{ descriptorOf(setting).recommended }}</small>
+          <span class="restart-pill" *ngIf="descriptorOf(setting).restartRequired">Requires backend restart</span>
+        </div>
+
+        <div class="setting-control">
+          <label class="switch" *ngIf="descriptorOf(setting).input === 'boolean'">
+            <input type="checkbox" [checked]="draftValues[setting.key] === 'true'"
+              (change)="draftValues[setting.key] = ($any($event.target).checked ? 'true' : 'false'); saveSetting(setting)">
+            <span class="slider"></span>
+          </label>
+
+          <select *ngIf="descriptorOf(setting).input === 'select'" class="input"
+            [(ngModel)]="draftValues[setting.key]" [class.input-invalid]="isInvalid(setting)"
+            [attr.title]="descriptorOf(setting).help">
+            <option *ngFor="let opt of getSelectOptions(setting)" [value]="opt.value">{{ opt.label }}</option>
+          </select>
+
+          <input *ngIf="descriptorOf(setting).input !== 'boolean' && descriptorOf(setting).input !== 'select'"
+            [type]="descriptorOf(setting).input" class="input" [(ngModel)]="draftValues[setting.key]"
+            [attr.min]="descriptorOf(setting).min" [attr.max]="descriptorOf(setting).max"
+            [attr.step]="descriptorOf(setting).step" [attr.placeholder]="getPlaceholder(setting)"
+            [class.input-invalid]="isInvalid(setting)" [attr.title]="descriptorOf(setting).help">
+
+          <small class="range-warning" *ngIf="getRecommendedRangeWarning(setting) as warning">
+            {{ warning }}
+          </small>
+          <small class="field-error" *ngIf="isInvalid(setting)">
+            {{ getValidationError(setting) }}
+          </small>
+
+          <div class="row-actions" *ngIf="descriptorOf(setting).input !== 'boolean'">
+            <button class="btn btn-primary" [disabled]="!isDirty(setting) || isSaving(setting.key) || isInvalid(setting)"
+              (click)="saveSetting(setting)">
+              {{ isSaving(setting.key) ? 'Saving...' : 'Save' }}
+            </button>
+            <button class="btn btn-secondary" [disabled]="!isDirty(setting)"
+              (click)="draftValues[setting.key] = setting.value">
+              Reset
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card accent-blue">
+    <div class="section-head">
+      <div>
+        <h2>Apply Timing Changes</h2>
+        <p>Regenerate timeslots after changing start/end/lunch timing settings.</p>
+      </div>
+      <button class="btn btn-primary" [disabled]="regenerating" (click)="regenerateTimeslots()">
+        {{ regenerating ? 'Regenerating...' : 'Regenerate Timeslots' }}
+      </button>
+    </div>
+    <div *ngIf="regenerateMessage" class="alert mt-2" [class.alert-success]="regenerateSuccess"
+      [class.alert-error]="!regenerateSuccess">
+      {{ regenerateMessage }}
+    </div>
+  </section>
+
+  <section class="card danger-zone">
+    <h2>Danger Zone</h2>
+    <p>This permanently deletes timetable entities and cannot be undone.</p>
+    <button class="btn danger-btn" (click)="showWipeConfirmation = true">Wipe All Data</button>
+
+    <div *ngIf="showWipeConfirmation" class="modal-backdrop">
+      <div class="modal">
+        <h3>Confirm System Wipe</h3>
+        <p>Type <strong>DELETE</strong> to continue.</p>
+        <input class="input" [(ngModel)]="wipeConfirmText" placeholder="DELETE">
+        <div class="row-actions">
+          <button class="btn btn-secondary" (click)="cancelWipe()">Cancel</button>
+          <button class="btn danger-btn" (click)="executeSystemWipe()"
+            [disabled]="wipeConfirmText !== 'DELETE' || wiping">
+            {{ wiping ? 'Wiping...' : 'Confirm Wipe' }}
+          </button>
+        </div>
+        <div *ngIf="wipeMessage" class="alert mt-2" [class.alert-success]="wipeSuccess" [class.alert-error]="!wipeSuccess">
+          {{ wipeMessage }}
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

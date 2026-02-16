@@ -25,6 +25,9 @@ jobs:
       - name: Backend tests
         run: ./mvnw test
 
+      - name: Solver performance gate (optional baseline file)
+        run: python3 scripts/solver_perf_gate.py --input docs/benchmarks/latest_solver_benchmark.json --threshold-p95-ms 120000 --allow-missing
+
   frontend:
     runs-on: ubuntu-latest
     steps:
@@ -45,4 +48,3 @@ jobs:
       - name: Frontend build
         run: npm run build
         working-directory: frontend
-

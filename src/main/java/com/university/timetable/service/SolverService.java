@@ -10,6 +10,8 @@ import com.university.timetable.domain.StudentGroup;
 import com.university.timetable.domain.TimeTable;
 import com.university.timetable.domain.Timeslot;
 import com.university.timetable.dto.SolveRequestDTO;
+import com.university.timetable.dto.SolverProfile;
+import com.university.timetable.dto.SolverRuntimeDiagnosticsDTO;
 import com.university.timetable.dto.SolverStatusDTO;
 import com.university.timetable.repository.CourseRepository;
 import com.university.timetable.repository.LecturerRepository;
@@ -64,12 +66,16 @@ public class SolverService {
     private final SolverRunMetricsService solverRunMetricsService;
     private final TimetableChangeTrackerService timetableChangeTrackerService;
     private final AuditLogService auditLogService;
+    private final SolverRuntimeDiagnosticsDTO runtimeDiagnostics;
 
-    @Value("${solver.persistence.min-interval-ms:5000}")
-    private long persistenceMinIntervalMs;
+    @Value("${solver.persistence.checkpoint-enabled:false}")
+    private boolean checkpointEnabledDefault;
 
-    @Value("${solver.persistence.every-n-improvements:10}")
-    private int persistenceEveryNImprovements;
+    @Value("${solver.persistence.checkpoint-min-interval-ms:120000}")
+    private long checkpointMinIntervalMsDefault;
+
+    @Value("${solver.persistence.checkpoint-every-n-improvements:0}")
+    private int checkpointEveryNImprovementsDefault;
 
     @Value("${solver.scoped.max-impact-ratio:0.25}")
     private double scopedMaxImpactRatio;
@@ -78,6 +84,7 @@ public class SolverService {
 
     private String currentJobId;
     private volatile String currentMode = "FULL_REPLAN";
+    private volatile String currentProfile = SolverProfile.BALANCED.name();
     private volatile String currentBestScore = "N/A";
     private volatile Integer currentBestHardScore;
     private volatile Integer currentBestSoftScore;
@@ -94,6 +101,7 @@ public class SolverService {
     private final AtomicLong solveStartedAtMs = new AtomicLong(0L);
     private final AtomicLong bestSolutionCount = new AtomicLong(0L);
     private final AtomicLong firstBestAtMs = new AtomicLong(0L);
+    private final AtomicLong firstFeasibleAtMs = new AtomicLong(0L);
     private final AtomicLong lastBestAtMs = new AtomicLong(0L);
     private final AtomicLong lastPersistedAtMs = new AtomicLong(0L);
     private final AtomicLong persistedBestCount = new AtomicLong(0L);
@@ -101,10 +109,12 @@ public class SolverService {
     private final AtomicLong feasibleBestCount = new AtomicLong(0L);
     private final AtomicBoolean runFinalized = new AtomicBoolean(true);
     private volatile HardSoftScore lastPersistedScore;
+    private volatile TimeTable latestFeasibleBestSolution;
 
     @PostConstruct
     public void init() {
-        log.info("SolverService initialized with SolverManager: {}", solverManager);
+        log.info("SolverService initialized with SolverManager: {} | runtimeDiagnostics={}",
+                solverManager, runtimeDiagnostics);
     }
 
     /**
@@ -123,7 +133,12 @@ public class SolverService {
         long startNanos = System.nanoTime();
         String mode = request != null ? request.getMode() : null;
         String normalizedMode = (mode == null || mode.isBlank()) ? "FULL_REPLAN" : mode.trim().toUpperCase();
-        log.info("Starting solver in {} mode", normalizedMode);
+        SolverProfile profile = SolverProfile.fromNullable(request != null ? request.getProfile() : null);
+        log.info("Starting solver in {} mode with profile {} (threads={}, env={}, processors={})",
+                normalizedMode, profile,
+                runtimeDiagnostics.getMoveThreadCount(),
+                runtimeDiagnostics.getEnvironmentMode(),
+                runtimeDiagnostics.getAvailableProcessors());
         if ("SCOPED_REPLAN".equalsIgnoreCase(normalizedMode)) {
             throw new IllegalStateException(
                     "Scoped replan is discontinued. Enable editing mode, apply your changes, then run FULL_REPLAN.");
@@ -197,17 +212,21 @@ public class SolverService {
 
         currentJobId = UUID.randomUUID().toString();
         currentMode = normalizedMode;
+        currentProfile = profile.name();
         currentRunStartedAt = LocalDateTime.now();
         currentRunError = null;
         currentBestScore = "N/A";
         currentBestHardScore = null;
         currentBestSoftScore = null;
         lastRunDurationMs = null;
+        latestFeasibleBestSolution = null;
+        AtomicBoolean fastFeasibleTerminationRequested = new AtomicBoolean(false);
 
         long nowMs = System.currentTimeMillis();
         solveStartedAtMs.set(nowMs);
         bestSolutionCount.set(0L);
         firstBestAtMs.set(0L);
+        firstFeasibleAtMs.set(0L);
         lastBestAtMs.set(0L);
         lastPersistedAtMs.set(0L);
         persistedBestCount.set(0L);
@@ -242,6 +261,16 @@ public class SolverService {
                         currentBestSoftScore = score.softScore();
                         if (score.hardScore() >= 0) {
                             feasibleBestCount.incrementAndGet();
+                            if (firstFeasibleAtMs.get() == 0L) {
+                                firstFeasibleAtMs.compareAndSet(0L, callbackNow);
+                            }
+                            latestFeasibleBestSolution = bestSolution;
+                            if (profile == SolverProfile.FAST_FEASIBLE &&
+                                    fastFeasibleTerminationRequested.compareAndSet(false, true)) {
+                                log.info("FAST_FEASIBLE reached first hard-feasible score ({}). Terminating early.",
+                                        score);
+                                solverManager.terminateEarly(PROBLEM_ID);
+                            }
                         }
                     }
                     currentBestScore = String.valueOf(score);
@@ -271,7 +300,7 @@ public class SolverService {
                                 assignedLessons, bestSolution.getLessons().size());
                     }
 
-                    if (shouldPersistBestSolution(improvementIndex, score, callbackNow)) {
+                    if (isCheckpointEnabled() && shouldPersistCheckpoint(improvementIndex, score, callbackNow)) {
                         long saveStart = System.nanoTime();
                         try {
                             solutionSaver.saveSolution(bestSolution);
@@ -280,16 +309,16 @@ public class SolverService {
                             persistedBestTotalMs.addAndGet(saveMs);
                             lastPersistedAtMs.set(callbackNow);
                             lastPersistedScore = score;
-                            log.debug("Persisted best solution #{} in {} ms", improvementIndex, saveMs);
+                            log.debug("Checkpoint persisted best solution #{} in {} ms", improvementIndex, saveMs);
                         } catch (Exception e) {
                             log.error("Failed to save solution: {}", e.getMessage(), e);
                         }
                     } else {
                         if (score != null && score.hardScore() < 0) {
-                            log.debug("Skipped persistence for best solution #{} (hard-infeasible score={})",
+                            log.debug("Skipped checkpoint for best solution #{} (hard-infeasible score={})",
                                     improvementIndex, score);
                         } else {
-                            log.debug("Skipped persistence for best solution #{} (throttled)", improvementIndex);
+                            log.debug("Skipped checkpoint for best solution #{} (disabled/throttled)", improvementIndex);
                         }
                     }
                 },
@@ -316,9 +345,15 @@ public class SolverService {
                     null);
         }
         SolverStatusDTO status = new SolverStatusDTO(currentJobId, "SOLVING", currentBestScore, null);
+        status.setRunOutcome("RUNNING");
+        status.setBestHardScore(currentBestHardScore);
+        status.setBestSoftScore(currentBestSoftScore);
+        status.setFeasible(currentBestHardScore != null && currentBestHardScore >= 0);
+        status.setProfile(currentProfile);
         status.setImpactedLessonsCount(currentImpactedLessonsCount);
         status.setLockedLessonsCount(currentLockedLessonsCount);
         status.setChangedLockedLessonsCount(currentChangedLockedLessonsCount);
+        enrichRuntimeDetails(status);
         return enrichWithPendingChangeStatus(status);
     }
 
@@ -346,9 +381,17 @@ public class SolverService {
             durationMs = Math.max(0L, System.currentTimeMillis() - solveStartedAtMs.get());
         }
         SolverStatusDTO dto = new SolverStatusDTO(currentJobId, status.name(), score, durationMs);
+        dto.setRunOutcome(status == SolverStatus.NOT_SOLVING
+                ? (currentRunError == null ? "COMPLETED" : "FAILED")
+                : "RUNNING");
+        dto.setBestHardScore(currentBestHardScore);
+        dto.setBestSoftScore(currentBestSoftScore);
+        dto.setFeasible(currentBestHardScore != null && currentBestHardScore >= 0);
+        dto.setProfile(currentProfile);
         dto.setImpactedLessonsCount(currentImpactedLessonsCount);
         dto.setLockedLessonsCount(currentLockedLessonsCount);
         dto.setChangedLockedLessonsCount(currentChangedLockedLessonsCount);
+        enrichRuntimeDetails(dto);
         return enrichWithPendingChangeStatus(dto);
     }
 
@@ -364,9 +407,15 @@ public class SolverService {
         log.info("Solver terminated after {} ms with {} improvements; latest score={}",
                 elapsed, bestSolutionCount.get(), currentBestScore);
         SolverStatusDTO dto = new SolverStatusDTO(currentJobId, "TERMINATED", currentBestScore, elapsed);
+        dto.setRunOutcome("TERMINATED");
+        dto.setBestHardScore(currentBestHardScore);
+        dto.setBestSoftScore(currentBestSoftScore);
+        dto.setFeasible(currentBestHardScore != null && currentBestHardScore >= 0);
+        dto.setProfile(currentProfile);
         dto.setImpactedLessonsCount(currentImpactedLessonsCount);
         dto.setLockedLessonsCount(currentLockedLessonsCount);
         dto.setChangedLockedLessonsCount(currentChangedLockedLessonsCount);
+        enrichRuntimeDetails(dto);
         return enrichWithPendingChangeStatus(dto);
     }
 
@@ -522,7 +571,7 @@ public class SolverService {
         return timeslotId + "|" + roomId;
     }
 
-    private boolean shouldPersistBestSolution(long improvementIndex, HardSoftScore score, long nowMs) {
+    private boolean shouldPersistCheckpoint(long improvementIndex, HardSoftScore score, long nowMs) {
         if (score != null && score.hardScore() < 0) {
             return false;
         }
@@ -535,10 +584,27 @@ public class SolverService {
         if (score != null && lastPersistedScore == null) {
             return true;
         }
-        if (persistenceEveryNImprovements > 0 && improvementIndex % persistenceEveryNImprovements == 0) {
+        int checkpointEveryNImprovements = getCheckpointEveryNImprovements();
+        if (checkpointEveryNImprovements > 0 && improvementIndex % checkpointEveryNImprovements == 0) {
             return true;
         }
-        return nowMs - lastPersistedAtMs.get() >= Math.max(0L, persistenceMinIntervalMs);
+        return nowMs - lastPersistedAtMs.get() >= Math.max(0L, getCheckpointMinIntervalMs());
+    }
+
+    private boolean isCheckpointEnabled() {
+        return constraintSettingsService.getBoolean("solver_checkpoint_enabled", checkpointEnabledDefault);
+    }
+
+    private long getCheckpointMinIntervalMs() {
+        return constraintSettingsService.getInt(
+                "solver_checkpoint_min_interval_ms",
+                (int) Math.max(0L, checkpointMinIntervalMsDefault));
+    }
+
+    private int getCheckpointEveryNImprovements() {
+        return constraintSettingsService.getInt(
+                "solver_checkpoint_every_n_improvements",
+                checkpointEveryNImprovementsDefault);
     }
 
     private void finalizeRunIfNeeded(String status, String reason) {
@@ -557,12 +623,40 @@ public class SolverService {
         long durationMs = Math.max(0L, finishedMs - startedMs);
         lastRunDurationMs = durationMs;
         Long firstBestDelay = firstBestAtMs.get() > 0L ? Math.max(0L, firstBestAtMs.get() - startedMs) : null;
+
+        if ("COMPLETED".equalsIgnoreCase(status) && currentBestHardScore != null && currentBestHardScore >= 0) {
+            TimeTable finalFeasible = latestFeasibleBestSolution;
+            if (finalFeasible != null) {
+                long saveStart = System.nanoTime();
+                try {
+                    solutionSaver.saveSolution(finalFeasible);
+                    long saveMs = elapsedMs(saveStart);
+                    persistedBestCount.incrementAndGet();
+                    persistedBestTotalMs.addAndGet(saveMs);
+                    lastPersistedAtMs.set(System.currentTimeMillis());
+                    if (finalFeasible.getScore() != null) {
+                        lastPersistedScore = finalFeasible.getScore();
+                    }
+                    log.info("Persisted final feasible timetable snapshot in {} ms (hardScore={})",
+                            saveMs, currentBestHardScore);
+                } catch (Exception e) {
+                    log.error("Failed to persist final feasible timetable snapshot: {}", e.getMessage(), e);
+                    if (reason == null || reason.isBlank()) {
+                        reason = "Final solution persistence failed: " + e.getMessage();
+                    }
+                }
+            } else {
+                log.warn("Solver completed but no feasible best solution snapshot was captured for final persistence.");
+            }
+        }
+
         long persistenceCount = persistedBestCount.get();
         Long avgPersistence = persistenceCount > 0 ? persistedBestTotalMs.get() / persistenceCount : null;
 
         SolverRunMetric runMetric = new SolverRunMetric();
         runMetric.setRunId(currentJobId);
         runMetric.setMode(currentMode);
+        runMetric.setProfile(currentProfile);
         runMetric.setStatus(status);
         runMetric.setBestScore(currentBestScore);
         runMetric.setBestHardScore(currentBestHardScore);
@@ -579,6 +673,10 @@ public class SolverService {
         runMetric.setDurationMs(durationMs);
         runMetric.setTimeToFirstBestMs(firstBestDelay);
         runMetric.setErrorMessage(reason);
+        runMetric.setMoveThreadCount(runtimeDiagnostics.getMoveThreadCount());
+        runMetric.setEnvironmentMode(runtimeDiagnostics.getEnvironmentMode());
+        runMetric.setParallelSolverCount(runtimeDiagnostics.getParallelSolverCount());
+        runMetric.setAvailableProcessors(runtimeDiagnostics.getAvailableProcessors());
         runMetric.setStartedAt(currentRunStartedAt != null ? currentRunStartedAt : toLocalDateTime(startedMs));
         runMetric.setFinishedAt(LocalDateTime.now());
 
@@ -620,6 +718,29 @@ public class SolverService {
         status.setPendingChangeReason(changeStatus.getReason());
         status.setPendingChangeSince(changeStatus.getChangedAt());
         return status;
+    }
+
+    private void enrichRuntimeDetails(SolverStatusDTO status) {
+        long startedMs = solveStartedAtMs.get();
+        status.setRunStartedAt(currentRunStartedAt);
+        status.setLastImprovementAt(lastBestAtMs.get() > 0 ? toLocalDateTime(lastBestAtMs.get()) : null);
+        status.setTimeToFirstBestMs(firstBestAtMs.get() > 0 && startedMs > 0
+                ? Math.max(0L, firstBestAtMs.get() - startedMs)
+                : null);
+        status.setTimeToFirstFeasibleMs(firstFeasibleAtMs.get() > 0 && startedMs > 0
+                ? Math.max(0L, firstFeasibleAtMs.get() - startedMs)
+                : null);
+        status.setImprovementCount(bestSolutionCount.get());
+        long persistenceCount = persistedBestCount.get();
+        status.setPersistenceCount(persistenceCount);
+        status.setAvgPersistenceMs(persistenceCount > 0 ? persistedBestTotalMs.get() / persistenceCount : null);
+        status.setLessonsCount(currentLessonsCount);
+        status.setTimeslotsCount(currentTimeslotsCount);
+        status.setRoomsCount(currentRoomsCount);
+        status.setMoveThreadCount(runtimeDiagnostics.getMoveThreadCount());
+        status.setEnvironmentMode(runtimeDiagnostics.getEnvironmentMode());
+        status.setParallelSolverCount(runtimeDiagnostics.getParallelSolverCount());
+        status.setAvailableProcessors(runtimeDiagnostics.getAvailableProcessors());
     }
 
     private LocalDateTime toLocalDateTime(long epochMs) {

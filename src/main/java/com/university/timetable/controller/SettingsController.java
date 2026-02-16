@@ -171,6 +171,20 @@ public class SettingsController {
                 "features", Map.of(
                         "lunchBreakEnforced", settingsService.isLunchBreakEnforced(),
                         "dayBalanceEnforced", settingsService.isDayBalanceEnforced(),
-                        "sameCourseSameDayAllowed", settingsService.isSameCourseSameDayAllowed())));
+                        "sameCourseSameDayAllowed", settingsService.isSameCourseSameDayAllowed()),
+                "solver", Map.of(
+                        "moveThreadCount", settingsService.getSolverMoveThreadCount(),
+                        "environmentMode", settingsService.getSolverEnvironmentMode(),
+                        "parallelSolverCount", settingsService.getSolverParallelSolverCount(),
+                        "minutesSpentLimit", settingsService.getSolverMinutesSpentLimit(),
+                        "unimprovedSecondsSpentLimit", settingsService.getSolverUnimprovedSecondsSpentLimit(),
+                        "foragerAcceptedCountLimit", settingsService.getSolverForagerAcceptedCountLimit(),
+                        "checkpointEnabled", settingsService.isSolverCheckpointEnabled(),
+                        "checkpointMinIntervalMs", settingsService.getSolverCheckpointMinIntervalMs(),
+                        "checkpointEveryNImprovements", settingsService.getSolverCheckpointEveryNImprovements()),
+                "system", Map.of(
+                        "rollbackWindowHours", settingsService.getRollbackWindowHours(),
+                        "unavailabilitySystemEnabled", settingsService.isUnavailabilitySystemEnabled(),
+                        "unavailabilityRequestsOpen", settingsService.isUnavailabilityRequestsOpen())));
     }
 }

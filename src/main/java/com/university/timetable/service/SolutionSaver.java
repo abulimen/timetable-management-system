@@ -12,6 +12,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 /**
  * SolutionSaver - saves solver solutions with proper transaction handling.
  * This is a separate service to ensure @Transactional works correctly
@@ -28,9 +34,7 @@ public class SolutionSaver {
 
     /**
      * Save the solution to database with a new transaction.
-     * Note: We look up timeslots and rooms from DB by their attributes because
-     * the solver uses in-memory objects that may have IDs not matching the DB
-     * (especially timeslots which are dynamically regenerated from settings).
+     * Uses batched updates to reduce DB round-trips on large datasets.
      */
     @Transactional
     public void saveSolution(TimeTable solution) {
@@ -38,56 +42,93 @@ public class SolutionSaver {
         log.info("Saving solution with score {} and {} lessons",
                 solution.getScore(), solution.getLessons().size());
 
-        int saved = 0;
+        int updated = 0;
+        int missingDbLessons = 0;
         int missingTimeslots = 0;
         int missingRooms = 0;
 
-        long lookupAndSaveStart = System.nanoTime();
-        for (Lesson lesson : solution.getLessons()) {
-            Timeslot solverTimeslot = lesson.getTimeslot();
-            Room solverRoom = lesson.getRoom();
+        long preloadStart = System.nanoTime();
+        Map<String, Timeslot> timeslotByKey = new HashMap<>();
+        for (Timeslot timeslot : timeslotRepository.findAll()) {
+            timeslotByKey.put(timeslotKey(timeslot), timeslot);
+        }
+        Map<Long, Room> roomById = new HashMap<>();
+        for (Room room : roomRepository.findAll()) {
+            roomById.put(room.getId(), room);
+        }
+        List<Long> lessonIds = solution.getLessons().stream()
+                .map(Lesson::getId)
+                .filter(Objects::nonNull)
+                .toList();
+        Map<Long, Lesson> dbLessonById = new HashMap<>();
+        for (Lesson dbLesson : lessonRepository.findAllById(lessonIds)) {
+            dbLessonById.put(dbLesson.getId(), dbLesson);
+        }
+        long preloadMs = elapsedMs(preloadStart);
 
-            // Look up the actual DB timeslot by day+time
+        long mapAndUpdateStart = System.nanoTime();
+        List<Lesson> changedLessons = new ArrayList<>(solution.getLessons().size());
+        for (Lesson solverLesson : solution.getLessons()) {
+            Long lessonId = solverLesson.getId();
+            if (lessonId == null) {
+                continue;
+            }
+            Lesson dbLesson = dbLessonById.get(lessonId);
+            if (dbLesson == null) {
+                missingDbLessons++;
+                continue;
+            }
+
+            Timeslot solverTimeslot = solverLesson.getTimeslot();
             Timeslot dbTimeslot = null;
             if (solverTimeslot != null) {
-                dbTimeslot = timeslotRepository.findByDayOfWeekAndStartTime(
-                        solverTimeslot.getDayOfWeek(),
-                        solverTimeslot.getStartTime()).orElse(null);
-
+                dbTimeslot = timeslotByKey.get(timeslotKey(solverTimeslot));
                 if (dbTimeslot == null) {
                     missingTimeslots++;
-                    log.warn("Timeslot not found in DB: {} {}",
-                            solverTimeslot.getDayOfWeek(), solverTimeslot.getStartTime());
                 }
             }
 
-            // Look up room by ID (rooms should be stable, but verify it exists)
+            Room solverRoom = solverLesson.getRoom();
             Room dbRoom = null;
             if (solverRoom != null) {
-                dbRoom = roomRepository.findById(solverRoom.getId()).orElse(null);
+                dbRoom = roomById.get(solverRoom.getId());
                 if (dbRoom == null) {
                     missingRooms++;
-                    log.warn("Room not found in DB: {}", solverRoom.getId());
                 }
             }
 
-            final Timeslot finalTimeslot = dbTimeslot;
-            final Room finalRoom = dbRoom;
+            Long currentTimeslotId = dbLesson.getTimeslot() != null ? dbLesson.getTimeslot().getId() : null;
+            Long nextTimeslotId = dbTimeslot != null ? dbTimeslot.getId() : null;
+            Long currentRoomId = dbLesson.getRoom() != null ? dbLesson.getRoom().getId() : null;
+            Long nextRoomId = dbRoom != null ? dbRoom.getId() : null;
+            if (Objects.equals(currentTimeslotId, nextTimeslotId) && Objects.equals(currentRoomId, nextRoomId)) {
+                continue;
+            }
 
-            // Re-fetch the lesson from DB and update only the planning variables
-            lessonRepository.findById(lesson.getId()).ifPresent(dbLesson -> {
-                dbLesson.setTimeslot(finalTimeslot);
-                dbLesson.setRoom(finalRoom);
-                lessonRepository.save(dbLesson);
-            });
-            saved++;
+            dbLesson.setTimeslot(dbTimeslot);
+            dbLesson.setRoom(dbRoom);
+            changedLessons.add(dbLesson);
         }
 
-        log.info("Saved {} lessons successfully in {} ms (lookup+update {} ms, missingTimeslots={}, missingRooms={})",
-                saved, elapsedMs(startNanos), elapsedMs(lookupAndSaveStart), missingTimeslots, missingRooms);
+        if (!changedLessons.isEmpty()) {
+            lessonRepository.saveAll(changedLessons);
+            updated = changedLessons.size();
+        }
+        long updateMs = elapsedMs(mapAndUpdateStart);
+
+        if (missingTimeslots > 0 || missingRooms > 0 || missingDbLessons > 0) {
+            log.warn("Save solution had unresolved references: missingLessons={}, missingTimeslots={}, missingRooms={}",
+                    missingDbLessons, missingTimeslots, missingRooms);
+        }
+        log.info("Saved solution updates: {} changed lessons in {} ms (preload={} ms, map+update={} ms, missingLessons={}, missingTimeslots={}, missingRooms={})",
+                updated, elapsedMs(startNanos), preloadMs, updateMs, missingDbLessons, missingTimeslots, missingRooms);
     }
 
     private long elapsedMs(long startNanos) {
         return (System.nanoTime() - startNanos) / 1_000_000;
+    }
+
+    private String timeslotKey(Timeslot timeslot) {
+        return timeslot.getDayOfWeek() + "|" + timeslot.getStartTime();
     }
 }

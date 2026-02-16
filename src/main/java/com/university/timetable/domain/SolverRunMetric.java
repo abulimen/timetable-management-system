@@ -22,6 +22,9 @@ public class SolverRunMetric {
     @Column(name = "mode", nullable = false, length = 32)
     private String mode;
 
+    @Column(name = "profile", length = 32)
+    private String profile;
+
     @Column(name = "status", nullable = false, length = 32)
     private String status;
 
@@ -69,6 +72,18 @@ public class SolverRunMetric {
 
     @Column(name = "error_message", length = 512)
     private String errorMessage;
+
+    @Column(name = "move_thread_count", length = 32)
+    private String moveThreadCount;
+
+    @Column(name = "environment_mode", length = 32)
+    private String environmentMode;
+
+    @Column(name = "parallel_solver_count", length = 32)
+    private String parallelSolverCount;
+
+    @Column(name = "available_processors")
+    private Integer availableProcessors;
 
     @Column(name = "started_at", nullable = false)
     private LocalDateTime startedAt;

@@ -61,6 +61,7 @@ public class SolverRunMetricsService {
             Map<String, Object> row = new HashMap<>();
             row.put("runId", run.getRunId());
             row.put("mode", run.getMode());
+            row.put("profile", run.getProfile());
             row.put("status", run.getStatus());
             row.put("bestScore", run.getBestScore());
             row.put("bestHardScore", run.getBestHardScore());
@@ -79,6 +80,10 @@ public class SolverRunMetricsService {
             row.put("startedAt", run.getStartedAt());
             row.put("finishedAt", run.getFinishedAt());
             row.put("errorMessage", run.getErrorMessage());
+            row.put("moveThreadCount", run.getMoveThreadCount());
+            row.put("environmentMode", run.getEnvironmentMode());
+            row.put("parallelSolverCount", run.getParallelSolverCount());
+            row.put("availableProcessors", run.getAvailableProcessors());
             recentRuns.add(row);
         }
 

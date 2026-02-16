@@ -12,6 +12,8 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 
 import java.time.LocalTime;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -53,6 +55,15 @@ public class Lesson {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "lecturer_id")
     private Lecturer lecturer;
+
+    @Transient
+    private Set<StudentGroup> cachedStudentGroups;
+
+    @Transient
+    private Set<Long> cachedConflictGroupIds;
+
+    @Transient
+    private Integer cachedTotalStudentCount;
 
     /**
      * Planning Variable: The assigned timeslot.
@@ -133,7 +144,47 @@ public class Lesson {
      * Supports combined classes (e.g., Groups A+D+E).
      */
     public Set<StudentGroup> getStudentGroups() {
-        return course != null ? course.getAllStudentGroups() : Set.of();
+        if (cachedStudentGroups != null) {
+            return cachedStudentGroups;
+        }
+        if (course == null) {
+            cachedStudentGroups = Set.of();
+            return cachedStudentGroups;
+        }
+        cachedStudentGroups = Collections.unmodifiableSet(new HashSet<>(course.getAllStudentGroups()));
+        return cachedStudentGroups;
+    }
+
+    /**
+     * Get a conflict-aware group ID set used by solver constraints.
+     * Includes direct groups + their immediate parent/children IDs.
+     */
+    public Set<Long> getConflictGroupIds() {
+        if (cachedConflictGroupIds != null) {
+            return cachedConflictGroupIds;
+        }
+        Set<Long> conflictIds = new HashSet<>();
+        for (StudentGroup group : getStudentGroups()) {
+            if (group == null) {
+                continue;
+            }
+            if (group.getId() != null) {
+                conflictIds.add(group.getId());
+            }
+            StudentGroup parent = group.getParentGroup();
+            if (parent != null && parent.getId() != null) {
+                conflictIds.add(parent.getId());
+            }
+            if (group.getChildren() != null) {
+                for (StudentGroup child : group.getChildren()) {
+                    if (child != null && child.getId() != null) {
+                        conflictIds.add(child.getId());
+                    }
+                }
+            }
+        }
+        cachedConflictGroupIds = Collections.unmodifiableSet(conflictIds);
+        return cachedConflictGroupIds;
     }
 
     /**
@@ -141,7 +192,17 @@ public class Lesson {
      * Used for room capacity constraint.
      */
     public int getTotalStudentCount() {
-        return course != null ? course.getTotalStudentCount() : 0;
+        if (cachedTotalStudentCount != null) {
+            return cachedTotalStudentCount;
+        }
+        if (course == null) {
+            cachedTotalStudentCount = 0;
+            return 0;
+        }
+        cachedTotalStudentCount = getStudentGroups().stream()
+                .mapToInt(StudentGroup::getSize)
+                .sum();
+        return cachedTotalStudentCount;
     }
 
     /**
@@ -150,6 +211,20 @@ public class Lesson {
      */
     public boolean isOnline() {
         return course != null && course.isOnline();
+    }
+
+    /**
+     * Override generated setter to invalidate derived caches when course changes.
+     */
+    public void setCourse(Course course) {
+        this.course = course;
+        clearDerivedCaches();
+    }
+
+    private void clearDerivedCaches() {
+        this.cachedStudentGroups = null;
+        this.cachedConflictGroupIds = null;
+        this.cachedTotalStudentCount = null;
     }
 
     @Override
