@@ -169,14 +169,6 @@ export class ApiService {
         return this.http.post<SolverStatus>(`${this.baseUrl}/solver/solve`, payload);
     }
 
-    startScopedReplan(scope: SolveScope, allowLargeScope = false): Observable<SolverStatus> {
-        return this.startSolver({
-            mode: 'SCOPED_REPLAN',
-            scope,
-            allowLargeScope
-        });
-    }
-
     getSolverStatus(): Observable<SolverStatus> {
         return this.http.get<SolverStatus>(`${this.baseUrl}/solver/status`);
     }
@@ -215,10 +207,6 @@ export class ApiService {
 
     disableEditingMode(): Observable<TimetableChangeStatus> {
         return this.http.post<TimetableChangeStatus>(`${this.baseUrl}/solver/editing/disable`, {});
-    }
-
-    getImpactPreview(payload: ImpactPreviewRequest): Observable<ImpactPreviewResponse> {
-        return this.http.post<ImpactPreviewResponse>(`${this.baseUrl}/solver/impact-preview`, payload);
     }
 
     getSolverAnalysis(): Observable<SolverAnalysis> {
@@ -613,8 +601,6 @@ export interface Course {
     allowedZones: string[];
     allowedZoneIds?: number[];
     online: boolean;
-    impactPreview?: ImpactPreviewResponse;
-    requiresScopedReplan?: boolean;
     changeNotice?: string;
 }
 
@@ -681,6 +667,11 @@ export interface SolverStatus {
     environmentMode?: string | null;
     parallelSolverCount?: string | null;
     availableProcessors?: number | null;
+    adaptiveMaxRuntimeMs?: number | null;
+    adaptiveUnimprovedMs?: number | null;
+    adaptiveAcceptedCountLimit?: number | null;
+    adaptiveDatasetBand?: 'SMALL' | 'MEDIUM' | 'LARGE' | string | null;
+    adaptiveTerminationReason?: string | null;
     bestHardScore?: number | null;
     bestSoftScore?: number | null;
     feasible?: boolean | null;
@@ -692,20 +683,12 @@ export interface SolverStatus {
     pendingChangeSince?: string | null;
 }
 
-export type SolveMode = 'FULL_REPLAN' | 'STABILITY' | 'SCOPED_REPLAN';
-
-export interface SolveScope {
-    impactedLessonIds: number[];
-    excludedLessonIds?: number[];
-    reason?: string;
-}
+export type SolveMode = 'FULL_REPLAN' | 'STABILITY';
 
 export interface SolveRequest {
     mode: SolveMode;
-    profile?: 'FAST_FEASIBLE' | 'BALANCED' | 'QUALITY';
+    profile?: 'BALANCED' | 'QUALITY';
     skipFeasibility?: boolean;
-    scope?: SolveScope;
-    allowLargeScope?: boolean;
 }
 
 export interface SolverRuntimeDiagnostics {
@@ -722,7 +705,7 @@ export interface SolverBenchmarkRequest {
     pollIntervalMs?: number;
     perRunTimeoutSeconds?: number;
     modes?: Array<'FULL_REPLAN' | 'STABILITY'>;
-    profiles?: Array<'FAST_FEASIBLE' | 'BALANCED' | 'QUALITY'>;
+    profiles?: Array<'BALANCED' | 'QUALITY'>;
     skipFeasibility?: boolean;
 }
 
@@ -761,69 +744,16 @@ export interface TimetableChangeStatus {
     editingEnabled: boolean;
 }
 
-export type ImpactChangeType =
-    | 'COURSE_CREATE'
-    | 'COURSE_CANCEL'
-    | 'LECTURER_REASSIGN'
-    | 'SPECIAL_EVENT_UPSERT'
-    | 'MANUAL';
-
-export interface ImpactPreviewRequest {
-    changeType: ImpactChangeType;
-    entityId?: number;
-    options?: {
-        impactedLessonIds?: number[];
-        lecturerId?: number;
-        roomId?: number;
-        dayOfWeek?: string;
-        startTime?: string;
-        durationHours?: number;
-        studentGroupIds?: number[];
-    };
-}
-
-export interface ImpactPreviewSummary {
-    totalLessons: number;
-    impactedCount: number;
-    lockedCount: number;
-    byDay: Record<string, number>;
-    byLecturer: Record<string, number>;
-    byGroup: Record<string, number>;
-    byRoom: Record<string, number>;
-}
-
-export interface ImpactPreviewLesson {
-    lessonId: number;
-    courseCode: string;
-    courseName: string;
-    dayOfWeek: string;
-    startTime: string | null;
-    endTime: string | null;
-    lecturerName: string;
-    roomName: string;
-    groupNames: string[];
-}
-
-export interface ImpactPreviewResponse {
-    impactedLessonIds: number[];
-    lockedLessonIds: number[];
-    summary: ImpactPreviewSummary;
-    warnings: string[];
-    impactedLessons: ImpactPreviewLesson[];
-}
-
 export interface CourseCancelResponse {
     status: string;
     courseId: number;
     deletedLessons: number;
-    impactPreview: ImpactPreviewResponse;
     changeNotice: string;
 }
 
 export interface CourseReassignResponse {
     status: string;
     course: Course;
-    impactPreview: ImpactPreviewResponse;
     changeNotice: string;
 }
 

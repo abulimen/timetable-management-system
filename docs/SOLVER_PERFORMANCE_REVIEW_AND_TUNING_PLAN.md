@@ -100,10 +100,10 @@
 - Added runtime diagnostics endpoint:
   - `GET /api/v1/solver/runtime`
 - Extended solve request with:
-  - `profile` (`FAST_FEASIBLE`, `BALANCED`, `QUALITY`)
+  - `profile` (`BALANCED`, `QUALITY`)
   - `skipFeasibility`
 - Added profile visibility in solver status and solver UI.
-- Implemented `FAST_FEASIBLE` behavior:
+- Implemented Stage-A feasibility handoff behavior (using `BALANCED` in two-stage QUALITY flow):
   - solver terminates early on first hard-feasible solution.
 - Shifted persistence strategy toward final-feasible save:
   - captures latest feasible best solution and persists at completion.

@@ -28,6 +28,13 @@ public class SolverStatusDTO {
     private Boolean pendingChanges;
     private String pendingChangeReason;
     private LocalDateTime pendingChangeSince;
+    private String stage;
+    private LocalDateTime stageStartedAt;
+    private Long stageOneDurationMs;
+    private Long stageTwoDurationMs;
+    private Long hardFeasibleReachedMs;
+    private String stageOneBestScore;
+    private String stageTwoBestScore;
     private LocalDateTime runStartedAt;
     private LocalDateTime lastImprovementAt;
     private Long timeToFirstBestMs;
@@ -42,6 +49,11 @@ public class SolverStatusDTO {
     private String environmentMode;
     private String parallelSolverCount;
     private Integer availableProcessors;
+    private Long adaptiveMaxRuntimeMs;
+    private Long adaptiveUnimprovedMs;
+    private Integer adaptiveAcceptedCountLimit;
+    private String adaptiveDatasetBand;
+    private String adaptiveTerminationReason;
     
     public SolverStatusDTO(String state, String score) {
         this.state = state;

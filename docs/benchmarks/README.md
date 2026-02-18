@@ -17,7 +17,7 @@ Example request body:
   "pollIntervalMs": 1000,
   "perRunTimeoutSeconds": 600,
   "modes": ["FULL_REPLAN"],
-  "profiles": ["FAST_FEASIBLE", "BALANCED", "QUALITY"],
+  "profiles": ["BALANCED", "QUALITY"],
   "skipFeasibility": true,
   "clearAssignmentsBeforeEachRun": true
 }

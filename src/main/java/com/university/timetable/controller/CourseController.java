@@ -272,19 +272,78 @@ public class CourseController {
     @PostMapping("/{id}/cancel")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<?> cancelCourse(@PathVariable Long id) {
-        return ResponseEntity.status(410).body(Map.of(
-                "error", "DISCONTINUED",
-                "message",
-                "Course cancel scoped workflow is discontinued. Use normal course delete while editing mode is enabled, then run FULL_REPLAN."));
+        return courseRepository.findById(id)
+                .map(course -> {
+                    CourseDTO previousState = toDTO(course);
+                    List<Lesson> lessons = lessonRepository.findByCourse(course);
+                    int deletedLessons = lessons.size();
+                    if (!lessons.isEmpty()) {
+                        lessonRepository.deleteAllInBatch(lessons);
+                    }
+                    courseRepository.delete(course);
+                    timetableChangeTrackerService.markDirty("Course canceled: " + course.getCode());
+                    auditLogService.logAction(
+                            AuditAction.DELETE,
+                            "Course",
+                            String.valueOf(id),
+                            course.getCode() + " - " + course.getName(),
+                            previousState,
+                            null,
+                            "COURSE_CANCELED_HARD_DELETE: Deleted course " + course.getCode()
+                                    + " and " + deletedLessons + " lesson(s)");
+                    return ResponseEntity.ok(Map.of(
+                            "status", "CANCELED",
+                            "courseId", id,
+                            "deletedLessons", deletedLessons,
+                            "changeNotice", "COURSE_CANCELED_HARD_DELETE"));
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping("/{id}/reassign-lecturer")
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN')")
     public ResponseEntity<?> reassignLecturer(@PathVariable Long id, @RequestBody ReassignLecturerRequest request) {
-        return ResponseEntity.status(410).body(Map.of(
-                "error", "DISCONTINUED",
-                "message",
-                "Course reassign scoped workflow is discontinued. Edit the course lecturer in normal edit mode, then run FULL_REPLAN."));
+        if (request == null || request.lecturerId == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "lecturerId is required"));
+        }
+
+        Lecturer targetLecturer = lecturerRepository.findById(request.lecturerId)
+                .orElse(null);
+        if (targetLecturer == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Lecturer not found: " + request.lecturerId));
+        }
+
+        return courseRepository.findById(id)
+                .map(course -> {
+                    CourseDTO previousState = toDTO(course);
+                    course.setLecturer(targetLecturer);
+                    Course saved = courseRepository.save(course);
+
+                    List<Lesson> lessons = lessonRepository.findByCourse(saved);
+                    if (!lessons.isEmpty()) {
+                        for (Lesson lesson : lessons) {
+                            lesson.setLecturer(targetLecturer);
+                        }
+                        lessonRepository.saveAll(lessons);
+                    }
+
+                    timetableChangeTrackerService.markDirty("Course lecturer reassigned: " + saved.getCode());
+                    auditLogService.logAction(
+                            AuditAction.UPDATE,
+                            "Course",
+                            String.valueOf(saved.getId()),
+                            saved.getCode() + " - " + saved.getName(),
+                            previousState,
+                            toDTO(saved),
+                            "COURSE_LECTURER_REASSIGNED: Reassigned " + saved.getCode()
+                                    + " to " + targetLecturer.getName());
+
+                    return ResponseEntity.ok(Map.of(
+                            "status", "REASSIGNED",
+                            "course", toDTO(saved),
+                            "changeNotice", "COURSE_LECTURER_REASSIGNED"));
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     // ==================== BATCH OPERATIONS ====================

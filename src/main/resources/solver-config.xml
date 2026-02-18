@@ -31,6 +31,48 @@
     
     <!-- Local Search with OPTIMIZATIONS -->
     <localSearch>
+        <!-- Option 4: Neighborhood pruning using nearby selection.
+             Restrict each move step to "near" timeslots/rooms instead of global random values. -->
+        <unionMoveSelector>
+            <!-- Timeslot neighborhood moves -->
+            <changeMoveSelector>
+                <entitySelector id="timeslotEntitySelector">
+                    <cacheType>JUST_IN_TIME</cacheType>
+                    <selectionOrder>RANDOM</selectionOrder>
+                </entitySelector>
+                <valueSelector variableName="timeslot">
+                    <cacheType>JUST_IN_TIME</cacheType>
+                    <selectionOrder>RANDOM</selectionOrder>
+                    <nearbySelection>
+                        <originEntitySelector mimicSelectorRef="timeslotEntitySelector"/>
+                        <nearbyDistanceMeterClass>com.university.timetable.solver.TimeslotNearbyDistanceMeter</nearbyDistanceMeterClass>
+                        <nearbySelectionDistributionType>LINEAR_DISTRIBUTION</nearbySelectionDistributionType>
+                        <linearDistributionSizeMaximum>16</linearDistributionSizeMaximum>
+                    </nearbySelection>
+                    <selectedCountLimit>16</selectedCountLimit>
+                </valueSelector>
+            </changeMoveSelector>
+
+            <!-- Room neighborhood moves -->
+            <changeMoveSelector>
+                <entitySelector id="roomEntitySelector">
+                    <cacheType>JUST_IN_TIME</cacheType>
+                    <selectionOrder>RANDOM</selectionOrder>
+                </entitySelector>
+                <valueSelector variableName="room">
+                    <cacheType>JUST_IN_TIME</cacheType>
+                    <selectionOrder>RANDOM</selectionOrder>
+                    <nearbySelection>
+                        <originEntitySelector mimicSelectorRef="roomEntitySelector"/>
+                        <nearbyDistanceMeterClass>com.university.timetable.solver.RoomNearbyDistanceMeter</nearbyDistanceMeterClass>
+                        <nearbySelectionDistributionType>LINEAR_DISTRIBUTION</nearbySelectionDistributionType>
+                        <linearDistributionSizeMaximum>12</linearDistributionSizeMaximum>
+                    </nearbySelection>
+                    <selectedCountLimit>12</selectedCountLimit>
+                </valueSelector>
+            </changeMoveSelector>
+        </unionMoveSelector>
+
         <!-- OPTIMIZATION 2: Combined acceptors for better exploration -->
         <acceptor>
             <!-- Tabu: Avoid revisiting recent moves -->

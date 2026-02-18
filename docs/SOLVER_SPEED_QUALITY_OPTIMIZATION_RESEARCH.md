@@ -215,6 +215,35 @@ You already have nearby distance meter artifacts; fully wiring them into solver 
 ### Validation plan
 Benchmark with and without neighborhood pruning across identical seeds/configs.
 
+### Implementation status (completed)
+Implemented in `src/main/resources/solver-config.xml`:
+1. `unionMoveSelector` with two pruned `changeMoveSelector` branches:
+   - timeslot nearby moves using `TimeslotNearbyDistanceMeter`
+   - room nearby moves using `RoomNearbyDistanceMeter`
+2. `LINEAR_DISTRIBUTION` nearby selection:
+   - timeslot neighborhood max size: `16`
+   - room neighborhood max size: `12`
+3. `selectedCountLimit` aligned to neighborhood size to prevent broad random scans.
+
+### Quick benchmark result (same dataset, BALANCED, FULL_REPLAN, skipFeasibility=true)
+- **Before Option 4** (`docs/benchmarks/option4_before_quick.json`):
+  - samples: `120782 ms`, `109740 ms`
+  - avg: `115261 ms` (1m 55s)
+  - soft score: `-1460`
+- **After Option 4** (`docs/benchmarks/option4_after_quick.json`):
+  - samples: `93125 ms`, `85524 ms`
+  - avg: `89324.5 ms` (1m 29s)
+  - soft score: `-1520`
+
+### Measured effect
+- Speed improvement: `~22.5%` faster on this dataset.
+- Quality tradeoff observed: soft score worsened by `60` points in this quick run.
+
+### Next tuning to recover soft quality while keeping speed
+1. Increase Stage-B (QUALITY) neighborhood sizes while leaving BALANCED conservative.
+2. Add a small swap move branch only in QUALITY stage for escape from local minima.
+3. Raise Stage-B `acceptedCountLimit` to improve exploitation depth.
+
 ---
 
 ## Option 5: Adaptive Runtime Profiles And Termination Tuning
@@ -240,6 +269,29 @@ Adaptive settings prevent stopping too early on large instances while avoiding o
 
 ### Validation plan
 Use benchmark matrix by dataset size and validate p50/p95 gains.
+
+### Implementation status (completed)
+Implemented adaptive runtime policy inside `SolverService` with stage-aware watchdog termination:
+1. **Dataset bands** (small/medium/large) are selected from lesson count.
+   - configurable thresholds via settings keys (optional):  
+     - `solver_adaptive_small_dataset_threshold` (default `200`)  
+     - `solver_adaptive_large_dataset_threshold` (default `800`)
+2. **Profile-aware policy resolution** per run/stage:
+   - `BALANCED`: moderate limits (also used for Stage-A feasibility handoff)
+   - `QUALITY`: larger no-improvement window and broader search target
+3. **Two-stage QUALITY integration**:
+   - Stage A uses BALANCED adaptive policy tuned for quicker feasibility handoff
+   - Stage B uses QUALITY adaptive policy
+4. **Watchdog enforcement**:
+   - terminate stage when max stage runtime is reached
+   - terminate stage when no improvement exceeds adaptive unimproved limit
+   - still supports first-feasible handoff for Stage A
+5. **Visibility in solver status/UI**:
+   - effective dataset band
+   - effective max runtime
+   - effective unimproved limit
+   - effective accepted-count target
+   - termination reason (if policy-triggered)
 
 ---
 
@@ -394,4 +446,3 @@ If the objective is "significantly faster solves with much better soft optimizat
 4. **partitioned solving for full scale**.
 
 This path gives the highest realistic gains without abandoning the current solver platform.
-

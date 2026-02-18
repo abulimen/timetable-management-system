@@ -1,0 +1,32 @@
+{
+    "startedAt"           : "2026-02-15T21:11:17.294772652",
+    "finishedAt"          : "2026-02-15T21:14:27.666264449",
+    "warmupRuns"          : 0,
+    "measuredRuns"        : 1,
+    "pollIntervalMs"      : 1000,
+    "perRunTimeoutSeconds": 300,
+    "scenarios"           : [
+        {
+            "mode"           : "FULL_REPLAN",
+            "profile"        : "BALANCED",
+            "warmupSamples"  : [],
+            "measuredSamples": [
+                {
+                    "state"        : "NOT_SOLVING",
+                    "runOutcome"   : "COMPLETED",
+                    "score"        : "0hard/-553soft (last best)",
+                    "bestHardScore": 0,
+                    "bestSoftScore": -553,
+                    "feasible"     : true,
+                    "validForPerf" : true,
+                    "durationMs"   : 189204
+                }
+            ],
+            "minDurationMs"  : 189204,
+            "p50DurationMs"  : 189204,
+            "p95DurationMs"  : 189204,
+            "maxDurationMs"  : 189204,
+            "avgDurationMs"  : 189204.0
+        }
+    ]
+}

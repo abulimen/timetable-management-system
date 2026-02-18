@@ -1,7 +1,6 @@
 package com.university.timetable.dto;
 
 public enum SolverProfile {
-    FAST_FEASIBLE,
     BALANCED,
     QUALITY;
 
@@ -9,6 +8,10 @@ public enum SolverProfile {
         if (value == null || value.isBlank()) {
             return BALANCED;
         }
-        return SolverProfile.valueOf(value.trim().toUpperCase());
+        try {
+            return SolverProfile.valueOf(value.trim().toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            return BALANCED;
+        }
     }
 }

@@ -24,6 +24,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
+import org.optaplanner.core.api.solver.SolverJob;
 import org.optaplanner.core.api.solver.SolverManager;
 import org.optaplanner.core.api.solver.SolverStatus;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,6 +41,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -77,9 +79,6 @@ public class SolverService {
     @Value("${solver.persistence.checkpoint-every-n-improvements:0}")
     private int checkpointEveryNImprovementsDefault;
 
-    @Value("${solver.scoped.max-impact-ratio:0.25}")
-    private double scopedMaxImpactRatio;
-
     private static final Long PROBLEM_ID = 1L;
 
     private String currentJobId;
@@ -97,6 +96,17 @@ public class SolverService {
     private volatile int currentChangedLockedLessonsCount;
     private volatile LocalDateTime currentRunStartedAt;
     private volatile Long lastRunDurationMs;
+    private volatile String currentStage = "IDLE";
+    private volatile LocalDateTime currentStageStartedAt;
+    private volatile Long stageOneDurationMs;
+    private volatile Long stageTwoDurationMs;
+    private volatile Long hardFeasibleReachedMs;
+    private volatile String stageOneBestScore = "N/A";
+    private volatile String stageTwoBestScore = "N/A";
+    private volatile AdaptivePolicy activeAdaptivePolicy;
+    private volatile AdaptivePolicy stageOneAdaptivePolicy;
+    private volatile AdaptivePolicy stageTwoAdaptivePolicy;
+    private volatile String lastAdaptiveTerminationReason;
 
     private final AtomicLong solveStartedAtMs = new AtomicLong(0L);
     private final AtomicLong bestSolutionCount = new AtomicLong(0L);
@@ -108,8 +118,45 @@ public class SolverService {
     private final AtomicLong persistedBestTotalMs = new AtomicLong(0L);
     private final AtomicLong feasibleBestCount = new AtomicLong(0L);
     private final AtomicBoolean runFinalized = new AtomicBoolean(true);
+    private final AtomicBoolean awaitingSecondStage = new AtomicBoolean(false);
+    private final AtomicBoolean terminateRequested = new AtomicBoolean(false);
     private volatile HardSoftScore lastPersistedScore;
     private volatile TimeTable latestFeasibleBestSolution;
+
+    private enum DatasetBand {
+        SMALL,
+        MEDIUM,
+        LARGE
+    }
+
+    private static final class AdaptivePolicy {
+        private final SolverProfile profile;
+        private final DatasetBand datasetBand;
+        private final long maxRuntimeMs;
+        private final long unimprovedMs;
+        private final int acceptedCountLimit;
+
+        private AdaptivePolicy(
+                SolverProfile profile,
+                DatasetBand datasetBand,
+                long maxRuntimeMs,
+                long unimprovedMs,
+                int acceptedCountLimit) {
+            this.profile = profile;
+            this.datasetBand = datasetBand;
+            this.maxRuntimeMs = maxRuntimeMs;
+            this.unimprovedMs = unimprovedMs;
+            this.acceptedCountLimit = acceptedCountLimit;
+        }
+
+        private String toSummary() {
+            return "profile=" + profile
+                    + ", band=" + datasetBand
+                    + ", maxRuntimeMs=" + maxRuntimeMs
+                    + ", unimprovedMs=" + unimprovedMs
+                    + ", acceptedCountLimit=" + acceptedCountLimit;
+        }
+    }
 
     @PostConstruct
     public void init() {
@@ -199,16 +246,6 @@ public class SolverService {
             prepareStabilityMode(problem);
         }
         Map<Long, String> lockedAssignmentBaseline = Map.of();
-        Set<Long> scopedImpactedIds = Set.of();
-        if ("SCOPED_REPLAN".equalsIgnoreCase(normalizedMode)) {
-            SolveRequestDTO.SolveScopeDTO scope = request != null ? request.getScope() : null;
-            boolean allowLargeScope = request != null && Boolean.TRUE.equals(request.getAllowLargeScope());
-            scopedImpactedIds = applyScopedReplanMode(problem, scope, allowLargeScope);
-            lockedAssignmentBaseline = captureLockedAssignments(problem, scopedImpactedIds);
-            currentImpactedLessonsCount = scopedImpactedIds.size();
-            currentLockedLessonsCount = Math.max(0, problem.getLessons().size() - scopedImpactedIds.size());
-            log.info("Scoped replan prepared: impacted={}, locked={}", currentImpactedLessonsCount, currentLockedLessonsCount);
-        }
 
         currentJobId = UUID.randomUUID().toString();
         currentMode = normalizedMode;
@@ -220,7 +257,19 @@ public class SolverService {
         currentBestSoftScore = null;
         lastRunDurationMs = null;
         latestFeasibleBestSolution = null;
-        AtomicBoolean fastFeasibleTerminationRequested = new AtomicBoolean(false);
+        currentStage = "QUEUED";
+        currentStageStartedAt = LocalDateTime.now();
+        stageOneDurationMs = null;
+        stageTwoDurationMs = null;
+        hardFeasibleReachedMs = null;
+        stageOneBestScore = "N/A";
+        stageTwoBestScore = "N/A";
+        activeAdaptivePolicy = null;
+        stageOneAdaptivePolicy = null;
+        stageTwoAdaptivePolicy = null;
+        lastAdaptiveTerminationReason = null;
+        awaitingSecondStage.set(false);
+        terminateRequested.set(false);
 
         long nowMs = System.currentTimeMillis();
         solveStartedAtMs.set(nowMs);
@@ -237,113 +286,28 @@ public class SolverService {
         timetableChangeTrackerService.lockEditing("Solver run in progress. Editing is locked.");
 
         final Map<Long, String> finalLockedAssignmentBaseline = lockedAssignmentBaseline;
-        final Set<Long> finalScopedImpactedIds = scopedImpactedIds;
-        log.info("Starting async solver with problem ID: {}", PROBLEM_ID);
-        solverManager.solveAndListen(PROBLEM_ID,
-                id -> {
-                    log.info("Problem factory called for ID: {}", id);
-                    return problem;
-                },
-                bestSolution -> {
-                    long callbackNow = System.currentTimeMillis();
-                    long improvementIndex = bestSolutionCount.incrementAndGet();
-
-                    if (firstBestAtMs.get() == 0L) {
-                        firstBestAtMs.compareAndSet(0L, callbackNow);
-                    }
-                    long previousBest = lastBestAtMs.getAndSet(callbackNow);
-                    long solveElapsedMs = callbackNow - solveStartedAtMs.get();
-                    long sinceLastImprovementMs = previousBest == 0L ? solveElapsedMs : callbackNow - previousBest;
-
-                    HardSoftScore score = bestSolution.getScore();
-                    if (score != null) {
-                        currentBestHardScore = score.hardScore();
-                        currentBestSoftScore = score.softScore();
-                        if (score.hardScore() >= 0) {
-                            feasibleBestCount.incrementAndGet();
-                            if (firstFeasibleAtMs.get() == 0L) {
-                                firstFeasibleAtMs.compareAndSet(0L, callbackNow);
-                            }
-                            latestFeasibleBestSolution = bestSolution;
-                            if (profile == SolverProfile.FAST_FEASIBLE &&
-                                    fastFeasibleTerminationRequested.compareAndSet(false, true)) {
-                                log.info("FAST_FEASIBLE reached first hard-feasible score ({}). Terminating early.",
-                                        score);
-                                solverManager.terminateEarly(PROBLEM_ID);
-                            }
-                        }
-                    }
-                    currentBestScore = String.valueOf(score);
-                    int assignedLessons = countAssignedLessons(bestSolution);
-
-                    if ("SCOPED_REPLAN".equalsIgnoreCase(currentMode) && !finalLockedAssignmentBaseline.isEmpty()) {
-                        long changedLocked = countChangedLockedAssignments(bestSolution, finalLockedAssignmentBaseline);
-                        currentChangedLockedLessonsCount = (int) changedLocked;
-                        if (changedLocked > 0) {
-                            currentRunError = "Scoped replan modified locked lessons (" + changedLocked + ").";
-                            log.error("Scoped replan breach: {} locked lessons changed. Terminating run.", changedLocked);
-                            solverManager.terminateEarly(PROBLEM_ID);
-                            return;
-                        }
-                    }
-
-                    if (improvementIndex == 1) {
-                        log.info("First best solution in {} ms | score={} | assignedLessons={}/{}",
-                                solveElapsedMs, currentBestScore, assignedLessons, bestSolution.getLessons().size());
-                    } else if (improvementIndex <= 5 || improvementIndex % 10 == 0) {
-                        log.info("Best solution #{} at {} ms (+{} ms) | score={} | assignedLessons={}/{}",
-                                improvementIndex, solveElapsedMs, sinceLastImprovementMs, currentBestScore,
-                                assignedLessons, bestSolution.getLessons().size());
-                    } else {
-                        log.debug("Best solution #{} at {} ms (+{} ms) | score={} | assignedLessons={}/{}",
-                                improvementIndex, solveElapsedMs, sinceLastImprovementMs, currentBestScore,
-                                assignedLessons, bestSolution.getLessons().size());
-                    }
-
-                    if (isCheckpointEnabled() && shouldPersistCheckpoint(improvementIndex, score, callbackNow)) {
-                        long saveStart = System.nanoTime();
-                        try {
-                            solutionSaver.saveSolution(bestSolution);
-                            long saveMs = elapsedMs(saveStart);
-                            persistedBestCount.incrementAndGet();
-                            persistedBestTotalMs.addAndGet(saveMs);
-                            lastPersistedAtMs.set(callbackNow);
-                            lastPersistedScore = score;
-                            log.debug("Checkpoint persisted best solution #{} in {} ms", improvementIndex, saveMs);
-                        } catch (Exception e) {
-                            log.error("Failed to save solution: {}", e.getMessage(), e);
-                        }
-                    } else {
-                        if (score != null && score.hardScore() < 0) {
-                            log.debug("Skipped checkpoint for best solution #{} (hard-infeasible score={})",
-                                    improvementIndex, score);
-                        } else {
-                            log.debug("Skipped checkpoint for best solution #{} (disabled/throttled)", improvementIndex);
-                        }
-                    }
-                },
-                (problemId, exception) -> {
-                    String errorMessage = exception != null ? exception.getMessage() : "Unknown solver exception";
-                    currentRunError = errorMessage;
-                    log.error("Solver exception for problem {} after {} ms and {} improvements: {}",
-                            problemId,
-                            System.currentTimeMillis() - solveStartedAtMs.get(),
-                            bestSolutionCount.get(),
-                            errorMessage,
-                            exception);
-                    finalizeRunIfNeeded("FAILED", errorMessage);
-                });
+        boolean useTwoStageQuality = shouldUseTwoStageQuality(normalizedMode, profile);
+        log.info("Starting async solver with problem ID: {} (twoStageQuality={})", PROBLEM_ID, useTwoStageQuality);
+        if (useTwoStageQuality) {
+            awaitingSecondStage.set(true);
+            currentStage = "STAGE_A_FEASIBILITY";
+            currentStageStartedAt = LocalDateTime.now();
+            stageOneAdaptivePolicy = resolveAdaptivePolicy(SolverProfile.BALANCED, currentLessonsCount, true);
+            activeAdaptivePolicy = stageOneAdaptivePolicy;
+            log.info("QUALITY profile two-stage run started: Stage A (BALANCED feasibility) -> Stage B (QUALITY)");
+            SolverJob<TimeTable, Long> stageOneJob = startSolveJob(problem,
+                    stageOneAdaptivePolicy, finalLockedAssignmentBaseline, "STAGE_A_FEASIBILITY");
+            startTwoStageWatcher(stageOneJob, finalLockedAssignmentBaseline);
+        } else {
+            currentStage = "SINGLE_STAGE";
+            currentStageStartedAt = LocalDateTime.now();
+            activeAdaptivePolicy = resolveAdaptivePolicy(profile, currentLessonsCount, false);
+            SolverJob<TimeTable, Long> job = startSolveJob(problem, activeAdaptivePolicy,
+                    finalLockedAssignmentBaseline, "SINGLE_STAGE");
+            startSingleStageWatcher(job);
+        }
 
         log.info("Solver started with job ID: {}", currentJobId);
-        if ("SCOPED_REPLAN".equalsIgnoreCase(currentMode)) {
-            auditLogService.logSystemAction(
-                    "SCOPED_REPLAN_STARTED: runId=" + currentJobId
-                            + ", impacted=" + currentImpactedLessonsCount
-                            + ", locked=" + currentLockedLessonsCount
-                            + ", reason=" + (request != null && request.getScope() != null ? request.getScope().getReason() : "n/a"),
-                    true,
-                    null);
-        }
         SolverStatusDTO status = new SolverStatusDTO(currentJobId, "SOLVING", currentBestScore, null);
         status.setRunOutcome("RUNNING");
         status.setBestHardScore(currentBestHardScore);
@@ -357,11 +321,420 @@ public class SolverService {
         return enrichWithPendingChangeStatus(status);
     }
 
+    private SolverJob<TimeTable, Long> startSolveJob(
+            TimeTable problem,
+            AdaptivePolicy adaptivePolicy,
+            Map<Long, String> lockedAssignmentBaseline,
+            String stageLabel) {
+        AtomicBoolean fastFeasibleTerminationRequested = new AtomicBoolean(false);
+        if (adaptivePolicy != null) {
+            log.info("[{}] Applying adaptive runtime policy: {}", stageLabel, adaptivePolicy.toSummary());
+        }
+        return solverManager.solveAndListen(PROBLEM_ID,
+                id -> {
+                    log.info("Problem factory called for ID: {} [{}]", id, stageLabel);
+                    return problem;
+                },
+                bestSolution -> onBestSolution(bestSolution, lockedAssignmentBaseline,
+                        fastFeasibleTerminationRequested, stageLabel),
+                (problemId, exception) -> {
+                    String errorMessage = exception != null ? exception.getMessage() : "Unknown solver exception";
+                    currentRunError = errorMessage;
+                    log.error("Solver exception for problem {} [{}] after {} ms and {} improvements: {}",
+                            problemId,
+                            stageLabel,
+                            System.currentTimeMillis() - solveStartedAtMs.get(),
+                            bestSolutionCount.get(),
+                            errorMessage,
+                            exception);
+                    finalizeRunIfNeeded("FAILED", errorMessage);
+                });
+    }
+
+    private void onBestSolution(
+            TimeTable bestSolution,
+            Map<Long, String> lockedAssignmentBaseline,
+            AtomicBoolean fastFeasibleTerminationRequested,
+            String stageLabel) {
+        long callbackNow = System.currentTimeMillis();
+        long improvementIndex = bestSolutionCount.incrementAndGet();
+
+        if (firstBestAtMs.get() == 0L) {
+            firstBestAtMs.compareAndSet(0L, callbackNow);
+        }
+        long previousBest = lastBestAtMs.getAndSet(callbackNow);
+        long solveElapsedMs = callbackNow - solveStartedAtMs.get();
+        long sinceLastImprovementMs = previousBest == 0L ? solveElapsedMs : callbackNow - previousBest;
+
+        HardSoftScore score = bestSolution.getScore();
+        if (score != null) {
+            currentBestHardScore = score.hardScore();
+            currentBestSoftScore = score.softScore();
+            if (score.hardScore() >= 0) {
+                feasibleBestCount.incrementAndGet();
+                if (firstFeasibleAtMs.get() == 0L) {
+                    firstFeasibleAtMs.compareAndSet(0L, callbackNow);
+                    hardFeasibleReachedMs = solveElapsedMs;
+                }
+                latestFeasibleBestSolution = bestSolution;
+                if (awaitingSecondStage.get() &&
+                        fastFeasibleTerminationRequested.compareAndSet(false, true)) {
+                    if (awaitingSecondStage.get()) {
+                        log.info("{} reached first hard-feasible score ({}). Waiting for Stage A controller to terminate and hand off to Stage B.",
+                                stageLabel, score);
+                    } else {
+                        log.info("{} reached first hard-feasible score ({}). Terminating current stage early.",
+                                stageLabel, score);
+                        solverManager.terminateEarly(PROBLEM_ID);
+                    }
+                }
+            }
+        }
+        currentBestScore = String.valueOf(score);
+        int assignedLessons = countAssignedLessons(bestSolution);
+
+        if (improvementIndex == 1) {
+            log.info("[{}] First best solution in {} ms | score={} | assignedLessons={}/{}",
+                    stageLabel, solveElapsedMs, currentBestScore, assignedLessons, bestSolution.getLessons().size());
+        } else if (improvementIndex <= 5 || improvementIndex % 10 == 0) {
+            log.info("[{}] Best solution #{} at {} ms (+{} ms) | score={} | assignedLessons={}/{}",
+                    stageLabel, improvementIndex, solveElapsedMs, sinceLastImprovementMs, currentBestScore,
+                    assignedLessons, bestSolution.getLessons().size());
+        } else {
+            log.debug("[{}] Best solution #{} at {} ms (+{} ms) | score={} | assignedLessons={}/{}",
+                    stageLabel, improvementIndex, solveElapsedMs, sinceLastImprovementMs, currentBestScore,
+                    assignedLessons, bestSolution.getLessons().size());
+        }
+
+        if (isCheckpointEnabled() && shouldPersistCheckpoint(improvementIndex, score, callbackNow)) {
+            long saveStart = System.nanoTime();
+            try {
+                solutionSaver.saveSolution(bestSolution);
+                long saveMs = elapsedMs(saveStart);
+                persistedBestCount.incrementAndGet();
+                persistedBestTotalMs.addAndGet(saveMs);
+                lastPersistedAtMs.set(callbackNow);
+                lastPersistedScore = score;
+                log.debug("[{}] Checkpoint persisted best solution #{} in {} ms", stageLabel, improvementIndex,
+                        saveMs);
+            } catch (Exception e) {
+                log.error("Failed to save solution: {}", e.getMessage(), e);
+            }
+        } else {
+            if (score != null && score.hardScore() < 0) {
+                log.debug("[{}] Skipped checkpoint for best solution #{} (hard-infeasible score={})",
+                        stageLabel, improvementIndex, score);
+            } else {
+                log.debug("[{}] Skipped checkpoint for best solution #{} (disabled/throttled)",
+                        stageLabel, improvementIndex);
+            }
+        }
+    }
+
+    private void startSingleStageWatcher(SolverJob<TimeTable, Long> job) {
+        Thread watcher = new Thread(() -> {
+            try {
+                TimeTable finalBest = awaitJobWithAdaptivePolicy(job, activeAdaptivePolicy, "SINGLE_STAGE", false);
+                captureFeasibleSnapshot(finalBest);
+                stageOneBestScore = resolveBestScoreFromLatestFeasible();
+                if (currentRunStartedAt != null) {
+                    stageOneDurationMs = Math.max(0L,
+                            System.currentTimeMillis() - toEpochMs(currentRunStartedAt));
+                }
+                completeRunFromCurrentState();
+            } catch (Exception e) {
+                if (!runFinalized.get()) {
+                    String message = "Single-stage watcher failed: " + e.getMessage();
+                    currentRunError = message;
+                    log.error(message, e);
+                    finalizeRunIfNeeded("FAILED", message);
+                }
+            }
+        }, "solver-single-stage-watcher");
+        watcher.setDaemon(true);
+        watcher.start();
+    }
+
+    private void startTwoStageWatcher(
+            SolverJob<TimeTable, Long> stageOneJob,
+            Map<Long, String> lockedAssignmentBaseline) {
+        Thread watcher = new Thread(() -> {
+            try {
+                TimeTable stageOneBest = awaitJobWithAdaptivePolicy(
+                        stageOneJob,
+                        stageOneAdaptivePolicy,
+                        "STAGE_A_FEASIBILITY",
+                        true);
+                captureFeasibleSnapshot(stageOneBest);
+                TimeTable stageOneFinal = latestFeasibleBestSolution;
+                if (stageOneFinal == null) {
+                    HardSoftScore stageOneBestScoreCandidate = stageOneBest != null ? stageOneBest.getScore() : null;
+                    if (stageOneBestScoreCandidate != null && stageOneBestScoreCandidate.hardScore() >= 0) {
+                        stageOneFinal = stageOneBest;
+                        latestFeasibleBestSolution = stageOneBest;
+                        currentBestScore = stageOneBestScoreCandidate.toString();
+                        currentBestHardScore = stageOneBestScoreCandidate.hardScore();
+                        currentBestSoftScore = stageOneBestScoreCandidate.softScore();
+                    }
+                }
+                stageOneDurationMs = currentStageStartedAt == null
+                        ? null
+                        : Math.max(0L, System.currentTimeMillis() - toEpochMs(currentStageStartedAt));
+                stageOneBestScore = resolveBestScoreFromLatestFeasible();
+
+                if (terminateRequested.get() || runFinalized.get()) {
+                    awaitingSecondStage.set(false);
+                    return;
+                }
+
+                HardSoftScore stageOneScore = stageOneFinal != null ? stageOneFinal.getScore() : null;
+                if (stageOneScore == null || stageOneScore.hardScore() < 0) {
+                    awaitingSecondStage.set(false);
+                    currentRunError = "Two-stage solve failed to reach hard-feasible timetable in Stage A.";
+                    finalizeRunIfNeeded("FAILED", currentRunError);
+                    return;
+                }
+
+                currentStage = "STAGE_B_QUALITY_OPTIMIZATION";
+                currentStageStartedAt = LocalDateTime.now();
+                stageTwoAdaptivePolicy = resolveAdaptivePolicy(SolverProfile.QUALITY, currentLessonsCount, true);
+                activeAdaptivePolicy = stageTwoAdaptivePolicy;
+                lastAdaptiveTerminationReason = null;
+                log.info("Two-stage solve entering Stage B with seed score={}", stageOneScore);
+                awaitingSecondStage.set(false);
+                SolverJob<TimeTable, Long> stageTwoJob = startSolveJob(stageOneFinal,
+                        stageTwoAdaptivePolicy, lockedAssignmentBaseline, "STAGE_B_QUALITY_OPTIMIZATION");
+                TimeTable stageTwoBest = awaitJobWithAdaptivePolicy(
+                        stageTwoJob,
+                        stageTwoAdaptivePolicy,
+                        "STAGE_B_QUALITY_OPTIMIZATION",
+                        false);
+                captureFeasibleSnapshot(stageTwoBest);
+                stageTwoDurationMs = currentStageStartedAt == null
+                        ? null
+                        : Math.max(0L, System.currentTimeMillis() - toEpochMs(currentStageStartedAt));
+                stageTwoBestScore = resolveBestScoreFromLatestFeasible();
+
+                if (!runFinalized.get()) {
+                    completeRunFromCurrentState();
+                }
+            } catch (Exception e) {
+                awaitingSecondStage.set(false);
+                if (!runFinalized.get()) {
+                    String message = "Two-stage watcher failed: " + e.getMessage();
+                    currentRunError = message;
+                    log.error(message, e);
+                    finalizeRunIfNeeded("FAILED", message);
+                }
+            }
+        }, "solver-two-stage-watcher");
+        watcher.setDaemon(true);
+        watcher.start();
+    }
+
+    private TimeTable awaitJobFinalBest(SolverJob<TimeTable, Long> job) throws InterruptedException {
+        try {
+            return job.getFinalBestSolution();
+        } catch (ExecutionException e) {
+            throw new IllegalStateException("Solver job failed while waiting for completion.", e);
+        }
+    }
+
+    private TimeTable awaitJobWithAdaptivePolicy(
+            SolverJob<TimeTable, Long> job,
+            AdaptivePolicy policy,
+            String stageLabel,
+            boolean terminateOnFirstFeasible) throws InterruptedException {
+        AtomicBoolean terminationRequestedForStage = new AtomicBoolean(false);
+        long stageStartedAtMs = System.currentTimeMillis();
+        while (job.getSolverStatus() == SolverStatus.SOLVING_ACTIVE && !runFinalized.get()) {
+            if (!terminationRequestedForStage.get() && terminateRequested.get()) {
+                terminationRequestedForStage.set(true);
+                job.terminateEarly();
+                break;
+            }
+
+            if (!terminationRequestedForStage.get() && terminateOnFirstFeasible && hasHardFeasibleSnapshot()) {
+                terminationRequestedForStage.set(true);
+                lastAdaptiveTerminationReason = stageLabel + ": first hard-feasible snapshot reached";
+                log.info("{} controller terminating after first hard-feasible snapshot.", stageLabel);
+                job.terminateEarly();
+            }
+
+            String policyTerminationReason = !terminationRequestedForStage.get()
+                    ? evaluatePolicyTermination(policy, stageStartedAtMs)
+                    : null;
+            if (policyTerminationReason != null) {
+                terminationRequestedForStage.set(true);
+                lastAdaptiveTerminationReason = policyTerminationReason;
+                log.info("{} controller terminating by adaptive policy: {}", stageLabel, policyTerminationReason);
+                job.terminateEarly();
+            }
+
+            Thread.sleep(200L);
+        }
+
+        return awaitJobFinalBest(job);
+    }
+
+    private String evaluatePolicyTermination(AdaptivePolicy policy, long stageStartedAtMs) {
+        if (policy == null || terminateRequested.get()) {
+            return null;
+        }
+        long nowMs = System.currentTimeMillis();
+        long stageElapsedMs = Math.max(0L, nowMs - stageStartedAtMs);
+        long runStartedMs = solveStartedAtMs.get();
+        long sinceLastImprovementMs;
+        if (lastBestAtMs.get() > 0L) {
+            sinceLastImprovementMs = nowMs - lastBestAtMs.get();
+        } else if (runStartedMs > 0L) {
+            sinceLastImprovementMs = nowMs - runStartedMs;
+        } else {
+            sinceLastImprovementMs = stageElapsedMs;
+        }
+
+        if (policy.maxRuntimeMs > 0 && stageElapsedMs >= policy.maxRuntimeMs) {
+            return "Reached stage runtime limit (" + policy.maxRuntimeMs + " ms)";
+        }
+
+        if (policy.unimprovedMs > 0 && sinceLastImprovementMs >= policy.unimprovedMs) {
+            return "No score improvement for " + sinceLastImprovementMs + " ms (limit=" + policy.unimprovedMs + " ms)";
+        }
+        return null;
+    }
+
+    private boolean hasHardFeasibleSnapshot() {
+        TimeTable feasible = latestFeasibleBestSolution;
+        HardSoftScore feasibleScore = feasible != null ? feasible.getScore() : null;
+        return feasibleScore != null && feasibleScore.hardScore() >= 0;
+    }
+
+    private void captureFeasibleSnapshot(TimeTable candidate) {
+        HardSoftScore score = candidate != null ? candidate.getScore() : null;
+        if (score == null || score.hardScore() < 0) {
+            return;
+        }
+        latestFeasibleBestSolution = candidate;
+        currentBestScore = score.toString();
+        currentBestHardScore = score.hardScore();
+        currentBestSoftScore = score.softScore();
+    }
+
+    private String resolveBestScoreFromLatestFeasible() {
+        if (latestFeasibleBestSolution != null && latestFeasibleBestSolution.getScore() != null) {
+            return latestFeasibleBestSolution.getScore().toString();
+        }
+        return currentBestScore;
+    }
+
+    private boolean shouldUseTwoStageQuality(String mode, SolverProfile profile) {
+        return "FULL_REPLAN".equalsIgnoreCase(mode) && profile == SolverProfile.QUALITY;
+    }
+
+    private AdaptivePolicy resolveAdaptivePolicy(SolverProfile profile, int lessonCount, boolean isTwoStageRun) {
+        int boundedLessons = Math.max(0, lessonCount);
+        DatasetBand band = classifyDatasetBand(boundedLessons);
+
+        int baseMinutes = Math.max(1, constraintSettingsService.getSolverMinutesSpentLimit());
+        int baseUnimprovedSeconds = Math.max(5, constraintSettingsService.getSolverUnimprovedSecondsSpentLimit());
+        int baseAcceptedCount = Math.max(10, constraintSettingsService.getSolverForagerAcceptedCountLimit());
+
+        double runtimeFactor;
+        double unimprovedFactor;
+        double acceptedFactor;
+        switch (profile) {
+            case QUALITY -> {
+                runtimeFactor = switch (band) {
+                    case SMALL -> 0.95;
+                    case MEDIUM -> 1.00;
+                    case LARGE -> 1.00;
+                };
+                unimprovedFactor = switch (band) {
+                    case SMALL -> 1.10;
+                    case MEDIUM -> 1.20;
+                    case LARGE -> 1.35;
+                };
+                acceptedFactor = switch (band) {
+                    case SMALL -> 1.10;
+                    case MEDIUM -> 1.25;
+                    case LARGE -> 1.40;
+                };
+            }
+            case BALANCED -> {
+                runtimeFactor = switch (band) {
+                    case SMALL -> 0.70;
+                    case MEDIUM -> 0.90;
+                    case LARGE -> 1.00;
+                };
+                unimprovedFactor = switch (band) {
+                    case SMALL -> 0.75;
+                    case MEDIUM -> 0.90;
+                    case LARGE -> 1.00;
+                };
+                acceptedFactor = switch (band) {
+                    case SMALL -> 0.85;
+                    case MEDIUM -> 1.00;
+                    case LARGE -> 1.10;
+                };
+            }
+            default -> throw new IllegalStateException("Unexpected profile: " + profile);
+        }
+
+        if (isTwoStageRun && profile == SolverProfile.BALANCED) {
+            runtimeFactor = Math.min(runtimeFactor, 0.35);
+            unimprovedFactor = Math.min(unimprovedFactor, 0.35);
+            acceptedFactor = Math.min(acceptedFactor, 0.65);
+        }
+
+        long maxRuntimeMs = Math.max(
+                30_000L,
+                Math.round(baseMinutes * 60_000.0 * runtimeFactor));
+        long unimprovedMs = Math.max(
+                15_000L,
+                Math.round(baseUnimprovedSeconds * 1_000.0 * unimprovedFactor));
+        int acceptedCountLimit = Math.max(
+                10,
+                Math.min(5_000, (int) Math.round(baseAcceptedCount * acceptedFactor)));
+
+        return new AdaptivePolicy(profile, band, maxRuntimeMs, unimprovedMs, acceptedCountLimit);
+    }
+
+    private DatasetBand classifyDatasetBand(int lessonCount) {
+        int smallThreshold = Math.max(50, constraintSettingsService.getInt("solver_adaptive_small_dataset_threshold", 200));
+        int largeThreshold = Math.max(smallThreshold + 1,
+                constraintSettingsService.getInt("solver_adaptive_large_dataset_threshold", 800));
+        if (lessonCount <= smallThreshold) {
+            return DatasetBand.SMALL;
+        }
+        if (lessonCount >= largeThreshold) {
+            return DatasetBand.LARGE;
+        }
+        return DatasetBand.MEDIUM;
+    }
+
+    private void completeRunFromCurrentState() {
+        if (currentRunError == null && currentBestHardScore != null && currentBestHardScore < 0) {
+            currentRunError = "Solver finished without a hard-feasible timetable. No invalid assignments were applied.";
+        }
+        String finalStatus = currentRunError == null ? "COMPLETED" : "FAILED";
+        finalizeRunIfNeeded(finalStatus, currentRunError);
+    }
+
+    private long toEpochMs(LocalDateTime value) {
+        return value.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+
     /**
      * Get current solver status.
      */
     public SolverStatusDTO getStatus() {
         SolverStatus status = solverManager.getSolverStatus(PROBLEM_ID);
+        boolean transitioningToStageTwo = status == SolverStatus.NOT_SOLVING
+                && awaitingSecondStage.get()
+                && !runFinalized.get();
+        if (transitioningToStageTwo) {
+            status = SolverStatus.SOLVING_ACTIVE;
+        }
         if (status == SolverStatus.NOT_SOLVING) {
             if (currentRunError == null && currentBestHardScore != null && currentBestHardScore < 0) {
                 currentRunError = "Solver finished without a hard-feasible timetable. No invalid assignments were applied.";
@@ -400,6 +773,8 @@ public class SolverService {
      */
     public SolverStatusDTO terminate() {
         log.info("Terminating solver early");
+        terminateRequested.set(true);
+        awaitingSecondStage.set(false);
         solverManager.terminateEarly(PROBLEM_ID);
         finalizeRunIfNeeded("TERMINATED", "Manual termination requested.");
 
@@ -492,85 +867,6 @@ public class SolverService {
         }
     }
 
-    private Set<Long> applyScopedReplanMode(
-            TimeTable problem,
-            SolveRequestDTO.SolveScopeDTO scope,
-            boolean allowLargeScope) {
-        if (scope == null || scope.getImpactedLessonIds() == null || scope.getImpactedLessonIds().isEmpty()) {
-            throw new IllegalStateException("Scoped replan requires non-empty scope.impactedLessonIds.");
-        }
-
-        Set<Long> impacted = scope.getImpactedLessonIds().stream()
-                .filter(Objects::nonNull)
-                .collect(java.util.stream.Collectors.toCollection(HashSet::new));
-        if (scope.getExcludedLessonIds() != null) {
-            impacted.removeAll(scope.getExcludedLessonIds().stream().filter(Objects::nonNull).toList());
-        }
-        if (impacted.isEmpty()) {
-            throw new IllegalStateException("Scoped replan scope is empty after exclusions.");
-        }
-
-        Set<Long> availableIds = problem.getLessons().stream()
-                .map(Lesson::getId)
-                .filter(Objects::nonNull)
-                .collect(java.util.stream.Collectors.toSet());
-        List<Long> missingIds = impacted.stream()
-                .filter(id -> !availableIds.contains(id))
-                .sorted()
-                .toList();
-        if (!missingIds.isEmpty()) {
-            throw new IllegalStateException("Scoped replan contains invalid lesson IDs: " + missingIds);
-        }
-
-        int total = Math.max(1, problem.getLessons().size());
-        double ratio = (double) impacted.size() / (double) total;
-        if (!allowLargeScope && ratio > scopedMaxImpactRatio) {
-            throw new IllegalStateException(String.format(
-                    "Scoped replan too large: %d/%d lessons (%.1f%%). Use full replan or allowLargeScope=true.",
-                    impacted.size(), total, ratio * 100.0));
-        }
-
-        for (Lesson lesson : problem.getLessons()) {
-            Long lessonId = lesson.getId();
-            boolean isImpacted = lessonId != null && impacted.contains(lessonId);
-            lesson.setPinned(!isImpacted);
-        }
-
-        return impacted;
-    }
-
-    private Map<Long, String> captureLockedAssignments(TimeTable problem, Set<Long> impactedIds) {
-        Map<Long, String> baseline = new HashMap<>();
-        for (Lesson lesson : problem.getLessons()) {
-            if (lesson.getId() == null || impactedIds.contains(lesson.getId())) {
-                continue;
-            }
-            baseline.put(lesson.getId(), assignmentSignature(lesson));
-        }
-        return baseline;
-    }
-
-    private long countChangedLockedAssignments(TimeTable solution, Map<Long, String> baseline) {
-        long changed = 0L;
-        for (Lesson lesson : solution.getLessons()) {
-            if (lesson.getId() == null || !baseline.containsKey(lesson.getId())) {
-                continue;
-            }
-            String expected = baseline.get(lesson.getId());
-            String actual = assignmentSignature(lesson);
-            if (!Objects.equals(expected, actual)) {
-                changed++;
-            }
-        }
-        return changed;
-    }
-
-    private String assignmentSignature(Lesson lesson) {
-        Long timeslotId = lesson.getTimeslot() != null ? lesson.getTimeslot().getId() : null;
-        Long roomId = lesson.getRoom() != null ? lesson.getRoom().getId() : null;
-        return timeslotId + "|" + roomId;
-    }
-
     private boolean shouldPersistCheckpoint(long improvementIndex, HardSoftScore score, long nowMs) {
         if (score != null && score.hardScore() < 0) {
             return false;
@@ -622,6 +918,10 @@ public class SolverService {
         long finishedMs = System.currentTimeMillis();
         long durationMs = Math.max(0L, finishedMs - startedMs);
         lastRunDurationMs = durationMs;
+        awaitingSecondStage.set(false);
+        if (hardFeasibleReachedMs == null && firstFeasibleAtMs.get() > 0L) {
+            hardFeasibleReachedMs = Math.max(0L, firstFeasibleAtMs.get() - startedMs);
+        }
         Long firstBestDelay = firstBestAtMs.get() > 0L ? Math.max(0L, firstBestAtMs.get() - startedMs) : null;
 
         if ("COMPLETED".equalsIgnoreCase(status) && currentBestHardScore != null && currentBestHardScore >= 0) {
@@ -687,29 +987,18 @@ public class SolverService {
         }
 
         log.info(
-                "Solver run finalized: runId={}, status={}, mode={}, durationMs={}, firstBestMs={}, improvements={}, persistenceCount={}, bestScore={}",
-                currentJobId, status, currentMode, durationMs, firstBestDelay, bestSolutionCount.get(),
+                "Solver run finalized: runId={}, status={}, mode={}, stage={}, durationMs={}, firstBestMs={}, hardFeasibleMs={}, stageOneMs={}, stageTwoMs={}, improvements={}, persistenceCount={}, bestScore={}",
+                currentJobId, status, currentMode, currentStage, durationMs, firstBestDelay, hardFeasibleReachedMs,
+                stageOneDurationMs, stageTwoDurationMs, bestSolutionCount.get(),
                 persistenceCount, currentBestScore);
-
-        if ("SCOPED_REPLAN".equalsIgnoreCase(currentMode)) {
-            boolean success = "COMPLETED".equalsIgnoreCase(status);
-            String eventType = success ? "SCOPED_REPLAN_COMPLETED" : "SCOPED_REPLAN_FAILED";
-            auditLogService.logSystemAction(
-                    eventType + ": runId=" + currentJobId
-                            + ", status=" + status
-                            + ", impacted=" + currentImpactedLessonsCount
-                            + ", locked=" + currentLockedLessonsCount
-                            + ", changedLocked=" + currentChangedLockedLessonsCount
-                            + ", durationMs=" + durationMs,
-                    success,
-                    success ? null : reason);
-        }
 
         if ("COMPLETED".equals(status)) {
             timetableChangeTrackerService.clear("Timetable solved (" + currentMode + ")");
             timetableChangeTrackerService
                     .lockEditing("Timetable generated. Editing is now locked until admin enables editing mode.");
         }
+        currentStage = "IDLE";
+        currentStageStartedAt = null;
     }
 
     private SolverStatusDTO enrichWithPendingChangeStatus(SolverStatusDTO status) {
@@ -723,6 +1012,13 @@ public class SolverService {
     private void enrichRuntimeDetails(SolverStatusDTO status) {
         long startedMs = solveStartedAtMs.get();
         status.setRunStartedAt(currentRunStartedAt);
+        status.setStage(currentStage);
+        status.setStageStartedAt(currentStageStartedAt);
+        status.setStageOneDurationMs(stageOneDurationMs);
+        status.setStageTwoDurationMs(stageTwoDurationMs);
+        status.setHardFeasibleReachedMs(hardFeasibleReachedMs);
+        status.setStageOneBestScore(stageOneBestScore);
+        status.setStageTwoBestScore(stageTwoBestScore);
         status.setLastImprovementAt(lastBestAtMs.get() > 0 ? toLocalDateTime(lastBestAtMs.get()) : null);
         status.setTimeToFirstBestMs(firstBestAtMs.get() > 0 && startedMs > 0
                 ? Math.max(0L, firstBestAtMs.get() - startedMs)
@@ -741,6 +1037,12 @@ public class SolverService {
         status.setEnvironmentMode(runtimeDiagnostics.getEnvironmentMode());
         status.setParallelSolverCount(runtimeDiagnostics.getParallelSolverCount());
         status.setAvailableProcessors(runtimeDiagnostics.getAvailableProcessors());
+        AdaptivePolicy policy = activeAdaptivePolicy;
+        status.setAdaptiveMaxRuntimeMs(policy != null ? policy.maxRuntimeMs : null);
+        status.setAdaptiveUnimprovedMs(policy != null ? policy.unimprovedMs : null);
+        status.setAdaptiveAcceptedCountLimit(policy != null ? policy.acceptedCountLimit : null);
+        status.setAdaptiveDatasetBand(policy != null ? policy.datasetBand.name() : null);
+        status.setAdaptiveTerminationReason(lastAdaptiveTerminationReason);
     }
 
     private LocalDateTime toLocalDateTime(long epochMs) {

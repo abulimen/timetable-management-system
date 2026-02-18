@@ -81,6 +81,17 @@ import {
                 <span class="text-secondary-500">Live runtime:</span>
                 <span class="font-medium ml-1">{{ status.moveThreadCount || runtime?.moveThreadCount || 'N/A' }} threads • {{ status.parallelSolverCount || runtime?.parallelSolverCount || 'N/A' }} jobs • {{ status.availableProcessors ?? runtime?.availableProcessors ?? 'N/A' }} cores</span>
               </div>
+              <div class="p-2 rounded bg-secondary-100 dark:bg-secondary-700">
+                <span class="text-secondary-500">Adaptive limits:</span>
+                <span class="font-medium ml-1">
+                  {{ status.adaptiveDatasetBand || 'N/A' }} band • max {{ status.adaptiveMaxRuntimeMs != null ? formatDuration(status.adaptiveMaxRuntimeMs) : 'N/A' }} • no-improve {{ status.adaptiveUnimprovedMs != null ? formatDuration(status.adaptiveUnimprovedMs) : 'N/A' }}
+                </span>
+              </div>
+              <div class="p-2 rounded bg-secondary-100 dark:bg-secondary-700">
+                <span class="text-secondary-500">Adaptive search breadth:</span>
+                <span class="font-medium ml-1">{{ status.adaptiveAcceptedCountLimit ?? 'N/A' }}</span>
+                <span *ngIf="status.adaptiveTerminationReason" class="text-amber-700 ml-2">({{ status.adaptiveTerminationReason }})</span>
+              </div>
             </div>
             <div *ngIf="status?.pendingChanges" class="mt-2 text-xs text-amber-700 bg-amber-100 rounded px-2 py-1 inline-block">
               Pending timetable changes not yet replanned: {{ status?.pendingChangeReason || 'Unknown reason' }}
@@ -104,12 +115,6 @@ import {
           <div class="flex flex-col gap-3 items-end">
             <div class="flex items-center gap-2 text-sm">
               <span class="text-secondary-500">Profile:</span>
-              <button
-                (click)="selectedProfile='FAST_FEASIBLE'"
-                class="px-2 py-1 rounded border text-xs"
-                [ngClass]="selectedProfile === 'FAST_FEASIBLE' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-secondary-700 border-secondary-300'">
-                Fast
-              </button>
               <button
                 (click)="selectedProfile='BALANCED'"
                 class="px-2 py-1 rounded border text-xs"
@@ -289,7 +294,7 @@ export class SolverComponent implements OnInit, OnDestroy {
   analysis: SolverAnalysis | null = null;
   feasibility: FeasibilityCheck | null = null;
   runtime: SolverRuntimeDiagnostics | null = null;
-  selectedProfile: 'FAST_FEASIBLE' | 'BALANCED' | 'QUALITY' = 'BALANCED';
+  selectedProfile: 'BALANCED' | 'QUALITY' = 'BALANCED';
   skipFeasibility = false;
   courseDiagnostics: CourseFeasibilityDiagnostics | null = null;
   featureDiagnostics: FeatureScarcityDiagnostics | null = null;
