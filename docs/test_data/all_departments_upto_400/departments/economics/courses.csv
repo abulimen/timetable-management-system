@@ -1,0 +1,51 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+ECO101,Principles of Economics I,3,abulimensamuel+pool120@gmail.com,ECO 100 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ECO101,Principles of Economics I,3,abulimensamuel+pool121@gmail.com,ECO 100 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool122@gmail.com,ECO 100 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool123@gmail.com,ECO 100 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool124@gmail.com,ECO 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool125@gmail.com,ECO 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST111,Communication in English,2,abulimensamuel+pool126@gmail.com,ECO 100 LEVEL (GRP A)|ECO 100 LEVEL (GRP B),true,,
+ECO201,Microeconomics and Macroeconomics,3,abulimensamuel+pool127@gmail.com,ECO 200 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ECO201,Microeconomics and Macroeconomics,3,abulimensamuel+pool120@gmail.com,ECO 200 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool121@gmail.com,ECO 200 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool122@gmail.com,ECO 200 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+GST212,Philosophy and Human Existence,2,abulimensamuel+pool123@gmail.com,ECO 200 LEVEL (GRP A)|ECO 200 LEVEL (GRP B),true,,
+ECO301,Public Sector Economics,3,abulimensamuel+pool124@gmail.com,ECO 300 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ECO301,Public Sector Economics,3,abulimensamuel+pool125@gmail.com,ECO 300 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool126@gmail.com,ECO 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|BUSINESS SCHOOL
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool127@gmail.com,ECO 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|BUSINESS SCHOOL
+BU-GST322,Citizenship Orientation,1,abulimensamuel+pool120@gmail.com,ECO 300 LEVEL (GRP A)|ECO 300 LEVEL (GRP B),true,,
+ECO401,Development Economics,3,abulimensamuel+pool121@gmail.com,ECO 400 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ECO401,Development Economics,3,abulimensamuel+pool122@gmail.com,ECO 400 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ECO402,Econometric Research Project,3,abulimensamuel+pool123@gmail.com,ECO 400 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ECO402,Econometric Research Project,3,abulimensamuel+pool124@gmail.com,ECO 400 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+pool125@gmail.com,ECO 400 LEVEL (GRP A)|ECO 400 LEVEL (GRP B),true,,
+ECO104,Mathematics for Economists,3,abulimensamuel+pool083@gmail.com,ECO 100 LEVEL (GRP A),false,PROJECTOR,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+ECO104,Mathematics for Economists,3,abulimensamuel+pool083@gmail.com,ECO 100 LEVEL (GRP B),false,PROJECTOR,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+ECO105,Statistical Computing for Economics,2,abulimensamuel+pool084@gmail.com,ECO 100 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+ECO105,Statistical Computing for Economics,2,abulimensamuel+pool084@gmail.com,ECO 100 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+ECO106,Economic Writing and Communication,2,abulimensamuel+pool085@gmail.com,ECO 100 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ECO106,Economic Writing and Communication,2,abulimensamuel+pool085@gmail.com,ECO 100 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+GST121,Critical Thinking and Writing,2,abulimensamuel+pool126@gmail.com,ECO 100 LEVEL (GRP A)|ECO 100 LEVEL (GRP B),true,,
+ECO204,Intermediate Microeconomics,3,abulimensamuel+pool086@gmail.com,ECO 200 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ECO204,Intermediate Microeconomics,3,abulimensamuel+pool086@gmail.com,ECO 200 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ECO205,Intermediate Macroeconomics,3,abulimensamuel+pool087@gmail.com,ECO 200 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ECO205,Intermediate Macroeconomics,3,abulimensamuel+pool087@gmail.com,ECO 200 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ECO206,Econometrics I,2,abulimensamuel+pool084@gmail.com,ECO 200 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+ECO206,Econometrics I,2,abulimensamuel+pool084@gmail.com,ECO 200 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+GST221,Logic and Scientific Reasoning,2,abulimensamuel+pool127@gmail.com,ECO 200 LEVEL (GRP A)|ECO 200 LEVEL (GRP B),true,,
+ECO304,Development Economics,3,abulimensamuel+pool088@gmail.com,ECO 300 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ECO304,Development Economics,3,abulimensamuel+pool088@gmail.com,ECO 300 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ECO305,Public Finance and Policy,3,abulimensamuel+pool086@gmail.com,ECO 300 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ECO305,Public Finance and Policy,3,abulimensamuel+pool086@gmail.com,ECO 300 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ECO306,Applied Econometrics Lab,2,abulimensamuel+pool084@gmail.com,ECO 300 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+ECO306,Applied Econometrics Lab,2,abulimensamuel+pool084@gmail.com,ECO 300 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+GST321,Peace Studies and Conflict Resolution,2,abulimensamuel+pool120@gmail.com,ECO 300 LEVEL (GRP A)|ECO 300 LEVEL (GRP B),true,,
+ECO404,International Economics,3,abulimensamuel+pool087@gmail.com,ECO 400 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ECO404,International Economics,3,abulimensamuel+pool087@gmail.com,ECO 400 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ECO405,Monetary Economics,3,abulimensamuel+pool088@gmail.com,ECO 400 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ECO405,Monetary Economics,3,abulimensamuel+pool088@gmail.com,ECO 400 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ECO406,Policy Modeling Workshop,2,abulimensamuel+pool085@gmail.com,ECO 400 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+ECO406,Policy Modeling Workshop,2,abulimensamuel+pool085@gmail.com,ECO 400 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+GST421,Leadership Communication and Culture,2,abulimensamuel+pool121@gmail.com,ECO 400 LEVEL (GRP A)|ECO 400 LEVEL (GRP B),true,,

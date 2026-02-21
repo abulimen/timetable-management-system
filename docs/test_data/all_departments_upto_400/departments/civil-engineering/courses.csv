@@ -1,0 +1,51 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+CIV101,Introduction to Civil Engineering,3,abulimensamuel+musa.abdullahi@gmail.com,CIV 100 LEVEL (GRP A),false,PROJECTOR,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+CIV101,Introduction to Civil Engineering,3,abulimensamuel+peter.adigwe@gmail.com,CIV 100 LEVEL (GRP B),false,PROJECTOR,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool096@gmail.com,CIV 100 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|ENGINEERING BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool097@gmail.com,CIV 100 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|ENGINEERING BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool098@gmail.com,CIV 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool099@gmail.com,CIV 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+GST111,Communication in English,2,abulimensamuel+pool100@gmail.com,CIV 100 LEVEL (GRP A)|CIV 100 LEVEL (GRP B),true,,
+CIV201,Engineering Mechanics and Materials,3,abulimensamuel+musa.abdullahi@gmail.com,CIV 200 LEVEL (GRP A),false,PROJECTOR,ENGINEERING BLOCK
+CIV201,Engineering Mechanics and Materials,3,abulimensamuel+peter.adigwe@gmail.com,CIV 200 LEVEL (GRP B),false,PROJECTOR,ENGINEERING BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool101@gmail.com,CIV 200 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|ENGINEERING BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool102@gmail.com,CIV 200 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|ENGINEERING BLOCK
+GST212,Philosophy and Human Existence,2,abulimensamuel+pool103@gmail.com,CIV 200 LEVEL (GRP A)|CIV 200 LEVEL (GRP B),true,,
+CIV301,Structural Analysis and Design,3,abulimensamuel+musa.abdullahi@gmail.com,CIV 300 LEVEL (GRP A),false,PROJECTOR,ENGINEERING BLOCK|INNOVATION HUB
+CIV301,Structural Analysis and Design,3,abulimensamuel+peter.adigwe@gmail.com,CIV 300 LEVEL (GRP B),false,PROJECTOR,ENGINEERING BLOCK|INNOVATION HUB
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool096@gmail.com,CIV 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|ENGINEERING BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool097@gmail.com,CIV 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|ENGINEERING BLOCK
+BU-GST322,Citizenship Orientation,1,abulimensamuel+pool098@gmail.com,CIV 300 LEVEL (GRP A)|CIV 300 LEVEL (GRP B),true,,
+CIV401,Transportation and Highway Engineering,3,abulimensamuel+musa.abdullahi@gmail.com,CIV 400 LEVEL (GRP A),false,PROJECTOR,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+CIV401,Transportation and Highway Engineering,3,abulimensamuel+peter.adigwe@gmail.com,CIV 400 LEVEL (GRP B),false,PROJECTOR,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+CIV402,Civil Engineering Project,3,abulimensamuel+peter.adigwe@gmail.com,CIV 400 LEVEL (GRP A),false,PROJECTOR,ENGINEERING BLOCK|INNOVATION HUB
+CIV402,Civil Engineering Project,3,abulimensamuel+musa.abdullahi@gmail.com,CIV 400 LEVEL (GRP B),false,PROJECTOR,ENGINEERING BLOCK|INNOVATION HUB
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+pool099@gmail.com,CIV 400 LEVEL (GRP A)|CIV 400 LEVEL (GRP B),true,,
+CIV104,Engineering Graphics and Drafting,2,abulimensamuel+pool071@gmail.com,CIV 100 LEVEL (GRP A),false,PROJECTOR|SMART BOARD,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+CIV104,Engineering Graphics and Drafting,2,abulimensamuel+pool071@gmail.com,CIV 100 LEVEL (GRP B),false,PROJECTOR|SMART BOARD,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+CIV105,Construction Materials Science,3,abulimensamuel+pool072@gmail.com,CIV 100 LEVEL (GRP A),false,PROJECTOR,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+CIV105,Construction Materials Science,3,abulimensamuel+pool072@gmail.com,CIV 100 LEVEL (GRP B),false,PROJECTOR,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+CIV106,Computing for Engineers,2,abulimensamuel+pool073@gmail.com,CIV 100 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+CIV106,Computing for Engineers,2,abulimensamuel+pool073@gmail.com,CIV 100 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+GST121,Critical Thinking and Writing,2,abulimensamuel+pool100@gmail.com,CIV 100 LEVEL (GRP A)|CIV 100 LEVEL (GRP B),true,,
+CIV204,Structural Mechanics,3,abulimensamuel+pool074@gmail.com,CIV 200 LEVEL (GRP A),false,PROJECTOR,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+CIV204,Structural Mechanics,3,abulimensamuel+pool074@gmail.com,CIV 200 LEVEL (GRP B),false,PROJECTOR,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+CIV205,Surveying and Geomatics,2,abulimensamuel+pool075@gmail.com,CIV 200 LEVEL (GRP A),false,PROJECTOR,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+CIV205,Surveying and Geomatics,2,abulimensamuel+pool075@gmail.com,CIV 200 LEVEL (GRP B),false,PROJECTOR,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+CIV206,Engineering Analysis Lab,2,abulimensamuel+pool073@gmail.com,CIV 200 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+CIV206,Engineering Analysis Lab,2,abulimensamuel+pool073@gmail.com,CIV 200 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+GST221,Logic and Scientific Reasoning,2,abulimensamuel+pool101@gmail.com,CIV 200 LEVEL (GRP A)|CIV 200 LEVEL (GRP B),true,,
+CIV304,Transportation Engineering,3,abulimensamuel+pool076@gmail.com,CIV 300 LEVEL (GRP A),false,PROJECTOR,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+CIV304,Transportation Engineering,3,abulimensamuel+pool076@gmail.com,CIV 300 LEVEL (GRP B),false,PROJECTOR,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+CIV305,Hydraulics and Hydrology,3,abulimensamuel+pool072@gmail.com,CIV 300 LEVEL (GRP A),false,PROJECTOR,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+CIV305,Hydraulics and Hydrology,3,abulimensamuel+pool072@gmail.com,CIV 300 LEVEL (GRP B),false,PROJECTOR,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+CIV306,Civil CAD Studio,2,abulimensamuel+pool071@gmail.com,CIV 300 LEVEL (GRP A),false,CAD STUDIO|PROJECTOR,DESIGN STUDIO BLOCK|ENGINEERING BLOCK
+CIV306,Civil CAD Studio,2,abulimensamuel+pool071@gmail.com,CIV 300 LEVEL (GRP B),false,CAD STUDIO|PROJECTOR,DESIGN STUDIO BLOCK|ENGINEERING BLOCK
+GST321,Peace Studies and Conflict Resolution,2,abulimensamuel+pool102@gmail.com,CIV 300 LEVEL (GRP A)|CIV 300 LEVEL (GRP B),true,,
+CIV404,Geotechnical Engineering,3,abulimensamuel+pool074@gmail.com,CIV 400 LEVEL (GRP A),false,PROJECTOR,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+CIV404,Geotechnical Engineering,3,abulimensamuel+pool074@gmail.com,CIV 400 LEVEL (GRP B),false,PROJECTOR,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+CIV405,Construction Project Management,3,abulimensamuel+pool075@gmail.com,CIV 400 LEVEL (GRP A),false,PROJECTOR,ENGINEERING BLOCK|BUSINESS SCHOOL
+CIV405,Construction Project Management,3,abulimensamuel+pool075@gmail.com,CIV 400 LEVEL (GRP B),false,PROJECTOR,ENGINEERING BLOCK|BUSINESS SCHOOL
+CIV406,Bridge and Highway Design Studio,2,abulimensamuel+pool076@gmail.com,CIV 400 LEVEL (GRP A),false,SMART BOARD|PROJECTOR,ENGINEERING BLOCK|INNOVATION HUB
+CIV406,Bridge and Highway Design Studio,2,abulimensamuel+pool076@gmail.com,CIV 400 LEVEL (GRP B),false,SMART BOARD|PROJECTOR,ENGINEERING BLOCK|INNOVATION HUB
+GST421,Leadership Communication and Culture,2,abulimensamuel+pool103@gmail.com,CIV 400 LEVEL (GRP A)|CIV 400 LEVEL (GRP B),true,,

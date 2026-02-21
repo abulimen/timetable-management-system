@@ -41,7 +41,7 @@ public class SolverController {
     private final TimetableChangeTrackerService timetableChangeTrackerService;
     private final SolverRuntimeDiagnosticsDTO runtimeDiagnostics;
 
-    @Value("${solver.feasibility.run-on-dirty-only:true}")
+    @Value("${solver.feasibility.run-on-dirty-only:false}")
     private boolean runFeasibilityOnDirtyOnly;
 
     /**
@@ -178,6 +178,21 @@ public class SolverController {
                 true);
 
         return ResponseEntity.ok(status);
+    }
+
+    @PostMapping("/resume")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
+    public ResponseEntity<?> resume() {
+        log.info("Resume requested");
+        try {
+            SolverStatusDTO status = solverService.resume();
+            auditLogService.logSchedulerAction("Solver resumed from last saved progress.", true);
+            return ResponseEntity.ok(status);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "RESUME_FAILED",
+                    "message", e.getMessage()));
+        }
     }
 
     /**

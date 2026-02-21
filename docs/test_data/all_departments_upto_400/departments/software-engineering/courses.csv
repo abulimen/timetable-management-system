@@ -1,0 +1,72 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+SENG101,Introduction to Software Engineering,3,abulimensamuel+ada.soyinka@gmail.com,SENG 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+SENG101,Introduction to Software Engineering,3,abulimensamuel+femi.balogun@gmail.com,SENG 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+SENG101,Introduction to Software Engineering,3,abulimensamuel+ifeoma.nwosu@gmail.com,SENG 100 LEVEL (GRP C),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool216@gmail.com,SENG 100 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|ICT COMPLEX
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool217@gmail.com,SENG 100 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|ICT COMPLEX
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool218@gmail.com,SENG 100 LEVEL (GRP C),false,,MAIN ACADEMIC BLOCK|ICT COMPLEX
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool219@gmail.com,SENG 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+chineye.okafor@gmail.com,SENG 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool220@gmail.com,SENG 100 LEVEL (GRP C),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST111,Communication in English,2,abulimensamuel+pool221@gmail.com,SENG 100 LEVEL (GRP A)|SENG 100 LEVEL (GRP B)|SENG 100 LEVEL (GRP C),true,,
+SENG201,Software Design Patterns,3,abulimensamuel+ada.soyinka@gmail.com,SENG 200 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG201,Software Design Patterns,3,abulimensamuel+femi.balogun@gmail.com,SENG 200 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG201,Software Design Patterns,3,abulimensamuel+loretta.eze@gmail.com,SENG 200 LEVEL (GRP C),false,PROJECTOR,ICT COMPLEX|INNOVATION HUB
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool222@gmail.com,SENG 200 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|ICT COMPLEX
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool223@gmail.com,SENG 200 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|ICT COMPLEX
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool216@gmail.com,SENG 200 LEVEL (GRP C),false,,MAIN ACADEMIC BLOCK|ICT COMPLEX
+GST212,Philosophy and Human Existence,2,abulimensamuel+pool217@gmail.com,SENG 200 LEVEL (GRP A)|SENG 200 LEVEL (GRP B)|SENG 200 LEVEL (GRP C),true,,
+SENG301,Agile Methodologies and DevOps,3,abulimensamuel+tobi.alade@gmail.com,SENG 300 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG301,Agile Methodologies and DevOps,3,abulimensamuel+femi.balogun@gmail.com,SENG 300 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG301,Agile Methodologies and DevOps,3,abulimensamuel+loretta.eze@gmail.com,SENG 300 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool218@gmail.com,SENG 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool219@gmail.com,SENG 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool220@gmail.com,SENG 300 LEVEL (GRP C),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+BU-GST322,Citizenship Orientation,1,abulimensamuel+pool221@gmail.com,SENG 300 LEVEL (GRP A)|SENG 300 LEVEL (GRP B)|SENG 300 LEVEL (GRP C),true,,
+SENG401,Enterprise Software Architecture,3,abulimensamuel+ada.soyinka@gmail.com,SENG 400 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG401,Enterprise Software Architecture,3,abulimensamuel+tobi.alade@gmail.com,SENG 400 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG401,Enterprise Software Architecture,3,abulimensamuel+loretta.eze@gmail.com,SENG 400 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG402,Software Engineering Project,3,abulimensamuel+tobi.alade@gmail.com,SENG 400 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,INNOVATION HUB|ICT COMPLEX
+SENG402,Software Engineering Project,3,abulimensamuel+ada.soyinka@gmail.com,SENG 400 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,INNOVATION HUB|ICT COMPLEX
+SENG402,Software Engineering Project,3,abulimensamuel+ifeoma.nwosu@gmail.com,SENG 400 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,INNOVATION HUB|ICT COMPLEX
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+pool222@gmail.com,SENG 400 LEVEL (GRP A)|SENG 400 LEVEL (GRP B)|SENG 400 LEVEL (GRP C),true,,
+SENG104,Programming Fundamentals Lab,2,abulimensamuel+pool063@gmail.com,SENG 100 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG104,Programming Fundamentals Lab,2,abulimensamuel+pool063@gmail.com,SENG 100 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG104,Programming Fundamentals Lab,2,abulimensamuel+pool063@gmail.com,SENG 100 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG105,Computational Thinking and Logic,2,abulimensamuel+pool064@gmail.com,SENG 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+SENG105,Computational Thinking and Logic,2,abulimensamuel+pool064@gmail.com,SENG 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+SENG105,Computational Thinking and Logic,2,abulimensamuel+pool064@gmail.com,SENG 100 LEVEL (GRP C),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+SENG106,Engineering Design Studio I,2,abulimensamuel+pool065@gmail.com,SENG 100 LEVEL (GRP A),false,SMART BOARD|PROJECTOR,INNOVATION HUB|ICT COMPLEX
+SENG106,Engineering Design Studio I,2,abulimensamuel+pool065@gmail.com,SENG 100 LEVEL (GRP B),false,SMART BOARD|PROJECTOR,INNOVATION HUB|ICT COMPLEX
+SENG106,Engineering Design Studio I,2,abulimensamuel+pool065@gmail.com,SENG 100 LEVEL (GRP C),false,SMART BOARD|PROJECTOR,INNOVATION HUB|ICT COMPLEX
+GST121,Critical Thinking and Writing,2,abulimensamuel+pool223@gmail.com,SENG 100 LEVEL (GRP A)|SENG 100 LEVEL (GRP B)|SENG 100 LEVEL (GRP C),true,,
+SENG204,Requirements Engineering,3,abulimensamuel+pool066@gmail.com,SENG 200 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG204,Requirements Engineering,3,abulimensamuel+pool066@gmail.com,SENG 200 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG204,Requirements Engineering,3,abulimensamuel+pool066@gmail.com,SENG 200 LEVEL (GRP C),false,PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG205,Object-Oriented Analysis,3,abulimensamuel+pool067@gmail.com,SENG 200 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG205,Object-Oriented Analysis,3,abulimensamuel+pool067@gmail.com,SENG 200 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG205,Object-Oriented Analysis,3,abulimensamuel+pool067@gmail.com,SENG 200 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG206,Software Quality Assurance I,2,abulimensamuel+pool068@gmail.com,SENG 200 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+SENG206,Software Quality Assurance I,2,abulimensamuel+pool068@gmail.com,SENG 200 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+SENG206,Software Quality Assurance I,2,abulimensamuel+pool068@gmail.com,SENG 200 LEVEL (GRP C),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST221,Logic and Scientific Reasoning,2,abulimensamuel+pool216@gmail.com,SENG 200 LEVEL (GRP A)|SENG 200 LEVEL (GRP B)|SENG 200 LEVEL (GRP C),true,,
+SENG304,Software Architecture and Patterns,3,abulimensamuel+pool069@gmail.com,SENG 300 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG304,Software Architecture and Patterns,3,abulimensamuel+pool069@gmail.com,SENG 300 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG304,Software Architecture and Patterns,3,abulimensamuel+pool069@gmail.com,SENG 300 LEVEL (GRP C),false,PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG305,Software Project Management,3,abulimensamuel+pool070@gmail.com,SENG 300 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+SENG305,Software Project Management,3,abulimensamuel+pool070@gmail.com,SENG 300 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+SENG305,Software Project Management,3,abulimensamuel+pool070@gmail.com,SENG 300 LEVEL (GRP C),false,PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+SENG306,Continuous Integration Lab,2,abulimensamuel+pool063@gmail.com,SENG 300 LEVEL (GRP A),false,COMPUTER LAB|SMART BOARD|PROJECTOR,INNOVATION HUB|ICT COMPLEX
+SENG306,Continuous Integration Lab,2,abulimensamuel+pool063@gmail.com,SENG 300 LEVEL (GRP B),false,COMPUTER LAB|SMART BOARD|PROJECTOR,INNOVATION HUB|ICT COMPLEX
+SENG306,Continuous Integration Lab,2,abulimensamuel+pool063@gmail.com,SENG 300 LEVEL (GRP C),false,COMPUTER LAB|SMART BOARD|PROJECTOR,INNOVATION HUB|ICT COMPLEX
+GST321,Peace Studies and Conflict Resolution,2,abulimensamuel+pool217@gmail.com,SENG 300 LEVEL (GRP A)|SENG 300 LEVEL (GRP B)|SENG 300 LEVEL (GRP C),true,,
+SENG404,Cloud Native Systems,3,abulimensamuel+pool067@gmail.com,SENG 400 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG404,Cloud Native Systems,3,abulimensamuel+pool067@gmail.com,SENG 400 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG404,Cloud Native Systems,3,abulimensamuel+pool067@gmail.com,SENG 400 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG405,Software Security Engineering,3,abulimensamuel+pool068@gmail.com,SENG 400 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG405,Software Security Engineering,3,abulimensamuel+pool068@gmail.com,SENG 400 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG405,Software Security Engineering,3,abulimensamuel+pool068@gmail.com,SENG 400 LEVEL (GRP C),false,PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG406,Reliability and Performance Lab,2,abulimensamuel+pool069@gmail.com,SENG 400 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG406,Reliability and Performance Lab,2,abulimensamuel+pool069@gmail.com,SENG 400 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+SENG406,Reliability and Performance Lab,2,abulimensamuel+pool069@gmail.com,SENG 400 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+GST421,Leadership Communication and Culture,2,abulimensamuel+pool218@gmail.com,SENG 400 LEVEL (GRP A)|SENG 400 LEVEL (GRP B)|SENG 400 LEVEL (GRP C),true,,

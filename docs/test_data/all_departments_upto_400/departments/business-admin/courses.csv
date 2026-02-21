@@ -1,0 +1,72 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+BUS101,Foundations of Business Management,3,abulimensamuel+joy.nwankwo@gmail.com,BUS 100 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS101,Foundations of Business Management,3,abulimensamuel+joy.nwankwo@gmail.com,BUS 100 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS101,Foundations of Business Management,3,abulimensamuel+pool088@gmail.com,BUS 100 LEVEL (GRP C),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool089@gmail.com,BUS 100 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool090@gmail.com,BUS 100 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool091@gmail.com,BUS 100 LEVEL (GRP C),false,,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool092@gmail.com,BUS 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool093@gmail.com,BUS 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+chineye.okafor@gmail.com,BUS 100 LEVEL (GRP C),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST111,Communication in English,2,abulimensamuel+pool094@gmail.com,BUS 100 LEVEL (GRP A)|BUS 100 LEVEL (GRP B)|BUS 100 LEVEL (GRP C),true,,
+BUS201,Organizational Behavior,3,abulimensamuel+joy.nwankwo@gmail.com,BUS 200 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS201,Organizational Behavior,3,abulimensamuel+pool095@gmail.com,BUS 200 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS201,Organizational Behavior,3,abulimensamuel+pool088@gmail.com,BUS 200 LEVEL (GRP C),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool089@gmail.com,BUS 200 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool090@gmail.com,BUS 200 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool091@gmail.com,BUS 200 LEVEL (GRP C),false,,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+GST212,Philosophy and Human Existence,2,abulimensamuel+pool092@gmail.com,BUS 200 LEVEL (GRP A)|BUS 200 LEVEL (GRP B)|BUS 200 LEVEL (GRP C),true,,
+BUS301,Strategic Management,3,abulimensamuel+joy.nwankwo@gmail.com,BUS 300 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS301,Strategic Management,3,abulimensamuel+pool093@gmail.com,BUS 300 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS301,Strategic Management,3,abulimensamuel+pool094@gmail.com,BUS 300 LEVEL (GRP C),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool095@gmail.com,BUS 300 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|GENERAL STUDIES BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool088@gmail.com,BUS 300 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|GENERAL STUDIES BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool089@gmail.com,BUS 300 LEVEL (GRP C),false,PROJECTOR,BUSINESS SCHOOL|GENERAL STUDIES BLOCK
+BU-GST322,Citizenship Orientation,1,abulimensamuel+pool090@gmail.com,BUS 300 LEVEL (GRP A)|BUS 300 LEVEL (GRP B)|BUS 300 LEVEL (GRP C),true,,
+BUS401,Corporate Policy and Governance,3,abulimensamuel+joy.nwankwo@gmail.com,BUS 400 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS401,Corporate Policy and Governance,3,abulimensamuel+pool091@gmail.com,BUS 400 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS401,Corporate Policy and Governance,3,abulimensamuel+pool092@gmail.com,BUS 400 LEVEL (GRP C),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS402,Business Research Project,3,abulimensamuel+pool093@gmail.com,BUS 400 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS402,Business Research Project,3,abulimensamuel+joy.nwankwo@gmail.com,BUS 400 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS402,Business Research Project,3,abulimensamuel+pool094@gmail.com,BUS 400 LEVEL (GRP C),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+pool095@gmail.com,BUS 400 LEVEL (GRP A)|BUS 400 LEVEL (GRP B)|BUS 400 LEVEL (GRP C),true,,
+BUS104,Business Communication Skills,2,abulimensamuel+pool031@gmail.com,BUS 100 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS104,Business Communication Skills,2,abulimensamuel+pool031@gmail.com,BUS 100 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS104,Business Communication Skills,2,abulimensamuel+pool031@gmail.com,BUS 100 LEVEL (GRP C),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS105,Spreadsheet Analysis for Managers,2,abulimensamuel+pool032@gmail.com,BUS 100 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+BUS105,Spreadsheet Analysis for Managers,2,abulimensamuel+pool032@gmail.com,BUS 100 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+BUS105,Spreadsheet Analysis for Managers,2,abulimensamuel+pool032@gmail.com,BUS 100 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+BUS106,Introduction to Financial Literacy,2,abulimensamuel+pool033@gmail.com,BUS 100 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS106,Introduction to Financial Literacy,2,abulimensamuel+pool033@gmail.com,BUS 100 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS106,Introduction to Financial Literacy,2,abulimensamuel+pool033@gmail.com,BUS 100 LEVEL (GRP C),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+GST121,Critical Thinking and Writing,2,abulimensamuel+pool088@gmail.com,BUS 100 LEVEL (GRP A)|BUS 100 LEVEL (GRP B)|BUS 100 LEVEL (GRP C),true,,
+BUS204,Operations Management,3,abulimensamuel+pool034@gmail.com,BUS 200 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS204,Operations Management,3,abulimensamuel+pool034@gmail.com,BUS 200 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS204,Operations Management,3,abulimensamuel+pool034@gmail.com,BUS 200 LEVEL (GRP C),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS205,Managerial Accounting Basics,2,abulimensamuel+pool035@gmail.com,BUS 200 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS205,Managerial Accounting Basics,2,abulimensamuel+pool035@gmail.com,BUS 200 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS205,Managerial Accounting Basics,2,abulimensamuel+pool035@gmail.com,BUS 200 LEVEL (GRP C),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS206,Business Data Analysis,2,abulimensamuel+pool032@gmail.com,BUS 200 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+BUS206,Business Data Analysis,2,abulimensamuel+pool032@gmail.com,BUS 200 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+BUS206,Business Data Analysis,2,abulimensamuel+pool032@gmail.com,BUS 200 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+GST221,Logic and Scientific Reasoning,2,abulimensamuel+pool089@gmail.com,BUS 200 LEVEL (GRP A)|BUS 200 LEVEL (GRP B)|BUS 200 LEVEL (GRP C),true,,
+BUS304,Business Law and Compliance,2,abulimensamuel+pool036@gmail.com,BUS 300 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|LAW COMPLEX
+BUS304,Business Law and Compliance,2,abulimensamuel+pool036@gmail.com,BUS 300 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|LAW COMPLEX
+BUS304,Business Law and Compliance,2,abulimensamuel+pool036@gmail.com,BUS 300 LEVEL (GRP C),false,PROJECTOR,BUSINESS SCHOOL|LAW COMPLEX
+BUS305,Supply Chain Management,3,abulimensamuel+pool037@gmail.com,BUS 300 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS305,Supply Chain Management,3,abulimensamuel+pool037@gmail.com,BUS 300 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS305,Supply Chain Management,3,abulimensamuel+pool037@gmail.com,BUS 300 LEVEL (GRP C),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS306,Digital Marketing and CRM,2,abulimensamuel+pool038@gmail.com,BUS 300 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+BUS306,Digital Marketing and CRM,2,abulimensamuel+pool038@gmail.com,BUS 300 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+BUS306,Digital Marketing and CRM,2,abulimensamuel+pool038@gmail.com,BUS 300 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+GST321,Peace Studies and Conflict Resolution,2,abulimensamuel+pool090@gmail.com,BUS 300 LEVEL (GRP A)|BUS 300 LEVEL (GRP B)|BUS 300 LEVEL (GRP C),true,,
+BUS404,Strategic Financial Management,3,abulimensamuel+pool033@gmail.com,BUS 400 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS404,Strategic Financial Management,3,abulimensamuel+pool033@gmail.com,BUS 400 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS404,Strategic Financial Management,3,abulimensamuel+pool033@gmail.com,BUS 400 LEVEL (GRP C),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BUS405,Business Intelligence Systems,2,abulimensamuel+pool032@gmail.com,BUS 400 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+BUS405,Business Intelligence Systems,2,abulimensamuel+pool032@gmail.com,BUS 400 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+BUS405,Business Intelligence Systems,2,abulimensamuel+pool032@gmail.com,BUS 400 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+BUS406,Corporate Strategy Lab,2,abulimensamuel+pool037@gmail.com,BUS 400 LEVEL (GRP A),false,SMART BOARD|PROJECTOR,INNOVATION HUB|BUSINESS SCHOOL
+BUS406,Corporate Strategy Lab,2,abulimensamuel+pool037@gmail.com,BUS 400 LEVEL (GRP B),false,SMART BOARD|PROJECTOR,INNOVATION HUB|BUSINESS SCHOOL
+BUS406,Corporate Strategy Lab,2,abulimensamuel+pool037@gmail.com,BUS 400 LEVEL (GRP C),false,SMART BOARD|PROJECTOR,INNOVATION HUB|BUSINESS SCHOOL
+GST421,Leadership Communication and Culture,2,abulimensamuel+pool091@gmail.com,BUS 400 LEVEL (GRP A)|BUS 400 LEVEL (GRP B)|BUS 400 LEVEL (GRP C),true,,

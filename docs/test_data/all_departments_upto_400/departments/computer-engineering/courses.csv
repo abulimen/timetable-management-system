@@ -1,0 +1,51 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+CEN101,Foundations of Computer Engineering,3,abulimensamuel+chinedu.nnaemeka@gmail.com,CEN 100 LEVEL (GRP A),false,PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+CEN101,Foundations of Computer Engineering,3,abulimensamuel+khalid.usman@gmail.com,CEN 100 LEVEL (GRP B),false,PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool104@gmail.com,CEN 100 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|ENGINEERING BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool105@gmail.com,CEN 100 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|ENGINEERING BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool106@gmail.com,CEN 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+chineye.okafor@gmail.com,CEN 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+GST111,Communication in English,2,abulimensamuel+pool107@gmail.com,CEN 100 LEVEL (GRP A)|CEN 100 LEVEL (GRP B),true,,
+CEN201,Digital Logic and Embedded Systems,3,abulimensamuel+chinedu.nnaemeka@gmail.com,CEN 200 LEVEL (GRP A),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+CEN201,Digital Logic and Embedded Systems,3,abulimensamuel+khalid.usman@gmail.com,CEN 200 LEVEL (GRP B),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool108@gmail.com,CEN 200 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|ENGINEERING BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool109@gmail.com,CEN 200 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|ENGINEERING BLOCK
+GST212,Philosophy and Human Existence,2,abulimensamuel+pool110@gmail.com,CEN 200 LEVEL (GRP A)|CEN 200 LEVEL (GRP B),true,,
+CEN301,Microprocessor Systems,3,abulimensamuel+chinedu.nnaemeka@gmail.com,CEN 300 LEVEL (GRP A),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+CEN301,Microprocessor Systems,3,abulimensamuel+prosper.ekanem@gmail.com,CEN 300 LEVEL (GRP B),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool111@gmail.com,CEN 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|ENGINEERING BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool104@gmail.com,CEN 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|ENGINEERING BLOCK
+BU-GST322,Citizenship Orientation,1,abulimensamuel+pool105@gmail.com,CEN 300 LEVEL (GRP A)|CEN 300 LEVEL (GRP B),true,,
+CEN401,Computer Architecture and Systems Integration,3,abulimensamuel+chinedu.nnaemeka@gmail.com,CEN 400 LEVEL (GRP A),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+CEN401,Computer Architecture and Systems Integration,3,abulimensamuel+khalid.usman@gmail.com,CEN 400 LEVEL (GRP B),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+CEN402,Computer Engineering Project,3,abulimensamuel+khalid.usman@gmail.com,CEN 400 LEVEL (GRP A),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|INNOVATION HUB
+CEN402,Computer Engineering Project,3,abulimensamuel+chinedu.nnaemeka@gmail.com,CEN 400 LEVEL (GRP B),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|INNOVATION HUB
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+pool106@gmail.com,CEN 400 LEVEL (GRP A)|CEN 400 LEVEL (GRP B),true,,
+CEN104,Digital Logic Design,3,abulimensamuel+pool077@gmail.com,CEN 100 LEVEL (GRP A),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+CEN104,Digital Logic Design,3,abulimensamuel+pool077@gmail.com,CEN 100 LEVEL (GRP B),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+CEN105,Engineering Mathematics for Computing,2,abulimensamuel+pool078@gmail.com,CEN 100 LEVEL (GRP A),false,PROJECTOR,MAIN ACADEMIC BLOCK|ENGINEERING BLOCK
+CEN105,Engineering Mathematics for Computing,2,abulimensamuel+pool078@gmail.com,CEN 100 LEVEL (GRP B),false,PROJECTOR,MAIN ACADEMIC BLOCK|ENGINEERING BLOCK
+CEN106,Programming for Computer Engineers,2,abulimensamuel+pool079@gmail.com,CEN 100 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+CEN106,Programming for Computer Engineers,2,abulimensamuel+pool079@gmail.com,CEN 100 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+GST121,Critical Thinking and Writing,2,abulimensamuel+pool107@gmail.com,CEN 100 LEVEL (GRP A)|CEN 100 LEVEL (GRP B),true,,
+CEN204,Microprocessors and Interfacing,3,abulimensamuel+pool080@gmail.com,CEN 200 LEVEL (GRP A),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+CEN204,Microprocessors and Interfacing,3,abulimensamuel+pool080@gmail.com,CEN 200 LEVEL (GRP B),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+CEN205,Data Communications,3,abulimensamuel+pool081@gmail.com,CEN 200 LEVEL (GRP A),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+CEN205,Data Communications,3,abulimensamuel+pool081@gmail.com,CEN 200 LEVEL (GRP B),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+CEN206,Computer Architecture Lab,2,abulimensamuel+pool082@gmail.com,CEN 200 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+CEN206,Computer Architecture Lab,2,abulimensamuel+pool082@gmail.com,CEN 200 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+GST221,Logic and Scientific Reasoning,2,abulimensamuel+pool108@gmail.com,CEN 200 LEVEL (GRP A)|CEN 200 LEVEL (GRP B),true,,
+CEN304,Embedded Systems Design,3,abulimensamuel+pool077@gmail.com,CEN 300 LEVEL (GRP A),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|INNOVATION HUB
+CEN304,Embedded Systems Design,3,abulimensamuel+pool077@gmail.com,CEN 300 LEVEL (GRP B),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|INNOVATION HUB
+CEN305,Computer Networks and Security,3,abulimensamuel+pool081@gmail.com,CEN 300 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+CEN305,Computer Networks and Security,3,abulimensamuel+pool081@gmail.com,CEN 300 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+CEN306,FPGA and Digital Systems Lab,2,abulimensamuel+pool080@gmail.com,CEN 300 LEVEL (GRP A),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK
+CEN306,FPGA and Digital Systems Lab,2,abulimensamuel+pool080@gmail.com,CEN 300 LEVEL (GRP B),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK
+GST321,Peace Studies and Conflict Resolution,2,abulimensamuel+pool109@gmail.com,CEN 300 LEVEL (GRP A)|CEN 300 LEVEL (GRP B),true,,
+CEN404,IoT Systems Engineering,3,abulimensamuel+pool082@gmail.com,CEN 400 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CEN404,IoT Systems Engineering,3,abulimensamuel+pool082@gmail.com,CEN 400 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CEN405,VLSI and Advanced Digital Design,3,abulimensamuel+pool077@gmail.com,CEN 400 LEVEL (GRP A),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK
+CEN405,VLSI and Advanced Digital Design,3,abulimensamuel+pool077@gmail.com,CEN 400 LEVEL (GRP B),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK
+CEN406,Computer Engineering Project Lab,2,abulimensamuel+pool080@gmail.com,CEN 400 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR|SMART BOARD,INNOVATION HUB|ICT COMPLEX
+CEN406,Computer Engineering Project Lab,2,abulimensamuel+pool080@gmail.com,CEN 400 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR|SMART BOARD,INNOVATION HUB|ICT COMPLEX
+GST421,Leadership Communication and Culture,2,abulimensamuel+pool110@gmail.com,CEN 400 LEVEL (GRP A)|CEN 400 LEVEL (GRP B),true,,

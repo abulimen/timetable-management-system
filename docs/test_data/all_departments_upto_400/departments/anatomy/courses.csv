@@ -1,0 +1,51 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+ANA101,Human Anatomy Fundamentals,3,abulimensamuel+uche.okonkwo@gmail.com,ANA 100 LEVEL (GRP A),false,ANATOMY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+ANA101,Human Anatomy Fundamentals,3,abulimensamuel+uche.okonkwo@gmail.com,ANA 100 LEVEL (GRP B),false,ANATOMY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool056@gmail.com,ANA 100 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|HEALTH SCIENCES COMPLEX
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool057@gmail.com,ANA 100 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|HEALTH SCIENCES COMPLEX
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool058@gmail.com,ANA 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool059@gmail.com,ANA 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST111,Communication in English,2,abulimensamuel+pool060@gmail.com,ANA 100 LEVEL (GRP A)|ANA 100 LEVEL (GRP B),true,,
+ANA201,Gross Anatomy and Histology,3,abulimensamuel+uche.okonkwo@gmail.com,ANA 200 LEVEL (GRP A),false,ANATOMY LAB|BIOLOGY LAB,HEALTH SCIENCES COMPLEX
+ANA201,Gross Anatomy and Histology,3,abulimensamuel+mercy.francis@gmail.com,ANA 200 LEVEL (GRP B),false,ANATOMY LAB|BIOLOGY LAB,HEALTH SCIENCES COMPLEX
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool061@gmail.com,ANA 200 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|HEALTH SCIENCES COMPLEX
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool062@gmail.com,ANA 200 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|HEALTH SCIENCES COMPLEX
+GST212,Philosophy and Human Existence,2,abulimensamuel+pool063@gmail.com,ANA 200 LEVEL (GRP A)|ANA 200 LEVEL (GRP B),true,,
+ANA301,Neuroanatomy and Imaging,3,abulimensamuel+uche.okonkwo@gmail.com,ANA 300 LEVEL (GRP A),false,ANATOMY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX|ICT COMPLEX
+ANA301,Neuroanatomy and Imaging,3,abulimensamuel+daniel.edet@gmail.com,ANA 300 LEVEL (GRP B),false,ANATOMY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX|ICT COMPLEX
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool056@gmail.com,ANA 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|HEALTH SCIENCES COMPLEX
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool057@gmail.com,ANA 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|HEALTH SCIENCES COMPLEX
+BU-GST322,Citizenship Orientation,1,abulimensamuel+pool058@gmail.com,ANA 300 LEVEL (GRP A)|ANA 300 LEVEL (GRP B),true,,
+ANA401,Clinical Anatomy Applications,3,abulimensamuel+uche.okonkwo@gmail.com,ANA 400 LEVEL (GRP A),false,ANATOMY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+ANA401,Clinical Anatomy Applications,3,abulimensamuel+mercy.francis@gmail.com,ANA 400 LEVEL (GRP B),false,ANATOMY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+ANA402,Anatomy Research Project,3,abulimensamuel+mercy.francis@gmail.com,ANA 400 LEVEL (GRP A),false,ANATOMY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+ANA402,Anatomy Research Project,3,abulimensamuel+uche.okonkwo@gmail.com,ANA 400 LEVEL (GRP B),false,ANATOMY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+pool059@gmail.com,ANA 400 LEVEL (GRP A)|ANA 400 LEVEL (GRP B),true,,
+ANA104,Cell Biology and Tissue Science,3,abulimensamuel+pool017@gmail.com,ANA 100 LEVEL (GRP A),false,BIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+ANA104,Cell Biology and Tissue Science,3,abulimensamuel+pool017@gmail.com,ANA 100 LEVEL (GRP B),false,BIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+ANA105,Medical Terminology,2,abulimensamuel+pool018@gmail.com,ANA 100 LEVEL (GRP A),false,PROJECTOR,HEALTH SCIENCES COMPLEX|MAIN ACADEMIC BLOCK
+ANA105,Medical Terminology,2,abulimensamuel+pool018@gmail.com,ANA 100 LEVEL (GRP B),false,PROJECTOR,HEALTH SCIENCES COMPLEX|MAIN ACADEMIC BLOCK
+ANA106,Anatomy Practical I,2,abulimensamuel+pool019@gmail.com,ANA 100 LEVEL (GRP A),false,ANATOMY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+ANA106,Anatomy Practical I,2,abulimensamuel+pool019@gmail.com,ANA 100 LEVEL (GRP B),false,ANATOMY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+GST121,Critical Thinking and Writing,2,abulimensamuel+pool060@gmail.com,ANA 100 LEVEL (GRP A)|ANA 100 LEVEL (GRP B),true,,
+ANA204,Human Embryology,3,abulimensamuel+pool020@gmail.com,ANA 200 LEVEL (GRP A),false,ANATOMY LAB|BIOLOGY LAB,HEALTH SCIENCES COMPLEX
+ANA204,Human Embryology,3,abulimensamuel+pool020@gmail.com,ANA 200 LEVEL (GRP B),false,ANATOMY LAB|BIOLOGY LAB,HEALTH SCIENCES COMPLEX
+ANA205,Anatomy Practical II,2,abulimensamuel+pool021@gmail.com,ANA 200 LEVEL (GRP A),false,ANATOMY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+ANA205,Anatomy Practical II,2,abulimensamuel+pool021@gmail.com,ANA 200 LEVEL (GRP B),false,ANATOMY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+ANA206,Comparative Anatomy,2,abulimensamuel+pool022@gmail.com,ANA 200 LEVEL (GRP A),false,ANATOMY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+ANA206,Comparative Anatomy,2,abulimensamuel+pool022@gmail.com,ANA 200 LEVEL (GRP B),false,ANATOMY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+GST221,Logic and Scientific Reasoning,2,abulimensamuel+pool061@gmail.com,ANA 200 LEVEL (GRP A)|ANA 200 LEVEL (GRP B),true,,
+ANA304,Musculoskeletal Systems,3,abulimensamuel+pool023@gmail.com,ANA 300 LEVEL (GRP A),false,ANATOMY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+ANA304,Musculoskeletal Systems,3,abulimensamuel+pool023@gmail.com,ANA 300 LEVEL (GRP B),false,ANATOMY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+ANA305,Cardiovascular and Respiratory Anatomy,3,abulimensamuel+pool024@gmail.com,ANA 300 LEVEL (GRP A),false,ANATOMY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+ANA305,Cardiovascular and Respiratory Anatomy,3,abulimensamuel+pool024@gmail.com,ANA 300 LEVEL (GRP B),false,ANATOMY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+ANA306,Imaging and Applied Anatomy,2,abulimensamuel+pool017@gmail.com,ANA 300 LEVEL (GRP A),false,PROJECTOR|SMART BOARD,HEALTH SCIENCES COMPLEX|ICT COMPLEX
+ANA306,Imaging and Applied Anatomy,2,abulimensamuel+pool017@gmail.com,ANA 300 LEVEL (GRP B),false,PROJECTOR|SMART BOARD,HEALTH SCIENCES COMPLEX|ICT COMPLEX
+GST321,Peace Studies and Conflict Resolution,2,abulimensamuel+pool062@gmail.com,ANA 300 LEVEL (GRP A)|ANA 300 LEVEL (GRP B),true,,
+ANA404,Forensic Anatomy,3,abulimensamuel+pool018@gmail.com,ANA 400 LEVEL (GRP A),false,ANATOMY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+ANA404,Forensic Anatomy,3,abulimensamuel+pool018@gmail.com,ANA 400 LEVEL (GRP B),false,ANATOMY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+ANA405,Anatomy Education and Simulation,3,abulimensamuel+pool019@gmail.com,ANA 400 LEVEL (GRP A),false,ANATOMY LAB|PROJECTOR|SMART BOARD,HEALTH SCIENCES COMPLEX
+ANA405,Anatomy Education and Simulation,3,abulimensamuel+pool019@gmail.com,ANA 400 LEVEL (GRP B),false,ANATOMY LAB|PROJECTOR|SMART BOARD,HEALTH SCIENCES COMPLEX
+ANA406,Clinical Anatomy Seminar,2,abulimensamuel+pool020@gmail.com,ANA 400 LEVEL (GRP A),false,PROJECTOR,HEALTH SCIENCES COMPLEX|MAIN ACADEMIC BLOCK
+ANA406,Clinical Anatomy Seminar,2,abulimensamuel+pool020@gmail.com,ANA 400 LEVEL (GRP B),false,PROJECTOR,HEALTH SCIENCES COMPLEX|MAIN ACADEMIC BLOCK
+GST421,Leadership Communication and Culture,2,abulimensamuel+pool063@gmail.com,ANA 400 LEVEL (GRP A)|ANA 400 LEVEL (GRP B),true,,

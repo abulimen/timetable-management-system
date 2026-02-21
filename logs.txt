@@ -1,0 +1,53 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------< com.university:timetable-engine >-------------------
+[INFO] Building University Timetable Scheduling Engine 1.0.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.5.0:run (default-cli) > test-compile @ timetable-engine >>>
+[INFO] 
+[INFO] --- enforcer:3.4.1:enforce (enforce-java-version) @ timetable-engine ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.version.RequireJavaVersion passed
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ timetable-engine ---
+[INFO] Copying 2 resources from src/main/resources to target/classes
+[INFO] Copying 46 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ timetable-engine ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 148 source files with javac [forked debug release 21] to target/classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR]   on the class path. A future release of javac may disable annotation processing
+  unless at least one processor is specified by name (-processor), or a search
+  path is specified (--processor-path, --processor-module-path), or annotation
+  processing is enabled explicitly (-proc:only, -proc:full).
+  Use -Xlint:-options to suppress this message.
+  Use -proc:none to disable annotation processing.
+/home/x/Projects/BUTMS/src/main/java/com/university/timetable/solver/TimetableConstraintProvider.java:[571,4] error: unclosed comment
+[INFO] 1 error
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  7.521 s
+[INFO] Finished at: 2026-02-20T00:34:17+01:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project timetable-engine: Compilation failure
+[ERROR]   on the class path. A future release of javac may disable annotation processing
+[ERROR]   unless at least one processor is specified by name (-processor), or a search
+[ERROR]   path is specified (--processor-path, --processor-module-path), or annotation
+[ERROR]   processing is enabled explicitly (-proc:only, -proc:full).
+[ERROR]   Use -Xlint:-options to suppress this message.
+[ERROR]   Use -proc:none to disable annotation processing.
+[ERROR] /home/x/Projects/BUTMS/src/main/java/com/university/timetable/solver/TimetableConstraintProvider.java:[571,4] error: unclosed comment
+[ERROR] 
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

@@ -1,0 +1,51 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+EDU101,Foundations of Education,3,abulimensamuel+funke.aderemi@gmail.com,EDU 100 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+EDU101,Foundations of Education,3,abulimensamuel+funke.aderemi@gmail.com,EDU 100 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool128@gmail.com,EDU 100 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|HUMANITIES BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool129@gmail.com,EDU 100 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|HUMANITIES BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool130@gmail.com,EDU 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool131@gmail.com,EDU 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST111,Communication in English,2,abulimensamuel+pool132@gmail.com,EDU 100 LEVEL (GRP A)|EDU 100 LEVEL (GRP B),true,,
+EDU201,Curriculum and Instructional Methods,3,abulimensamuel+funke.aderemi@gmail.com,EDU 200 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+EDU201,Curriculum and Instructional Methods,3,abulimensamuel+adeola.fasina@gmail.com,EDU 200 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool133@gmail.com,EDU 200 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|HUMANITIES BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool134@gmail.com,EDU 200 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|HUMANITIES BLOCK
+GST212,Philosophy and Human Existence,2,abulimensamuel+pool135@gmail.com,EDU 200 LEVEL (GRP A)|EDU 200 LEVEL (GRP B),true,,
+EDU301,Educational Psychology and Guidance,3,abulimensamuel+funke.aderemi@gmail.com,EDU 300 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+EDU301,Educational Psychology and Guidance,3,abulimensamuel+adeola.fasina@gmail.com,EDU 300 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool128@gmail.com,EDU 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool129@gmail.com,EDU 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+BU-GST322,Citizenship Orientation,1,abulimensamuel+pool130@gmail.com,EDU 300 LEVEL (GRP A)|EDU 300 LEVEL (GRP B),true,,
+EDU401,Educational Administration and Policy,3,abulimensamuel+funke.aderemi@gmail.com,EDU 400 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+EDU401,Educational Administration and Policy,3,abulimensamuel+adeola.fasina@gmail.com,EDU 400 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+EDU402,Teaching Practice and Research Project,3,abulimensamuel+adeola.fasina@gmail.com,EDU 400 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+EDU402,Teaching Practice and Research Project,3,abulimensamuel+funke.aderemi@gmail.com,EDU 400 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+pool131@gmail.com,EDU 400 LEVEL (GRP A)|EDU 400 LEVEL (GRP B),true,,
+EDU104,Educational Psychology I,3,abulimensamuel+pool089@gmail.com,EDU 100 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+EDU104,Educational Psychology I,3,abulimensamuel+pool089@gmail.com,EDU 100 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+EDU105,Digital Literacy for Educators,2,abulimensamuel+pool090@gmail.com,EDU 100 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|HUMANITIES BLOCK
+EDU105,Digital Literacy for Educators,2,abulimensamuel+pool090@gmail.com,EDU 100 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|HUMANITIES BLOCK
+EDU106,Communication Skills in Education,2,abulimensamuel+pool091@gmail.com,EDU 100 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+EDU106,Communication Skills in Education,2,abulimensamuel+pool091@gmail.com,EDU 100 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+GST121,Critical Thinking and Writing,2,abulimensamuel+pool132@gmail.com,EDU 100 LEVEL (GRP A)|EDU 100 LEVEL (GRP B),true,,
+EDU204,Curriculum Development,3,abulimensamuel+pool092@gmail.com,EDU 200 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+EDU204,Curriculum Development,3,abulimensamuel+pool092@gmail.com,EDU 200 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+EDU205,Assessment and Evaluation,3,abulimensamuel+pool093@gmail.com,EDU 200 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+EDU205,Assessment and Evaluation,3,abulimensamuel+pool093@gmail.com,EDU 200 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+EDU206,Instructional Media Lab,2,abulimensamuel+pool090@gmail.com,EDU 200 LEVEL (GRP A),false,SMART BOARD|PROJECTOR,HUMANITIES BLOCK|ICT COMPLEX
+EDU206,Instructional Media Lab,2,abulimensamuel+pool090@gmail.com,EDU 200 LEVEL (GRP B),false,SMART BOARD|PROJECTOR,HUMANITIES BLOCK|ICT COMPLEX
+GST221,Logic and Scientific Reasoning,2,abulimensamuel+pool133@gmail.com,EDU 200 LEVEL (GRP A)|EDU 200 LEVEL (GRP B),true,,
+EDU304,Educational Administration,3,abulimensamuel+pool094@gmail.com,EDU 300 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+EDU304,Educational Administration,3,abulimensamuel+pool094@gmail.com,EDU 300 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+EDU305,Guidance and Counselling,3,abulimensamuel+pool089@gmail.com,EDU 300 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+EDU305,Guidance and Counselling,3,abulimensamuel+pool089@gmail.com,EDU 300 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+EDU306,Teaching Practice Preparation,2,abulimensamuel+pool091@gmail.com,EDU 300 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+EDU306,Teaching Practice Preparation,2,abulimensamuel+pool091@gmail.com,EDU 300 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+GST321,Peace Studies and Conflict Resolution,2,abulimensamuel+pool134@gmail.com,EDU 300 LEVEL (GRP A)|EDU 300 LEVEL (GRP B),true,,
+EDU404,Comparative Education,3,abulimensamuel+pool092@gmail.com,EDU 400 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+EDU404,Comparative Education,3,abulimensamuel+pool092@gmail.com,EDU 400 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+EDU405,Educational Research Methods,3,abulimensamuel+pool093@gmail.com,EDU 400 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+EDU405,Educational Research Methods,3,abulimensamuel+pool093@gmail.com,EDU 400 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+EDU406,Education Technology Integration Lab,2,abulimensamuel+pool090@gmail.com,EDU 400 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|HUMANITIES BLOCK
+EDU406,Education Technology Integration Lab,2,abulimensamuel+pool090@gmail.com,EDU 400 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|HUMANITIES BLOCK
+GST421,Leadership Communication and Culture,2,abulimensamuel+pool135@gmail.com,EDU 400 LEVEL (GRP A)|EDU 400 LEVEL (GRP B),true,,

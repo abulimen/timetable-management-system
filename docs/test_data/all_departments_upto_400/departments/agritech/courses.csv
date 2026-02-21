@@ -1,0 +1,51 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+AGR101,Fundamentals of Agritech,3,abulimensamuel+yemi.oladapo@gmail.com,AGR 100 LEVEL (GRP A),false,PROJECTOR,AGRIC LAB COMPLEX|MAIN ACADEMIC BLOCK
+AGR101,Fundamentals of Agritech,3,abulimensamuel+yemi.oladapo@gmail.com,AGR 100 LEVEL (GRP B),false,PROJECTOR,AGRIC LAB COMPLEX|MAIN ACADEMIC BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool048@gmail.com,AGR 100 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|AGRIC LAB COMPLEX
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool049@gmail.com,AGR 100 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|AGRIC LAB COMPLEX
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool050@gmail.com,AGR 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool051@gmail.com,AGR 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST111,Communication in English,2,abulimensamuel+pool052@gmail.com,AGR 100 LEVEL (GRP A)|AGR 100 LEVEL (GRP B),true,,
+AGR201,Crop Production Systems,3,abulimensamuel+yemi.oladapo@gmail.com,AGR 200 LEVEL (GRP A),false,SOIL LAB|PROJECTOR,AGRIC LAB COMPLEX|MAIN ACADEMIC BLOCK
+AGR201,Crop Production Systems,3,abulimensamuel+yemi.oladapo@gmail.com,AGR 200 LEVEL (GRP B),false,SOIL LAB|PROJECTOR,AGRIC LAB COMPLEX|MAIN ACADEMIC BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool053@gmail.com,AGR 200 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|AGRIC LAB COMPLEX
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool054@gmail.com,AGR 200 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|AGRIC LAB COMPLEX
+GST212,Philosophy and Human Existence,2,abulimensamuel+pool055@gmail.com,AGR 200 LEVEL (GRP A)|AGR 200 LEVEL (GRP B),true,,
+AGR301,Precision Agriculture,3,abulimensamuel+yemi.oladapo@gmail.com,AGR 300 LEVEL (GRP A),false,SOIL LAB|PROJECTOR,AGRIC LAB COMPLEX|INNOVATION HUB
+AGR301,Precision Agriculture,3,abulimensamuel+prosper.ekanem@gmail.com,AGR 300 LEVEL (GRP B),false,SOIL LAB|PROJECTOR,AGRIC LAB COMPLEX|INNOVATION HUB
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool048@gmail.com,AGR 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|AGRIC LAB COMPLEX
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool049@gmail.com,AGR 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|AGRIC LAB COMPLEX
+BU-GST322,Citizenship Orientation,1,abulimensamuel+pool050@gmail.com,AGR 300 LEVEL (GRP A)|AGR 300 LEVEL (GRP B),true,,
+AGR401,Smart Farm Operations,3,abulimensamuel+yemi.oladapo@gmail.com,AGR 400 LEVEL (GRP A),false,SOIL LAB|PROJECTOR,AGRIC LAB COMPLEX|INNOVATION HUB
+AGR401,Smart Farm Operations,3,abulimensamuel+yemi.oladapo@gmail.com,AGR 400 LEVEL (GRP B),false,SOIL LAB|PROJECTOR,AGRIC LAB COMPLEX|INNOVATION HUB
+AGR402,Agricultural Data Analytics,3,abulimensamuel+pool051@gmail.com,AGR 400 LEVEL (GRP A),false,PROJECTOR,AGRIC LAB COMPLEX|ICT COMPLEX
+AGR402,Agricultural Data Analytics,3,abulimensamuel+pool052@gmail.com,AGR 400 LEVEL (GRP B),false,PROJECTOR,AGRIC LAB COMPLEX|ICT COMPLEX
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+pool053@gmail.com,AGR 400 LEVEL (GRP A)|AGR 400 LEVEL (GRP B),true,,
+AGR104,Plant Biology for Agritech,3,abulimensamuel+pool009@gmail.com,AGR 100 LEVEL (GRP A),false,BIOLOGY LAB|PROJECTOR,AGRIC LAB COMPLEX|MAIN ACADEMIC BLOCK
+AGR104,Plant Biology for Agritech,3,abulimensamuel+pool009@gmail.com,AGR 100 LEVEL (GRP B),false,BIOLOGY LAB|PROJECTOR,AGRIC LAB COMPLEX|MAIN ACADEMIC BLOCK
+AGR105,Agricultural Data Literacy,2,abulimensamuel+pool010@gmail.com,AGR 100 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|AGRIC LAB COMPLEX
+AGR105,Agricultural Data Literacy,2,abulimensamuel+pool010@gmail.com,AGR 100 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|AGRIC LAB COMPLEX
+AGR106,Soil and Water Fundamentals,2,abulimensamuel+pool011@gmail.com,AGR 100 LEVEL (GRP A),false,SOIL LAB|PROJECTOR,AGRIC LAB COMPLEX
+AGR106,Soil and Water Fundamentals,2,abulimensamuel+pool011@gmail.com,AGR 100 LEVEL (GRP B),false,SOIL LAB|PROJECTOR,AGRIC LAB COMPLEX
+GST121,Critical Thinking and Writing,2,abulimensamuel+pool054@gmail.com,AGR 100 LEVEL (GRP A)|AGR 100 LEVEL (GRP B),true,,
+AGR204,Agro-Economics and Policy,3,abulimensamuel+pool012@gmail.com,AGR 200 LEVEL (GRP A),false,PROJECTOR,AGRIC LAB COMPLEX|BUSINESS SCHOOL
+AGR204,Agro-Economics and Policy,3,abulimensamuel+pool012@gmail.com,AGR 200 LEVEL (GRP B),false,PROJECTOR,AGRIC LAB COMPLEX|BUSINESS SCHOOL
+AGR205,Farm Mechanization Basics,2,abulimensamuel+pool013@gmail.com,AGR 200 LEVEL (GRP A),false,PROJECTOR,AGRIC LAB COMPLEX|ENGINEERING BLOCK
+AGR205,Farm Mechanization Basics,2,abulimensamuel+pool013@gmail.com,AGR 200 LEVEL (GRP B),false,PROJECTOR,AGRIC LAB COMPLEX|ENGINEERING BLOCK
+AGR206,Agricultural Extension Practice,2,abulimensamuel+pool014@gmail.com,AGR 200 LEVEL (GRP A),false,PROJECTOR,AGRIC LAB COMPLEX|MAIN ACADEMIC BLOCK
+AGR206,Agricultural Extension Practice,2,abulimensamuel+pool014@gmail.com,AGR 200 LEVEL (GRP B),false,PROJECTOR,AGRIC LAB COMPLEX|MAIN ACADEMIC BLOCK
+GST221,Logic and Scientific Reasoning,2,abulimensamuel+pool055@gmail.com,AGR 200 LEVEL (GRP A)|AGR 200 LEVEL (GRP B),true,,
+AGR304,Agribusiness Operations,3,abulimensamuel+pool015@gmail.com,AGR 300 LEVEL (GRP A),false,PROJECTOR,AGRIC LAB COMPLEX|BUSINESS SCHOOL
+AGR304,Agribusiness Operations,3,abulimensamuel+pool015@gmail.com,AGR 300 LEVEL (GRP B),false,PROJECTOR,AGRIC LAB COMPLEX|BUSINESS SCHOOL
+AGR305,Precision Irrigation Systems,3,abulimensamuel+pool016@gmail.com,AGR 300 LEVEL (GRP A),false,SOIL LAB|PROJECTOR,AGRIC LAB COMPLEX
+AGR305,Precision Irrigation Systems,3,abulimensamuel+pool016@gmail.com,AGR 300 LEVEL (GRP B),false,SOIL LAB|PROJECTOR,AGRIC LAB COMPLEX
+AGR306,Agritech Product Development,2,abulimensamuel+pool009@gmail.com,AGR 300 LEVEL (GRP A),false,PROJECTOR|SMART BOARD,INNOVATION HUB|AGRIC LAB COMPLEX
+AGR306,Agritech Product Development,2,abulimensamuel+pool009@gmail.com,AGR 300 LEVEL (GRP B),false,PROJECTOR|SMART BOARD,INNOVATION HUB|AGRIC LAB COMPLEX
+GST321,Peace Studies and Conflict Resolution,2,abulimensamuel+pool048@gmail.com,AGR 300 LEVEL (GRP A)|AGR 300 LEVEL (GRP B),true,,
+AGR404,Advanced Crop Systems,3,abulimensamuel+pool010@gmail.com,AGR 400 LEVEL (GRP A),false,SOIL LAB|PROJECTOR,AGRIC LAB COMPLEX
+AGR404,Advanced Crop Systems,3,abulimensamuel+pool010@gmail.com,AGR 400 LEVEL (GRP B),false,SOIL LAB|PROJECTOR,AGRIC LAB COMPLEX
+AGR405,Sustainable Farm Innovation,3,abulimensamuel+pool011@gmail.com,AGR 400 LEVEL (GRP A),false,PROJECTOR,AGRIC LAB COMPLEX|INNOVATION HUB
+AGR405,Sustainable Farm Innovation,3,abulimensamuel+pool011@gmail.com,AGR 400 LEVEL (GRP B),false,PROJECTOR,AGRIC LAB COMPLEX|INNOVATION HUB
+AGR406,Agritech Capstone Workshop,2,abulimensamuel+pool012@gmail.com,AGR 400 LEVEL (GRP A),false,PROJECTOR|SMART BOARD,INNOVATION HUB|AGRIC LAB COMPLEX
+AGR406,Agritech Capstone Workshop,2,abulimensamuel+pool012@gmail.com,AGR 400 LEVEL (GRP B),false,PROJECTOR|SMART BOARD,INNOVATION HUB|AGRIC LAB COMPLEX
+GST421,Leadership Communication and Culture,2,abulimensamuel+pool049@gmail.com,AGR 400 LEVEL (GRP A)|AGR 400 LEVEL (GRP B),true,,

@@ -1,0 +1,55 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+GST101,Foundations of Liberal Studies,3,abulimensamuel+pool160@gmail.com,GST 100 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+GST101,Foundations of Liberal Studies,3,abulimensamuel+pool161@gmail.com,GST 100 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool162@gmail.com,GST 100 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|GENERAL STUDIES BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool163@gmail.com,GST 100 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|GENERAL STUDIES BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool164@gmail.com,GST 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool165@gmail.com,GST 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST111,Communication in English,2,abulimensamuel+pool166@gmail.com,GST 100 LEVEL (GRP A)|GST 100 LEVEL (GRP B),true,,
+GST201,Interdisciplinary Studies and Society,3,abulimensamuel+pool167@gmail.com,GST 200 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+GST201,Interdisciplinary Studies and Society,3,abulimensamuel+pool160@gmail.com,GST 200 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool161@gmail.com,GST 200 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|GENERAL STUDIES BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool162@gmail.com,GST 200 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|GENERAL STUDIES BLOCK
+GST212,Philosophy and Human Existence,2,abulimensamuel+pool163@gmail.com,GST 200 LEVEL (GRP A)|GST 200 LEVEL (GRP B),true,,
+GST301,Comparative Civilization Studies,3,abulimensamuel+pool164@gmail.com,GST 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|HUMANITIES BLOCK
+GST301,Comparative Civilization Studies,3,abulimensamuel+adeola.fasina@gmail.com,GST 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|HUMANITIES BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool165@gmail.com,GST 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool166@gmail.com,GST 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+BU-GST322,Citizenship Orientation,1,abulimensamuel+pool167@gmail.com,GST 300 LEVEL (GRP A)|GST 300 LEVEL (GRP B),true,,
+GST401,Ethics and Public Leadership,3,abulimensamuel+pool160@gmail.com,GST 400 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|HUMANITIES BLOCK
+GST401,Ethics and Public Leadership,3,abulimensamuel+pool161@gmail.com,GST 400 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|HUMANITIES BLOCK
+GST402,Capstone Seminar in Society and Policy,3,abulimensamuel+pool162@gmail.com,GST 400 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|HUMANITIES BLOCK
+GST402,Capstone Seminar in Society and Policy,3,abulimensamuel+pool163@gmail.com,GST 400 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|HUMANITIES BLOCK
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+pool164@gmail.com,GST 400 LEVEL (GRP A)|GST 400 LEVEL (GRP B),true,,
+GST104,Critical Reasoning and Communication,2,abulimensamuel+pool107@gmail.com,GST 100 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|HUMANITIES BLOCK
+GST104,Critical Reasoning and Communication,2,abulimensamuel+pool107@gmail.com,GST 100 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|HUMANITIES BLOCK
+GST105,Digital Citizenship and Media Literacy,2,abulimensamuel+pool108@gmail.com,GST 100 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|ICT COMPLEX
+GST105,Digital Citizenship and Media Literacy,2,abulimensamuel+pool108@gmail.com,GST 100 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|ICT COMPLEX
+GST106,Writing for Academic Purposes,2,abulimensamuel+pool109@gmail.com,GST 100 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|HUMANITIES BLOCK
+GST106,Writing for Academic Purposes,2,abulimensamuel+pool109@gmail.com,GST 100 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|HUMANITIES BLOCK
+GST121,Critical Thinking and Writing,2,abulimensamuel+pool165@gmail.com,GST 100 LEVEL (GRP A)|GST 100 LEVEL (GRP B),true,,
+GST204,Science and Society,3,abulimensamuel+pool110@gmail.com,GST 200 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+GST204,Science and Society,3,abulimensamuel+pool110@gmail.com,GST 200 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+GST205,Research Methods for Social Inquiry,2,abulimensamuel+pool111@gmail.com,GST 200 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|HUMANITIES BLOCK
+GST205,Research Methods for Social Inquiry,2,abulimensamuel+pool111@gmail.com,GST 200 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|HUMANITIES BLOCK
+GST206,Data Literacy Workshop,2,abulimensamuel+pool108@gmail.com,GST 200 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|GENERAL STUDIES BLOCK
+GST206,Data Literacy Workshop,2,abulimensamuel+pool108@gmail.com,GST 200 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|GENERAL STUDIES BLOCK
+GST221,Logic and Scientific Reasoning,2,abulimensamuel+pool166@gmail.com,GST 200 LEVEL (GRP A)|GST 200 LEVEL (GRP B),true,,
+GST304,African Thought and Global Culture,3,abulimensamuel+pool112@gmail.com,GST 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|HUMANITIES BLOCK
+GST304,African Thought and Global Culture,3,abulimensamuel+pool112@gmail.com,GST 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|HUMANITIES BLOCK
+GST305,Peace and Civic Responsibility,3,abulimensamuel+pool107@gmail.com,GST 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|HUMANITIES BLOCK
+GST305,Peace and Civic Responsibility,3,abulimensamuel+pool107@gmail.com,GST 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|HUMANITIES BLOCK
+GST306,Policy Debate Studio,2,abulimensamuel+pool109@gmail.com,GST 300 LEVEL (GRP A),false,SMART BOARD|PROJECTOR,GENERAL STUDIES BLOCK|INNOVATION HUB
+GST306,Policy Debate Studio,2,abulimensamuel+pool109@gmail.com,GST 300 LEVEL (GRP B),false,SMART BOARD|PROJECTOR,GENERAL STUDIES BLOCK|INNOVATION HUB
+GST321,Peace Studies and Conflict Resolution,2,abulimensamuel+pool167@gmail.com,GST 300 LEVEL (GRP A)|GST 300 LEVEL (GRP B),true,,
+GST404,Ethics in Technology and Society,3,abulimensamuel+pool110@gmail.com,GST 400 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|ICT COMPLEX
+GST404,Ethics in Technology and Society,3,abulimensamuel+pool110@gmail.com,GST 400 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|ICT COMPLEX
+GST405,Public Policy and Governance,3,abulimensamuel+pool111@gmail.com,GST 400 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|HUMANITIES BLOCK
+GST405,Public Policy and Governance,3,abulimensamuel+pool111@gmail.com,GST 400 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|HUMANITIES BLOCK
+GST406,Capstone Workshop and Seminar,2,abulimensamuel+pool112@gmail.com,GST 400 LEVEL (GRP A),false,SMART BOARD|PROJECTOR,GENERAL STUDIES BLOCK|INNOVATION HUB
+GST406,Capstone Workshop and Seminar,2,abulimensamuel+pool112@gmail.com,GST 400 LEVEL (GRP B),false,SMART BOARD|PROJECTOR,GENERAL STUDIES BLOCK|INNOVATION HUB
+GST421,Leadership Communication and Culture,2,abulimensamuel+pool160@gmail.com,GST 400 LEVEL (GRP A)|GST 400 LEVEL (GRP B),true,,
+GST129,Foundations of National Development,2,abulimensamuel+pool161@gmail.com,SENG 200 LEVEL (GRP A)|LAW 200 LEVEL (GRP A)|EDU 200 LEVEL (GRP A),true,,
+GST229,Contemporary African Challenges,2,abulimensamuel+pool162@gmail.com,CSC 200 LEVEL (GRP B)|ECO 200 LEVEL (GRP A)|EST 200 LEVEL (GRP A),true,,
+GST329,Innovation and Nation Building,2,abulimensamuel+pool163@gmail.com,ITE 300 LEVEL (GRP A)|MCB 300 LEVEL (GRP A)|AGR 300 LEVEL (GRP A),true,,
+GST429,Ethics of Leadership in Practice,2,abulimensamuel+pool164@gmail.com,BUS 400 LEVEL (GRP A)|HIS 400 LEVEL (GRP A)|MLS 400 LEVEL (GRP A),true,,

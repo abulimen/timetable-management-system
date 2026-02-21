@@ -238,15 +238,21 @@ export class SettingsComponent implements OnInit {
     },
     solver_minutes_spent_limit: {
       label: 'Solver max runtime (minutes)',
-      help: 'Hard cap on total solve duration. Lower values return faster.',
+      help: 'Hard cap on total solve duration. Turn OFF "Use runtime limit" to allow indefinite solving.',
       section: 'solver',
       input: 'number',
       min: 1,
-      max: 180,
       recommendedMin: 10,
       recommendedMax: 45,
       step: 1,
       restartRequired: true
+    },
+    solver_runtime_limit_enabled: {
+      label: 'Use runtime limit',
+      help: 'When OFF, solver does not stop due to max runtime and can run indefinitely until stopped.',
+      section: 'solver',
+      input: 'boolean',
+      recommended: 'Keep ON for predictable run duration.'
     },
     solver_unimproved_seconds_spent_limit: {
       label: 'Stop after no improvement (seconds)',
@@ -262,33 +268,32 @@ export class SettingsComponent implements OnInit {
     },
     solver_forager_accepted_count_limit: {
       label: 'Search breadth per step',
-      help: 'Higher = better exploration/quality, lower = faster runtime.',
+      help: 'Moves evaluated per step. Higher explores more but can slow runtime significantly.',
       section: 'solver',
       input: 'number',
-      min: 10,
-      max: 5000,
-      recommendedMin: 150,
-      recommendedMax: 1200,
-      step: 10,
+      min: 1,
+      recommendedMin: 2,
+      recommendedMax: 8,
+      step: 1,
       restartRequired: true
     },
     solver_move_thread_count: {
       label: 'CPU threads used by solver',
-      help: 'More threads can reduce solve time on multi-core machines.',
+      help: 'Multi-threaded solving requires Timefold Enterprise. Community edition runs single-threaded.',
       section: 'solver',
       input: 'select',
       options: MOVE_THREAD_OPTIONS,
-      recommended: 'Recommended: 4 for most servers. Increase only after benchmarking.',
+      recommended: 'Multi-threaded solving requires Timefold Enterprise license.',
       restartRequired: true
     },
     solver_environment_mode: {
       label: 'Solver execution mode',
-      help: 'REPRODUCIBLE is stable and recommended for production.',
+      help: 'NON_REPRODUCIBLE is faster (15-25%). REPRODUCIBLE adds overhead for deterministic results.',
       section: 'solver',
       input: 'select',
       options: [
-        { value: 'REPRODUCIBLE', label: 'Reproducible (recommended)' },
-        { value: 'NON_REPRODUCIBLE', label: 'Non-reproducible (potentially faster)' }
+        { value: 'NON_REPRODUCIBLE', label: 'Non-reproducible (recommended, faster)' },
+        { value: 'REPRODUCIBLE', label: 'Reproducible (slower, deterministic)' }
       ],
       restartRequired: true
     },
@@ -325,6 +330,35 @@ export class SettingsComponent implements OnInit {
       min: 0,
       max: 1000,
       step: 1
+    },
+    solver_ruin_recreate_enabled: {
+      label: 'Deep restructuring (Ruin & Recreate)',
+      help: 'When enabled, the solver detects problem areas — groups of lessons with scheduling conflicts that cannot be fixed by small adjustments — and tears them out to rebuild from scratch. This only activates after the solver has been running for several minutes and is stuck on unresolvable conflicts. Think of it like clearing a tangled section of wiring and re-routing it cleanly. Recommended ON for large timetables (300+ lessons). Default: OFF.',
+      section: 'solver',
+      input: 'boolean'
+    },
+    solver_ruin_recreate_cluster_size: {
+      label: 'Restructuring group size',
+      help: 'How many conflicting lessons the solver pulls out and rebuilds at once. It automatically selects the most problematic lessons — this just caps how many it handles per attempt. Larger groups can resolve bigger tangles but take longer. Recommended: 6-12.',
+      section: 'solver',
+      input: 'number',
+      min: 3,
+      max: 25,
+      step: 1
+    },
+    solver_adaptive_limits_enabled: {
+      label: 'Use adaptive runtime limits',
+      help: 'When ON, solver auto-adjusts max runtime and no-improvement timeout by dataset size. Turn OFF to enforce the exact values you set.',
+      section: 'solver',
+      input: 'boolean',
+      recommended: 'Turn OFF if you want strict manual runtime control.'
+    },
+    solver_adaptive_search_breadth_enabled: {
+      label: 'Use adaptive search breadth',
+      help: 'When ON, solver auto-tunes search breadth per step. Turn OFF to use your exact Search breadth per step value.',
+      section: 'solver',
+      input: 'boolean',
+      recommended: 'Turn OFF if you want strict manual search breadth control.'
     },
     bulk_import_rollback_window_hours: {
       label: 'Import rollback window (hours)',
@@ -658,23 +692,22 @@ export class SettingsComponent implements OnInit {
       safe: {
         solver_minutes_spent_limit: '45',
         solver_unimproved_seconds_spent_limit: '90',
-        solver_forager_accepted_count_limit: '1200',
-        solver_move_thread_count: '4',
-        solver_environment_mode: 'REPRODUCIBLE'
+        solver_forager_accepted_count_limit: '8',
+        solver_environment_mode: 'NON_REPRODUCIBLE',
+        solver_ruin_recreate_enabled: 'true',
+        solver_ruin_recreate_cluster_size: '10'
       },
       balanced: {
         solver_minutes_spent_limit: '30',
         solver_unimproved_seconds_spent_limit: '45',
-        solver_forager_accepted_count_limit: '500',
-        solver_move_thread_count: '4',
-        solver_environment_mode: 'REPRODUCIBLE'
+        solver_forager_accepted_count_limit: '4',
+        solver_environment_mode: 'NON_REPRODUCIBLE'
       },
       fast: {
         solver_minutes_spent_limit: '20',
         solver_unimproved_seconds_spent_limit: '30',
-        solver_forager_accepted_count_limit: '250',
-        solver_move_thread_count: '4',
-        solver_environment_mode: 'REPRODUCIBLE'
+        solver_forager_accepted_count_limit: '2',
+        solver_environment_mode: 'NON_REPRODUCIBLE'
       }
     };
 

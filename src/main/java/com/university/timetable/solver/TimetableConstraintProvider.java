@@ -4,8 +4,8 @@ import com.university.timetable.domain.Lesson;
 import com.university.timetable.domain.SpecialEvent;
 import com.university.timetable.domain.StudentGroup;
 import com.university.timetable.service.ConstraintSettingsService;
-import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
-import org.optaplanner.core.api.score.stream.*;
+import ai.timefold.solver.core.api.score.buildin.hardsoft.HardSoftScore;
+import ai.timefold.solver.core.api.score.stream.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,69 +102,61 @@ public class TimetableConstraintProvider implements ConstraintProvider {
         }
     }
 
-    // Fast cached getters - no service lookup after initialization
+    // Fast cached getters — no service lookup needed; settings loaded once in
+    // defineConstraints()
     private LocalTime getLunchBreakStart() {
-        initializeSettings();
         return cachedLunchBreakStart;
     }
 
     private LocalTime getLunchBreakEnd() {
-        initializeSettings();
         return cachedLunchBreakEnd;
     }
 
     private boolean isLunchBreakEnforced() {
-        initializeSettings();
         return cachedLunchBreakEnforced;
     }
 
     private boolean isSameCourseSameDayAllowed() {
-        initializeSettings();
         return cachedSameCourseSameDayAllowed;
     }
 
     private boolean isDayBalanceEnforced() {
-        initializeSettings();
         return cachedDayBalanceEnforced;
     }
 
     private int getWeightRoomCapacity() {
-        initializeSettings();
         return cachedWeightRoomCapacity;
     }
 
     private int getWeightDayBalance() {
-        initializeSettings();
         return cachedWeightDayBalance;
     }
 
     private int getWeightLecturerTransition() {
-        initializeSettings();
         return cachedWeightLecturerTransition;
     }
 
     private int getWeightStudentFatigue() {
-        initializeSettings();
         return cachedWeightStudentFatigue;
     }
 
     private int getWeightEarlyMorning() {
-        initializeSettings();
         return cachedWeightEarlyMorning;
     }
 
     private LocalTime getLatestEndTime() {
-        initializeSettings();
         return cachedLatestEndTime;
     }
 
     private LocalTime getFridayLatestEndTime() {
-        initializeSettings();
         return cachedFridayLatestEndTime;
     }
 
     @Override
     public Constraint[] defineConstraints(ConstraintFactory factory) {
+        // Consolidate: load all settings once per solve, not per constraint evaluation
+        initializeSettings();
+
         return new Constraint[] {
                 // Hard Constraints
                 roomConflict(factory),
@@ -176,8 +168,9 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 lunchBreakOverlap(factory),
                 sameCourseOnSameDay(factory),
                 lessonExceedsEndTime(factory),
-                roomCapacityOverflow(factory), // Room must fit all students
-                specialEventConflict(factory), // Prevent scheduling during special events
+                roomCapacityOverflow(factory),
+                specialEventConflict(factory),
+                maxLecturerConsecutiveHoursConstraint(factory),
 
                 // Soft Constraints
                 roomCapacityEfficiency(factory),
@@ -185,6 +178,7 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 lecturerRoomTransition(factory),
                 dayBalanceForStudentGroup(factory),
                 earlyMorningPenalty(factory),
+                lateAfternoonPenalty(factory),
                 lecturerFatigue(factory)
         };
     }
@@ -192,38 +186,48 @@ public class TimetableConstraintProvider implements ConstraintProvider {
     // ==================== HARD CONSTRAINTS ====================
 
     private Constraint roomConflict(ConstraintFactory factory) {
-        var scheduledLessons = factory.forEach(Lesson.class).filter(this::isScheduledLesson);
-        return scheduledLessons
-                .join(scheduledLessons,
+        // Important for CH performance: avoid joining lessons with null room.
+        // During construction, many lessons have timeslot assigned before room;
+        // joining on room=null creates a massive useless pair explosion.
+        var scheduledRoomLessons = factory.forEach(Lesson.class)
+                .filter(lesson -> lesson.getTimeslot() != null
+                        && lesson.getRoom() != null
+                        && !lesson.isOnline());
+        return scheduledRoomLessons
+                .join(scheduledRoomLessons,
                         Joiners.lessThan(Lesson::getId, Lesson::getId),
                         Joiners.equal(Lesson::getRoom),
                         Joiners.equal(this::lessonDay),
-                        Joiners.overlapping(this::lessonStart, Lesson::getEndTime, this::lessonStart, Lesson::getEndTime))
-                .filter((lesson1, lesson2) -> !lesson1.isOnline() && !lesson2.isOnline() && lesson1.getRoom() != null)
+                        Joiners.overlapping(this::lessonStart, Lesson::getEndTime, this::lessonStart,
+                                Lesson::getEndTime))
                 .penalize(HardSoftScore.ONE_HARD)
                 .asConstraint("Room conflict");
     }
 
     private Constraint lecturerConflict(ConstraintFactory factory) {
-        var scheduledLessons = factory.forEach(Lesson.class).filter(this::isScheduledLesson);
-        return scheduledLessons
-                .join(scheduledLessons,
+        // Pre-filter lecturer!=null before join to avoid null-equality fan-out.
+        var scheduledLecturerLessons = factory.forEach(Lesson.class)
+                .filter(lesson -> lesson.getTimeslot() != null && lesson.getLecturer() != null);
+        return scheduledLecturerLessons
+                .join(scheduledLecturerLessons,
                         Joiners.lessThan(Lesson::getId, Lesson::getId),
                         Joiners.equal(Lesson::getLecturer),
                         Joiners.equal(this::lessonDay),
-                        Joiners.overlapping(this::lessonStart, Lesson::getEndTime, this::lessonStart, Lesson::getEndTime))
-                .filter((lesson1, lesson2) -> lesson1.getLecturer() != null)
+                        Joiners.overlapping(this::lessonStart, Lesson::getEndTime, this::lessonStart,
+                                Lesson::getEndTime))
                 .penalize(HardSoftScore.ONE_HARD)
                 .asConstraint("Lecturer conflict");
     }
 
     private Constraint studentGroupConflict(ConstraintFactory factory) {
-        var scheduledLessons = factory.forEach(Lesson.class).filter(this::isScheduledLesson);
-        return scheduledLessons
-                .join(scheduledLessons,
+        var scheduledLessonsWithGroups = factory.forEach(Lesson.class)
+                .filter(lesson -> lesson.getTimeslot() != null && !lesson.getConflictGroupIds().isEmpty());
+        return scheduledLessonsWithGroups
+                .join(scheduledLessonsWithGroups,
                         Joiners.lessThan(Lesson::getId, Lesson::getId),
                         Joiners.equal(this::lessonDay),
-                        Joiners.overlapping(this::lessonStart, Lesson::getEndTime, this::lessonStart, Lesson::getEndTime))
+                        Joiners.overlapping(this::lessonStart, Lesson::getEndTime, this::lessonStart,
+                                Lesson::getEndTime))
                 .filter(this::hasStudentGroupOverlap)
                 .penalize(HardSoftScore.ONE_HARD)
                 .asConstraint("Student group conflict");
@@ -388,7 +392,8 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                     if (lesson.getTimeslot() == null || !event.isActive()) {
                         return false;
                     }
-                    // Check overlap against the full lesson interval (not just the 1-hour start slot).
+                    // Check overlap against the full lesson interval (not just the 1-hour start
+                    // slot).
                     LocalTime lessonStart = lesson.getTimeslot().getStartTime();
                     LocalTime lessonEnd = lesson.getEndTime();
                     LocalTime eventStart = event.getStartTime();
@@ -435,6 +440,14 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 .asConstraint("Room capacity efficiency");
     }
 
+    /**
+     * SOFT: Student fatigue — penalizes consecutive teaching chains.
+     * Instead of penalizing each pair independently, counts the total
+     * number of consecutive lesson pairs per student group per day.
+     * This makes longer chains penalized more heavily (e.g., 4 consecutive
+     * hours = 3 pairs = 3× penalty, encouraging the solver to break up
+     * long blocks rather than just shortening them by one).
+     */
     private Constraint studentFatigue(ConstraintFactory factory) {
         return factory.forEach(Lesson.class)
                 .filter(lesson -> lesson.getTimeslot() != null && lesson.getStudentGroup() != null)
@@ -472,29 +485,74 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 .asConstraint("Lecturer room transition");
     }
 
+    /**
+     * SOFT: Day balance for student groups.
+     * Fixed for combined classes: uses conflict group ID overlap to detect
+     * when two lessons share ANY student group (direct or parent/child).
+     * This ensures combined classes (e.g., Groups A+D+E) are balanced fairly.
+     */
     private Constraint dayBalanceForStudentGroup(ConstraintFactory factory) {
         return factory.forEach(Lesson.class)
                 .filter(lesson -> isDayBalanceEnforced() &&
                         lesson.getTimeslot() != null &&
-                        lesson.getStudentGroup() != null)
-                .groupBy(Lesson::getStudentGroup, this::lessonDay, ConstraintCollectors.count())
-                .filter((studentGroup, day, lessonCount) -> lessonCount > 1)
+                        !lesson.getConflictGroupIds().isEmpty())
+                // Use the optimized getter instead of creating an iterator on every evaluation
+                .groupBy(Lesson::getPrimaryConflictGroupId,
+                        this::lessonDay, ConstraintCollectors.count())
+                .filter((groupId, day, lessonCount) -> lessonCount > 1)
                 .penalize(HardSoftScore.ofSoft(getWeightDayBalance()),
-                        (studentGroup, day, lessonCount) -> pairCount(lessonCount))
+                        (groupId, day, lessonCount) -> pairCount(lessonCount))
                 .asConstraint("Day balance for student group");
     }
 
     /**
-     * SOFT CONSTRAINT: Early Morning Penalty
-     * Penalize lessons starting at 7am - students prefer later starts.
-     * This is a soft constraint so 7am is still used if necessary.
+     * SOFT CONSTRAINT: Graduated Early Morning Penalty
+     * Penalizes early morning lessons with decreasing severity:
+     * - 7:00 AM → 3x weight (strongest: students really dislike this)
+     * - 8:00 AM → 1x weight (mild: slightly discouraged)
+     * - 9:00 AM+ → no penalty
+     * This distributes lessons away from very early slots while still
+     * allowing 8am lessons when needed.
      */
     private Constraint earlyMorningPenalty(ConstraintFactory factory) {
+        int weight = getWeightEarlyMorning();
         return factory.forEach(Lesson.class)
                 .filter(lesson -> lesson.getTimeslot() != null &&
-                        lesson.getTimeslot().getStartTime().equals(LocalTime.of(7, 0)))
-                .penalize(HardSoftScore.ofSoft(getWeightEarlyMorning()))
+                        lesson.getTimeslot().getStartTime().isBefore(LocalTime.of(9, 0)))
+                .penalize(HardSoftScore.ONE_SOFT,
+                        lesson -> {
+                            LocalTime start = lesson.getTimeslot().getStartTime();
+                            if (start.equals(LocalTime.of(7, 0))) {
+                                return weight * 3; // Heavy penalty for 7am
+                            } else { // 8:00 AM
+                                return weight; // Mild penalty for 8am
+                            }
+                        })
                 .asConstraint("Early morning penalty");
+    }
+
+    /**
+     * SOFT CONSTRAINT: Graduated Late Afternoon Penalty
+     * Penalizes late afternoon/evening lessons with increasing severity:
+     * - 5:00 PM → 1× weight (mild: slightly discouraged)
+     * - 6:00 PM+ → 3× weight (strong: students really dislike this)
+     * Mirrors the early morning penalty to encourage a balanced daily schedule.
+     */
+    private Constraint lateAfternoonPenalty(ConstraintFactory factory) {
+        int weight = getWeightEarlyMorning(); // Reuse early morning weight
+        return factory.forEach(Lesson.class)
+                .filter(lesson -> lesson.getTimeslot() != null &&
+                        !lesson.getTimeslot().getStartTime().isBefore(LocalTime.of(17, 0)))
+                .penalize(HardSoftScore.ONE_SOFT,
+                        lesson -> {
+                            LocalTime start = lesson.getTimeslot().getStartTime();
+                            if (start.isBefore(LocalTime.of(18, 0))) {
+                                return weight; // Mild penalty for 5pm
+                            } else {
+                                return weight * 3; // Heavy penalty for 6pm+
+                            }
+                        })
+                .asConstraint("Late afternoon penalty");
     }
 
     /**
@@ -514,8 +572,43 @@ public class TimetableConstraintProvider implements ConstraintProvider {
     }
 
     private int getMaxLecturerConsecutiveHours() {
-        initializeSettings();
         return cachedMaxLecturerConsecutiveHours;
+    }
+
+    /**
+     * HARD CONSTRAINT: Maximum Lecturer Consecutive Hours
+     * Penalizes (hard) when a lecturer teaches more consecutive hours than allowed.
+     * Uses a chain-counting approach: counts pairs of back-to-back lessons per
+     * lecturer per day. If the number of consecutive pairs exceeds the limit,
+     * each excess pair incurs a hard penalty.
+     *
+     * Example: If limit is 4 hours and a lecturer has 5 consecutive 1-hour lessons,
+     * that's 4 consecutive pairs, which exceeds the limit of 3 pairs (limit-1),
+     * so 1 hard penalty is applied.
+     */
+    private Constraint maxLecturerConsecutiveHoursConstraint(ConstraintFactory factory) {
+        // With O(1) pairwise penalty:
+        // A pair of back-to-back lessons is 1 penalty.
+        // A block of 3 continuous lessons is 2 pairs (2 penalties).
+        // This is extremely fast because it evaluates purely linearly.
+        // The weight represents a configurable hard threshold limit.
+        int maxHours = getMaxLecturerConsecutiveHours();
+        if (maxHours <= 0) {
+            return factory.forEach(Lesson.class)
+                    .filter(l -> false)
+                    .penalize(HardSoftScore.ONE_HARD)
+                    .asConstraint("Max lecturer consecutive hours");
+        }
+
+        return factory.forEach(Lesson.class)
+                .filter(lesson -> lesson.getTimeslot() != null && lesson.getLecturer() != null)
+                .join(Lesson.class,
+                        Joiners.equal(Lesson::getLecturer),
+                        Joiners.equal(this::lessonDay, this::lessonDay),
+                        Joiners.equal(Lesson::getEndTime, this::lessonStart))
+                .filter((a, b) -> !crossesLunchBoundary(a, b))
+                .penalize(HardSoftScore.ONE_HARD)
+                .asConstraint("Max lecturer consecutive hours");
     }
 
     // ==================== HELPER METHODS ====================

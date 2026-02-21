@@ -1,0 +1,51 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+MCM101,Foundations of Mass Communication,3,abulimensamuel+ahannaya.gandolph@gmail.com,MCM 100 LEVEL (GRP A),false,PROJECTOR|MEDIA STUDIO,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+MCM101,Foundations of Mass Communication,3,abulimensamuel+grace.udoh@gmail.com,MCM 100 LEVEL (GRP B),false,PROJECTOR|MEDIA STUDIO,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool192@gmail.com,MCM 100 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|HUMANITIES BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool193@gmail.com,MCM 100 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|HUMANITIES BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool194@gmail.com,MCM 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool195@gmail.com,MCM 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST111,Communication in English,2,abulimensamuel+pool196@gmail.com,MCM 100 LEVEL (GRP A)|MCM 100 LEVEL (GRP B),true,,
+MCM201,News Writing and Reporting,3,abulimensamuel+ahannaya.gandolph@gmail.com,MCM 200 LEVEL (GRP A),false,MEDIA STUDIO|PROJECTOR,HUMANITIES BLOCK
+MCM201,News Writing and Reporting,3,abulimensamuel+grace.udoh@gmail.com,MCM 200 LEVEL (GRP B),false,MEDIA STUDIO|PROJECTOR,HUMANITIES BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool197@gmail.com,MCM 200 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|HUMANITIES BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool198@gmail.com,MCM 200 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|HUMANITIES BLOCK
+GST212,Philosophy and Human Existence,2,abulimensamuel+pool199@gmail.com,MCM 200 LEVEL (GRP A)|MCM 200 LEVEL (GRP B),true,,
+MCM301,Broadcast Production,3,abulimensamuel+ahannaya.gandolph@gmail.com,MCM 300 LEVEL (GRP A),false,MEDIA STUDIO|PROJECTOR,HUMANITIES BLOCK
+MCM301,Broadcast Production,3,abulimensamuel+grace.udoh@gmail.com,MCM 300 LEVEL (GRP B),false,MEDIA STUDIO|PROJECTOR,HUMANITIES BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool192@gmail.com,MCM 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|HUMANITIES BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool193@gmail.com,MCM 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|HUMANITIES BLOCK
+BU-GST322,Citizenship Orientation,1,abulimensamuel+pool194@gmail.com,MCM 300 LEVEL (GRP A)|MCM 300 LEVEL (GRP B),true,,
+MCM401,Media Management and Law,3,abulimensamuel+ahannaya.gandolph@gmail.com,MCM 400 LEVEL (GRP A),false,PROJECTOR|MEDIA STUDIO,HUMANITIES BLOCK|LAW COMPLEX
+MCM401,Media Management and Law,3,abulimensamuel+grace.udoh@gmail.com,MCM 400 LEVEL (GRP B),false,PROJECTOR|MEDIA STUDIO,HUMANITIES BLOCK|LAW COMPLEX
+MCM402,Mass Communication Project,3,abulimensamuel+grace.udoh@gmail.com,MCM 400 LEVEL (GRP A),false,MEDIA STUDIO|PROJECTOR,HUMANITIES BLOCK
+MCM402,Mass Communication Project,3,abulimensamuel+ahannaya.gandolph@gmail.com,MCM 400 LEVEL (GRP B),false,MEDIA STUDIO|PROJECTOR,HUMANITIES BLOCK
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+pool195@gmail.com,MCM 400 LEVEL (GRP A)|MCM 400 LEVEL (GRP B),true,,
+MCM104,Media Writing and Reporting,3,abulimensamuel+pool125@gmail.com,MCM 100 LEVEL (GRP A),false,MEDIA STUDIO|PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+MCM104,Media Writing and Reporting,3,abulimensamuel+pool125@gmail.com,MCM 100 LEVEL (GRP B),false,MEDIA STUDIO|PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+MCM105,Photography and Visual Storytelling,2,abulimensamuel+pool126@gmail.com,MCM 100 LEVEL (GRP A),false,MEDIA STUDIO|PROJECTOR,HUMANITIES BLOCK
+MCM105,Photography and Visual Storytelling,2,abulimensamuel+pool126@gmail.com,MCM 100 LEVEL (GRP B),false,MEDIA STUDIO|PROJECTOR,HUMANITIES BLOCK
+MCM106,Digital Publishing Fundamentals,2,abulimensamuel+pool127@gmail.com,MCM 100 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|HUMANITIES BLOCK
+MCM106,Digital Publishing Fundamentals,2,abulimensamuel+pool127@gmail.com,MCM 100 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|HUMANITIES BLOCK
+GST121,Critical Thinking and Writing,2,abulimensamuel+pool196@gmail.com,MCM 100 LEVEL (GRP A)|MCM 100 LEVEL (GRP B),true,,
+MCM204,Broadcast Media Production,3,abulimensamuel+pool128@gmail.com,MCM 200 LEVEL (GRP A),false,MEDIA STUDIO|PROJECTOR,HUMANITIES BLOCK
+MCM204,Broadcast Media Production,3,abulimensamuel+pool128@gmail.com,MCM 200 LEVEL (GRP B),false,MEDIA STUDIO|PROJECTOR,HUMANITIES BLOCK
+MCM205,Public Relations and Branding,3,abulimensamuel+pool129@gmail.com,MCM 200 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|BUSINESS SCHOOL
+MCM205,Public Relations and Branding,3,abulimensamuel+pool129@gmail.com,MCM 200 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|BUSINESS SCHOOL
+MCM206,Audio Editing Lab,2,abulimensamuel+pool130@gmail.com,MCM 200 LEVEL (GRP A),false,MEDIA STUDIO|PROJECTOR,HUMANITIES BLOCK
+MCM206,Audio Editing Lab,2,abulimensamuel+pool130@gmail.com,MCM 200 LEVEL (GRP B),false,MEDIA STUDIO|PROJECTOR,HUMANITIES BLOCK
+GST221,Logic and Scientific Reasoning,2,abulimensamuel+pool197@gmail.com,MCM 200 LEVEL (GRP A)|MCM 200 LEVEL (GRP B),true,,
+MCM304,Investigative Journalism,3,abulimensamuel+pool125@gmail.com,MCM 300 LEVEL (GRP A),false,MEDIA STUDIO|PROJECTOR,HUMANITIES BLOCK
+MCM304,Investigative Journalism,3,abulimensamuel+pool125@gmail.com,MCM 300 LEVEL (GRP B),false,MEDIA STUDIO|PROJECTOR,HUMANITIES BLOCK
+MCM305,Development Communication,3,abulimensamuel+pool126@gmail.com,MCM 300 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|GENERAL STUDIES BLOCK
+MCM305,Development Communication,3,abulimensamuel+pool126@gmail.com,MCM 300 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|GENERAL STUDIES BLOCK
+MCM306,Digital Content Production Lab,2,abulimensamuel+pool127@gmail.com,MCM 300 LEVEL (GRP A),false,COMPUTER LAB|MEDIA STUDIO|PROJECTOR,ICT COMPLEX|HUMANITIES BLOCK
+MCM306,Digital Content Production Lab,2,abulimensamuel+pool127@gmail.com,MCM 300 LEVEL (GRP B),false,COMPUTER LAB|MEDIA STUDIO|PROJECTOR,ICT COMPLEX|HUMANITIES BLOCK
+GST321,Peace Studies and Conflict Resolution,2,abulimensamuel+pool198@gmail.com,MCM 300 LEVEL (GRP A)|MCM 300 LEVEL (GRP B),true,,
+MCM404,Media Law and Ethics,3,abulimensamuel+pool128@gmail.com,MCM 400 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|LAW COMPLEX
+MCM404,Media Law and Ethics,3,abulimensamuel+pool128@gmail.com,MCM 400 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|LAW COMPLEX
+MCM405,Strategic Communication Campaigns,3,abulimensamuel+pool129@gmail.com,MCM 400 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|BUSINESS SCHOOL
+MCM405,Strategic Communication Campaigns,3,abulimensamuel+pool129@gmail.com,MCM 400 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|BUSINESS SCHOOL
+MCM406,Capstone Media Project,2,abulimensamuel+pool130@gmail.com,MCM 400 LEVEL (GRP A),false,MEDIA STUDIO|PROJECTOR,HUMANITIES BLOCK
+MCM406,Capstone Media Project,2,abulimensamuel+pool130@gmail.com,MCM 400 LEVEL (GRP B),false,MEDIA STUDIO|PROJECTOR,HUMANITIES BLOCK
+GST421,Leadership Communication and Culture,2,abulimensamuel+pool199@gmail.com,MCM 400 LEVEL (GRP A)|MCM 400 LEVEL (GRP B),true,,

@@ -64,11 +64,13 @@ public class TimetableEditLockInterceptor implements HandlerInterceptor {
 
     private boolean isAlwaysAllowedMutatingPath(String path) {
         return path.startsWith("/api/v1/auth/")
+                || path.startsWith("/api/v1/settings/")
                 || path.startsWith("/api/v1/solver/");
     }
 
     private boolean isSkippedForDirtyTracking(String path) {
         return path.startsWith("/api/v1/auth/")
+                || path.startsWith("/api/v1/settings/")
                 || path.startsWith("/api/v1/solver/");
     }
 }

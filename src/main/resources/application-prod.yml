@@ -7,7 +7,7 @@ spring:
 solver:
   performance:
     move-thread-count: ${SOLVER_MOVE_THREAD_COUNT:4}
-    environment-mode: ${SOLVER_ENVIRONMENT_MODE:REPRODUCIBLE}
+    environment-mode: ${SOLVER_ENVIRONMENT_MODE:NON_REPRODUCIBLE}
     parallel-solver-count: ${SOLVER_PARALLEL_SOLVER_COUNT:1}
   feasibility:
     run-on-dirty-only: ${SOLVER_FEASIBILITY_RUN_ON_DIRTY_ONLY:true}
@@ -18,9 +18,9 @@ solver:
 
 logging:
   level:
-    org.optaplanner: INFO
-    org.optaplanner.core.impl.solver: INFO
-    org.optaplanner.core.impl.localsearch: INFO
+    ai.timefold: INFO
+    ai.timefold.solver.core.impl.solver: INFO
+    ai.timefold.solver.core.impl.localsearch: INFO
     com.university.timetable: INFO
     com.university.timetable.security: INFO
     org.hibernate.SQL: WARN

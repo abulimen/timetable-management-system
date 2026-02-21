@@ -82,13 +82,18 @@ import {
                 <span class="font-medium ml-1">{{ status.moveThreadCount || runtime?.moveThreadCount || 'N/A' }} threads • {{ status.parallelSolverCount || runtime?.parallelSolverCount || 'N/A' }} jobs • {{ status.availableProcessors ?? runtime?.availableProcessors ?? 'N/A' }} cores</span>
               </div>
               <div class="p-2 rounded bg-secondary-100 dark:bg-secondary-700">
-                <span class="text-secondary-500">Adaptive limits:</span>
+                <span class="text-secondary-500">{{ status.adaptiveLimitsEnabled === false ? 'Runtime limits:' : 'Adaptive limits:' }}</span>
                 <span class="font-medium ml-1">
-                  {{ status.adaptiveDatasetBand || 'N/A' }} band • max {{ status.adaptiveMaxRuntimeMs != null ? formatDuration(status.adaptiveMaxRuntimeMs) : 'N/A' }} • no-improve {{ status.adaptiveUnimprovedMs != null ? formatDuration(status.adaptiveUnimprovedMs) : 'N/A' }}
+                  <ng-container *ngIf="status.adaptiveLimitsEnabled !== false; else manualRuntimeLimits">
+                    {{ status.adaptiveDatasetBand || 'N/A' }} band • max {{ status.adaptiveMaxRuntimeMs != null ? formatDuration(status.adaptiveMaxRuntimeMs) : 'N/A' }} • no-improve {{ status.adaptiveUnimprovedMs != null ? formatDuration(status.adaptiveUnimprovedMs) : 'N/A' }}
+                  </ng-container>
+                  <ng-template #manualRuntimeLimits>
+                    Manual • max {{ status.adaptiveMaxRuntimeMs != null ? formatDuration(status.adaptiveMaxRuntimeMs) : 'N/A' }} • no-improve {{ status.adaptiveUnimprovedMs != null ? formatDuration(status.adaptiveUnimprovedMs) : 'N/A' }}
+                  </ng-template>
                 </span>
               </div>
               <div class="p-2 rounded bg-secondary-100 dark:bg-secondary-700">
-                <span class="text-secondary-500">Adaptive search breadth:</span>
+                <span class="text-secondary-500">{{ status.adaptiveSearchBreadthEnabled === false ? 'Search breadth (manual):' : 'Adaptive search breadth:' }}</span>
                 <span class="font-medium ml-1">{{ status.adaptiveAcceptedCountLimit ?? 'N/A' }}</span>
                 <span *ngIf="status.adaptiveTerminationReason" class="text-amber-700 ml-2">({{ status.adaptiveTerminationReason }})</span>
               </div>
@@ -150,6 +155,12 @@ import {
                 [disabled]="!isSolving"
                 class="btn btn-danger disabled:opacity-50">
                 Stop
+              </button>
+              <button
+                (click)="resumeSolver()"
+                [disabled]="isSolving || !status?.resumeAvailable"
+                class="btn btn-secondary disabled:opacity-50">
+                Resume
               </button>
               <button
                 (click)="clearCurrentTimetable()"
@@ -397,6 +408,19 @@ export class SolverComponent implements OnInit, OnDestroy {
       next: (s) => {
         this.status = s;
         this.stopPolling();
+      }
+    });
+  }
+
+  resumeSolver() {
+    this.api.resumeSolver().subscribe({
+      next: (s) => {
+        this.status = s;
+        this.startPolling();
+      },
+      error: (err) => {
+        const message = err?.error?.message || 'No saved solver progress available to resume.';
+        alert(message);
       }
     });
   }

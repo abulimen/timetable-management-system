@@ -2,7 +2,7 @@ package com.university.timetable.solver;
 
 import com.university.timetable.domain.Lesson;
 import com.university.timetable.domain.Room;
-import org.optaplanner.core.impl.heuristic.selector.common.nearby.NearbyDistanceMeter;
+import ai.timefold.solver.core.impl.heuristic.selector.common.nearby.NearbyDistanceMeter;
 
 import java.util.Objects;
 

@@ -1,0 +1,51 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+FIN101,Principles of Finance,3,abulimensamuel+pool152@gmail.com,FIN 100 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+FIN101,Principles of Finance,3,abulimensamuel+pool153@gmail.com,FIN 100 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool154@gmail.com,FIN 100 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool155@gmail.com,FIN 100 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool156@gmail.com,FIN 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool157@gmail.com,FIN 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST111,Communication in English,2,abulimensamuel+pool158@gmail.com,FIN 100 LEVEL (GRP A)|FIN 100 LEVEL (GRP B),true,,
+FIN201,Financial Management and Markets,3,abulimensamuel+pool159@gmail.com,FIN 200 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+FIN201,Financial Management and Markets,3,abulimensamuel+pool152@gmail.com,FIN 200 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool153@gmail.com,FIN 200 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool154@gmail.com,FIN 200 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+GST212,Philosophy and Human Existence,2,abulimensamuel+pool155@gmail.com,FIN 200 LEVEL (GRP A)|FIN 200 LEVEL (GRP B),true,,
+FIN301,Investment Analysis and Portfolio,3,abulimensamuel+pool156@gmail.com,FIN 300 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+FIN301,Investment Analysis and Portfolio,3,abulimensamuel+pool157@gmail.com,FIN 300 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool158@gmail.com,FIN 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|BUSINESS SCHOOL
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool159@gmail.com,FIN 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|BUSINESS SCHOOL
+BU-GST322,Citizenship Orientation,1,abulimensamuel+pool152@gmail.com,FIN 300 LEVEL (GRP A)|FIN 300 LEVEL (GRP B),true,,
+FIN401,Risk Management and Derivatives,3,abulimensamuel+pool153@gmail.com,FIN 400 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+FIN401,Risk Management and Derivatives,3,abulimensamuel+pool154@gmail.com,FIN 400 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+FIN402,Corporate Finance Project,3,abulimensamuel+pool155@gmail.com,FIN 400 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+FIN402,Corporate Finance Project,3,abulimensamuel+pool156@gmail.com,FIN 400 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+pool157@gmail.com,FIN 400 LEVEL (GRP A)|FIN 400 LEVEL (GRP B),true,,
+FIN104,Financial Accounting Foundations,3,abulimensamuel+pool101@gmail.com,FIN 100 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+FIN104,Financial Accounting Foundations,3,abulimensamuel+pool101@gmail.com,FIN 100 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+FIN105,Business Statistics Lab,2,abulimensamuel+pool102@gmail.com,FIN 100 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+FIN105,Business Statistics Lab,2,abulimensamuel+pool102@gmail.com,FIN 100 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+FIN106,Communication for Finance Professionals,2,abulimensamuel+pool103@gmail.com,FIN 100 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+FIN106,Communication for Finance Professionals,2,abulimensamuel+pool103@gmail.com,FIN 100 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+GST121,Critical Thinking and Writing,2,abulimensamuel+pool158@gmail.com,FIN 100 LEVEL (GRP A)|FIN 100 LEVEL (GRP B),true,,
+FIN204,Corporate Finance I,3,abulimensamuel+pool104@gmail.com,FIN 200 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+FIN204,Corporate Finance I,3,abulimensamuel+pool104@gmail.com,FIN 200 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+FIN205,Investment Analysis I,3,abulimensamuel+pool105@gmail.com,FIN 200 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+FIN205,Investment Analysis I,3,abulimensamuel+pool105@gmail.com,FIN 200 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+FIN206,Spreadsheet Modeling for Finance,2,abulimensamuel+pool102@gmail.com,FIN 200 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+FIN206,Spreadsheet Modeling for Finance,2,abulimensamuel+pool102@gmail.com,FIN 200 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+GST221,Logic and Scientific Reasoning,2,abulimensamuel+pool159@gmail.com,FIN 200 LEVEL (GRP A)|FIN 200 LEVEL (GRP B),true,,
+FIN304,Financial Markets and Institutions,3,abulimensamuel+pool106@gmail.com,FIN 300 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+FIN304,Financial Markets and Institutions,3,abulimensamuel+pool106@gmail.com,FIN 300 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+FIN305,Risk Management and Insurance,3,abulimensamuel+pool104@gmail.com,FIN 300 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+FIN305,Risk Management and Insurance,3,abulimensamuel+pool104@gmail.com,FIN 300 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+FIN306,Financial Data Analytics,2,abulimensamuel+pool102@gmail.com,FIN 300 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+FIN306,Financial Data Analytics,2,abulimensamuel+pool102@gmail.com,FIN 300 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+GST321,Peace Studies and Conflict Resolution,2,abulimensamuel+pool152@gmail.com,FIN 300 LEVEL (GRP A)|FIN 300 LEVEL (GRP B),true,,
+FIN404,Portfolio Management,3,abulimensamuel+pool105@gmail.com,FIN 400 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+FIN404,Portfolio Management,3,abulimensamuel+pool105@gmail.com,FIN 400 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+FIN405,International Finance,3,abulimensamuel+pool106@gmail.com,FIN 400 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+FIN405,International Finance,3,abulimensamuel+pool106@gmail.com,FIN 400 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+FIN406,Finance Simulation Studio,2,abulimensamuel+pool103@gmail.com,FIN 400 LEVEL (GRP A),false,SMART BOARD|PROJECTOR,INNOVATION HUB|BUSINESS SCHOOL
+FIN406,Finance Simulation Studio,2,abulimensamuel+pool103@gmail.com,FIN 400 LEVEL (GRP B),false,SMART BOARD|PROJECTOR,INNOVATION HUB|BUSINESS SCHOOL
+GST421,Leadership Communication and Culture,2,abulimensamuel+pool153@gmail.com,FIN 400 LEVEL (GRP A)|FIN 400 LEVEL (GRP B),true,,

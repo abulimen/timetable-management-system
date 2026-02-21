@@ -138,7 +138,7 @@ public class ConstraintSettingsService {
     }
 
     public String getSolverEnvironmentMode() {
-        return getString("solver_environment_mode", "REPRODUCIBLE");
+        return getString("solver_environment_mode", "NON_REPRODUCIBLE");
     }
 
     public String getSolverParallelSolverCount() {
@@ -149,12 +149,24 @@ public class ConstraintSettingsService {
         return getInt("solver_minutes_spent_limit", 30);
     }
 
+    public boolean isSolverRuntimeLimitEnabled() {
+        return getBoolean("solver_runtime_limit_enabled", true);
+    }
+
     public int getSolverUnimprovedSecondsSpentLimit() {
         return getInt("solver_unimproved_seconds_spent_limit", 60);
     }
 
     public int getSolverForagerAcceptedCountLimit() {
-        return getInt("solver_forager_accepted_count_limit", 1000);
+        return getInt("solver_forager_accepted_count_limit", 4);
+    }
+
+    public boolean isSolverAdaptiveLimitsEnabled() {
+        return getBoolean("solver_adaptive_limits_enabled", true);
+    }
+
+    public boolean isSolverAdaptiveSearchBreadthEnabled() {
+        return getBoolean("solver_adaptive_search_breadth_enabled", true);
     }
 
     public boolean isSolverCheckpointEnabled() {
@@ -167,6 +179,16 @@ public class ConstraintSettingsService {
 
     public int getSolverCheckpointEveryNImprovements() {
         return getInt("solver_checkpoint_every_n_improvements", 0);
+    }
+
+    // ==================== RUIN-AND-RECREATE SETTINGS ====================
+
+    public boolean isSolverRuinRecreateEnabled() {
+        return getBoolean("solver_ruin_recreate_enabled", false);
+    }
+
+    public int getSolverRuinRecreateClusterSize() {
+        return getInt("solver_ruin_recreate_cluster_size", 8);
     }
 
     // ==================== AVAILABILITY SETTINGS ====================

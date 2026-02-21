@@ -1,0 +1,51 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+LAW101,Introduction to Legal Systems,3,abulimensamuel+andy.titus@gmail.com,LAW 100 LEVEL (GRP A),false,PROJECTOR,LAW COMPLEX|MAIN ACADEMIC BLOCK
+LAW101,Introduction to Legal Systems,3,abulimensamuel+andy.titus@gmail.com,LAW 100 LEVEL (GRP B),false,PROJECTOR,LAW COMPLEX|MAIN ACADEMIC BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool184@gmail.com,LAW 100 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|LAW COMPLEX
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool185@gmail.com,LAW 100 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|LAW COMPLEX
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool186@gmail.com,LAW 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool187@gmail.com,LAW 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST111,Communication in English,2,abulimensamuel+pool188@gmail.com,LAW 100 LEVEL (GRP A)|LAW 100 LEVEL (GRP B),true,,
+LAW201,Law of Contract and Torts,3,abulimensamuel+andy.titus@gmail.com,LAW 200 LEVEL (GRP A),false,PROJECTOR,LAW COMPLEX|MAIN ACADEMIC BLOCK
+LAW201,Law of Contract and Torts,3,abulimensamuel+adeola.fasina@gmail.com,LAW 200 LEVEL (GRP B),false,PROJECTOR,LAW COMPLEX|MAIN ACADEMIC BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool189@gmail.com,LAW 200 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|LAW COMPLEX
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool190@gmail.com,LAW 200 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|LAW COMPLEX
+GST212,Philosophy and Human Existence,2,abulimensamuel+pool191@gmail.com,LAW 200 LEVEL (GRP A)|LAW 200 LEVEL (GRP B),true,,
+LAW301,Constitutional and Administrative Law,3,abulimensamuel+andy.titus@gmail.com,LAW 300 LEVEL (GRP A),false,MOOT COURT|PROJECTOR,LAW COMPLEX
+LAW301,Constitutional and Administrative Law,3,abulimensamuel+andy.titus@gmail.com,LAW 300 LEVEL (GRP B),false,MOOT COURT|PROJECTOR,LAW COMPLEX
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool184@gmail.com,LAW 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|LAW COMPLEX
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool185@gmail.com,LAW 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|LAW COMPLEX
+BU-GST322,Citizenship Orientation,1,abulimensamuel+pool186@gmail.com,LAW 300 LEVEL (GRP A)|LAW 300 LEVEL (GRP B),true,,
+LAW401,Corporate and Commercial Law,3,abulimensamuel+andy.titus@gmail.com,LAW 400 LEVEL (GRP A),false,MOOT COURT|PROJECTOR,LAW COMPLEX
+LAW401,Corporate and Commercial Law,3,abulimensamuel+andy.titus@gmail.com,LAW 400 LEVEL (GRP B),false,MOOT COURT|PROJECTOR,LAW COMPLEX
+LAW402,Law Practice and Research Project,3,abulimensamuel+andy.titus@gmail.com,LAW 400 LEVEL (GRP A),false,MOOT COURT|PROJECTOR,LAW COMPLEX
+LAW402,Law Practice and Research Project,3,abulimensamuel+andy.titus@gmail.com,LAW 400 LEVEL (GRP B),false,MOOT COURT|PROJECTOR,LAW COMPLEX
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+pool187@gmail.com,LAW 400 LEVEL (GRP A)|LAW 400 LEVEL (GRP B),true,,
+LAW104,Legal Research and Writing I,2,abulimensamuel+pool119@gmail.com,LAW 100 LEVEL (GRP A),false,PROJECTOR,LAW COMPLEX|MAIN ACADEMIC BLOCK
+LAW104,Legal Research and Writing I,2,abulimensamuel+pool119@gmail.com,LAW 100 LEVEL (GRP B),false,PROJECTOR,LAW COMPLEX|MAIN ACADEMIC BLOCK
+LAW105,Constitutional Foundations,3,abulimensamuel+pool120@gmail.com,LAW 100 LEVEL (GRP A),false,PROJECTOR,LAW COMPLEX|MAIN ACADEMIC BLOCK
+LAW105,Constitutional Foundations,3,abulimensamuel+pool120@gmail.com,LAW 100 LEVEL (GRP B),false,PROJECTOR,LAW COMPLEX|MAIN ACADEMIC BLOCK
+LAW106,Legal Informatics,2,abulimensamuel+pool121@gmail.com,LAW 100 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|LAW COMPLEX
+LAW106,Legal Informatics,2,abulimensamuel+pool121@gmail.com,LAW 100 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|LAW COMPLEX
+GST121,Critical Thinking and Writing,2,abulimensamuel+pool188@gmail.com,LAW 100 LEVEL (GRP A)|LAW 100 LEVEL (GRP B),true,,
+LAW204,Criminal Law I,3,abulimensamuel+pool122@gmail.com,LAW 200 LEVEL (GRP A),false,MOOT COURT|PROJECTOR,LAW COMPLEX
+LAW204,Criminal Law I,3,abulimensamuel+pool122@gmail.com,LAW 200 LEVEL (GRP B),false,MOOT COURT|PROJECTOR,LAW COMPLEX
+LAW205,Property Law,3,abulimensamuel+pool123@gmail.com,LAW 200 LEVEL (GRP A),false,PROJECTOR,LAW COMPLEX|MAIN ACADEMIC BLOCK
+LAW205,Property Law,3,abulimensamuel+pool123@gmail.com,LAW 200 LEVEL (GRP B),false,PROJECTOR,LAW COMPLEX|MAIN ACADEMIC BLOCK
+LAW206,Legal Drafting Practice,2,abulimensamuel+pool119@gmail.com,LAW 200 LEVEL (GRP A),false,MOOT COURT|PROJECTOR,LAW COMPLEX
+LAW206,Legal Drafting Practice,2,abulimensamuel+pool119@gmail.com,LAW 200 LEVEL (GRP B),false,MOOT COURT|PROJECTOR,LAW COMPLEX
+GST221,Logic and Scientific Reasoning,2,abulimensamuel+pool189@gmail.com,LAW 200 LEVEL (GRP A)|LAW 200 LEVEL (GRP B),true,,
+LAW304,Administrative Law Practice,3,abulimensamuel+pool124@gmail.com,LAW 300 LEVEL (GRP A),false,MOOT COURT|PROJECTOR,LAW COMPLEX
+LAW304,Administrative Law Practice,3,abulimensamuel+pool124@gmail.com,LAW 300 LEVEL (GRP B),false,MOOT COURT|PROJECTOR,LAW COMPLEX
+LAW305,Law of Evidence,3,abulimensamuel+pool120@gmail.com,LAW 300 LEVEL (GRP A),false,MOOT COURT|PROJECTOR,LAW COMPLEX
+LAW305,Law of Evidence,3,abulimensamuel+pool120@gmail.com,LAW 300 LEVEL (GRP B),false,MOOT COURT|PROJECTOR,LAW COMPLEX
+LAW306,Advocacy and Moot Preparation,2,abulimensamuel+pool122@gmail.com,LAW 300 LEVEL (GRP A),false,MOOT COURT|PROJECTOR,LAW COMPLEX
+LAW306,Advocacy and Moot Preparation,2,abulimensamuel+pool122@gmail.com,LAW 300 LEVEL (GRP B),false,MOOT COURT|PROJECTOR,LAW COMPLEX
+GST321,Peace Studies and Conflict Resolution,2,abulimensamuel+pool190@gmail.com,LAW 300 LEVEL (GRP A)|LAW 300 LEVEL (GRP B),true,,
+LAW404,Commercial Arbitration,3,abulimensamuel+pool123@gmail.com,LAW 400 LEVEL (GRP A),false,MOOT COURT|PROJECTOR,LAW COMPLEX
+LAW404,Commercial Arbitration,3,abulimensamuel+pool123@gmail.com,LAW 400 LEVEL (GRP B),false,MOOT COURT|PROJECTOR,LAW COMPLEX
+LAW405,International Human Rights Law,3,abulimensamuel+pool124@gmail.com,LAW 400 LEVEL (GRP A),false,PROJECTOR,LAW COMPLEX|HUMANITIES BLOCK
+LAW405,International Human Rights Law,3,abulimensamuel+pool124@gmail.com,LAW 400 LEVEL (GRP B),false,PROJECTOR,LAW COMPLEX|HUMANITIES BLOCK
+LAW406,Clinical Legal Education,2,abulimensamuel+pool121@gmail.com,LAW 400 LEVEL (GRP A),false,MOOT COURT|PROJECTOR,LAW COMPLEX
+LAW406,Clinical Legal Education,2,abulimensamuel+pool121@gmail.com,LAW 400 LEVEL (GRP B),false,MOOT COURT|PROJECTOR,LAW COMPLEX
+GST421,Leadership Communication and Culture,2,abulimensamuel+pool191@gmail.com,LAW 400 LEVEL (GRP A)|LAW 400 LEVEL (GRP B),true,,

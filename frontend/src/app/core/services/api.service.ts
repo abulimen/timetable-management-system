@@ -185,6 +185,10 @@ export class ApiService {
         return this.http.post<SolverStatus>(`${this.baseUrl}/solver/terminate`, {});
     }
 
+    resumeSolver(): Observable<SolverStatus> {
+        return this.http.post<SolverStatus>(`${this.baseUrl}/solver/resume`, {});
+    }
+
     clearCurrentTimetable(): Observable<{ status: string; message: string; lessonsCleared: number }> {
         return this.http.post<{ status: string; message: string; lessonsCleared: number }>(
             `${this.baseUrl}/solver/clear-timetable`,
@@ -672,6 +676,9 @@ export interface SolverStatus {
     adaptiveAcceptedCountLimit?: number | null;
     adaptiveDatasetBand?: 'SMALL' | 'MEDIUM' | 'LARGE' | string | null;
     adaptiveTerminationReason?: string | null;
+    adaptiveLimitsEnabled?: boolean | null;
+    adaptiveSearchBreadthEnabled?: boolean | null;
+    resumeAvailable?: boolean | null;
     bestHardScore?: number | null;
     bestSoftScore?: number | null;
     feasible?: boolean | null;

@@ -23,10 +23,10 @@ import com.university.timetable.repository.TimeslotRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
-import org.optaplanner.core.api.solver.SolverJob;
-import org.optaplanner.core.api.solver.SolverManager;
-import org.optaplanner.core.api.solver.SolverStatus;
+import ai.timefold.solver.core.api.score.buildin.hardsoft.HardSoftScore;
+import ai.timefold.solver.core.api.solver.SolverJob;
+import ai.timefold.solver.core.api.solver.SolverManager;
+import ai.timefold.solver.core.api.solver.SolverStatus;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +46,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * SolverService - manages asynchronous solving with OptaPlanner's SolverManager.
+ * SolverService - manages asynchronous solving with OptaPlanner's
+ * SolverManager.
  */
 @Service
 @RequiredArgsConstructor
@@ -122,6 +123,7 @@ public class SolverService {
     private final AtomicBoolean terminateRequested = new AtomicBoolean(false);
     private volatile HardSoftScore lastPersistedScore;
     private volatile TimeTable latestFeasibleBestSolution;
+    private volatile TimeTable latestBestSolutionSnapshot;
 
     private enum DatasetBand {
         SMALL,
@@ -196,7 +198,8 @@ public class SolverService {
             throw new IllegalStateException("Solver is already running.");
         }
 
-        // Block solving if unavailability system is enabled but requests are still open.
+        // Block solving if unavailability system is enabled but requests are still
+        // open.
         if (constraintSettingsService.isUnavailabilitySystemEnabled() &&
                 constraintSettingsService.isUnavailabilityRequestsOpen()) {
             throw new IllegalStateException(
@@ -245,6 +248,13 @@ public class SolverService {
         if ("STABILITY".equalsIgnoreCase(normalizedMode)) {
             prepareStabilityMode(problem);
         }
+        return startSolvingFromSeed(request, problem);
+    }
+
+    private SolverStatusDTO startSolvingFromSeed(SolveRequestDTO request, TimeTable problem) {
+        String mode = request != null ? request.getMode() : null;
+        String normalizedMode = (mode == null || mode.isBlank()) ? "FULL_REPLAN" : mode.trim().toUpperCase();
+        SolverProfile profile = SolverProfile.fromNullable(request != null ? request.getProfile() : null);
         Map<Long, String> lockedAssignmentBaseline = Map.of();
 
         currentJobId = UUID.randomUUID().toString();
@@ -257,6 +267,7 @@ public class SolverService {
         currentBestSoftScore = null;
         lastRunDurationMs = null;
         latestFeasibleBestSolution = null;
+        latestBestSolutionSnapshot = problem;
         currentStage = "QUEUED";
         currentStageStartedAt = LocalDateTime.now();
         stageOneDurationMs = null;
@@ -285,7 +296,6 @@ public class SolverService {
         runFinalized.set(false);
         timetableChangeTrackerService.lockEditing("Solver run in progress. Editing is locked.");
 
-        final Map<Long, String> finalLockedAssignmentBaseline = lockedAssignmentBaseline;
         boolean useTwoStageQuality = shouldUseTwoStageQuality(normalizedMode, profile);
         log.info("Starting async solver with problem ID: {} (twoStageQuality={})", PROBLEM_ID, useTwoStageQuality);
         if (useTwoStageQuality) {
@@ -296,14 +306,14 @@ public class SolverService {
             activeAdaptivePolicy = stageOneAdaptivePolicy;
             log.info("QUALITY profile two-stage run started: Stage A (BALANCED feasibility) -> Stage B (QUALITY)");
             SolverJob<TimeTable, Long> stageOneJob = startSolveJob(problem,
-                    stageOneAdaptivePolicy, finalLockedAssignmentBaseline, "STAGE_A_FEASIBILITY");
-            startTwoStageWatcher(stageOneJob, finalLockedAssignmentBaseline);
+                    stageOneAdaptivePolicy, lockedAssignmentBaseline, "STAGE_A_FEASIBILITY");
+            startTwoStageWatcher(stageOneJob, lockedAssignmentBaseline);
         } else {
             currentStage = "SINGLE_STAGE";
             currentStageStartedAt = LocalDateTime.now();
             activeAdaptivePolicy = resolveAdaptivePolicy(profile, currentLessonsCount, false);
             SolverJob<TimeTable, Long> job = startSolveJob(problem, activeAdaptivePolicy,
-                    finalLockedAssignmentBaseline, "SINGLE_STAGE");
+                    lockedAssignmentBaseline, "SINGLE_STAGE");
             startSingleStageWatcher(job);
         }
 
@@ -367,6 +377,7 @@ public class SolverService {
         long sinceLastImprovementMs = previousBest == 0L ? solveElapsedMs : callbackNow - previousBest;
 
         HardSoftScore score = bestSolution.getScore();
+        latestBestSolutionSnapshot = bestSolution;
         if (score != null) {
             currentBestHardScore = score.hardScore();
             currentBestSoftScore = score.softScore();
@@ -380,7 +391,8 @@ public class SolverService {
                 if (awaitingSecondStage.get() &&
                         fastFeasibleTerminationRequested.compareAndSet(false, true)) {
                     if (awaitingSecondStage.get()) {
-                        log.info("{} reached first hard-feasible score ({}). Waiting for Stage A controller to terminate and hand off to Stage B.",
+                        log.info(
+                                "{} reached first hard-feasible score ({}). Waiting for Stage A controller to terminate and hand off to Stage B.",
                                 stageLabel, score);
                     } else {
                         log.info("{} reached first hard-feasible score ({}). Terminating current stage early.",
@@ -583,18 +595,32 @@ public class SolverService {
         }
         long nowMs = System.currentTimeMillis();
         long stageElapsedMs = Math.max(0L, nowMs - stageStartedAtMs);
-        long runStartedMs = solveStartedAtMs.get();
-        long sinceLastImprovementMs;
-        if (lastBestAtMs.get() > 0L) {
-            sinceLastImprovementMs = nowMs - lastBestAtMs.get();
-        } else if (runStartedMs > 0L) {
-            sinceLastImprovementMs = nowMs - runStartedMs;
-        } else {
-            sinceLastImprovementMs = stageElapsedMs;
-        }
 
+        // Hard max-runtime always applies (failsafe)
         if (policy.maxRuntimeMs > 0 && stageElapsedMs >= policy.maxRuntimeMs) {
             return "Reached stage runtime limit (" + policy.maxRuntimeMs + " ms)";
+        }
+
+        // No-improvement check: ONLY after at least one best-solution callback.
+        // During construction heuristic, the solver hasn't reported any best solution
+        // yet,
+        // so we must not count that time as "no improvement" — the solver is still
+        // building the initial solution. Without this guard, large datasets (1000+
+        // lessons)
+        // get killed during construction because CH takes longer than unimprovedMs.
+        long bestCount = bestSolutionCount.get();
+        if (bestCount == 0) {
+            // Construction heuristic still running — let it finish
+            return null;
+        }
+
+        long sinceLastImprovementMs;
+        long lastBest = lastBestAtMs.get();
+        if (lastBest > 0L) {
+            sinceLastImprovementMs = nowMs - lastBest;
+        } else {
+            // Fallback: should not happen when bestCount > 0, but safe guard
+            sinceLastImprovementMs = stageElapsedMs;
         }
 
         if (policy.unimprovedMs > 0 && sinceLastImprovementMs >= policy.unimprovedMs) {
@@ -634,10 +660,13 @@ public class SolverService {
     private AdaptivePolicy resolveAdaptivePolicy(SolverProfile profile, int lessonCount, boolean isTwoStageRun) {
         int boundedLessons = Math.max(0, lessonCount);
         DatasetBand band = classifyDatasetBand(boundedLessons);
+        boolean adaptiveLimitsEnabled = constraintSettingsService.isSolverAdaptiveLimitsEnabled();
+        boolean adaptiveSearchBreadthEnabled = constraintSettingsService.isSolverAdaptiveSearchBreadthEnabled();
+        boolean runtimeLimitEnabled = constraintSettingsService.isSolverRuntimeLimitEnabled();
 
         int baseMinutes = Math.max(1, constraintSettingsService.getSolverMinutesSpentLimit());
         int baseUnimprovedSeconds = Math.max(5, constraintSettingsService.getSolverUnimprovedSecondsSpentLimit());
-        int baseAcceptedCount = Math.max(10, constraintSettingsService.getSolverForagerAcceptedCountLimit());
+        int baseAcceptedCount = Math.max(1, constraintSettingsService.getSolverForagerAcceptedCountLimit());
 
         double runtimeFactor;
         double unimprovedFactor;
@@ -686,21 +715,53 @@ public class SolverService {
             acceptedFactor = Math.min(acceptedFactor, 0.65);
         }
 
-        long maxRuntimeMs = Math.max(
-                30_000L,
-                Math.round(baseMinutes * 60_000.0 * runtimeFactor));
-        long unimprovedMs = Math.max(
-                15_000L,
-                Math.round(baseUnimprovedSeconds * 1_000.0 * unimprovedFactor));
-        int acceptedCountLimit = Math.max(
-                10,
-                Math.min(5_000, (int) Math.round(baseAcceptedCount * acceptedFactor)));
+        long maxRuntimeMs;
+        long unimprovedMs;
+        long rawUnimprovedMs = Math.round(baseUnimprovedSeconds * 1_000.0 * unimprovedFactor);
+        long effectiveFloorMs = 0L;
+        if (adaptiveLimitsEnabled) {
+            maxRuntimeMs = runtimeLimitEnabled
+                    ? Math.max(30_000L, Math.round(baseMinutes * 60_000.0 * runtimeFactor))
+                    : 0L;
+
+            long bandFloorUnimprovedMs = switch (band) {
+                case SMALL -> 60_000L;
+                case MEDIUM -> 180_000L;
+                case LARGE -> 360_000L;
+            };
+            long twoStageFloorMs = (isTwoStageRun && profile == SolverProfile.BALANCED) ? 240_000L : 0L;
+            long configuredFloorMs = Math.max(30_000L,
+                    constraintSettingsService.getInt("solver_adaptive_min_unimproved_seconds", 180) * 1_000L);
+            effectiveFloorMs = Math.max(configuredFloorMs, Math.max(bandFloorUnimprovedMs, twoStageFloorMs));
+            unimprovedMs = Math.max(effectiveFloorMs, rawUnimprovedMs);
+        } else {
+            maxRuntimeMs = runtimeLimitEnabled ? Math.max(30_000L, baseMinutes * 60_000L) : 0L;
+            unimprovedMs = Math.max(5_000L, baseUnimprovedSeconds * 1_000L);
+        }
+
+        int acceptedCountLimit;
+        if (adaptiveSearchBreadthEnabled) {
+            acceptedCountLimit = Math.max(
+                    1,
+                    (int) Math.round(baseAcceptedCount * acceptedFactor));
+        } else {
+            acceptedCountLimit = Math.max(1, baseAcceptedCount);
+        }
+
+        log.info("Adaptive policy inputs: profile={}, band={}, twoStage={}, adaptiveLimitsEnabled={}, "
+                + "adaptiveSearchBreadthEnabled={}, runtimeLimitEnabled={}, baseMinutes={}, baseUnimprovedSeconds={}, "
+                + "runtimeFactor={}, unimprovedFactor={}, rawUnimprovedMs={}, floorMs={}, finalMaxRuntimeMs={}, "
+                + "finalUnimprovedMs={}, acceptedCountLimit={}",
+                profile, band, isTwoStageRun, adaptiveLimitsEnabled, adaptiveSearchBreadthEnabled, runtimeLimitEnabled,
+                baseMinutes, baseUnimprovedSeconds, runtimeFactor, unimprovedFactor, rawUnimprovedMs,
+                effectiveFloorMs, maxRuntimeMs, unimprovedMs, acceptedCountLimit);
 
         return new AdaptivePolicy(profile, band, maxRuntimeMs, unimprovedMs, acceptedCountLimit);
     }
 
     private DatasetBand classifyDatasetBand(int lessonCount) {
-        int smallThreshold = Math.max(50, constraintSettingsService.getInt("solver_adaptive_small_dataset_threshold", 200));
+        int smallThreshold = Math.max(50,
+                constraintSettingsService.getInt("solver_adaptive_small_dataset_threshold", 200));
         int largeThreshold = Math.max(smallThreshold + 1,
                 constraintSettingsService.getInt("solver_adaptive_large_dataset_threshold", 800));
         if (lessonCount <= smallThreshold) {
@@ -792,6 +853,22 @@ public class SolverService {
         dto.setChangedLockedLessonsCount(currentChangedLockedLessonsCount);
         enrichRuntimeDetails(dto);
         return enrichWithPendingChangeStatus(dto);
+    }
+
+    public SolverStatusDTO resume() {
+        SolverStatus currentStatus = solverManager.getSolverStatus(PROBLEM_ID);
+        if (currentStatus == SolverStatus.SOLVING_ACTIVE) {
+            throw new IllegalStateException("Solver is already running.");
+        }
+        if (latestBestSolutionSnapshot == null) {
+            throw new IllegalStateException("No saved solver progress is available to resume.");
+        }
+
+        SolveRequestDTO request = new SolveRequestDTO();
+        request.setMode(currentMode);
+        request.setProfile(currentProfile);
+        request.setSkipFeasibility(true);
+        return startSolvingFromSeed(request, latestBestSolutionSnapshot);
     }
 
     /**
@@ -924,29 +1001,32 @@ public class SolverService {
         }
         Long firstBestDelay = firstBestAtMs.get() > 0L ? Math.max(0L, firstBestAtMs.get() - startedMs) : null;
 
-        if ("COMPLETED".equalsIgnoreCase(status) && currentBestHardScore != null && currentBestHardScore >= 0) {
-            TimeTable finalFeasible = latestFeasibleBestSolution;
-            if (finalFeasible != null) {
+        if (("COMPLETED".equalsIgnoreCase(status)
+                || "TERMINATED".equalsIgnoreCase(status)
+                || "FAILED".equalsIgnoreCase(status))
+                && latestBestSolutionSnapshot != null) {
+            TimeTable snapshotToPersist = latestFeasibleBestSolution != null
+                    ? latestFeasibleBestSolution
+                    : latestBestSolutionSnapshot;
+            if (snapshotToPersist != null) {
                 long saveStart = System.nanoTime();
                 try {
-                    solutionSaver.saveSolution(finalFeasible);
+                    solutionSaver.saveSolution(snapshotToPersist);
                     long saveMs = elapsedMs(saveStart);
                     persistedBestCount.incrementAndGet();
                     persistedBestTotalMs.addAndGet(saveMs);
                     lastPersistedAtMs.set(System.currentTimeMillis());
-                    if (finalFeasible.getScore() != null) {
-                        lastPersistedScore = finalFeasible.getScore();
+                    if (snapshotToPersist.getScore() != null) {
+                        lastPersistedScore = snapshotToPersist.getScore();
                     }
-                    log.info("Persisted final feasible timetable snapshot in {} ms (hardScore={})",
-                            saveMs, currentBestHardScore);
+                    log.info("Persisted solver progress snapshot in {} ms (status={}, hardScore={})",
+                            saveMs, status, currentBestHardScore);
                 } catch (Exception e) {
-                    log.error("Failed to persist final feasible timetable snapshot: {}", e.getMessage(), e);
+                    log.error("Failed to persist solver progress snapshot: {}", e.getMessage(), e);
                     if (reason == null || reason.isBlank()) {
-                        reason = "Final solution persistence failed: " + e.getMessage();
+                        reason = "Progress persistence failed: " + e.getMessage();
                     }
                 }
-            } else {
-                log.warn("Solver completed but no feasible best solution snapshot was captured for final persistence.");
             }
         }
 
@@ -1037,12 +1117,17 @@ public class SolverService {
         status.setEnvironmentMode(runtimeDiagnostics.getEnvironmentMode());
         status.setParallelSolverCount(runtimeDiagnostics.getParallelSolverCount());
         status.setAvailableProcessors(runtimeDiagnostics.getAvailableProcessors());
+        boolean adaptiveLimitsEnabled = constraintSettingsService.isSolverAdaptiveLimitsEnabled();
+        boolean adaptiveSearchBreadthEnabled = constraintSettingsService.isSolverAdaptiveSearchBreadthEnabled();
+        status.setAdaptiveLimitsEnabled(adaptiveLimitsEnabled);
+        status.setAdaptiveSearchBreadthEnabled(adaptiveSearchBreadthEnabled);
         AdaptivePolicy policy = activeAdaptivePolicy;
-        status.setAdaptiveMaxRuntimeMs(policy != null ? policy.maxRuntimeMs : null);
+        status.setAdaptiveMaxRuntimeMs(policy != null && policy.maxRuntimeMs > 0 ? policy.maxRuntimeMs : null);
         status.setAdaptiveUnimprovedMs(policy != null ? policy.unimprovedMs : null);
         status.setAdaptiveAcceptedCountLimit(policy != null ? policy.acceptedCountLimit : null);
-        status.setAdaptiveDatasetBand(policy != null ? policy.datasetBand.name() : null);
+        status.setAdaptiveDatasetBand(adaptiveLimitsEnabled && policy != null ? policy.datasetBand.name() : null);
         status.setAdaptiveTerminationReason(lastAdaptiveTerminationReason);
+        status.setResumeAvailable(!isSolving() && latestBestSolutionSnapshot != null);
     }
 
     private LocalDateTime toLocalDateTime(long epochMs) {

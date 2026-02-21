@@ -1,0 +1,51 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+BCH101,General Biochemistry,3,abulimensamuel+daniel.edet@gmail.com,BCH 100 LEVEL (GRP A),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+BCH101,General Biochemistry,3,abulimensamuel+esther.ogundele@gmail.com,BCH 100 LEVEL (GRP B),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool080@gmail.com,BCH 100 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|HEALTH SCIENCES COMPLEX
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool081@gmail.com,BCH 100 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|HEALTH SCIENCES COMPLEX
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool082@gmail.com,BCH 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool083@gmail.com,BCH 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST111,Communication in English,2,abulimensamuel+pool084@gmail.com,BCH 100 LEVEL (GRP A)|BCH 100 LEVEL (GRP B),true,,
+BCH201,Metabolism and Enzymology,3,abulimensamuel+daniel.edet@gmail.com,BCH 200 LEVEL (GRP A),false,CHEMISTRY LAB|BIOLOGY LAB,HEALTH SCIENCES COMPLEX
+BCH201,Metabolism and Enzymology,3,abulimensamuel+esther.ogundele@gmail.com,BCH 200 LEVEL (GRP B),false,CHEMISTRY LAB|BIOLOGY LAB,HEALTH SCIENCES COMPLEX
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool085@gmail.com,BCH 200 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|HEALTH SCIENCES COMPLEX
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool086@gmail.com,BCH 200 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|HEALTH SCIENCES COMPLEX
+GST212,Philosophy and Human Existence,2,abulimensamuel+pool087@gmail.com,BCH 200 LEVEL (GRP A)|BCH 200 LEVEL (GRP B),true,,
+BCH301,Molecular Biochemistry,3,abulimensamuel+daniel.edet@gmail.com,BCH 300 LEVEL (GRP A),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+BCH301,Molecular Biochemistry,3,abulimensamuel+esther.ogundele@gmail.com,BCH 300 LEVEL (GRP B),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool080@gmail.com,BCH 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|HEALTH SCIENCES COMPLEX
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool081@gmail.com,BCH 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|HEALTH SCIENCES COMPLEX
+BU-GST322,Citizenship Orientation,1,abulimensamuel+pool082@gmail.com,BCH 300 LEVEL (GRP A)|BCH 300 LEVEL (GRP B),true,,
+BCH401,Clinical Biochemistry,3,abulimensamuel+daniel.edet@gmail.com,BCH 400 LEVEL (GRP A),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+BCH401,Clinical Biochemistry,3,abulimensamuel+esther.ogundele@gmail.com,BCH 400 LEVEL (GRP B),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+BCH402,Biochemistry Research Project,3,abulimensamuel+esther.ogundele@gmail.com,BCH 400 LEVEL (GRP A),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+BCH402,Biochemistry Research Project,3,abulimensamuel+daniel.edet@gmail.com,BCH 400 LEVEL (GRP B),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+pool083@gmail.com,BCH 400 LEVEL (GRP A)|BCH 400 LEVEL (GRP B),true,,
+BCH104,Organic Chemistry for Biochemistry,3,abulimensamuel+pool041@gmail.com,BCH 100 LEVEL (GRP A),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+BCH104,Organic Chemistry for Biochemistry,3,abulimensamuel+pool041@gmail.com,BCH 100 LEVEL (GRP B),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+BCH105,Biochemistry Laboratory Skills I,2,abulimensamuel+pool042@gmail.com,BCH 100 LEVEL (GRP A),false,CHEMISTRY LAB|BIOLOGY LAB,HEALTH SCIENCES COMPLEX
+BCH105,Biochemistry Laboratory Skills I,2,abulimensamuel+pool042@gmail.com,BCH 100 LEVEL (GRP B),false,CHEMISTRY LAB|BIOLOGY LAB,HEALTH SCIENCES COMPLEX
+BCH106,Introduction to Molecular Biology,2,abulimensamuel+pool043@gmail.com,BCH 100 LEVEL (GRP A),false,BIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+BCH106,Introduction to Molecular Biology,2,abulimensamuel+pool043@gmail.com,BCH 100 LEVEL (GRP B),false,BIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+GST121,Critical Thinking and Writing,2,abulimensamuel+pool084@gmail.com,BCH 100 LEVEL (GRP A)|BCH 100 LEVEL (GRP B),true,,
+BCH204,Biochemistry Laboratory Skills II,3,abulimensamuel+pool044@gmail.com,BCH 200 LEVEL (GRP A),false,CHEMISTRY LAB|BIOLOGY LAB,HEALTH SCIENCES COMPLEX
+BCH204,Biochemistry Laboratory Skills II,3,abulimensamuel+pool044@gmail.com,BCH 200 LEVEL (GRP B),false,CHEMISTRY LAB|BIOLOGY LAB,HEALTH SCIENCES COMPLEX
+BCH205,Clinical Enzymology,2,abulimensamuel+pool045@gmail.com,BCH 200 LEVEL (GRP A),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+BCH205,Clinical Enzymology,2,abulimensamuel+pool045@gmail.com,BCH 200 LEVEL (GRP B),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+BCH206,Nutritional Biochemistry,2,abulimensamuel+pool046@gmail.com,BCH 200 LEVEL (GRP A),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+BCH206,Nutritional Biochemistry,2,abulimensamuel+pool046@gmail.com,BCH 200 LEVEL (GRP B),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+GST221,Logic and Scientific Reasoning,2,abulimensamuel+pool085@gmail.com,BCH 200 LEVEL (GRP A)|BCH 200 LEVEL (GRP B),true,,
+BCH304,Advanced Molecular Techniques,3,abulimensamuel+pool047@gmail.com,BCH 300 LEVEL (GRP A),false,CHEMISTRY LAB|BIOLOGY LAB,HEALTH SCIENCES COMPLEX
+BCH304,Advanced Molecular Techniques,3,abulimensamuel+pool047@gmail.com,BCH 300 LEVEL (GRP B),false,CHEMISTRY LAB|BIOLOGY LAB,HEALTH SCIENCES COMPLEX
+BCH305,Biochemical Pharmacology,3,abulimensamuel+pool048@gmail.com,BCH 300 LEVEL (GRP A),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+BCH305,Biochemical Pharmacology,3,abulimensamuel+pool048@gmail.com,BCH 300 LEVEL (GRP B),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+BCH306,Biochemistry Data Analysis,2,abulimensamuel+pool041@gmail.com,BCH 300 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|HEALTH SCIENCES COMPLEX
+BCH306,Biochemistry Data Analysis,2,abulimensamuel+pool041@gmail.com,BCH 300 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|HEALTH SCIENCES COMPLEX
+GST321,Peace Studies and Conflict Resolution,2,abulimensamuel+pool086@gmail.com,BCH 300 LEVEL (GRP A)|BCH 300 LEVEL (GRP B),true,,
+BCH404,Clinical Case Biochemistry,3,abulimensamuel+pool042@gmail.com,BCH 400 LEVEL (GRP A),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+BCH404,Clinical Case Biochemistry,3,abulimensamuel+pool042@gmail.com,BCH 400 LEVEL (GRP B),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+BCH405,Biochemistry Innovation Seminar,3,abulimensamuel+pool043@gmail.com,BCH 400 LEVEL (GRP A),false,PROJECTOR|SMART BOARD,INNOVATION HUB|HEALTH SCIENCES COMPLEX
+BCH405,Biochemistry Innovation Seminar,3,abulimensamuel+pool043@gmail.com,BCH 400 LEVEL (GRP B),false,PROJECTOR|SMART BOARD,INNOVATION HUB|HEALTH SCIENCES COMPLEX
+BCH406,Applied Biochemistry Capstone,2,abulimensamuel+pool044@gmail.com,BCH 400 LEVEL (GRP A),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+BCH406,Applied Biochemistry Capstone,2,abulimensamuel+pool044@gmail.com,BCH 400 LEVEL (GRP B),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+GST421,Leadership Communication and Culture,2,abulimensamuel+pool087@gmail.com,BCH 400 LEVEL (GRP A)|BCH 400 LEVEL (GRP B),true,,

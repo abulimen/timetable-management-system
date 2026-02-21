@@ -1,9 +1,9 @@
 package com.university.timetable.domain;
 
-import org.optaplanner.core.api.domain.entity.PlanningEntity;
-import org.optaplanner.core.api.domain.entity.PlanningPin;
-import org.optaplanner.core.api.domain.lookup.PlanningId;
-import org.optaplanner.core.api.domain.variable.PlanningVariable;
+import ai.timefold.solver.core.api.domain.entity.PlanningEntity;
+import ai.timefold.solver.core.api.domain.entity.PlanningPin;
+import ai.timefold.solver.core.api.domain.lookup.PlanningId;
+import ai.timefold.solver.core.api.domain.variable.PlanningVariable;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -63,6 +63,9 @@ public class Lesson {
     private Set<Long> cachedConflictGroupIds;
 
     @Transient
+    private Long cachedPrimaryConflictGroupId;
+
+    @Transient
     private Integer cachedTotalStudentCount;
 
     /**
@@ -70,10 +73,7 @@ public class Lesson {
      * OptaPlanner will determine this value.
      * strengthComparatorClass enables WEAKEST_FIT/STRONGEST_FIT heuristics.
      */
-    @PlanningVariable(
-        valueRangeProviderRefs = "timeslotRange",
-        strengthComparatorClass = com.university.timetable.solver.TimeslotStrengthComparator.class
-    )
+    @PlanningVariable(valueRangeProviderRefs = "timeslotRange", strengthComparatorClass = com.university.timetable.solver.TimeslotStrengthComparator.class)
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "assigned_timeslot_id")
     private Timeslot timeslot;
@@ -83,10 +83,7 @@ public class Lesson {
      * OptaPlanner will determine this value.
      * strengthComparatorClass enables WEAKEST_FIT/STRONGEST_FIT heuristics.
      */
-    @PlanningVariable(
-        valueRangeProviderRefs = "roomRange",
-        strengthComparatorClass = com.university.timetable.solver.RoomStrengthComparator.class
-    )
+    @PlanningVariable(valueRangeProviderRefs = "roomRange", strengthComparatorClass = com.university.timetable.solver.RoomStrengthComparator.class)
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "assigned_room_id")
     private Room room;
@@ -185,6 +182,22 @@ public class Lesson {
         }
         cachedConflictGroupIds = Collections.unmodifiableSet(conflictIds);
         return cachedConflictGroupIds;
+    }
+
+    /**
+     * Get the primary conflict group ID for fast grouping in constraints.
+     */
+    public Long getPrimaryConflictGroupId() {
+        if (cachedPrimaryConflictGroupId != null) {
+            return cachedPrimaryConflictGroupId;
+        }
+        Set<Long> ids = getConflictGroupIds();
+        if (ids.isEmpty()) {
+            cachedPrimaryConflictGroupId = -1L;
+        } else {
+            cachedPrimaryConflictGroupId = ids.iterator().next();
+        }
+        return cachedPrimaryConflictGroupId;
     }
 
     /**

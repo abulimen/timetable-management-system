@@ -43,6 +43,7 @@ public class SolverStatusDTO {
     private Long persistenceCount;
     private Long avgPersistenceMs;
     private Integer lessonsCount;
+    private Integer assignedLessonsCount; // Added for CH progress tracking
     private Integer timeslotsCount;
     private Integer roomsCount;
     private String moveThreadCount;
@@ -54,7 +55,10 @@ public class SolverStatusDTO {
     private Integer adaptiveAcceptedCountLimit;
     private String adaptiveDatasetBand;
     private String adaptiveTerminationReason;
-    
+    private Boolean adaptiveLimitsEnabled;
+    private Boolean adaptiveSearchBreadthEnabled;
+    private Boolean resumeAvailable;
+
     public SolverStatusDTO(String state, String score) {
         this.state = state;
         this.score = score;

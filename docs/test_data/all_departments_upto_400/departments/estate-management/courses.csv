@@ -1,0 +1,51 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+EST101,Introduction to Estate Management,3,abulimensamuel+olusola.ajibade@gmail.com,EST 100 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+EST101,Introduction to Estate Management,3,abulimensamuel+olusola.ajibade@gmail.com,EST 100 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool144@gmail.com,EST 100 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool145@gmail.com,EST 100 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool146@gmail.com,EST 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool147@gmail.com,EST 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST111,Communication in English,2,abulimensamuel+pool148@gmail.com,EST 100 LEVEL (GRP A)|EST 100 LEVEL (GRP B),true,,
+EST201,Property Valuation and Appraisal,3,abulimensamuel+olusola.ajibade@gmail.com,EST 200 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+EST201,Property Valuation and Appraisal,3,abulimensamuel+seyi.adegbite@gmail.com,EST 200 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool149@gmail.com,EST 200 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool150@gmail.com,EST 200 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+GST212,Philosophy and Human Existence,2,abulimensamuel+pool151@gmail.com,EST 200 LEVEL (GRP A)|EST 200 LEVEL (GRP B),true,,
+EST301,Urban and Regional Planning,3,abulimensamuel+olusola.ajibade@gmail.com,EST 300 LEVEL (GRP A),false,PROJECTOR,DESIGN STUDIO BLOCK|MAIN ACADEMIC BLOCK
+EST301,Urban and Regional Planning,3,abulimensamuel+seyi.adegbite@gmail.com,EST 300 LEVEL (GRP B),false,PROJECTOR,DESIGN STUDIO BLOCK|MAIN ACADEMIC BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool144@gmail.com,EST 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|BUSINESS SCHOOL
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool145@gmail.com,EST 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|BUSINESS SCHOOL
+BU-GST322,Citizenship Orientation,1,abulimensamuel+pool146@gmail.com,EST 300 LEVEL (GRP A)|EST 300 LEVEL (GRP B),true,,
+EST401,Facility Management Systems,3,abulimensamuel+olusola.ajibade@gmail.com,EST 400 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+EST401,Facility Management Systems,3,abulimensamuel+seyi.adegbite@gmail.com,EST 400 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+EST402,Real Estate Investment Project,3,abulimensamuel+seyi.adegbite@gmail.com,EST 400 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+EST402,Real Estate Investment Project,3,abulimensamuel+olusola.ajibade@gmail.com,EST 400 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+pool147@gmail.com,EST 400 LEVEL (GRP A)|EST 400 LEVEL (GRP B),true,,
+EST104,Property Law Fundamentals,3,abulimensamuel+pool095@gmail.com,EST 100 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|LAW COMPLEX
+EST104,Property Law Fundamentals,3,abulimensamuel+pool095@gmail.com,EST 100 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|LAW COMPLEX
+EST105,Building Materials and Services,2,abulimensamuel+pool096@gmail.com,EST 100 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+EST105,Building Materials and Services,2,abulimensamuel+pool096@gmail.com,EST 100 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+EST106,Digital Mapping Basics,2,abulimensamuel+pool097@gmail.com,EST 100 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+EST106,Digital Mapping Basics,2,abulimensamuel+pool097@gmail.com,EST 100 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+GST121,Critical Thinking and Writing,2,abulimensamuel+pool148@gmail.com,EST 100 LEVEL (GRP A)|EST 100 LEVEL (GRP B),true,,
+EST204,Valuation Principles,3,abulimensamuel+pool098@gmail.com,EST 200 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+EST204,Valuation Principles,3,abulimensamuel+pool098@gmail.com,EST 200 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+EST205,Urban and Regional Planning,3,abulimensamuel+pool099@gmail.com,EST 200 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+EST205,Urban and Regional Planning,3,abulimensamuel+pool099@gmail.com,EST 200 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+EST206,GIS for Estate Management,2,abulimensamuel+pool097@gmail.com,EST 200 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+EST206,GIS for Estate Management,2,abulimensamuel+pool097@gmail.com,EST 200 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+GST221,Logic and Scientific Reasoning,2,abulimensamuel+pool149@gmail.com,EST 200 LEVEL (GRP A)|EST 200 LEVEL (GRP B),true,,
+EST304,Property Investment Analysis,3,abulimensamuel+pool100@gmail.com,EST 300 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+EST304,Property Investment Analysis,3,abulimensamuel+pool100@gmail.com,EST 300 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+EST305,Facility Management Systems,3,abulimensamuel+pool096@gmail.com,EST 300 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+EST305,Facility Management Systems,3,abulimensamuel+pool096@gmail.com,EST 300 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+EST306,Real Estate Data Analytics,2,abulimensamuel+pool097@gmail.com,EST 300 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+EST306,Real Estate Data Analytics,2,abulimensamuel+pool097@gmail.com,EST 300 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+GST321,Peace Studies and Conflict Resolution,2,abulimensamuel+pool150@gmail.com,EST 300 LEVEL (GRP A)|EST 300 LEVEL (GRP B),true,,
+EST404,Advanced Property Valuation,3,abulimensamuel+pool098@gmail.com,EST 400 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+EST404,Advanced Property Valuation,3,abulimensamuel+pool098@gmail.com,EST 400 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+EST405,Corporate Real Estate Strategy,3,abulimensamuel+pool099@gmail.com,EST 400 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+EST405,Corporate Real Estate Strategy,3,abulimensamuel+pool099@gmail.com,EST 400 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+EST406,Estate Project Studio,2,abulimensamuel+pool100@gmail.com,EST 400 LEVEL (GRP A),false,SMART BOARD|PROJECTOR,INNOVATION HUB|BUSINESS SCHOOL
+EST406,Estate Project Studio,2,abulimensamuel+pool100@gmail.com,EST 400 LEVEL (GRP B),false,SMART BOARD|PROJECTOR,INNOVATION HUB|BUSINESS SCHOOL
+GST421,Leadership Communication and Culture,2,abulimensamuel+pool151@gmail.com,EST 400 LEVEL (GRP A)|EST 400 LEVEL (GRP B),true,,

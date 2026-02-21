@@ -1,0 +1,51 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+HIS101,Introduction to World History,3,abulimensamuel+adeola.fasina@gmail.com,HIS 100 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS101,Introduction to World History,3,abulimensamuel+adeola.fasina@gmail.com,HIS 100 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool168@gmail.com,HIS 100 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|HUMANITIES BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool169@gmail.com,HIS 100 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|HUMANITIES BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool170@gmail.com,HIS 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool171@gmail.com,HIS 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST111,Communication in English,2,abulimensamuel+pool172@gmail.com,HIS 100 LEVEL (GRP A)|HIS 100 LEVEL (GRP B),true,,
+HIS201,African and Nigerian History,3,abulimensamuel+adeola.fasina@gmail.com,HIS 200 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS201,African and Nigerian History,3,abulimensamuel+andy.titus@gmail.com,HIS 200 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool173@gmail.com,HIS 200 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|HUMANITIES BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool174@gmail.com,HIS 200 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|HUMANITIES BLOCK
+GST212,Philosophy and Human Existence,2,abulimensamuel+pool175@gmail.com,HIS 200 LEVEL (GRP A)|HIS 200 LEVEL (GRP B),true,,
+HIS301,Historical Methods and Historiography,3,abulimensamuel+adeola.fasina@gmail.com,HIS 300 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS301,Historical Methods and Historiography,3,abulimensamuel+andy.titus@gmail.com,HIS 300 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool168@gmail.com,HIS 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|HUMANITIES BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool169@gmail.com,HIS 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|HUMANITIES BLOCK
+BU-GST322,Citizenship Orientation,1,abulimensamuel+pool170@gmail.com,HIS 300 LEVEL (GRP A)|HIS 300 LEVEL (GRP B),true,,
+HIS401,Contemporary Global History,3,abulimensamuel+adeola.fasina@gmail.com,HIS 400 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS401,Contemporary Global History,3,abulimensamuel+andy.titus@gmail.com,HIS 400 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS402,History Research Project,3,abulimensamuel+andy.titus@gmail.com,HIS 400 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS402,History Research Project,3,abulimensamuel+adeola.fasina@gmail.com,HIS 400 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+pool171@gmail.com,HIS 400 LEVEL (GRP A)|HIS 400 LEVEL (GRP B),true,,
+HIS104,Historical Methods and Sources,3,abulimensamuel+pool113@gmail.com,HIS 100 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS104,Historical Methods and Sources,3,abulimensamuel+pool113@gmail.com,HIS 100 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS105,African Civilizations,2,abulimensamuel+pool114@gmail.com,HIS 100 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS105,African Civilizations,2,abulimensamuel+pool114@gmail.com,HIS 100 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS106,History Communication Workshop,2,abulimensamuel+pool115@gmail.com,HIS 100 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS106,History Communication Workshop,2,abulimensamuel+pool115@gmail.com,HIS 100 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+GST121,Critical Thinking and Writing,2,abulimensamuel+pool172@gmail.com,HIS 100 LEVEL (GRP A)|HIS 100 LEVEL (GRP B),true,,
+HIS204,West African History,3,abulimensamuel+pool116@gmail.com,HIS 200 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS204,West African History,3,abulimensamuel+pool116@gmail.com,HIS 200 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS205,History of Ideas,3,abulimensamuel+pool117@gmail.com,HIS 200 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS205,History of Ideas,3,abulimensamuel+pool117@gmail.com,HIS 200 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS206,Digital Archiving and Records,2,abulimensamuel+pool118@gmail.com,HIS 200 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|HUMANITIES BLOCK
+HIS206,Digital Archiving and Records,2,abulimensamuel+pool118@gmail.com,HIS 200 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|HUMANITIES BLOCK
+GST221,Logic and Scientific Reasoning,2,abulimensamuel+pool173@gmail.com,HIS 200 LEVEL (GRP A)|HIS 200 LEVEL (GRP B),true,,
+HIS304,Modern World History,3,abulimensamuel+pool113@gmail.com,HIS 300 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS304,Modern World History,3,abulimensamuel+pool113@gmail.com,HIS 300 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS305,Historiography,3,abulimensamuel+pool114@gmail.com,HIS 300 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS305,Historiography,3,abulimensamuel+pool114@gmail.com,HIS 300 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS306,Oral History and Field Methods,2,abulimensamuel+pool115@gmail.com,HIS 300 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS306,Oral History and Field Methods,2,abulimensamuel+pool115@gmail.com,HIS 300 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+GST321,Peace Studies and Conflict Resolution,2,abulimensamuel+pool174@gmail.com,HIS 300 LEVEL (GRP A)|HIS 300 LEVEL (GRP B),true,,
+HIS404,Public History and Heritage,3,abulimensamuel+pool116@gmail.com,HIS 400 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS404,Public History and Heritage,3,abulimensamuel+pool116@gmail.com,HIS 400 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS405,History Seminar and Critique,3,abulimensamuel+pool117@gmail.com,HIS 400 LEVEL (GRP A),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS405,History Seminar and Critique,3,abulimensamuel+pool117@gmail.com,HIS 400 LEVEL (GRP B),false,PROJECTOR,HUMANITIES BLOCK|MAIN ACADEMIC BLOCK
+HIS406,Capstone Historical Research,2,abulimensamuel+pool118@gmail.com,HIS 400 LEVEL (GRP A),false,PROJECTOR|SMART BOARD,HUMANITIES BLOCK|INNOVATION HUB
+HIS406,Capstone Historical Research,2,abulimensamuel+pool118@gmail.com,HIS 400 LEVEL (GRP B),false,PROJECTOR|SMART BOARD,HUMANITIES BLOCK|INNOVATION HUB
+GST421,Leadership Communication and Culture,2,abulimensamuel+pool175@gmail.com,HIS 400 LEVEL (GRP A)|HIS 400 LEVEL (GRP B),true,,

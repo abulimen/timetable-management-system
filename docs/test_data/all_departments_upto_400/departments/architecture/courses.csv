@@ -1,0 +1,51 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+ARC101,Introduction to Architectural Design,3,abulimensamuel+seyi.adegbite@gmail.com,ARC 100 LEVEL (GRP A),false,CAD STUDIO|PROJECTOR,DESIGN STUDIO BLOCK|MAIN ACADEMIC BLOCK
+ARC101,Introduction to Architectural Design,3,abulimensamuel+seyi.adegbite@gmail.com,ARC 100 LEVEL (GRP B),false,CAD STUDIO|PROJECTOR,DESIGN STUDIO BLOCK|MAIN ACADEMIC BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool064@gmail.com,ARC 100 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|DESIGN STUDIO BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool065@gmail.com,ARC 100 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|DESIGN STUDIO BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool066@gmail.com,ARC 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool067@gmail.com,ARC 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST111,Communication in English,2,abulimensamuel+pool068@gmail.com,ARC 100 LEVEL (GRP A)|ARC 100 LEVEL (GRP B),true,,
+ARC201,Building Materials and Methods,3,abulimensamuel+seyi.adegbite@gmail.com,ARC 200 LEVEL (GRP A),false,CAD STUDIO|PROJECTOR,DESIGN STUDIO BLOCK
+ARC201,Building Materials and Methods,3,abulimensamuel+olusola.ajibade@gmail.com,ARC 200 LEVEL (GRP B),false,CAD STUDIO|PROJECTOR,DESIGN STUDIO BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool069@gmail.com,ARC 200 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|DESIGN STUDIO BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool070@gmail.com,ARC 200 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|DESIGN STUDIO BLOCK
+GST212,Philosophy and Human Existence,2,abulimensamuel+pool071@gmail.com,ARC 200 LEVEL (GRP A)|ARC 200 LEVEL (GRP B),true,,
+ARC301,Urban Design Studio,3,abulimensamuel+seyi.adegbite@gmail.com,ARC 300 LEVEL (GRP A),false,CAD STUDIO|SMART BOARD,DESIGN STUDIO BLOCK|MAIN ACADEMIC BLOCK
+ARC301,Urban Design Studio,3,abulimensamuel+olusola.ajibade@gmail.com,ARC 300 LEVEL (GRP B),false,CAD STUDIO|SMART BOARD,DESIGN STUDIO BLOCK|MAIN ACADEMIC BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool064@gmail.com,ARC 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool065@gmail.com,ARC 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+BU-GST322,Citizenship Orientation,1,abulimensamuel+pool066@gmail.com,ARC 300 LEVEL (GRP A)|ARC 300 LEVEL (GRP B),true,,
+ARC401,Architectural Thesis I,3,abulimensamuel+seyi.adegbite@gmail.com,ARC 400 LEVEL (GRP A),false,CAD STUDIO|PROJECTOR,DESIGN STUDIO BLOCK
+ARC401,Architectural Thesis I,3,abulimensamuel+olusola.ajibade@gmail.com,ARC 400 LEVEL (GRP B),false,CAD STUDIO|PROJECTOR,DESIGN STUDIO BLOCK
+ARC402,Architectural Thesis II,3,abulimensamuel+olusola.ajibade@gmail.com,ARC 400 LEVEL (GRP A),false,CAD STUDIO|PROJECTOR,DESIGN STUDIO BLOCK
+ARC402,Architectural Thesis II,3,abulimensamuel+seyi.adegbite@gmail.com,ARC 400 LEVEL (GRP B),false,CAD STUDIO|PROJECTOR,DESIGN STUDIO BLOCK
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+pool067@gmail.com,ARC 400 LEVEL (GRP A)|ARC 400 LEVEL (GRP B),true,,
+ARC104,Architectural Graphics and Drafting,3,abulimensamuel+pool025@gmail.com,ARC 100 LEVEL (GRP A),false,CAD STUDIO|PROJECTOR,DESIGN STUDIO BLOCK
+ARC104,Architectural Graphics and Drafting,3,abulimensamuel+pool025@gmail.com,ARC 100 LEVEL (GRP B),false,CAD STUDIO|PROJECTOR,DESIGN STUDIO BLOCK
+ARC105,History of Architecture,2,abulimensamuel+pool026@gmail.com,ARC 100 LEVEL (GRP A),false,PROJECTOR,DESIGN STUDIO BLOCK|HUMANITIES BLOCK
+ARC105,History of Architecture,2,abulimensamuel+pool026@gmail.com,ARC 100 LEVEL (GRP B),false,PROJECTOR,DESIGN STUDIO BLOCK|HUMANITIES BLOCK
+ARC106,Design Studio Practice I,2,abulimensamuel+pool027@gmail.com,ARC 100 LEVEL (GRP A),false,CAD STUDIO|SMART BOARD,DESIGN STUDIO BLOCK
+ARC106,Design Studio Practice I,2,abulimensamuel+pool027@gmail.com,ARC 100 LEVEL (GRP B),false,CAD STUDIO|SMART BOARD,DESIGN STUDIO BLOCK
+GST121,Critical Thinking and Writing,2,abulimensamuel+pool068@gmail.com,ARC 100 LEVEL (GRP A)|ARC 100 LEVEL (GRP B),true,,
+ARC204,Construction Technology,3,abulimensamuel+pool028@gmail.com,ARC 200 LEVEL (GRP A),false,CAD STUDIO|PROJECTOR,DESIGN STUDIO BLOCK
+ARC204,Construction Technology,3,abulimensamuel+pool028@gmail.com,ARC 200 LEVEL (GRP B),false,CAD STUDIO|PROJECTOR,DESIGN STUDIO BLOCK
+ARC205,Architectural Visualization,2,abulimensamuel+pool029@gmail.com,ARC 200 LEVEL (GRP A),false,CAD STUDIO|COMPUTER LAB,DESIGN STUDIO BLOCK|ICT COMPLEX
+ARC205,Architectural Visualization,2,abulimensamuel+pool029@gmail.com,ARC 200 LEVEL (GRP B),false,CAD STUDIO|COMPUTER LAB,DESIGN STUDIO BLOCK|ICT COMPLEX
+ARC206,Environmental Design,2,abulimensamuel+pool030@gmail.com,ARC 200 LEVEL (GRP A),false,PROJECTOR,DESIGN STUDIO BLOCK|MAIN ACADEMIC BLOCK
+ARC206,Environmental Design,2,abulimensamuel+pool030@gmail.com,ARC 200 LEVEL (GRP B),false,PROJECTOR,DESIGN STUDIO BLOCK|MAIN ACADEMIC BLOCK
+GST221,Logic and Scientific Reasoning,2,abulimensamuel+pool069@gmail.com,ARC 200 LEVEL (GRP A)|ARC 200 LEVEL (GRP B),true,,
+ARC304,Landscape Design Studio,3,abulimensamuel+pool031@gmail.com,ARC 300 LEVEL (GRP A),false,CAD STUDIO|PROJECTOR,DESIGN STUDIO BLOCK
+ARC304,Landscape Design Studio,3,abulimensamuel+pool031@gmail.com,ARC 300 LEVEL (GRP B),false,CAD STUDIO|PROJECTOR,DESIGN STUDIO BLOCK
+ARC305,Building Services Engineering,3,abulimensamuel+pool032@gmail.com,ARC 300 LEVEL (GRP A),false,PROJECTOR,DESIGN STUDIO BLOCK|ENGINEERING BLOCK
+ARC305,Building Services Engineering,3,abulimensamuel+pool032@gmail.com,ARC 300 LEVEL (GRP B),false,PROJECTOR,DESIGN STUDIO BLOCK|ENGINEERING BLOCK
+ARC306,Design Studio Practice II,2,abulimensamuel+pool025@gmail.com,ARC 300 LEVEL (GRP A),false,CAD STUDIO|SMART BOARD,DESIGN STUDIO BLOCK
+ARC306,Design Studio Practice II,2,abulimensamuel+pool025@gmail.com,ARC 300 LEVEL (GRP B),false,CAD STUDIO|SMART BOARD,DESIGN STUDIO BLOCK
+GST321,Peace Studies and Conflict Resolution,2,abulimensamuel+pool070@gmail.com,ARC 300 LEVEL (GRP A)|ARC 300 LEVEL (GRP B),true,,
+ARC404,Architectural Conservation,3,abulimensamuel+pool026@gmail.com,ARC 400 LEVEL (GRP A),false,CAD STUDIO|PROJECTOR,DESIGN STUDIO BLOCK|HUMANITIES BLOCK
+ARC404,Architectural Conservation,3,abulimensamuel+pool026@gmail.com,ARC 400 LEVEL (GRP B),false,CAD STUDIO|PROJECTOR,DESIGN STUDIO BLOCK|HUMANITIES BLOCK
+ARC405,Professional Practice in Architecture,3,abulimensamuel+pool027@gmail.com,ARC 400 LEVEL (GRP A),false,PROJECTOR,DESIGN STUDIO BLOCK|MAIN ACADEMIC BLOCK
+ARC405,Professional Practice in Architecture,3,abulimensamuel+pool027@gmail.com,ARC 400 LEVEL (GRP B),false,PROJECTOR,DESIGN STUDIO BLOCK|MAIN ACADEMIC BLOCK
+ARC406,Architectural Portfolio Workshop,2,abulimensamuel+pool028@gmail.com,ARC 400 LEVEL (GRP A),false,CAD STUDIO|COMPUTER LAB,DESIGN STUDIO BLOCK|ICT COMPLEX
+ARC406,Architectural Portfolio Workshop,2,abulimensamuel+pool028@gmail.com,ARC 400 LEVEL (GRP B),false,CAD STUDIO|COMPUTER LAB,DESIGN STUDIO BLOCK|ICT COMPLEX
+GST421,Leadership Communication and Culture,2,abulimensamuel+pool071@gmail.com,ARC 400 LEVEL (GRP A)|ARC 400 LEVEL (GRP B),true,,

@@ -1,0 +1,72 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+EEE101,Electrical Engineering Fundamentals,3,abulimensamuel+kenneth.ogunleye@gmail.com,EEE 100 LEVEL (GRP A),false,PROJECTOR,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+EEE101,Electrical Engineering Fundamentals,3,abulimensamuel+prosper.ekanem@gmail.com,EEE 100 LEVEL (GRP B),false,PROJECTOR,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+EEE101,Electrical Engineering Fundamentals,3,abulimensamuel+kenneth.ogunleye@gmail.com,EEE 100 LEVEL (GRP C),false,PROJECTOR,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool136@gmail.com,EEE 100 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|ENGINEERING BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool137@gmail.com,EEE 100 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|ENGINEERING BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool138@gmail.com,EEE 100 LEVEL (GRP C),false,,MAIN ACADEMIC BLOCK|ENGINEERING BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool139@gmail.com,EEE 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool140@gmail.com,EEE 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+chineye.okafor@gmail.com,EEE 100 LEVEL (GRP C),false,PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+GST111,Communication in English,2,abulimensamuel+pool141@gmail.com,EEE 100 LEVEL (GRP A)|EEE 100 LEVEL (GRP B)|EEE 100 LEVEL (GRP C),true,,
+EEE201,Circuit Theory and Analysis,3,abulimensamuel+kenneth.ogunleye@gmail.com,EEE 200 LEVEL (GRP A),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK
+EEE201,Circuit Theory and Analysis,3,abulimensamuel+prosper.ekanem@gmail.com,EEE 200 LEVEL (GRP B),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK
+EEE201,Circuit Theory and Analysis,3,abulimensamuel+khalid.usman@gmail.com,EEE 200 LEVEL (GRP C),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool142@gmail.com,EEE 200 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|ENGINEERING BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool143@gmail.com,EEE 200 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|ENGINEERING BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool136@gmail.com,EEE 200 LEVEL (GRP C),false,,MAIN ACADEMIC BLOCK|ENGINEERING BLOCK
+GST212,Philosophy and Human Existence,2,abulimensamuel+pool137@gmail.com,EEE 200 LEVEL (GRP A)|EEE 200 LEVEL (GRP B)|EEE 200 LEVEL (GRP C),true,,
+EEE301,Power Systems and Machines,3,abulimensamuel+kenneth.ogunleye@gmail.com,EEE 300 LEVEL (GRP A),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+EEE301,Power Systems and Machines,3,abulimensamuel+prosper.ekanem@gmail.com,EEE 300 LEVEL (GRP B),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+EEE301,Power Systems and Machines,3,abulimensamuel+khalid.usman@gmail.com,EEE 300 LEVEL (GRP C),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool138@gmail.com,EEE 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|ENGINEERING BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool139@gmail.com,EEE 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|ENGINEERING BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool140@gmail.com,EEE 300 LEVEL (GRP C),false,PROJECTOR,GENERAL STUDIES BLOCK|ENGINEERING BLOCK
+BU-GST322,Citizenship Orientation,1,abulimensamuel+pool141@gmail.com,EEE 300 LEVEL (GRP A)|EEE 300 LEVEL (GRP B)|EEE 300 LEVEL (GRP C),true,,
+EEE401,Control Systems Engineering,3,abulimensamuel+kenneth.ogunleye@gmail.com,EEE 400 LEVEL (GRP A),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+EEE401,Control Systems Engineering,3,abulimensamuel+prosper.ekanem@gmail.com,EEE 400 LEVEL (GRP B),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+EEE401,Control Systems Engineering,3,abulimensamuel+khalid.usman@gmail.com,EEE 400 LEVEL (GRP C),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+EEE402,Electrical Engineering Design Project,3,abulimensamuel+prosper.ekanem@gmail.com,EEE 400 LEVEL (GRP A),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|INNOVATION HUB
+EEE402,Electrical Engineering Design Project,3,abulimensamuel+kenneth.ogunleye@gmail.com,EEE 400 LEVEL (GRP B),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|INNOVATION HUB
+EEE402,Electrical Engineering Design Project,3,abulimensamuel+khalid.usman@gmail.com,EEE 400 LEVEL (GRP C),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|INNOVATION HUB
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+pool142@gmail.com,EEE 400 LEVEL (GRP A)|EEE 400 LEVEL (GRP B)|EEE 400 LEVEL (GRP C),true,,
+EEE104,Engineering Drawing and Design Tools,2,abulimensamuel+pool047@gmail.com,EEE 100 LEVEL (GRP A),false,PROJECTOR|SMART BOARD,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+EEE104,Engineering Drawing and Design Tools,2,abulimensamuel+pool047@gmail.com,EEE 100 LEVEL (GRP B),false,PROJECTOR|SMART BOARD,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+EEE104,Engineering Drawing and Design Tools,2,abulimensamuel+pool047@gmail.com,EEE 100 LEVEL (GRP C),false,PROJECTOR|SMART BOARD,ENGINEERING BLOCK|MAIN ACADEMIC BLOCK
+EEE105,Digital Electronics Basics,3,abulimensamuel+pool048@gmail.com,EEE 100 LEVEL (GRP A),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK
+EEE105,Digital Electronics Basics,3,abulimensamuel+pool048@gmail.com,EEE 100 LEVEL (GRP B),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK
+EEE105,Digital Electronics Basics,3,abulimensamuel+pool048@gmail.com,EEE 100 LEVEL (GRP C),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK
+EEE106,Programming for Embedded Systems,2,abulimensamuel+pool049@gmail.com,EEE 100 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+EEE106,Programming for Embedded Systems,2,abulimensamuel+pool049@gmail.com,EEE 100 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+EEE106,Programming for Embedded Systems,2,abulimensamuel+pool049@gmail.com,EEE 100 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+GST121,Critical Thinking and Writing,2,abulimensamuel+pool143@gmail.com,EEE 100 LEVEL (GRP A)|EEE 100 LEVEL (GRP B)|EEE 100 LEVEL (GRP C),true,,
+EEE204,Signals and Systems,3,abulimensamuel+pool050@gmail.com,EEE 200 LEVEL (GRP A),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK
+EEE204,Signals and Systems,3,abulimensamuel+pool050@gmail.com,EEE 200 LEVEL (GRP B),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK
+EEE204,Signals and Systems,3,abulimensamuel+pool050@gmail.com,EEE 200 LEVEL (GRP C),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK
+EEE205,Electrical Measurements and Instrumentation,2,abulimensamuel+pool051@gmail.com,EEE 200 LEVEL (GRP A),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK
+EEE205,Electrical Measurements and Instrumentation,2,abulimensamuel+pool051@gmail.com,EEE 200 LEVEL (GRP B),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK
+EEE205,Electrical Measurements and Instrumentation,2,abulimensamuel+pool051@gmail.com,EEE 200 LEVEL (GRP C),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK
+EEE206,Engineering Computation Lab,2,abulimensamuel+pool049@gmail.com,EEE 200 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+EEE206,Engineering Computation Lab,2,abulimensamuel+pool049@gmail.com,EEE 200 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+EEE206,Engineering Computation Lab,2,abulimensamuel+pool049@gmail.com,EEE 200 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+GST221,Logic and Scientific Reasoning,2,abulimensamuel+pool136@gmail.com,EEE 200 LEVEL (GRP A)|EEE 200 LEVEL (GRP B)|EEE 200 LEVEL (GRP C),true,,
+EEE304,Power Electronics,3,abulimensamuel+pool052@gmail.com,EEE 300 LEVEL (GRP A),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK
+EEE304,Power Electronics,3,abulimensamuel+pool052@gmail.com,EEE 300 LEVEL (GRP B),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK
+EEE304,Power Electronics,3,abulimensamuel+pool052@gmail.com,EEE 300 LEVEL (GRP C),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK
+EEE305,Telecommunications Engineering,3,abulimensamuel+pool053@gmail.com,EEE 300 LEVEL (GRP A),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+EEE305,Telecommunications Engineering,3,abulimensamuel+pool053@gmail.com,EEE 300 LEVEL (GRP B),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+EEE305,Telecommunications Engineering,3,abulimensamuel+pool053@gmail.com,EEE 300 LEVEL (GRP C),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|ICT COMPLEX
+EEE306,Automation and PLC Lab,2,abulimensamuel+pool054@gmail.com,EEE 300 LEVEL (GRP A),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|INNOVATION HUB
+EEE306,Automation and PLC Lab,2,abulimensamuel+pool054@gmail.com,EEE 300 LEVEL (GRP B),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|INNOVATION HUB
+EEE306,Automation and PLC Lab,2,abulimensamuel+pool054@gmail.com,EEE 300 LEVEL (GRP C),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|INNOVATION HUB
+GST321,Peace Studies and Conflict Resolution,2,abulimensamuel+pool137@gmail.com,EEE 300 LEVEL (GRP A)|EEE 300 LEVEL (GRP B)|EEE 300 LEVEL (GRP C),true,,
+EEE404,Renewable Energy Systems,3,abulimensamuel+pool050@gmail.com,EEE 400 LEVEL (GRP A),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|INNOVATION HUB
+EEE404,Renewable Energy Systems,3,abulimensamuel+pool050@gmail.com,EEE 400 LEVEL (GRP B),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|INNOVATION HUB
+EEE404,Renewable Energy Systems,3,abulimensamuel+pool050@gmail.com,EEE 400 LEVEL (GRP C),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|INNOVATION HUB
+EEE405,Smart Grid Technologies,3,abulimensamuel+pool052@gmail.com,EEE 400 LEVEL (GRP A),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|INNOVATION HUB
+EEE405,Smart Grid Technologies,3,abulimensamuel+pool052@gmail.com,EEE 400 LEVEL (GRP B),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|INNOVATION HUB
+EEE405,Smart Grid Technologies,3,abulimensamuel+pool052@gmail.com,EEE 400 LEVEL (GRP C),false,ELECTRONICS LAB|PROJECTOR,ENGINEERING BLOCK|INNOVATION HUB
+EEE406,Power System Simulation Studio,2,abulimensamuel+pool053@gmail.com,EEE 400 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+EEE406,Power System Simulation Studio,2,abulimensamuel+pool053@gmail.com,EEE 400 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+EEE406,Power System Simulation Studio,2,abulimensamuel+pool053@gmail.com,EEE 400 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|ENGINEERING BLOCK
+GST421,Leadership Communication and Culture,2,abulimensamuel+pool138@gmail.com,EEE 400 LEVEL (GRP A)|EEE 400 LEVEL (GRP B)|EEE 400 LEVEL (GRP C),true,,

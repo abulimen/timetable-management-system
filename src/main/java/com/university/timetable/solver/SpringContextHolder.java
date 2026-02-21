@@ -5,12 +5,17 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
- * Holder for Spring ApplicationContext to allow OptaPlanner
- * constraint providers to access Spring beans.
+ * Holder for Spring ApplicationContext to allow Timefold Solver
+ * constraint providers and move factories to access Spring beans.
  */
 @Component
 public class SpringContextHolder implements ApplicationContextAware {
+
+    private static final Logger log = LoggerFactory.getLogger(SpringContextHolder.class);
 
     private static ApplicationContext context;
 
@@ -21,11 +26,9 @@ public class SpringContextHolder implements ApplicationContextAware {
 
     public static <T> T getBean(Class<T> beanClass) {
         if (context == null) {
-            System.err.println("[SpringContextHolder] WARNING: ApplicationContext is null when trying to get " + beanClass.getSimpleName());
+            log.warn("ApplicationContext is null when trying to get {}", beanClass.getSimpleName());
             return null;
         }
-        T bean = context.getBean(beanClass);
-        System.out.println("[SpringContextHolder] Retrieved bean: " + beanClass.getSimpleName() + " = " + (bean != null ? "OK" : "NULL"));
-        return bean;
+        return context.getBean(beanClass);
     }
 }

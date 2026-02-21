@@ -1,0 +1,72 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+ITE101,Introduction to Information Technology,3,abulimensamuel+ubong.utibe@gmail.com,ITE 100 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE101,Introduction to Information Technology,3,abulimensamuel+pool176@gmail.com,ITE 100 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE101,Introduction to Information Technology,3,abulimensamuel+femi.balogun@gmail.com,ITE 100 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool177@gmail.com,ITE 100 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|ICT COMPLEX
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool178@gmail.com,ITE 100 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|ICT COMPLEX
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool179@gmail.com,ITE 100 LEVEL (GRP C),false,,MAIN ACADEMIC BLOCK|ICT COMPLEX
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool180@gmail.com,ITE 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+chineye.okafor@gmail.com,ITE 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool181@gmail.com,ITE 100 LEVEL (GRP C),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST111,Communication in English,2,abulimensamuel+pool182@gmail.com,ITE 100 LEVEL (GRP A)|ITE 100 LEVEL (GRP B)|ITE 100 LEVEL (GRP C),true,,
+ITE201,Database Systems and Administration,3,abulimensamuel+ubong.utibe@gmail.com,ITE 200 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE201,Database Systems and Administration,3,abulimensamuel+pool183@gmail.com,ITE 200 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE201,Database Systems and Administration,3,abulimensamuel+loretta.eze@gmail.com,ITE 200 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool176@gmail.com,ITE 200 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|ICT COMPLEX
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool177@gmail.com,ITE 200 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|ICT COMPLEX
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool178@gmail.com,ITE 200 LEVEL (GRP C),false,,MAIN ACADEMIC BLOCK|ICT COMPLEX
+GST212,Philosophy and Human Existence,2,abulimensamuel+pool179@gmail.com,ITE 200 LEVEL (GRP A)|ITE 200 LEVEL (GRP B)|ITE 200 LEVEL (GRP C),true,,
+ITE301,Cloud Infrastructure Management,3,abulimensamuel+ubong.utibe@gmail.com,ITE 300 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE301,Cloud Infrastructure Management,3,abulimensamuel+pool180@gmail.com,ITE 300 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE301,Cloud Infrastructure Management,3,abulimensamuel+tobi.alade@gmail.com,ITE 300 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool181@gmail.com,ITE 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool182@gmail.com,ITE 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool183@gmail.com,ITE 300 LEVEL (GRP C),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+BU-GST322,Citizenship Orientation,1,abulimensamuel+pool176@gmail.com,ITE 300 LEVEL (GRP A)|ITE 300 LEVEL (GRP B)|ITE 300 LEVEL (GRP C),true,,
+ITE401,Enterprise IT Governance,3,abulimensamuel+ubong.utibe@gmail.com,ITE 400 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE401,Enterprise IT Governance,3,abulimensamuel+pool177@gmail.com,ITE 400 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE401,Enterprise IT Governance,3,abulimensamuel+loretta.eze@gmail.com,ITE 400 LEVEL (GRP C),false,PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE402,Information Technology Project,3,abulimensamuel+pool178@gmail.com,ITE 400 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE402,Information Technology Project,3,abulimensamuel+ubong.utibe@gmail.com,ITE 400 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE402,Information Technology Project,3,abulimensamuel+tobi.alade@gmail.com,ITE 400 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+pool179@gmail.com,ITE 400 LEVEL (GRP A)|ITE 400 LEVEL (GRP B)|ITE 400 LEVEL (GRP C),true,,
+ITE104,Computer Hardware Fundamentals,2,abulimensamuel+pool055@gmail.com,ITE 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+ITE104,Computer Hardware Fundamentals,2,abulimensamuel+pool055@gmail.com,ITE 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+ITE104,Computer Hardware Fundamentals,2,abulimensamuel+pool055@gmail.com,ITE 100 LEVEL (GRP C),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+ITE105,Programming Lab I,2,abulimensamuel+pool040@gmail.com,ITE 100 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE105,Programming Lab I,2,abulimensamuel+pool040@gmail.com,ITE 100 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE105,Programming Lab I,2,abulimensamuel+pool040@gmail.com,ITE 100 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE106,Digital Systems and Networking Basics,2,abulimensamuel+pool056@gmail.com,ITE 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+ITE106,Digital Systems and Networking Basics,2,abulimensamuel+pool056@gmail.com,ITE 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+ITE106,Digital Systems and Networking Basics,2,abulimensamuel+pool056@gmail.com,ITE 100 LEVEL (GRP C),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST121,Critical Thinking and Writing,2,abulimensamuel+pool180@gmail.com,ITE 100 LEVEL (GRP A)|ITE 100 LEVEL (GRP B)|ITE 100 LEVEL (GRP C),true,,
+ITE204,System Analysis and Design,3,abulimensamuel+pool057@gmail.com,ITE 200 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE204,System Analysis and Design,3,abulimensamuel+pool057@gmail.com,ITE 200 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE204,System Analysis and Design,3,abulimensamuel+pool057@gmail.com,ITE 200 LEVEL (GRP C),false,PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE205,Operating Systems Administration,3,abulimensamuel+pool058@gmail.com,ITE 200 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE205,Operating Systems Administration,3,abulimensamuel+pool058@gmail.com,ITE 200 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE205,Operating Systems Administration,3,abulimensamuel+pool058@gmail.com,ITE 200 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE206,Web Technologies,2,abulimensamuel+pool059@gmail.com,ITE 200 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE206,Web Technologies,2,abulimensamuel+pool059@gmail.com,ITE 200 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE206,Web Technologies,2,abulimensamuel+pool059@gmail.com,ITE 200 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+GST221,Logic and Scientific Reasoning,2,abulimensamuel+pool181@gmail.com,ITE 200 LEVEL (GRP A)|ITE 200 LEVEL (GRP B)|ITE 200 LEVEL (GRP C),true,,
+ITE304,DevOps Foundations,3,abulimensamuel+pool060@gmail.com,ITE 300 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE304,DevOps Foundations,3,abulimensamuel+pool060@gmail.com,ITE 300 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE304,DevOps Foundations,3,abulimensamuel+pool060@gmail.com,ITE 300 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE305,Cybersecurity Operations,3,abulimensamuel+pool061@gmail.com,ITE 300 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE305,Cybersecurity Operations,3,abulimensamuel+pool061@gmail.com,ITE 300 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE305,Cybersecurity Operations,3,abulimensamuel+pool061@gmail.com,ITE 300 LEVEL (GRP C),false,PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE306,Cloud Services Lab,2,abulimensamuel+pool062@gmail.com,ITE 300 LEVEL (GRP A),false,COMPUTER LAB|SMART BOARD|PROJECTOR,INNOVATION HUB|ICT COMPLEX
+ITE306,Cloud Services Lab,2,abulimensamuel+pool062@gmail.com,ITE 300 LEVEL (GRP B),false,COMPUTER LAB|SMART BOARD|PROJECTOR,INNOVATION HUB|ICT COMPLEX
+ITE306,Cloud Services Lab,2,abulimensamuel+pool062@gmail.com,ITE 300 LEVEL (GRP C),false,COMPUTER LAB|SMART BOARD|PROJECTOR,INNOVATION HUB|ICT COMPLEX
+GST321,Peace Studies and Conflict Resolution,2,abulimensamuel+pool182@gmail.com,ITE 300 LEVEL (GRP A)|ITE 300 LEVEL (GRP B)|ITE 300 LEVEL (GRP C),true,,
+ITE404,IT Service Management,3,abulimensamuel+pool057@gmail.com,ITE 400 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+ITE404,IT Service Management,3,abulimensamuel+pool057@gmail.com,ITE 400 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+ITE404,IT Service Management,3,abulimensamuel+pool057@gmail.com,ITE 400 LEVEL (GRP C),false,PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+ITE405,Enterprise Architecture and Integration,3,abulimensamuel+pool058@gmail.com,ITE 400 LEVEL (GRP A),false,PROJECTOR|SMART BOARD,INNOVATION HUB|ICT COMPLEX
+ITE405,Enterprise Architecture and Integration,3,abulimensamuel+pool058@gmail.com,ITE 400 LEVEL (GRP B),false,PROJECTOR|SMART BOARD,INNOVATION HUB|ICT COMPLEX
+ITE405,Enterprise Architecture and Integration,3,abulimensamuel+pool058@gmail.com,ITE 400 LEVEL (GRP C),false,PROJECTOR|SMART BOARD,INNOVATION HUB|ICT COMPLEX
+ITE406,Data Center and Virtualization Lab,2,abulimensamuel+pool062@gmail.com,ITE 400 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE406,Data Center and Virtualization Lab,2,abulimensamuel+pool062@gmail.com,ITE 400 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ITE406,Data Center and Virtualization Lab,2,abulimensamuel+pool062@gmail.com,ITE 400 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+GST421,Leadership Communication and Culture,2,abulimensamuel+pool183@gmail.com,ITE 400 LEVEL (GRP A)|ITE 400 LEVEL (GRP B)|ITE 400 LEVEL (GRP C),true,,

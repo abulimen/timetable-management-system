@@ -1,0 +1,51 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+BAS101,Foundations of Basic Sciences,3,abulimensamuel+ruth.onyema@gmail.com,BAS 100 LEVEL (GRP A),false,PROJECTOR,MAIN ACADEMIC BLOCK|GENERAL STUDIES BLOCK
+BAS101,Foundations of Basic Sciences,3,abulimensamuel+ruth.onyema@gmail.com,BAS 100 LEVEL (GRP B),false,PROJECTOR,MAIN ACADEMIC BLOCK|GENERAL STUDIES BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool072@gmail.com,BAS 100 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|GENERAL STUDIES BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool073@gmail.com,BAS 100 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|GENERAL STUDIES BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool074@gmail.com,BAS 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool075@gmail.com,BAS 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST111,Communication in English,2,abulimensamuel+pool076@gmail.com,BAS 100 LEVEL (GRP A)|BAS 100 LEVEL (GRP B),true,,
+BAS201,Scientific Methods and Analysis,3,abulimensamuel+ruth.onyema@gmail.com,BAS 200 LEVEL (GRP A),false,PHYSICS LAB|PROJECTOR,MAIN ACADEMIC BLOCK|GENERAL STUDIES BLOCK
+BAS201,Scientific Methods and Analysis,3,abulimensamuel+esther.ogundele@gmail.com,BAS 200 LEVEL (GRP B),false,PHYSICS LAB|PROJECTOR,MAIN ACADEMIC BLOCK|GENERAL STUDIES BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool077@gmail.com,BAS 200 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|GENERAL STUDIES BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool078@gmail.com,BAS 200 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|GENERAL STUDIES BLOCK
+GST212,Philosophy and Human Existence,2,abulimensamuel+pool079@gmail.com,BAS 200 LEVEL (GRP A)|BAS 200 LEVEL (GRP B),true,,
+BAS301,Applied Scientific Research,3,abulimensamuel+ruth.onyema@gmail.com,BAS 300 LEVEL (GRP A),false,PHYSICS LAB|PROJECTOR,MAIN ACADEMIC BLOCK|INNOVATION HUB
+BAS301,Applied Scientific Research,3,abulimensamuel+daniel.edet@gmail.com,BAS 300 LEVEL (GRP B),false,PHYSICS LAB|PROJECTOR,MAIN ACADEMIC BLOCK|INNOVATION HUB
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool072@gmail.com,BAS 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool073@gmail.com,BAS 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+BU-GST322,Citizenship Orientation,1,abulimensamuel+pool074@gmail.com,BAS 300 LEVEL (GRP A)|BAS 300 LEVEL (GRP B),true,,
+BAS401,Capstone Science Project I,3,abulimensamuel+ruth.onyema@gmail.com,BAS 400 LEVEL (GRP A),false,PROJECTOR,MAIN ACADEMIC BLOCK|INNOVATION HUB
+BAS401,Capstone Science Project I,3,abulimensamuel+esther.ogundele@gmail.com,BAS 400 LEVEL (GRP B),false,PROJECTOR,MAIN ACADEMIC BLOCK|INNOVATION HUB
+BAS402,Capstone Science Project II,3,abulimensamuel+esther.ogundele@gmail.com,BAS 400 LEVEL (GRP A),false,PROJECTOR,MAIN ACADEMIC BLOCK|INNOVATION HUB
+BAS402,Capstone Science Project II,3,abulimensamuel+ruth.onyema@gmail.com,BAS 400 LEVEL (GRP B),false,PROJECTOR,MAIN ACADEMIC BLOCK|INNOVATION HUB
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+pool075@gmail.com,BAS 400 LEVEL (GRP A)|BAS 400 LEVEL (GRP B),true,,
+BAS104,Foundations of Physics,3,abulimensamuel+pool033@gmail.com,BAS 100 LEVEL (GRP A),false,PHYSICS LAB|PROJECTOR,MAIN ACADEMIC BLOCK
+BAS104,Foundations of Physics,3,abulimensamuel+pool033@gmail.com,BAS 100 LEVEL (GRP B),false,PHYSICS LAB|PROJECTOR,MAIN ACADEMIC BLOCK
+BAS105,Foundations of Chemistry,2,abulimensamuel+pool034@gmail.com,BAS 100 LEVEL (GRP A),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX|MAIN ACADEMIC BLOCK
+BAS105,Foundations of Chemistry,2,abulimensamuel+pool034@gmail.com,BAS 100 LEVEL (GRP B),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX|MAIN ACADEMIC BLOCK
+BAS106,Scientific Computing Basics,2,abulimensamuel+pool035@gmail.com,BAS 100 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+BAS106,Scientific Computing Basics,2,abulimensamuel+pool035@gmail.com,BAS 100 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST121,Critical Thinking and Writing,2,abulimensamuel+pool076@gmail.com,BAS 100 LEVEL (GRP A)|BAS 100 LEVEL (GRP B),true,,
+BAS204,Experimental Design and Instrumentation,3,abulimensamuel+pool036@gmail.com,BAS 200 LEVEL (GRP A),false,PHYSICS LAB|PROJECTOR,MAIN ACADEMIC BLOCK
+BAS204,Experimental Design and Instrumentation,3,abulimensamuel+pool036@gmail.com,BAS 200 LEVEL (GRP B),false,PHYSICS LAB|PROJECTOR,MAIN ACADEMIC BLOCK
+BAS205,Applied Chemistry for Science Majors,2,abulimensamuel+pool037@gmail.com,BAS 200 LEVEL (GRP A),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX|MAIN ACADEMIC BLOCK
+BAS205,Applied Chemistry for Science Majors,2,abulimensamuel+pool037@gmail.com,BAS 200 LEVEL (GRP B),false,CHEMISTRY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX|MAIN ACADEMIC BLOCK
+BAS206,Numerical Methods in Science,2,abulimensamuel+pool038@gmail.com,BAS 200 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+BAS206,Numerical Methods in Science,2,abulimensamuel+pool038@gmail.com,BAS 200 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST221,Logic and Scientific Reasoning,2,abulimensamuel+pool077@gmail.com,BAS 200 LEVEL (GRP A)|BAS 200 LEVEL (GRP B),true,,
+BAS304,Research Data Interpretation,3,abulimensamuel+pool039@gmail.com,BAS 300 LEVEL (GRP A),false,PROJECTOR,MAIN ACADEMIC BLOCK|INNOVATION HUB
+BAS304,Research Data Interpretation,3,abulimensamuel+pool039@gmail.com,BAS 300 LEVEL (GRP B),false,PROJECTOR,MAIN ACADEMIC BLOCK|INNOVATION HUB
+BAS305,Applied Laboratory Management,3,abulimensamuel+pool040@gmail.com,BAS 300 LEVEL (GRP A),false,PROJECTOR|SMART BOARD,MAIN ACADEMIC BLOCK|HEALTH SCIENCES COMPLEX
+BAS305,Applied Laboratory Management,3,abulimensamuel+pool040@gmail.com,BAS 300 LEVEL (GRP B),false,PROJECTOR|SMART BOARD,MAIN ACADEMIC BLOCK|HEALTH SCIENCES COMPLEX
+BAS306,Science Innovation Workshop,2,abulimensamuel+pool033@gmail.com,BAS 300 LEVEL (GRP A),false,PROJECTOR|SMART BOARD,INNOVATION HUB|MAIN ACADEMIC BLOCK
+BAS306,Science Innovation Workshop,2,abulimensamuel+pool033@gmail.com,BAS 300 LEVEL (GRP B),false,PROJECTOR|SMART BOARD,INNOVATION HUB|MAIN ACADEMIC BLOCK
+GST321,Peace Studies and Conflict Resolution,2,abulimensamuel+pool078@gmail.com,BAS 300 LEVEL (GRP A)|BAS 300 LEVEL (GRP B),true,,
+BAS404,Advanced Interdisciplinary Science,3,abulimensamuel+pool034@gmail.com,BAS 400 LEVEL (GRP A),false,PROJECTOR,MAIN ACADEMIC BLOCK|INNOVATION HUB
+BAS404,Advanced Interdisciplinary Science,3,abulimensamuel+pool034@gmail.com,BAS 400 LEVEL (GRP B),false,PROJECTOR,MAIN ACADEMIC BLOCK|INNOVATION HUB
+BAS405,Scientific Writing and Publication,3,abulimensamuel+pool035@gmail.com,BAS 400 LEVEL (GRP A),false,PROJECTOR,MAIN ACADEMIC BLOCK|HUMANITIES BLOCK
+BAS405,Scientific Writing and Publication,3,abulimensamuel+pool035@gmail.com,BAS 400 LEVEL (GRP B),false,PROJECTOR,MAIN ACADEMIC BLOCK|HUMANITIES BLOCK
+BAS406,Capstone Science Seminar,2,abulimensamuel+pool036@gmail.com,BAS 400 LEVEL (GRP A),false,PROJECTOR|SMART BOARD,INNOVATION HUB|MAIN ACADEMIC BLOCK
+BAS406,Capstone Science Seminar,2,abulimensamuel+pool036@gmail.com,BAS 400 LEVEL (GRP B),false,PROJECTOR|SMART BOARD,INNOVATION HUB|MAIN ACADEMIC BLOCK
+GST421,Leadership Communication and Culture,2,abulimensamuel+pool079@gmail.com,BAS 400 LEVEL (GRP A)|BAS 400 LEVEL (GRP B),true,,

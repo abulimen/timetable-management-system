@@ -1,0 +1,51 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+MCB101,General Microbiology,3,abulimensamuel+sodipo.akintoye@gmail.com,MCB 100 LEVEL (GRP A),false,MICROBIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MCB101,General Microbiology,3,abulimensamuel+sodipo.akintoye@gmail.com,MCB 100 LEVEL (GRP B),false,MICROBIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool208@gmail.com,MCB 100 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|HEALTH SCIENCES COMPLEX
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool209@gmail.com,MCB 100 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|HEALTH SCIENCES COMPLEX
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool210@gmail.com,MCB 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool211@gmail.com,MCB 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST111,Communication in English,2,abulimensamuel+pool212@gmail.com,MCB 100 LEVEL (GRP A)|MCB 100 LEVEL (GRP B),true,,
+MCB201,Microbial Physiology,3,abulimensamuel+sodipo.akintoye@gmail.com,MCB 200 LEVEL (GRP A),false,MICROBIOLOGY LAB|BIOLOGY LAB,HEALTH SCIENCES COMPLEX
+MCB201,Microbial Physiology,3,abulimensamuel+mercy.francis@gmail.com,MCB 200 LEVEL (GRP B),false,MICROBIOLOGY LAB|BIOLOGY LAB,HEALTH SCIENCES COMPLEX
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool213@gmail.com,MCB 200 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|HEALTH SCIENCES COMPLEX
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool214@gmail.com,MCB 200 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|HEALTH SCIENCES COMPLEX
+GST212,Philosophy and Human Existence,2,abulimensamuel+pool215@gmail.com,MCB 200 LEVEL (GRP A)|MCB 200 LEVEL (GRP B),true,,
+MCB301,Medical and Industrial Microbiology,3,abulimensamuel+sodipo.akintoye@gmail.com,MCB 300 LEVEL (GRP A),false,MICROBIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MCB301,Medical and Industrial Microbiology,3,abulimensamuel+mercy.francis@gmail.com,MCB 300 LEVEL (GRP B),false,MICROBIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool208@gmail.com,MCB 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|HEALTH SCIENCES COMPLEX
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool209@gmail.com,MCB 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|HEALTH SCIENCES COMPLEX
+BU-GST322,Citizenship Orientation,1,abulimensamuel+pool210@gmail.com,MCB 300 LEVEL (GRP A)|MCB 300 LEVEL (GRP B),true,,
+MCB401,Advanced Microbial Genetics,3,abulimensamuel+sodipo.akintoye@gmail.com,MCB 400 LEVEL (GRP A),false,MICROBIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MCB401,Advanced Microbial Genetics,3,abulimensamuel+mercy.francis@gmail.com,MCB 400 LEVEL (GRP B),false,MICROBIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MCB402,Microbiology Research Project,3,abulimensamuel+mercy.francis@gmail.com,MCB 400 LEVEL (GRP A),false,MICROBIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MCB402,Microbiology Research Project,3,abulimensamuel+sodipo.akintoye@gmail.com,MCB 400 LEVEL (GRP B),false,MICROBIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+pool211@gmail.com,MCB 400 LEVEL (GRP A)|MCB 400 LEVEL (GRP B),true,,
+MCB104,Microbial Physiology,3,abulimensamuel+pool137@gmail.com,MCB 100 LEVEL (GRP A),false,MICROBIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MCB104,Microbial Physiology,3,abulimensamuel+pool137@gmail.com,MCB 100 LEVEL (GRP B),false,MICROBIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MCB105,Cell Biology for Microbiology,2,abulimensamuel+pool138@gmail.com,MCB 100 LEVEL (GRP A),false,BIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MCB105,Cell Biology for Microbiology,2,abulimensamuel+pool138@gmail.com,MCB 100 LEVEL (GRP B),false,BIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MCB106,Scientific Computing for Biosciences,2,abulimensamuel+pool139@gmail.com,MCB 100 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|HEALTH SCIENCES COMPLEX
+MCB106,Scientific Computing for Biosciences,2,abulimensamuel+pool139@gmail.com,MCB 100 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|HEALTH SCIENCES COMPLEX
+GST121,Critical Thinking and Writing,2,abulimensamuel+pool212@gmail.com,MCB 100 LEVEL (GRP A)|MCB 100 LEVEL (GRP B),true,,
+MCB204,Bacterial Genetics,3,abulimensamuel+pool140@gmail.com,MCB 200 LEVEL (GRP A),false,MICROBIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MCB204,Bacterial Genetics,3,abulimensamuel+pool140@gmail.com,MCB 200 LEVEL (GRP B),false,MICROBIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MCB205,Environmental Microbiology,3,abulimensamuel+pool141@gmail.com,MCB 200 LEVEL (GRP A),false,MICROBIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MCB205,Environmental Microbiology,3,abulimensamuel+pool141@gmail.com,MCB 200 LEVEL (GRP B),false,MICROBIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MCB206,Microbial Data Analysis,2,abulimensamuel+pool139@gmail.com,MCB 200 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|HEALTH SCIENCES COMPLEX
+MCB206,Microbial Data Analysis,2,abulimensamuel+pool139@gmail.com,MCB 200 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|HEALTH SCIENCES COMPLEX
+GST221,Logic and Scientific Reasoning,2,abulimensamuel+pool213@gmail.com,MCB 200 LEVEL (GRP A)|MCB 200 LEVEL (GRP B),true,,
+MCB304,Medical Microbiology,3,abulimensamuel+pool142@gmail.com,MCB 300 LEVEL (GRP A),false,MICROBIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MCB304,Medical Microbiology,3,abulimensamuel+pool142@gmail.com,MCB 300 LEVEL (GRP B),false,MICROBIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MCB305,Industrial Microbiology,3,abulimensamuel+pool137@gmail.com,MCB 300 LEVEL (GRP A),false,MICROBIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MCB305,Industrial Microbiology,3,abulimensamuel+pool137@gmail.com,MCB 300 LEVEL (GRP B),false,MICROBIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MCB306,Molecular Microbiology Lab,2,abulimensamuel+pool138@gmail.com,MCB 300 LEVEL (GRP A),false,BIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MCB306,Molecular Microbiology Lab,2,abulimensamuel+pool138@gmail.com,MCB 300 LEVEL (GRP B),false,BIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+GST321,Peace Studies and Conflict Resolution,2,abulimensamuel+pool214@gmail.com,MCB 300 LEVEL (GRP A)|MCB 300 LEVEL (GRP B),true,,
+MCB404,Virology and Immunology,3,abulimensamuel+pool140@gmail.com,MCB 400 LEVEL (GRP A),false,MICROBIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MCB404,Virology and Immunology,3,abulimensamuel+pool140@gmail.com,MCB 400 LEVEL (GRP B),false,MICROBIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MCB405,Biotechnology Applications,3,abulimensamuel+pool141@gmail.com,MCB 400 LEVEL (GRP A),false,BIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MCB405,Biotechnology Applications,3,abulimensamuel+pool141@gmail.com,MCB 400 LEVEL (GRP B),false,BIOLOGY LAB|PROJECTOR,HEALTH SCIENCES COMPLEX
+MCB406,Microbiology Capstone Project,2,abulimensamuel+pool142@gmail.com,MCB 400 LEVEL (GRP A),false,PROJECTOR|SMART BOARD,HEALTH SCIENCES COMPLEX|INNOVATION HUB
+MCB406,Microbiology Capstone Project,2,abulimensamuel+pool142@gmail.com,MCB 400 LEVEL (GRP B),false,PROJECTOR|SMART BOARD,HEALTH SCIENCES COMPLEX|INNOVATION HUB
+GST421,Leadership Communication and Culture,2,abulimensamuel+pool215@gmail.com,MCB 400 LEVEL (GRP A)|MCB 400 LEVEL (GRP B),true,,

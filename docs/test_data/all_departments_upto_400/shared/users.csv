@@ -1,0 +1,337 @@
+email,first_name,last_name,role,department,phone
+abulimensamuel+admin.main@gmail.com,System,Admin,ADMIN,Academic Planning,+2348110000001
+abulimensamuel+viewer.qa@gmail.com,Quality,Viewer,VIEWER,Academic Planning,+2348110000002
+abulimensamuel+coord.accounting@gmail.com,Coordinator,Accounting,COORDINATOR,Accounting,+2348110000101
+abulimensamuel+coord.agritech@gmail.com,Coordinator,Agritech,COORDINATOR,Agritech,+2348110000102
+abulimensamuel+coord.anatomy@gmail.com,Coordinator,Anatomy,COORDINATOR,Anatomy,+2348110000103
+abulimensamuel+coord.architecture@gmail.com,Coordinator,Architecture,COORDINATOR,Architecture,+2348110000104
+abulimensamuel+coord.basicsciences@gmail.com,Coordinator,Basic Sciences,COORDINATOR,Basic Sciences,+2348110000105
+abulimensamuel+coord.biochemistry@gmail.com,Coordinator,Biochemistry,COORDINATOR,Biochemistry,+2348110000106
+abulimensamuel+coord.businessadmin@gmail.com,Coordinator,Business Admin,COORDINATOR,Business Admin,+2348110000107
+abulimensamuel+coord.civileng@gmail.com,Coordinator,Civil Engineering,COORDINATOR,Civil Engineering,+2348110000108
+abulimensamuel+coord.compeng@gmail.com,Coordinator,Computer Engineering,COORDINATOR,Computer Engineering,+2348110000109
+abulimensamuel+coord.compsci@gmail.com,Coordinator,Computer Science,COORDINATOR,Computer Science,+2348110000110
+abulimensamuel+coord.economics@gmail.com,Coordinator,Economics,COORDINATOR,Economics,+2348110000111
+abulimensamuel+coord.education@gmail.com,Coordinator,Education,COORDINATOR,Education,+2348110000112
+abulimensamuel+coord.electricaleng@gmail.com,Coordinator,Electrical Engineering,COORDINATOR,Electrical Engineering,+2348110000113
+abulimensamuel+coord.estate@gmail.com,Coordinator,Estate Management,COORDINATOR,Estate Management,+2348110000114
+abulimensamuel+coord.finance@gmail.com,Coordinator,Finance,COORDINATOR,Finance,+2348110000115
+abulimensamuel+coord.gst@gmail.com,Coordinator,General Studies,COORDINATOR,General Studies,+2348110000116
+abulimensamuel+coord.history@gmail.com,Coordinator,History,COORDINATOR,History,+2348110000117
+abulimensamuel+coord.it@gmail.com,Coordinator,Information Technology,COORDINATOR,Information Technology,+2348110000118
+abulimensamuel+coord.law@gmail.com,Coordinator,Law,COORDINATOR,Law,+2348110000119
+abulimensamuel+coord.masscomm@gmail.com,Coordinator,Mass Communication,COORDINATOR,Mass Communication,+2348110000120
+abulimensamuel+coord.mls@gmail.com,Coordinator,Medical Laboratory Science,COORDINATOR,Medical Laboratory Science,+2348110000121
+abulimensamuel+coord.microbiology@gmail.com,Coordinator,Microbiology,COORDINATOR,Microbiology,+2348110000122
+abulimensamuel+coord.seng@gmail.com,Coordinator,Software Engineering,COORDINATOR,Software Engineering,+2348110000123
+abulimensamuel+samson.ademola@gmail.com,Samson,Ademola,LECTURER,Mathematics,+2348110001001
+abulimensamuel+comfort.bello@gmail.com,Comfort,Bello,LECTURER,Mathematics,+2348110001002
+abulimensamuel+david.olumide@gmail.com,David,Olumide,LECTURER,Computer Science,+2348110001003
+abulimensamuel+chioma.adebayo@gmail.com,Chioma,Adebayo,LECTURER,General Studies,+2348110001004
+abulimensamuel+oluwaseun.ajayi@gmail.com,Oluwaseun,Ajayi,LECTURER,General Studies,+2348110001005
+abulimensamuel+gabriel.ike@gmail.com,Gabriel,Ike,LECTURER,Entrepreneurship,+2348110001006
+abulimensamuel+nkechi.okon@gmail.com,Nkechi,Okon,LECTURER,Entrepreneurship,+2348110001007
+abulimensamuel+emeka.okafor@gmail.com,Emeka,Okafor,LECTURER,Information Technology,+2348110001008
+abulimensamuel+olamide.faleye@gmail.com,Olamide,Faleye,LECTURER,Accounting,+2348110001101
+abulimensamuel+yemi.oladapo@gmail.com,Yemi,Oladapo,LECTURER,Agritech,+2348110001102
+abulimensamuel+uche.okonkwo@gmail.com,Uche,Okonkwo,LECTURER,Anatomy,+2348110001103
+abulimensamuel+seyi.adegbite@gmail.com,Seyi,Adegbite,LECTURER,Architecture,+2348110001104
+abulimensamuel+ruth.onyema@gmail.com,Ruth,Onyema,LECTURER,Basic Sciences,+2348110001105
+abulimensamuel+daniel.edet@gmail.com,Daniel,Edet,LECTURER,Biochemistry,+2348110001106
+abulimensamuel+joy.nwankwo@gmail.com,Joy,Nwankwo,LECTURER,Business Admin,+2348110001107
+abulimensamuel+musa.abdullahi@gmail.com,Musa,Abdullahi,LECTURER,Civil Engineering,+2348110001108
+abulimensamuel+chinedu.nnaemeka@gmail.com,Chinedu,Nnaemeka,LECTURER,Computer Engineering,+2348110001109
+abulimensamuel+chineye.okafor@gmail.com,Chineye,Okafor,LECTURER,Computer Science,+2348110001110
+abulimensamuel+tolu.adesina@gmail.com,Tolu,Adesina,LECTURER,Economics,+2348110001111
+abulimensamuel+funke.aderemi@gmail.com,Funke,Aderemi,LECTURER,Education,+2348110001112
+abulimensamuel+kenneth.ogunleye@gmail.com,Kenneth,Ogunleye,LECTURER,Electrical Engineering,+2348110001113
+abulimensamuel+olusola.ajibade@gmail.com,Olusola,Ajibade,LECTURER,Estate Management,+2348110001114
+abulimensamuel+temitope.awoyinka@gmail.com,Temitope,Awoyinka,LECTURER,Finance,+2348110001115
+abulimensamuel+victoria.abioye@gmail.com,Victoria,Abioye,LECTURER,General Studies,+2348110001116
+abulimensamuel+adeola.fasina@gmail.com,Adeola,Fasina,LECTURER,History,+2348110001117
+abulimensamuel+ubong.utibe@gmail.com,Ubong,Utibe,LECTURER,Information Technology,+2348110001118
+abulimensamuel+andy.titus@gmail.com,Andy,Titus,LECTURER,Law,+2348110001119
+abulimensamuel+ahannaya.gandolph@gmail.com,Ahannaya,Gandolph,LECTURER,Mass Communication,+2348110001120
+abulimensamuel+mercy.francis@gmail.com,Mercy,Francis,LECTURER,Medical Laboratory Science,+2348110001121
+abulimensamuel+sodipo.akintoye@gmail.com,Sodipo,Akintoye,LECTURER,Microbiology,+2348110001122
+abulimensamuel+ada.soyinka@gmail.com,Ada,Soyinka,LECTURER,Software Engineering,+2348110001123
+abulimensamuel+femi.balogun@gmail.com,Femi,Balogun,LECTURER,Software Engineering,+2348110001124
+abulimensamuel+ifeoma.nwosu@gmail.com,Ifeoma,Nwosu,LECTURER,Software Engineering,+2348110001125
+abulimensamuel+loretta.eze@gmail.com,Loretta,Eze,LECTURER,Software Engineering,+2348110001126
+abulimensamuel+mina.obi@gmail.com,Mina,Obi,LECTURER,Computer Science,+2348110001127
+abulimensamuel+khalid.usman@gmail.com,Khalid,Usman,LECTURER,Computer Engineering,+2348110001128
+abulimensamuel+tobi.alade@gmail.com,Tobi,Alade,LECTURER,Software Engineering,+2348110001129
+abulimensamuel+prosper.ekanem@gmail.com,Prosper,Ekanem,LECTURER,Electrical Engineering,+2348110001130
+abulimensamuel+esther.ogundele@gmail.com,Esther,Ogundele,LECTURER,Biochemistry,+2348110001131
+abulimensamuel+peter.adigwe@gmail.com,Peter,Adigwe,LECTURER,Civil Engineering,+2348110001132
+abulimensamuel+grace.udoh@gmail.com,Grace,Udoh,LECTURER,Mass Communication,+2348110001133
+abulimensamuel+pool001@gmail.com,Pool001,Lecturer,LECTURER,Academic Pool,+2348130000001
+abulimensamuel+pool002@gmail.com,Pool002,Lecturer,LECTURER,Academic Pool,+2348130000002
+abulimensamuel+pool003@gmail.com,Pool003,Lecturer,LECTURER,Academic Pool,+2348130000003
+abulimensamuel+pool004@gmail.com,Pool004,Lecturer,LECTURER,Academic Pool,+2348130000004
+abulimensamuel+pool005@gmail.com,Pool005,Lecturer,LECTURER,Academic Pool,+2348130000005
+abulimensamuel+pool006@gmail.com,Pool006,Lecturer,LECTURER,Academic Pool,+2348130000006
+abulimensamuel+pool007@gmail.com,Pool007,Lecturer,LECTURER,Academic Pool,+2348130000007
+abulimensamuel+pool008@gmail.com,Pool008,Lecturer,LECTURER,Academic Pool,+2348130000008
+abulimensamuel+pool009@gmail.com,Pool009,Lecturer,LECTURER,Academic Pool,+2348130000009
+abulimensamuel+pool010@gmail.com,Pool010,Lecturer,LECTURER,Academic Pool,+2348130000010
+abulimensamuel+pool011@gmail.com,Pool011,Lecturer,LECTURER,Academic Pool,+2348130000011
+abulimensamuel+pool012@gmail.com,Pool012,Lecturer,LECTURER,Academic Pool,+2348130000012
+abulimensamuel+pool013@gmail.com,Pool013,Lecturer,LECTURER,Academic Pool,+2348130000013
+abulimensamuel+pool014@gmail.com,Pool014,Lecturer,LECTURER,Academic Pool,+2348130000014
+abulimensamuel+pool015@gmail.com,Pool015,Lecturer,LECTURER,Academic Pool,+2348130000015
+abulimensamuel+pool016@gmail.com,Pool016,Lecturer,LECTURER,Academic Pool,+2348130000016
+abulimensamuel+pool017@gmail.com,Pool017,Lecturer,LECTURER,Academic Pool,+2348130000017
+abulimensamuel+pool018@gmail.com,Pool018,Lecturer,LECTURER,Academic Pool,+2348130000018
+abulimensamuel+pool019@gmail.com,Pool019,Lecturer,LECTURER,Academic Pool,+2348130000019
+abulimensamuel+pool020@gmail.com,Pool020,Lecturer,LECTURER,Academic Pool,+2348130000020
+abulimensamuel+pool021@gmail.com,Pool021,Lecturer,LECTURER,Academic Pool,+2348130000021
+abulimensamuel+pool022@gmail.com,Pool022,Lecturer,LECTURER,Academic Pool,+2348130000022
+abulimensamuel+pool023@gmail.com,Pool023,Lecturer,LECTURER,Academic Pool,+2348130000023
+abulimensamuel+pool024@gmail.com,Pool024,Lecturer,LECTURER,Academic Pool,+2348130000024
+abulimensamuel+pool025@gmail.com,Pool025,Lecturer,LECTURER,Academic Pool,+2348130000025
+abulimensamuel+pool026@gmail.com,Pool026,Lecturer,LECTURER,Academic Pool,+2348130000026
+abulimensamuel+pool027@gmail.com,Pool027,Lecturer,LECTURER,Academic Pool,+2348130000027
+abulimensamuel+pool028@gmail.com,Pool028,Lecturer,LECTURER,Academic Pool,+2348130000028
+abulimensamuel+pool029@gmail.com,Pool029,Lecturer,LECTURER,Academic Pool,+2348130000029
+abulimensamuel+pool030@gmail.com,Pool030,Lecturer,LECTURER,Academic Pool,+2348130000030
+abulimensamuel+pool031@gmail.com,Pool031,Lecturer,LECTURER,Academic Pool,+2348130000031
+abulimensamuel+pool032@gmail.com,Pool032,Lecturer,LECTURER,Academic Pool,+2348130000032
+abulimensamuel+pool033@gmail.com,Pool033,Lecturer,LECTURER,Academic Pool,+2348130000033
+abulimensamuel+pool034@gmail.com,Pool034,Lecturer,LECTURER,Academic Pool,+2348130000034
+abulimensamuel+pool035@gmail.com,Pool035,Lecturer,LECTURER,Academic Pool,+2348130000035
+abulimensamuel+pool036@gmail.com,Pool036,Lecturer,LECTURER,Academic Pool,+2348130000036
+abulimensamuel+pool037@gmail.com,Pool037,Lecturer,LECTURER,Academic Pool,+2348130000037
+abulimensamuel+pool038@gmail.com,Pool038,Lecturer,LECTURER,Academic Pool,+2348130000038
+abulimensamuel+pool039@gmail.com,Pool039,Lecturer,LECTURER,Academic Pool,+2348130000039
+abulimensamuel+pool040@gmail.com,Pool040,Lecturer,LECTURER,Academic Pool,+2348130000040
+abulimensamuel+pool041@gmail.com,Pool041,Lecturer,LECTURER,Academic Pool,+2348130000041
+abulimensamuel+pool042@gmail.com,Pool042,Lecturer,LECTURER,Academic Pool,+2348130000042
+abulimensamuel+pool043@gmail.com,Pool043,Lecturer,LECTURER,Academic Pool,+2348130000043
+abulimensamuel+pool044@gmail.com,Pool044,Lecturer,LECTURER,Academic Pool,+2348130000044
+abulimensamuel+pool045@gmail.com,Pool045,Lecturer,LECTURER,Academic Pool,+2348130000045
+abulimensamuel+pool046@gmail.com,Pool046,Lecturer,LECTURER,Academic Pool,+2348130000046
+abulimensamuel+pool047@gmail.com,Pool047,Lecturer,LECTURER,Academic Pool,+2348130000047
+abulimensamuel+pool048@gmail.com,Pool048,Lecturer,LECTURER,Academic Pool,+2348130000048
+abulimensamuel+pool049@gmail.com,Pool049,Lecturer,LECTURER,Academic Pool,+2348130000049
+abulimensamuel+pool050@gmail.com,Pool050,Lecturer,LECTURER,Academic Pool,+2348130000050
+abulimensamuel+pool051@gmail.com,Pool051,Lecturer,LECTURER,Academic Pool,+2348130000051
+abulimensamuel+pool052@gmail.com,Pool052,Lecturer,LECTURER,Academic Pool,+2348130000052
+abulimensamuel+pool053@gmail.com,Pool053,Lecturer,LECTURER,Academic Pool,+2348130000053
+abulimensamuel+pool054@gmail.com,Pool054,Lecturer,LECTURER,Academic Pool,+2348130000054
+abulimensamuel+pool055@gmail.com,Pool055,Lecturer,LECTURER,Academic Pool,+2348130000055
+abulimensamuel+pool056@gmail.com,Pool056,Lecturer,LECTURER,Academic Pool,+2348130000056
+abulimensamuel+pool057@gmail.com,Pool057,Lecturer,LECTURER,Academic Pool,+2348130000057
+abulimensamuel+pool058@gmail.com,Pool058,Lecturer,LECTURER,Academic Pool,+2348130000058
+abulimensamuel+pool059@gmail.com,Pool059,Lecturer,LECTURER,Academic Pool,+2348130000059
+abulimensamuel+pool060@gmail.com,Pool060,Lecturer,LECTURER,Academic Pool,+2348130000060
+abulimensamuel+pool061@gmail.com,Pool061,Lecturer,LECTURER,Academic Pool,+2348130000061
+abulimensamuel+pool062@gmail.com,Pool062,Lecturer,LECTURER,Academic Pool,+2348130000062
+abulimensamuel+pool063@gmail.com,Pool063,Lecturer,LECTURER,Academic Pool,+2348130000063
+abulimensamuel+pool064@gmail.com,Pool064,Lecturer,LECTURER,Academic Pool,+2348130000064
+abulimensamuel+pool065@gmail.com,Pool065,Lecturer,LECTURER,Academic Pool,+2348130000065
+abulimensamuel+pool066@gmail.com,Pool066,Lecturer,LECTURER,Academic Pool,+2348130000066
+abulimensamuel+pool067@gmail.com,Pool067,Lecturer,LECTURER,Academic Pool,+2348130000067
+abulimensamuel+pool068@gmail.com,Pool068,Lecturer,LECTURER,Academic Pool,+2348130000068
+abulimensamuel+pool069@gmail.com,Pool069,Lecturer,LECTURER,Academic Pool,+2348130000069
+abulimensamuel+pool070@gmail.com,Pool070,Lecturer,LECTURER,Academic Pool,+2348130000070
+abulimensamuel+pool071@gmail.com,Pool071,Lecturer,LECTURER,Academic Pool,+2348130000071
+abulimensamuel+pool072@gmail.com,Pool072,Lecturer,LECTURER,Academic Pool,+2348130000072
+abulimensamuel+pool073@gmail.com,Pool073,Lecturer,LECTURER,Academic Pool,+2348130000073
+abulimensamuel+pool074@gmail.com,Pool074,Lecturer,LECTURER,Academic Pool,+2348130000074
+abulimensamuel+pool075@gmail.com,Pool075,Lecturer,LECTURER,Academic Pool,+2348130000075
+abulimensamuel+pool076@gmail.com,Pool076,Lecturer,LECTURER,Academic Pool,+2348130000076
+abulimensamuel+pool077@gmail.com,Pool077,Lecturer,LECTURER,Academic Pool,+2348130000077
+abulimensamuel+pool078@gmail.com,Pool078,Lecturer,LECTURER,Academic Pool,+2348130000078
+abulimensamuel+pool079@gmail.com,Pool079,Lecturer,LECTURER,Academic Pool,+2348130000079
+abulimensamuel+pool080@gmail.com,Pool080,Lecturer,LECTURER,Academic Pool,+2348130000080
+abulimensamuel+pool081@gmail.com,Pool081,Lecturer,LECTURER,Academic Pool,+2348130000081
+abulimensamuel+pool082@gmail.com,Pool082,Lecturer,LECTURER,Academic Pool,+2348130000082
+abulimensamuel+pool083@gmail.com,Pool083,Lecturer,LECTURER,Academic Pool,+2348130000083
+abulimensamuel+pool084@gmail.com,Pool084,Lecturer,LECTURER,Academic Pool,+2348130000084
+abulimensamuel+pool085@gmail.com,Pool085,Lecturer,LECTURER,Academic Pool,+2348130000085
+abulimensamuel+pool086@gmail.com,Pool086,Lecturer,LECTURER,Academic Pool,+2348130000086
+abulimensamuel+pool087@gmail.com,Pool087,Lecturer,LECTURER,Academic Pool,+2348130000087
+abulimensamuel+pool088@gmail.com,Pool088,Lecturer,LECTURER,Academic Pool,+2348130000088
+abulimensamuel+pool089@gmail.com,Pool089,Lecturer,LECTURER,Academic Pool,+2348130000089
+abulimensamuel+pool090@gmail.com,Pool090,Lecturer,LECTURER,Academic Pool,+2348130000090
+abulimensamuel+pool091@gmail.com,Pool091,Lecturer,LECTURER,Academic Pool,+2348130000091
+abulimensamuel+pool092@gmail.com,Pool092,Lecturer,LECTURER,Academic Pool,+2348130000092
+abulimensamuel+pool093@gmail.com,Pool093,Lecturer,LECTURER,Academic Pool,+2348130000093
+abulimensamuel+pool094@gmail.com,Pool094,Lecturer,LECTURER,Academic Pool,+2348130000094
+abulimensamuel+pool095@gmail.com,Pool095,Lecturer,LECTURER,Academic Pool,+2348130000095
+abulimensamuel+pool096@gmail.com,Pool096,Lecturer,LECTURER,Academic Pool,+2348130000096
+abulimensamuel+pool097@gmail.com,Pool097,Lecturer,LECTURER,Academic Pool,+2348130000097
+abulimensamuel+pool098@gmail.com,Pool098,Lecturer,LECTURER,Academic Pool,+2348130000098
+abulimensamuel+pool099@gmail.com,Pool099,Lecturer,LECTURER,Academic Pool,+2348130000099
+abulimensamuel+pool100@gmail.com,Pool100,Lecturer,LECTURER,Academic Pool,+2348130000100
+abulimensamuel+pool101@gmail.com,Pool101,Lecturer,LECTURER,Academic Pool,+2348130000101
+abulimensamuel+pool102@gmail.com,Pool102,Lecturer,LECTURER,Academic Pool,+2348130000102
+abulimensamuel+pool103@gmail.com,Pool103,Lecturer,LECTURER,Academic Pool,+2348130000103
+abulimensamuel+pool104@gmail.com,Pool104,Lecturer,LECTURER,Academic Pool,+2348130000104
+abulimensamuel+pool105@gmail.com,Pool105,Lecturer,LECTURER,Academic Pool,+2348130000105
+abulimensamuel+pool106@gmail.com,Pool106,Lecturer,LECTURER,Academic Pool,+2348130000106
+abulimensamuel+pool107@gmail.com,Pool107,Lecturer,LECTURER,Academic Pool,+2348130000107
+abulimensamuel+pool108@gmail.com,Pool108,Lecturer,LECTURER,Academic Pool,+2348130000108
+abulimensamuel+pool109@gmail.com,Pool109,Lecturer,LECTURER,Academic Pool,+2348130000109
+abulimensamuel+pool110@gmail.com,Pool110,Lecturer,LECTURER,Academic Pool,+2348130000110
+abulimensamuel+pool111@gmail.com,Pool111,Lecturer,LECTURER,Academic Pool,+2348130000111
+abulimensamuel+pool112@gmail.com,Pool112,Lecturer,LECTURER,Academic Pool,+2348130000112
+abulimensamuel+pool113@gmail.com,Pool113,Lecturer,LECTURER,Academic Pool,+2348130000113
+abulimensamuel+pool114@gmail.com,Pool114,Lecturer,LECTURER,Academic Pool,+2348130000114
+abulimensamuel+pool115@gmail.com,Pool115,Lecturer,LECTURER,Academic Pool,+2348130000115
+abulimensamuel+pool116@gmail.com,Pool116,Lecturer,LECTURER,Academic Pool,+2348130000116
+abulimensamuel+pool117@gmail.com,Pool117,Lecturer,LECTURER,Academic Pool,+2348130000117
+abulimensamuel+pool118@gmail.com,Pool118,Lecturer,LECTURER,Academic Pool,+2348130000118
+abulimensamuel+pool119@gmail.com,Pool119,Lecturer,LECTURER,Academic Pool,+2348130000119
+abulimensamuel+pool120@gmail.com,Pool120,Lecturer,LECTURER,Academic Pool,+2348130000120
+abulimensamuel+pool121@gmail.com,Pool121,Lecturer,LECTURER,Academic Pool,+2348130000121
+abulimensamuel+pool122@gmail.com,Pool122,Lecturer,LECTURER,Academic Pool,+2348130000122
+abulimensamuel+pool123@gmail.com,Pool123,Lecturer,LECTURER,Academic Pool,+2348130000123
+abulimensamuel+pool124@gmail.com,Pool124,Lecturer,LECTURER,Academic Pool,+2348130000124
+abulimensamuel+pool125@gmail.com,Pool125,Lecturer,LECTURER,Academic Pool,+2348130000125
+abulimensamuel+pool126@gmail.com,Pool126,Lecturer,LECTURER,Academic Pool,+2348130000126
+abulimensamuel+pool127@gmail.com,Pool127,Lecturer,LECTURER,Academic Pool,+2348130000127
+abulimensamuel+pool128@gmail.com,Pool128,Lecturer,LECTURER,Academic Pool,+2348130000128
+abulimensamuel+pool129@gmail.com,Pool129,Lecturer,LECTURER,Academic Pool,+2348130000129
+abulimensamuel+pool130@gmail.com,Pool130,Lecturer,LECTURER,Academic Pool,+2348130000130
+abulimensamuel+pool131@gmail.com,Pool131,Lecturer,LECTURER,Academic Pool,+2348130000131
+abulimensamuel+pool132@gmail.com,Pool132,Lecturer,LECTURER,Academic Pool,+2348130000132
+abulimensamuel+pool133@gmail.com,Pool133,Lecturer,LECTURER,Academic Pool,+2348130000133
+abulimensamuel+pool134@gmail.com,Pool134,Lecturer,LECTURER,Academic Pool,+2348130000134
+abulimensamuel+pool135@gmail.com,Pool135,Lecturer,LECTURER,Academic Pool,+2348130000135
+abulimensamuel+pool136@gmail.com,Pool136,Lecturer,LECTURER,Academic Pool,+2348130000136
+abulimensamuel+pool137@gmail.com,Pool137,Lecturer,LECTURER,Academic Pool,+2348130000137
+abulimensamuel+pool138@gmail.com,Pool138,Lecturer,LECTURER,Academic Pool,+2348130000138
+abulimensamuel+pool139@gmail.com,Pool139,Lecturer,LECTURER,Academic Pool,+2348130000139
+abulimensamuel+pool140@gmail.com,Pool140,Lecturer,LECTURER,Academic Pool,+2348130000140
+abulimensamuel+pool141@gmail.com,Pool141,Lecturer,LECTURER,Academic Pool,+2348130000141
+abulimensamuel+pool142@gmail.com,Pool142,Lecturer,LECTURER,Academic Pool,+2348130000142
+abulimensamuel+pool143@gmail.com,Pool143,Lecturer,LECTURER,Academic Pool,+2348130000143
+abulimensamuel+pool144@gmail.com,Pool144,Lecturer,LECTURER,Academic Pool,+2348130000144
+abulimensamuel+pool145@gmail.com,Pool145,Lecturer,LECTURER,Academic Pool,+2348130000145
+abulimensamuel+pool146@gmail.com,Pool146,Lecturer,LECTURER,Academic Pool,+2348130000146
+abulimensamuel+pool147@gmail.com,Pool147,Lecturer,LECTURER,Academic Pool,+2348130000147
+abulimensamuel+pool148@gmail.com,Pool148,Lecturer,LECTURER,Academic Pool,+2348130000148
+abulimensamuel+pool149@gmail.com,Pool149,Lecturer,LECTURER,Academic Pool,+2348130000149
+abulimensamuel+pool150@gmail.com,Pool150,Lecturer,LECTURER,Academic Pool,+2348130000150
+abulimensamuel+pool151@gmail.com,Pool151,Lecturer,LECTURER,Academic Pool,+2348130000151
+abulimensamuel+pool152@gmail.com,Pool152,Lecturer,LECTURER,Academic Pool,+2348130000152
+abulimensamuel+pool153@gmail.com,Pool153,Lecturer,LECTURER,Academic Pool,+2348130000153
+abulimensamuel+pool154@gmail.com,Pool154,Lecturer,LECTURER,Academic Pool,+2348130000154
+abulimensamuel+pool155@gmail.com,Pool155,Lecturer,LECTURER,Academic Pool,+2348130000155
+abulimensamuel+pool156@gmail.com,Pool156,Lecturer,LECTURER,Academic Pool,+2348130000156
+abulimensamuel+pool157@gmail.com,Pool157,Lecturer,LECTURER,Academic Pool,+2348130000157
+abulimensamuel+pool158@gmail.com,Pool158,Lecturer,LECTURER,Academic Pool,+2348130000158
+abulimensamuel+pool159@gmail.com,Pool159,Lecturer,LECTURER,Academic Pool,+2348130000159
+abulimensamuel+pool160@gmail.com,Pool160,Lecturer,LECTURER,Academic Pool,+2348130000160
+abulimensamuel+pool161@gmail.com,Pool161,Lecturer,LECTURER,Academic Pool,+2348130000161
+abulimensamuel+pool162@gmail.com,Pool162,Lecturer,LECTURER,Academic Pool,+2348130000162
+abulimensamuel+pool163@gmail.com,Pool163,Lecturer,LECTURER,Academic Pool,+2348130000163
+abulimensamuel+pool164@gmail.com,Pool164,Lecturer,LECTURER,Academic Pool,+2348130000164
+abulimensamuel+pool165@gmail.com,Pool165,Lecturer,LECTURER,Academic Pool,+2348130000165
+abulimensamuel+pool166@gmail.com,Pool166,Lecturer,LECTURER,Academic Pool,+2348130000166
+abulimensamuel+pool167@gmail.com,Pool167,Lecturer,LECTURER,Academic Pool,+2348130000167
+abulimensamuel+pool168@gmail.com,Pool168,Lecturer,LECTURER,Academic Pool,+2348130000168
+abulimensamuel+pool169@gmail.com,Pool169,Lecturer,LECTURER,Academic Pool,+2348130000169
+abulimensamuel+pool170@gmail.com,Pool170,Lecturer,LECTURER,Academic Pool,+2348130000170
+abulimensamuel+pool171@gmail.com,Pool171,Lecturer,LECTURER,Academic Pool,+2348130000171
+abulimensamuel+pool172@gmail.com,Pool172,Lecturer,LECTURER,Academic Pool,+2348130000172
+abulimensamuel+pool173@gmail.com,Pool173,Lecturer,LECTURER,Academic Pool,+2348130000173
+abulimensamuel+pool174@gmail.com,Pool174,Lecturer,LECTURER,Academic Pool,+2348130000174
+abulimensamuel+pool175@gmail.com,Pool175,Lecturer,LECTURER,Academic Pool,+2348130000175
+abulimensamuel+pool176@gmail.com,Pool176,Lecturer,LECTURER,Academic Pool,+2348130000176
+abulimensamuel+pool177@gmail.com,Pool177,Lecturer,LECTURER,Academic Pool,+2348130000177
+abulimensamuel+pool178@gmail.com,Pool178,Lecturer,LECTURER,Academic Pool,+2348130000178
+abulimensamuel+pool179@gmail.com,Pool179,Lecturer,LECTURER,Academic Pool,+2348130000179
+abulimensamuel+pool180@gmail.com,Pool180,Lecturer,LECTURER,Academic Pool,+2348130000180
+abulimensamuel+pool181@gmail.com,Pool181,Lecturer,LECTURER,Academic Pool,+2348130000181
+abulimensamuel+pool182@gmail.com,Pool182,Lecturer,LECTURER,Academic Pool,+2348130000182
+abulimensamuel+pool183@gmail.com,Pool183,Lecturer,LECTURER,Academic Pool,+2348130000183
+abulimensamuel+pool184@gmail.com,Pool184,Lecturer,LECTURER,Academic Pool,+2348130000184
+abulimensamuel+pool185@gmail.com,Pool185,Lecturer,LECTURER,Academic Pool,+2348130000185
+abulimensamuel+pool186@gmail.com,Pool186,Lecturer,LECTURER,Academic Pool,+2348130000186
+abulimensamuel+pool187@gmail.com,Pool187,Lecturer,LECTURER,Academic Pool,+2348130000187
+abulimensamuel+pool188@gmail.com,Pool188,Lecturer,LECTURER,Academic Pool,+2348130000188
+abulimensamuel+pool189@gmail.com,Pool189,Lecturer,LECTURER,Academic Pool,+2348130000189
+abulimensamuel+pool190@gmail.com,Pool190,Lecturer,LECTURER,Academic Pool,+2348130000190
+abulimensamuel+pool191@gmail.com,Pool191,Lecturer,LECTURER,Academic Pool,+2348130000191
+abulimensamuel+pool192@gmail.com,Pool192,Lecturer,LECTURER,Academic Pool,+2348130000192
+abulimensamuel+pool193@gmail.com,Pool193,Lecturer,LECTURER,Academic Pool,+2348130000193
+abulimensamuel+pool194@gmail.com,Pool194,Lecturer,LECTURER,Academic Pool,+2348130000194
+abulimensamuel+pool195@gmail.com,Pool195,Lecturer,LECTURER,Academic Pool,+2348130000195
+abulimensamuel+pool196@gmail.com,Pool196,Lecturer,LECTURER,Academic Pool,+2348130000196
+abulimensamuel+pool197@gmail.com,Pool197,Lecturer,LECTURER,Academic Pool,+2348130000197
+abulimensamuel+pool198@gmail.com,Pool198,Lecturer,LECTURER,Academic Pool,+2348130000198
+abulimensamuel+pool199@gmail.com,Pool199,Lecturer,LECTURER,Academic Pool,+2348130000199
+abulimensamuel+pool200@gmail.com,Pool200,Lecturer,LECTURER,Academic Pool,+2348130000200
+abulimensamuel+pool201@gmail.com,Pool201,Lecturer,LECTURER,Academic Pool,+2348130000201
+abulimensamuel+pool202@gmail.com,Pool202,Lecturer,LECTURER,Academic Pool,+2348130000202
+abulimensamuel+pool203@gmail.com,Pool203,Lecturer,LECTURER,Academic Pool,+2348130000203
+abulimensamuel+pool204@gmail.com,Pool204,Lecturer,LECTURER,Academic Pool,+2348130000204
+abulimensamuel+pool205@gmail.com,Pool205,Lecturer,LECTURER,Academic Pool,+2348130000205
+abulimensamuel+pool206@gmail.com,Pool206,Lecturer,LECTURER,Academic Pool,+2348130000206
+abulimensamuel+pool207@gmail.com,Pool207,Lecturer,LECTURER,Academic Pool,+2348130000207
+abulimensamuel+pool208@gmail.com,Pool208,Lecturer,LECTURER,Academic Pool,+2348130000208
+abulimensamuel+pool209@gmail.com,Pool209,Lecturer,LECTURER,Academic Pool,+2348130000209
+abulimensamuel+pool210@gmail.com,Pool210,Lecturer,LECTURER,Academic Pool,+2348130000210
+abulimensamuel+pool211@gmail.com,Pool211,Lecturer,LECTURER,Academic Pool,+2348130000211
+abulimensamuel+pool212@gmail.com,Pool212,Lecturer,LECTURER,Academic Pool,+2348130000212
+abulimensamuel+pool213@gmail.com,Pool213,Lecturer,LECTURER,Academic Pool,+2348130000213
+abulimensamuel+pool214@gmail.com,Pool214,Lecturer,LECTURER,Academic Pool,+2348130000214
+abulimensamuel+pool215@gmail.com,Pool215,Lecturer,LECTURER,Academic Pool,+2348130000215
+abulimensamuel+pool216@gmail.com,Pool216,Lecturer,LECTURER,Academic Pool,+2348130000216
+abulimensamuel+pool217@gmail.com,Pool217,Lecturer,LECTURER,Academic Pool,+2348130000217
+abulimensamuel+pool218@gmail.com,Pool218,Lecturer,LECTURER,Academic Pool,+2348130000218
+abulimensamuel+pool219@gmail.com,Pool219,Lecturer,LECTURER,Academic Pool,+2348130000219
+abulimensamuel+pool220@gmail.com,Pool220,Lecturer,LECTURER,Academic Pool,+2348130000220
+abulimensamuel+pool221@gmail.com,Pool221,Lecturer,LECTURER,Academic Pool,+2348130000221
+abulimensamuel+pool222@gmail.com,Pool222,Lecturer,LECTURER,Academic Pool,+2348130000222
+abulimensamuel+pool223@gmail.com,Pool223,Lecturer,LECTURER,Academic Pool,+2348130000223
+abulimensamuel+pool224@gmail.com,Pool224,Lecturer,LECTURER,Academic Pool,+2348130000224
+abulimensamuel+pool225@gmail.com,Pool225,Lecturer,LECTURER,Academic Pool,+2348130000225
+abulimensamuel+pool226@gmail.com,Pool226,Lecturer,LECTURER,Academic Pool,+2348130000226
+abulimensamuel+pool227@gmail.com,Pool227,Lecturer,LECTURER,Academic Pool,+2348130000227
+abulimensamuel+pool228@gmail.com,Pool228,Lecturer,LECTURER,Academic Pool,+2348130000228
+abulimensamuel+pool229@gmail.com,Pool229,Lecturer,LECTURER,Academic Pool,+2348130000229
+abulimensamuel+pool230@gmail.com,Pool230,Lecturer,LECTURER,Academic Pool,+2348130000230
+abulimensamuel+pool231@gmail.com,Pool231,Lecturer,LECTURER,Academic Pool,+2348130000231
+abulimensamuel+pool232@gmail.com,Pool232,Lecturer,LECTURER,Academic Pool,+2348130000232
+abulimensamuel+pool233@gmail.com,Pool233,Lecturer,LECTURER,Academic Pool,+2348130000233
+abulimensamuel+pool234@gmail.com,Pool234,Lecturer,LECTURER,Academic Pool,+2348130000234
+abulimensamuel+pool235@gmail.com,Pool235,Lecturer,LECTURER,Academic Pool,+2348130000235
+abulimensamuel+pool236@gmail.com,Pool236,Lecturer,LECTURER,Academic Pool,+2348130000236
+abulimensamuel+pool237@gmail.com,Pool237,Lecturer,LECTURER,Academic Pool,+2348130000237
+abulimensamuel+pool238@gmail.com,Pool238,Lecturer,LECTURER,Academic Pool,+2348130000238
+abulimensamuel+pool239@gmail.com,Pool239,Lecturer,LECTURER,Academic Pool,+2348130000239
+abulimensamuel+pool240@gmail.com,Pool240,Lecturer,LECTURER,Academic Pool,+2348130000240
+abulimensamuel+pool241@gmail.com,Pool241,Lecturer,LECTURER,Academic Pool,+2348130000241
+abulimensamuel+pool242@gmail.com,Pool242,Lecturer,LECTURER,Academic Pool,+2348130000242
+abulimensamuel+pool243@gmail.com,Pool243,Lecturer,LECTURER,Academic Pool,+2348130000243
+abulimensamuel+pool244@gmail.com,Pool244,Lecturer,LECTURER,Academic Pool,+2348130000244
+abulimensamuel+pool245@gmail.com,Pool245,Lecturer,LECTURER,Academic Pool,+2348130000245
+abulimensamuel+pool246@gmail.com,Pool246,Lecturer,LECTURER,Academic Pool,+2348130000246
+abulimensamuel+pool247@gmail.com,Pool247,Lecturer,LECTURER,Academic Pool,+2348130000247
+abulimensamuel+pool248@gmail.com,Pool248,Lecturer,LECTURER,Academic Pool,+2348130000248
+abulimensamuel+pool249@gmail.com,Pool249,Lecturer,LECTURER,Academic Pool,+2348130000249
+abulimensamuel+pool250@gmail.com,Pool250,Lecturer,LECTURER,Academic Pool,+2348130000250
+abulimensamuel+pool251@gmail.com,Pool251,Lecturer,LECTURER,Academic Pool,+2348130000251
+abulimensamuel+pool252@gmail.com,Pool252,Lecturer,LECTURER,Academic Pool,+2348130000252
+abulimensamuel+pool253@gmail.com,Pool253,Lecturer,LECTURER,Academic Pool,+2348130000253
+abulimensamuel+pool254@gmail.com,Pool254,Lecturer,LECTURER,Academic Pool,+2348130000254
+abulimensamuel+pool255@gmail.com,Pool255,Lecturer,LECTURER,Academic Pool,+2348130000255
+abulimensamuel+pool256@gmail.com,Pool256,Lecturer,LECTURER,Academic Pool,+2348130000256
+abulimensamuel+pool257@gmail.com,Pool257,Lecturer,LECTURER,Academic Pool,+2348130000257
+abulimensamuel+pool258@gmail.com,Pool258,Lecturer,LECTURER,Academic Pool,+2348130000258
+abulimensamuel+pool259@gmail.com,Pool259,Lecturer,LECTURER,Academic Pool,+2348130000259
+abulimensamuel+pool260@gmail.com,Pool260,Lecturer,LECTURER,Academic Pool,+2348130000260
+abulimensamuel+pool261@gmail.com,Pool261,Lecturer,LECTURER,Academic Pool,+2348130000261
+abulimensamuel+pool262@gmail.com,Pool262,Lecturer,LECTURER,Academic Pool,+2348130000262
+abulimensamuel+pool263@gmail.com,Pool263,Lecturer,LECTURER,Academic Pool,+2348130000263
+abulimensamuel+pool264@gmail.com,Pool264,Lecturer,LECTURER,Academic Pool,+2348130000264
+abulimensamuel+pool265@gmail.com,Pool265,Lecturer,LECTURER,Academic Pool,+2348130000265
+abulimensamuel+pool266@gmail.com,Pool266,Lecturer,LECTURER,Academic Pool,+2348130000266
+abulimensamuel+pool267@gmail.com,Pool267,Lecturer,LECTURER,Academic Pool,+2348130000267
+abulimensamuel+pool268@gmail.com,Pool268,Lecturer,LECTURER,Academic Pool,+2348130000268
+abulimensamuel+pool269@gmail.com,Pool269,Lecturer,LECTURER,Academic Pool,+2348130000269
+abulimensamuel+pool270@gmail.com,Pool270,Lecturer,LECTURER,Academic Pool,+2348130000270

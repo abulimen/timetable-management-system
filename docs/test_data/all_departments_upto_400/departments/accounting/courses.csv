@@ -1,0 +1,51 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+ACC101,Principles of Accounting I,3,abulimensamuel+olamide.faleye@gmail.com,ACC 100 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ACC101,Principles of Accounting I,3,abulimensamuel+olamide.faleye@gmail.com,ACC 100 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool040@gmail.com,ACC 100 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool041@gmail.com,ACC 100 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool042@gmail.com,ACC 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+chineye.okafor@gmail.com,ACC 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST111,Communication in English,2,abulimensamuel+pool043@gmail.com,ACC 100 LEVEL (GRP A)|ACC 100 LEVEL (GRP B),true,,
+ACC201,Financial Reporting Systems,3,abulimensamuel+olamide.faleye@gmail.com,ACC 200 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ACC201,Financial Reporting Systems,3,abulimensamuel+pool044@gmail.com,ACC 200 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool045@gmail.com,ACC 200 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool046@gmail.com,ACC 200 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|BUSINESS SCHOOL
+GST212,Philosophy and Human Existence,2,abulimensamuel+pool047@gmail.com,ACC 200 LEVEL (GRP A)|ACC 200 LEVEL (GRP B),true,,
+ACC301,Cost and Management Accounting,3,abulimensamuel+olamide.faleye@gmail.com,ACC 300 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ACC301,Cost and Management Accounting,3,abulimensamuel+pool040@gmail.com,ACC 300 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool041@gmail.com,ACC 300 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|GENERAL STUDIES BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool042@gmail.com,ACC 300 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|GENERAL STUDIES BLOCK
+BU-GST322,Citizenship Orientation,1,abulimensamuel+pool043@gmail.com,ACC 300 LEVEL (GRP A)|ACC 300 LEVEL (GRP B),true,,
+ACC401,Auditing and Assurance,3,abulimensamuel+olamide.faleye@gmail.com,ACC 400 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ACC401,Auditing and Assurance,3,abulimensamuel+pool044@gmail.com,ACC 400 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ACC402,Taxation and Fiscal Policy,3,abulimensamuel+pool045@gmail.com,ACC 400 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ACC402,Taxation and Fiscal Policy,3,abulimensamuel+olamide.faleye@gmail.com,ACC 400 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+pool046@gmail.com,ACC 400 LEVEL (GRP A)|ACC 400 LEVEL (GRP B),true,,
+ACC104,Financial Accounting Practice,3,abulimensamuel+pool001@gmail.com,ACC 100 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ACC104,Financial Accounting Practice,3,abulimensamuel+pool001@gmail.com,ACC 100 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ACC105,Business Communication for Accountants,2,abulimensamuel+pool002@gmail.com,ACC 100 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ACC105,Business Communication for Accountants,2,abulimensamuel+pool002@gmail.com,ACC 100 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ACC106,Spreadsheet Analytics for Accounting,2,abulimensamuel+pool003@gmail.com,ACC 100 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+ACC106,Spreadsheet Analytics for Accounting,2,abulimensamuel+pool003@gmail.com,ACC 100 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+GST121,Critical Thinking and Writing,2,abulimensamuel+pool047@gmail.com,ACC 100 LEVEL (GRP A)|ACC 100 LEVEL (GRP B),true,,
+ACC204,Accounting Information Systems,3,abulimensamuel+pool004@gmail.com,ACC 200 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,BUSINESS SCHOOL|ICT COMPLEX
+ACC204,Accounting Information Systems,3,abulimensamuel+pool004@gmail.com,ACC 200 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,BUSINESS SCHOOL|ICT COMPLEX
+ACC205,Public Sector Accounting,2,abulimensamuel+pool005@gmail.com,ACC 200 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ACC205,Public Sector Accounting,2,abulimensamuel+pool005@gmail.com,ACC 200 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ACC206,Forensic Accounting Basics,2,abulimensamuel+pool006@gmail.com,ACC 200 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ACC206,Forensic Accounting Basics,2,abulimensamuel+pool006@gmail.com,ACC 200 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+GST221,Logic and Scientific Reasoning,2,abulimensamuel+pool040@gmail.com,ACC 200 LEVEL (GRP A)|ACC 200 LEVEL (GRP B),true,,
+ACC304,Advanced Costing Techniques,3,abulimensamuel+pool007@gmail.com,ACC 300 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ACC304,Advanced Costing Techniques,3,abulimensamuel+pool007@gmail.com,ACC 300 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ACC305,Corporate Reporting Standards,3,abulimensamuel+pool008@gmail.com,ACC 300 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ACC305,Corporate Reporting Standards,3,abulimensamuel+pool008@gmail.com,ACC 300 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ACC306,Financial Statement Modeling,2,abulimensamuel+pool001@gmail.com,ACC 300 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+ACC306,Financial Statement Modeling,2,abulimensamuel+pool001@gmail.com,ACC 300 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+GST321,Peace Studies and Conflict Resolution,2,abulimensamuel+pool041@gmail.com,ACC 300 LEVEL (GRP A)|ACC 300 LEVEL (GRP B),true,,
+ACC404,International Financial Reporting,3,abulimensamuel+pool002@gmail.com,ACC 400 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ACC404,International Financial Reporting,3,abulimensamuel+pool002@gmail.com,ACC 400 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ACC405,Strategic Management Accounting,3,abulimensamuel+pool003@gmail.com,ACC 400 LEVEL (GRP A),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ACC405,Strategic Management Accounting,3,abulimensamuel+pool003@gmail.com,ACC 400 LEVEL (GRP B),false,PROJECTOR,BUSINESS SCHOOL|MAIN ACADEMIC BLOCK
+ACC406,Assurance Analytics Workshop,2,abulimensamuel+pool004@gmail.com,ACC 400 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+ACC406,Assurance Analytics Workshop,2,abulimensamuel+pool004@gmail.com,ACC 400 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|BUSINESS SCHOOL
+GST421,Leadership Communication and Culture,2,abulimensamuel+pool042@gmail.com,ACC 400 LEVEL (GRP A)|ACC 400 LEVEL (GRP B),true,,

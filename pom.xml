@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.5</version>
+        <version>3.5.0</version>
         <relativePath/>
     </parent>
 
@@ -18,7 +18,7 @@
 
     <properties>
         <java.version>21</java.version>
-        <optaplanner.version>9.44.0.Final</optaplanner.version>
+        <timefold.version>1.31.0</timefold.version>
         <poi.version>5.2.5</poi.version>
     </properties>
 
@@ -52,11 +52,11 @@
             <artifactId>flyway-mysql</artifactId>
         </dependency>
 
-        <!-- OptaPlanner (Constraint Solver) -->
+        <!-- Timefold Solver (Constraint Solver — successor to OptaPlanner) -->
         <dependency>
-            <groupId>org.optaplanner</groupId>
-            <artifactId>optaplanner-spring-boot-starter</artifactId>
-            <version>${optaplanner.version}</version>
+            <groupId>ai.timefold.solver</groupId>
+            <artifactId>timefold-solver-spring-boot-starter</artifactId>
+            <version>${timefold.version}</version>
         </dependency>
 
         <!-- Apache POI (Excel Parsing) -->
@@ -124,9 +124,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.optaplanner</groupId>
-            <artifactId>optaplanner-test</artifactId>
-            <version>${optaplanner.version}</version>
+            <groupId>ai.timefold.solver</groupId>
+            <artifactId>timefold-solver-test</artifactId>
+            <version>${timefold.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -6,18 +6,18 @@ import com.university.timetable.service.ConstraintSettingsService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
-import org.optaplanner.core.api.solver.SolverFactory;
-import org.optaplanner.core.api.solver.SolverManager;
-import org.optaplanner.core.api.solver.SolutionManager;
-import org.optaplanner.core.config.constructionheuristic.ConstructionHeuristicPhaseConfig;
-import org.optaplanner.core.config.solver.EnvironmentMode;
-import org.optaplanner.core.config.solver.SolverConfig;
-import org.optaplanner.core.config.solver.SolverManagerConfig;
-import org.optaplanner.core.config.localsearch.LocalSearchPhaseConfig;
-import org.optaplanner.core.config.localsearch.decider.forager.LocalSearchForagerConfig;
-import org.optaplanner.core.config.phase.PhaseConfig;
-import org.optaplanner.core.config.solver.termination.TerminationConfig;
+import ai.timefold.solver.core.api.score.buildin.hardsoft.HardSoftScore;
+import ai.timefold.solver.core.api.solver.SolverFactory;
+import ai.timefold.solver.core.api.solver.SolverManager;
+import ai.timefold.solver.core.api.solver.SolutionManager;
+import ai.timefold.solver.core.config.constructionheuristic.ConstructionHeuristicPhaseConfig;
+import ai.timefold.solver.core.config.solver.EnvironmentMode;
+import ai.timefold.solver.core.config.solver.SolverConfig;
+import ai.timefold.solver.core.config.solver.SolverManagerConfig;
+import ai.timefold.solver.core.config.localsearch.LocalSearchPhaseConfig;
+import ai.timefold.solver.core.config.localsearch.decider.forager.LocalSearchForagerConfig;
+import ai.timefold.solver.core.config.phase.PhaseConfig;
+import ai.timefold.solver.core.config.solver.termination.TerminationConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,7 +38,7 @@ public class OptaPlannerConfig {
     @Value("${solver.performance.move-thread-count:4}")
     private String moveThreadCountDefault;
 
-    @Value("${solver.performance.environment-mode:REPRODUCIBLE}")
+    @Value("${solver.performance.environment-mode:NON_REPRODUCIBLE}")
     private String environmentModeDefault;
 
     @Value("${solver.performance.parallel-solver-count:1}")
@@ -59,7 +59,9 @@ public class OptaPlannerConfig {
     @Bean
     public SolverFactory<TimeTable> solverFactory() {
         SolverConfig config = SolverConfig.createFromXmlResource("solver-config.xml");
-        config.setMoveThreadCount(resolveMoveThreadCount());
+        // Note: moveThreadCount (multi-threaded solving) requires Timefold Enterprise.
+        // Community edition uses single-threaded solving, but the Timefold engine is
+        // ~2x faster.
         config.setEnvironmentMode(EnvironmentMode.valueOf(resolveEnvironmentMode()));
         applyDynamicTuning(config);
         return SolverFactory.create(config);
@@ -157,7 +159,8 @@ public class OptaPlannerConfig {
             }
         }
 
-        log.info("Applied solver tuning from admin settings: minutesLimit={}, unimprovedSeconds={}, acceptedCountLimit={}",
+        log.info(
+                "Applied solver tuning from admin settings: minutesLimit={}, unimprovedSeconds={}, acceptedCountLimit={}",
                 minutesLimit, unimprovedLimit, acceptedCountLimit);
     }
 

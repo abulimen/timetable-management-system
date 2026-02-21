@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- OptaPlanner Solver Configuration - OPTIMIZED
+<!-- Timefold Solver Configuration - OPTIMIZED
      Performance optimizations applied:
-     1. Multi-threaded solving (AUTO = all CPU cores)
-     2. Combined acceptors (Tabu + Late Acceptance)
-     3. FIRST_FIT_DECREASING construction (with difficulty comparator)
+     1. Combined acceptors (Tabu + Late Acceptance)
+     2. WEAKEST_FIT_DECREASING construction (with difficulty comparator)
+     3. Swap move selector for atomic exchanges
      4. Optimized termination criteria
 -->
-<solver xmlns="https://www.optaplanner.org/xsd/solver">
+<solver xmlns="https://timefold.ai/xsd/solver">
     <solutionClass>com.university.timetable.domain.TimeTable</solutionClass>
     <entityClass>com.university.timetable.domain.Lesson</entityClass>
-    
+
     <scoreDirectorFactory>
         <constraintProviderClass>
             com.university.timetable.solver.TimetableConstraintProvider
         </constraintProviderClass>
     </scoreDirectorFactory>
-    
+
     <!-- Multi-termination: Stop when ANY condition is met -->
     <termination>
         <!-- Maximum time limit (failsafe) - increased for large datasets -->
@@ -23,66 +23,41 @@
         <!-- Stop if no improvement for 60 seconds -->
         <unimprovedSecondsSpentLimit>60</unimprovedSecondsSpentLimit>
     </termination>
-    
-    <!-- WEAKEST_FIT_DECREASING: Schedule hard lessons first, use smallest suitable rooms -->
+
+    <!-- FIRST_FIT_DECREASING: Fast initialization by picking the first feasible slot for hardest lessons -->
     <constructionHeuristic>
-        <constructionHeuristicType>STRONGEST_FIT_DECREASING</constructionHeuristicType>
+        <constructionHeuristicType>FIRST_FIT_DECREASING</constructionHeuristicType>
     </constructionHeuristic>
-    
+
     <!-- Local Search with OPTIMIZATIONS -->
     <localSearch>
-        <!-- Option 4: Neighborhood pruning using nearby selection.
-             Restrict each move step to "near" timeslots/rooms instead of global random values. -->
         <unionMoveSelector>
-            <!-- Timeslot neighborhood moves -->
-            <changeMoveSelector>
-                <entitySelector id="timeslotEntitySelector">
-                    <cacheType>JUST_IN_TIME</cacheType>
-                    <selectionOrder>RANDOM</selectionOrder>
-                </entitySelector>
-                <valueSelector variableName="timeslot">
-                    <cacheType>JUST_IN_TIME</cacheType>
-                    <selectionOrder>RANDOM</selectionOrder>
-                    <nearbySelection>
-                        <originEntitySelector mimicSelectorRef="timeslotEntitySelector"/>
-                        <nearbyDistanceMeterClass>com.university.timetable.solver.TimeslotNearbyDistanceMeter</nearbyDistanceMeterClass>
-                        <nearbySelectionDistributionType>LINEAR_DISTRIBUTION</nearbySelectionDistributionType>
-                        <linearDistributionSizeMaximum>16</linearDistributionSizeMaximum>
-                    </nearbySelection>
-                    <selectedCountLimit>16</selectedCountLimit>
-                </valueSelector>
-            </changeMoveSelector>
+            <!-- Custom nearby-biased moves (primary: timeslot/room changes + swaps) -->
+            <moveListFactory>
+                <moveListFactoryClass>com.university.timetable.solver.move.NearbyMoveFactory</moveListFactoryClass>
+            </moveListFactory>
 
-            <!-- Room neighborhood moves -->
+            <!-- Intelligent ruin-and-recreate for escaping deep deadlocks -->
+            <moveListFactory>
+                <moveListFactoryClass>com.university.timetable.solver.move.RuinAndRecreateMoveFactory</moveListFactoryClass>
+            </moveListFactory>
+
+            <!-- Standard random selector as fallback for diversity/escape -->
             <changeMoveSelector>
-                <entitySelector id="roomEntitySelector">
-                    <cacheType>JUST_IN_TIME</cacheType>
-                    <selectionOrder>RANDOM</selectionOrder>
-                </entitySelector>
-                <valueSelector variableName="room">
-                    <cacheType>JUST_IN_TIME</cacheType>
-                    <selectionOrder>RANDOM</selectionOrder>
-                    <nearbySelection>
-                        <originEntitySelector mimicSelectorRef="roomEntitySelector"/>
-                        <nearbyDistanceMeterClass>com.university.timetable.solver.RoomNearbyDistanceMeter</nearbyDistanceMeterClass>
-                        <nearbySelectionDistributionType>LINEAR_DISTRIBUTION</nearbySelectionDistributionType>
-                        <linearDistributionSizeMaximum>12</linearDistributionSizeMaximum>
-                    </nearbySelection>
-                    <selectedCountLimit>12</selectedCountLimit>
-                </valueSelector>
+                <cacheType>PHASE</cacheType>
             </changeMoveSelector>
         </unionMoveSelector>
 
-        <!-- OPTIMIZATION 2: Combined acceptors for better exploration -->
+        <!-- Combined acceptors for better exploration -->
         <acceptor>
             <!-- Tabu: Avoid revisiting recent moves -->
             <entityTabuSize>7</entityTabuSize>
             <!-- Late Acceptance: Compare against solution from 400 steps ago -->
             <lateAcceptanceSize>400</lateAcceptanceSize>
         </acceptor>
-        
+
         <forager>
-            <acceptedCountLimit>1000</acceptedCountLimit>
+            <acceptedCountLimit>4</acceptedCountLimit>
         </forager>
     </localSearch>
 </solver>

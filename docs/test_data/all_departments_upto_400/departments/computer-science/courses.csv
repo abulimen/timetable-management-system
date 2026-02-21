@@ -1,0 +1,72 @@
+code,name,weekly_hours,lecturer_email,student_group_names,is_online,required_features,allowed_zones
+CSC111,Introduction to Programming,3,abulimensamuel+chineye.okafor@gmail.com,CSC 100 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC111,Introduction to Programming,3,abulimensamuel+mina.obi@gmail.com,CSC 100 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC111,Introduction to Programming,3,abulimensamuel+femi.balogun@gmail.com,CSC 100 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool112@gmail.com,CSC 100 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|ICT COMPLEX
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool113@gmail.com,CSC 100 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|ICT COMPLEX
+MTH101,Introductory Mathematics I,2,abulimensamuel+pool114@gmail.com,CSC 100 LEVEL (GRP C),false,,MAIN ACADEMIC BLOCK|ICT COMPLEX
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool115@gmail.com,CSC 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool116@gmail.com,CSC 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC101,Digital Literacy and Computing,2,abulimensamuel+pool117@gmail.com,CSC 100 LEVEL (GRP C),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+GST111,Communication in English,2,abulimensamuel+pool118@gmail.com,CSC 100 LEVEL (GRP A)|CSC 100 LEVEL (GRP B)|CSC 100 LEVEL (GRP C),true,,
+CSC211,Data Structures and Algorithms,3,abulimensamuel+chineye.okafor@gmail.com,CSC 200 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC211,Data Structures and Algorithms,3,abulimensamuel+mina.obi@gmail.com,CSC 200 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC211,Data Structures and Algorithms,3,abulimensamuel+femi.balogun@gmail.com,CSC 200 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool119@gmail.com,CSC 200 LEVEL (GRP A),false,,MAIN ACADEMIC BLOCK|ICT COMPLEX
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool112@gmail.com,CSC 200 LEVEL (GRP B),false,,MAIN ACADEMIC BLOCK|ICT COMPLEX
+MTH202,Statistics and Quantitative Methods,2,abulimensamuel+pool113@gmail.com,CSC 200 LEVEL (GRP C),false,,MAIN ACADEMIC BLOCK|ICT COMPLEX
+GST212,Philosophy and Human Existence,2,abulimensamuel+pool114@gmail.com,CSC 200 LEVEL (GRP A)|CSC 200 LEVEL (GRP B)|CSC 200 LEVEL (GRP C),true,,
+CSC311,Operating Systems and Networks,3,abulimensamuel+mina.obi@gmail.com,CSC 300 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC311,Operating Systems and Networks,3,abulimensamuel+femi.balogun@gmail.com,CSC 300 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC311,Operating Systems and Networks,3,abulimensamuel+khalid.usman@gmail.com,CSC 300 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool115@gmail.com,CSC 300 LEVEL (GRP A),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool116@gmail.com,CSC 300 LEVEL (GRP B),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+ENT301,Entrepreneurship and Innovation,2,abulimensamuel+pool117@gmail.com,CSC 300 LEVEL (GRP C),false,PROJECTOR,GENERAL STUDIES BLOCK|MAIN ACADEMIC BLOCK
+BU-GST322,Citizenship Orientation,1,abulimensamuel+pool118@gmail.com,CSC 300 LEVEL (GRP A)|CSC 300 LEVEL (GRP B)|CSC 300 LEVEL (GRP C),true,,
+CSC411,Artificial Intelligence Systems,3,abulimensamuel+chineye.okafor@gmail.com,CSC 400 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC411,Artificial Intelligence Systems,3,abulimensamuel+mina.obi@gmail.com,CSC 400 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC411,Artificial Intelligence Systems,3,abulimensamuel+tobi.alade@gmail.com,CSC 400 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC412,Final Year Research Project,3,abulimensamuel+tobi.alade@gmail.com,CSC 400 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,INNOVATION HUB|ICT COMPLEX
+CSC412,Final Year Research Project,3,abulimensamuel+mina.obi@gmail.com,CSC 400 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,INNOVATION HUB|ICT COMPLEX
+CSC412,Final Year Research Project,3,abulimensamuel+chineye.okafor@gmail.com,CSC 400 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,INNOVATION HUB|ICT COMPLEX
+BU-GST401,Ethics and Leadership Seminar,2,abulimensamuel+pool119@gmail.com,CSC 400 LEVEL (GRP A)|CSC 400 LEVEL (GRP B)|CSC 400 LEVEL (GRP C),true,,
+CSC114,Computer Organization and Logic Design,3,abulimensamuel+pool039@gmail.com,CSC 100 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC114,Computer Organization and Logic Design,3,abulimensamuel+pool039@gmail.com,CSC 100 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC114,Computer Organization and Logic Design,3,abulimensamuel+pool039@gmail.com,CSC 100 LEVEL (GRP C),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC115,Programming Studio I,2,abulimensamuel+pool040@gmail.com,CSC 100 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC115,Programming Studio I,2,abulimensamuel+pool040@gmail.com,CSC 100 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC115,Programming Studio I,2,abulimensamuel+pool040@gmail.com,CSC 100 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC116,Discrete Structures for Computing,2,abulimensamuel+pool041@gmail.com,CSC 100 LEVEL (GRP A),false,PROJECTOR,MAIN ACADEMIC BLOCK|ICT COMPLEX
+CSC116,Discrete Structures for Computing,2,abulimensamuel+pool041@gmail.com,CSC 100 LEVEL (GRP B),false,PROJECTOR,MAIN ACADEMIC BLOCK|ICT COMPLEX
+CSC116,Discrete Structures for Computing,2,abulimensamuel+pool041@gmail.com,CSC 100 LEVEL (GRP C),false,PROJECTOR,MAIN ACADEMIC BLOCK|ICT COMPLEX
+GST121,Critical Thinking and Writing,2,abulimensamuel+pool112@gmail.com,CSC 100 LEVEL (GRP A)|CSC 100 LEVEL (GRP B)|CSC 100 LEVEL (GRP C),true,,
+CSC214,Object-Oriented Design,3,abulimensamuel+pool042@gmail.com,CSC 200 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC214,Object-Oriented Design,3,abulimensamuel+pool042@gmail.com,CSC 200 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC214,Object-Oriented Design,3,abulimensamuel+pool042@gmail.com,CSC 200 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC215,Database Systems I,3,abulimensamuel+pool043@gmail.com,CSC 200 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC215,Database Systems I,3,abulimensamuel+pool043@gmail.com,CSC 200 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC215,Database Systems I,3,abulimensamuel+pool043@gmail.com,CSC 200 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC216,Software Testing Fundamentals,2,abulimensamuel+pool044@gmail.com,CSC 200 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC216,Software Testing Fundamentals,2,abulimensamuel+pool044@gmail.com,CSC 200 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC216,Software Testing Fundamentals,2,abulimensamuel+pool044@gmail.com,CSC 200 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+GST221,Logic and Scientific Reasoning,2,abulimensamuel+pool113@gmail.com,CSC 200 LEVEL (GRP A)|CSC 200 LEVEL (GRP B)|CSC 200 LEVEL (GRP C),true,,
+CSC314,Cloud and Distributed Systems,3,abulimensamuel+pool045@gmail.com,CSC 300 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC314,Cloud and Distributed Systems,3,abulimensamuel+pool045@gmail.com,CSC 300 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC314,Cloud and Distributed Systems,3,abulimensamuel+pool045@gmail.com,CSC 300 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC315,Computer Security Principles,3,abulimensamuel+pool046@gmail.com,CSC 300 LEVEL (GRP A),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC315,Computer Security Principles,3,abulimensamuel+pool046@gmail.com,CSC 300 LEVEL (GRP B),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC315,Computer Security Principles,3,abulimensamuel+pool046@gmail.com,CSC 300 LEVEL (GRP C),false,PROJECTOR,ICT COMPLEX|MAIN ACADEMIC BLOCK
+CSC316,Web Engineering Lab,2,abulimensamuel+pool040@gmail.com,CSC 300 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC316,Web Engineering Lab,2,abulimensamuel+pool040@gmail.com,CSC 300 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC316,Web Engineering Lab,2,abulimensamuel+pool040@gmail.com,CSC 300 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+GST321,Peace Studies and Conflict Resolution,2,abulimensamuel+pool114@gmail.com,CSC 300 LEVEL (GRP A)|CSC 300 LEVEL (GRP B)|CSC 300 LEVEL (GRP C),true,,
+CSC414,Machine Learning Engineering,3,abulimensamuel+pool046@gmail.com,CSC 400 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC414,Machine Learning Engineering,3,abulimensamuel+pool046@gmail.com,CSC 400 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC414,Machine Learning Engineering,3,abulimensamuel+pool046@gmail.com,CSC 400 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC415,DevOps and Platform Engineering,3,abulimensamuel+pool045@gmail.com,CSC 400 LEVEL (GRP A),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC415,DevOps and Platform Engineering,3,abulimensamuel+pool045@gmail.com,CSC 400 LEVEL (GRP B),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC415,DevOps and Platform Engineering,3,abulimensamuel+pool045@gmail.com,CSC 400 LEVEL (GRP C),false,COMPUTER LAB|PROJECTOR,ICT COMPLEX|INNOVATION HUB
+CSC416,Data Engineering Studio,2,abulimensamuel+pool043@gmail.com,CSC 400 LEVEL (GRP A),false,COMPUTER LAB|SMART BOARD|PROJECTOR,INNOVATION HUB|ICT COMPLEX
+CSC416,Data Engineering Studio,2,abulimensamuel+pool043@gmail.com,CSC 400 LEVEL (GRP B),false,COMPUTER LAB|SMART BOARD|PROJECTOR,INNOVATION HUB|ICT COMPLEX
+CSC416,Data Engineering Studio,2,abulimensamuel+pool043@gmail.com,CSC 400 LEVEL (GRP C),false,COMPUTER LAB|SMART BOARD|PROJECTOR,INNOVATION HUB|ICT COMPLEX
+GST421,Leadership Communication and Culture,2,abulimensamuel+pool115@gmail.com,CSC 400 LEVEL (GRP A)|CSC 400 LEVEL (GRP B)|CSC 400 LEVEL (GRP C),true,,
