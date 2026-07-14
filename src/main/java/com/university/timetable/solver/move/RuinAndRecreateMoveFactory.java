@@ -29,7 +29,7 @@ import java.util.*;
 public class RuinAndRecreateMoveFactory implements MoveListFactory<TimeTable> {
 
     /** Minimum elapsed time before ruin can fire (seconds). */
-    private static final long MIN_COOLDOWN_SECONDS = 300; // 5 minutes
+    private static final long MIN_COOLDOWN_SECONDS = 120; // 2 minutes
 
     /** Maximum number of ruin moves to generate per step. */
     private static final int MAX_RUIN_MOVES_PER_STEP = 3;
@@ -50,7 +50,7 @@ public class RuinAndRecreateMoveFactory implements MoveListFactory<TimeTable> {
     private int stagnationCounter = 0;
 
     /** Minimum stagnation calls before ruin fires. */
-    private static final int MIN_STAGNATION_CALLS = 500;
+    private static final int MIN_STAGNATION_CALLS = 100;
 
     @Override
     public List<? extends Move<TimeTable>> createMoveList(TimeTable solution) {
@@ -75,10 +75,10 @@ public class RuinAndRecreateMoveFactory implements MoveListFactory<TimeTable> {
             return List.of();
         }
 
-        // Gate 3: Find conflicting lessons — need MULTIPLE hard violations
+        // Gate 3: Find conflicting lessons — need at least ONE hard violation
         List<Lesson> conflictingLessons = ConflictAnalyzer.findConflictingLessons(solution);
-        if (conflictingLessons.size() < 2) {
-            // Fewer than 2 conflicting lessons: normal moves can handle it
+        if (conflictingLessons.isEmpty()) {
+            // No conflicts: normal moves are sufficient
             return List.of();
         }
 
@@ -151,13 +151,16 @@ public class RuinAndRecreateMoveFactory implements MoveListFactory<TimeTable> {
     }
 
     private int getClusterSize() {
+        int configured = 8; // default
         try {
             ConstraintSettingsService css = SpringContextHolder.getBean(ConstraintSettingsService.class);
             if (css != null) {
-                return Math.max(3, Math.min(25, css.getSolverRuinRecreateClusterSize()));
+                configured = css.getSolverRuinRecreateClusterSize();
             }
         } catch (Exception ignored) {
         }
-        return 8; // default
+        // Scale cluster size for large datasets: allow up to 50 for datasets >600 lessons
+        int maxSize = configured >= 8 ? 50 : 25;
+        return Math.max(3, Math.min(maxSize, configured));
     }
 }

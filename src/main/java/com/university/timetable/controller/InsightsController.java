@@ -198,20 +198,29 @@ public class InsightsController {
     @PreAuthorize("isAuthenticated()")
     public CourseFeasibilitySnapshot courseFeasibilitySnapshot() {
         InfeasibilityReport report = infeasibilityChecker.checkFeasibility();
-        List<InfeasibilityIssue> blockingIssues = report.getIssues() == null
+        List<InfeasibilityIssue> criticalIssues = report.getIssues() == null
                 ? List.of()
-                : report.getIssues().stream().filter(issue -> "BLOCKING".equals(issue.getSeverity())).toList();
-        List<InfeasibilityIssue> warningIssues = report.getIssues() == null
+                : report.getIssues().stream().filter(issue -> "CRITICAL".equals(issue.getSeverity())).toList();
+        List<InfeasibilityIssue> highIssues = report.getIssues() == null
                 ? List.of()
-                : report.getIssues().stream().filter(issue -> !"BLOCKING".equals(issue.getSeverity())).toList();
+                : report.getIssues().stream().filter(issue -> "HIGH".equals(issue.getSeverity())).toList();
+        List<InfeasibilityIssue> mediumIssues = report.getIssues() == null
+                ? List.of()
+                : report.getIssues().stream().filter(issue -> "MEDIUM".equals(issue.getSeverity())).toList();
+        
+        // Combine critical and high as "blocking" for backward compatibility
+        List<InfeasibilityIssue> blockingIssues = new java.util.ArrayList<>(criticalIssues);
+        blockingIssues.addAll(highIssues);
+        List<InfeasibilityIssue> warningIssues = mediumIssues;
+        
         return new CourseFeasibilitySnapshot(
                 report.isFeasible(),
                 report.getLessonCount(),
                 report.getTimeslotCount(),
                 report.getRoomCount(),
                 report.getAvailableRoomSlots(),
-                report.getBlockingCount(),
-                report.getWarningCount(),
+                report.getCriticalCount() + report.getHighCount(),
+                report.getMediumCount() + report.getLowCount(),
                 blockingIssues,
                 warningIssues
         );

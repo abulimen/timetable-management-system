@@ -53,4 +53,8 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE Lesson l SET l.timeslot = null, l.room = null, l.pinned = false")
     int clearAllAssignmentsAndPins();
+
+    // Fetch all lessons with course and lecturer eagerly loaded
+    @Query("SELECT l FROM Lesson l LEFT JOIN FETCH l.course c LEFT JOIN FETCH c.studentGroups LEFT JOIN FETCH c.allowedZones LEFT JOIN FETCH c.requiredFeatures LEFT JOIN FETCH l.lecturer")
+    List<Lesson> findAllWithCourseAndLecturer();
 }

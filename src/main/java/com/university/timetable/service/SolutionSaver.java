@@ -131,4 +131,26 @@ public class SolutionSaver {
     private String timeslotKey(Timeslot timeslot) {
         return timeslot.getDayOfWeek() + "|" + timeslot.getStartTime();
     }
+
+    /**
+     * Save a list of lessons directly (for CP-SAT solver).
+     * This bypasses the TimeTable wrapper.
+     */
+    @Transactional
+    public void saveSolution(List<Lesson> lessons) {
+        long startNanos = System.nanoTime();
+        log.info("Saving {} lessons directly", lessons.size());
+
+        List<Lesson> toSave = new ArrayList<>();
+        for (Lesson lesson : lessons) {
+            if (lesson.getId() == null) continue;
+            toSave.add(lesson);
+        }
+
+        if (!toSave.isEmpty()) {
+            lessonRepository.saveAll(toSave);
+        }
+
+        log.info("Saved {} lessons in {} ms", toSave.size(), elapsedMs(startNanos));
+    }
 }

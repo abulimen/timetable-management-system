@@ -221,6 +221,13 @@ export class ApiService {
         return this.http.get<FeasibilityCheck>(`${this.baseUrl}/solver/feasibility`);
     }
 
+    getLessonBreakdown(zoneId?: number, featureId?: number): Observable<LessonBreakdown> {
+        const params: any = {};
+        if (zoneId != null) params.zoneId = zoneId;
+        if (featureId != null) params.featureId = featureId;
+        return this.http.get<LessonBreakdown>(`${this.baseUrl}/solver/feasibility/breakdown`, { params });
+    }
+
     // Settings
     getSettings(): Observable<Setting[]> {
         return this.http.get<Setting[]>(`${this.baseUrl}/settings`);
@@ -688,14 +695,21 @@ export interface SolverStatus {
     pendingChanges?: boolean;
     pendingChangeReason?: string | null;
     pendingChangeSince?: string | null;
+    // Hybrid solver specific fields
+    stage?: string | null;
+    stageOneDurationMs?: number | null;
+    stageTwoDurationMs?: number | null;
 }
 
 export type SolveMode = 'FULL_REPLAN' | 'STABILITY';
+
+export type SolverEngine = 'TIMEFOLD' | 'CPSAT' | 'HYBRID';
 
 export interface SolveRequest {
     mode: SolveMode;
     profile?: 'BALANCED' | 'QUALITY';
     skipFeasibility?: boolean;
+    engine?: SolverEngine;
 }
 
 export interface SolverRuntimeDiagnostics {
@@ -783,13 +797,35 @@ export interface ConstraintViolation {
 
 export interface FeasibilityCheck {
     feasible: boolean;
-    blockingCount: number;
-    warningCount: number;
+    criticalCount: number;
+    highCount: number;
+    mediumCount: number;
+    lowCount: number;
     lessonCount: number;
     timeslotCount: number;
     roomCount: number;
     availableRoomSlots: number;
+    analysisText?: string;
     issues: { type: string; severity: string; description: string; recommendation: string }[];
+}
+
+export interface LessonBreakdown {
+    zoneName: string | null;
+    featureName: string | null;
+    totalLessons: number;
+    totalHours: number;
+    roomsAvailable: number;
+    utilization: number;
+    lessons: LessonDetail[];
+}
+
+export interface LessonDetail {
+    courseCode: string;
+    courseName: string;
+    weeklyHours: number;
+    studentGroups: string[];
+    lecturerName: string;
+    studentCount: number;
 }
 
 export interface Setting {

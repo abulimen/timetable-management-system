@@ -44,6 +44,7 @@ spring:
 
 # Solver runtime tuning
 solver:
+  engine: ${SOLVER_ENGINE:TIMEFOLD}  # TIMEFOLD, CPSAT, or HYBRID
   performance:
     move-thread-count: ${SOLVER_MOVE_THREAD_COUNT:4}
     environment-mode: ${SOLVER_ENVIRONMENT_MODE:NON_REPRODUCIBLE}
@@ -54,6 +55,26 @@ solver:
     checkpoint-enabled: ${SOLVER_PERSISTENCE_CHECKPOINT_ENABLED:false}
     checkpoint-min-interval-ms: ${SOLVER_PERSISTENCE_CHECKPOINT_MIN_INTERVAL_MS:120000}
     checkpoint-every-n-improvements: ${SOLVER_PERSISTENCE_CHECKPOINT_EVERY_N_IMPROVEMENTS:0}
+
+# CP-SAT Solver Configuration (Google OR-Tools)
+cpsat:
+  solver:
+    time-limit-seconds: ${CPSAT_TIME_LIMIT_SECONDS:12000}
+    num-workers: ${CPSAT_NUM_WORKERS:8}
+    enabled: ${CPSAT_ENABLED:true}
+    feasibility-only: ${CPSAT_FEASIBILITY_ONLY:true}  # Skip soft constraints for faster solving
+
+# Hybrid CP-SAT + Timefold Solver Configuration
+hybrid:
+  cpsat:
+    time-limit-seconds: ${HYBRID_CPSAT_TIME_LIMIT_SECONDS:300}
+    num-workers: ${HYBRID_NUM_WORKERS:8}
+  timefold:
+    time-limit-seconds: ${HYBRID_TIMEFOLD_TIME_LIMIT_SECONDS:600}
+  # Benders-style decomposition: CP-SAT timeslot-only + per-timeslot room matching
+  decomposed:
+    enabled: ${HYBRID_DECOMPOSED_ENABLED:true}
+    max-benders-iterations: ${HYBRID_MAX_BENDERS_ITERATIONS:3}
 
 # Server Configuration
 server:

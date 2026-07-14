@@ -17,20 +17,27 @@ import java.util.List;
 public class InfeasibilityReport {
     
     /**
-     * True if no BLOCKING issues were found.
+     * True if no CRITICAL or HIGH issues were found.
      */
     private boolean feasible;
     
     /**
-     * List of all detected issues (both BLOCKING and WARNING).
+     * List of all detected issues grouped by severity.
      */
     private List<InfeasibilityIssue> issues = new ArrayList<>();
     
     /**
-     * Summary counts.
+     * Detailed formatted analysis text for display.
      */
-    private int blockingCount;
-    private int warningCount;
+    private String analysisText;
+    
+    /**
+     * Summary counts by severity.
+     */
+    private int criticalCount;
+    private int highCount;
+    private int mediumCount;
+    private int lowCount;
     
     /**
      * Problem size info for context.
@@ -42,11 +49,15 @@ public class InfeasibilityReport {
     
     public void addIssue(InfeasibilityIssue issue) {
         issues.add(issue);
-        if ("BLOCKING".equals(issue.getSeverity())) {
-            blockingCount++;
+        switch (issue.getSeverity()) {
+            case "CRITICAL" -> criticalCount++;
+            case "HIGH" -> highCount++;
+            case "MEDIUM" -> mediumCount++;
+            case "LOW" -> lowCount++;
+        }
+        // Only infeasible if there are CRITICAL or HIGH issues
+        if ("CRITICAL".equals(issue.getSeverity()) || "HIGH".equals(issue.getSeverity())) {
             feasible = false;
-        } else {
-            warningCount++;
         }
     }
     
@@ -57,6 +68,25 @@ public class InfeasibilityReport {
         report.setTimeslotCount(timeslots);
         report.setRoomCount(rooms);
         report.setAvailableRoomSlots(timeslots * rooms);
+        return report;
+    }
+    
+    public static InfeasibilityReport infeasible(int lessons, int timeslots, int rooms, List<InfeasibilityIssue> issues) {
+        InfeasibilityReport report = new InfeasibilityReport();
+        report.setFeasible(false);
+        report.setLessonCount(lessons);
+        report.setTimeslotCount(timeslots);
+        report.setRoomCount(rooms);
+        report.setAvailableRoomSlots(timeslots * rooms);
+        report.setIssues(issues);
+        for (InfeasibilityIssue issue : issues) {
+            switch (issue.getSeverity()) {
+                case "CRITICAL" -> report.criticalCount++;
+                case "HIGH" -> report.highCount++;
+                case "MEDIUM" -> report.mediumCount++;
+                case "LOW" -> report.lowCount++;
+            }
+        }
         return report;
     }
 }

@@ -9,8 +9,25 @@ import {
   FeasibilityCheck,
   CourseFeasibilityDiagnostics,
   FeatureScarcityDiagnostics,
-  LecturerLoadDiagnostics
+  LecturerLoadDiagnostics,
+  SolverEngine,
+  LessonBreakdown
 } from '../../core/services/api.service';
+
+interface ParsedSection {
+  text: string;
+  isHeader?: boolean;
+  isAction?: boolean;
+  isBullet?: boolean;
+  isProblem?: boolean;
+}
+
+interface BulletPart {
+  text: string;
+  isClickable: boolean;
+  zoneName?: string;
+  featureName?: string;
+}
 
 @Component({
   selector: 'app-solver',
@@ -26,10 +43,10 @@ import {
           <div>
             <h2 class="text-lg font-semibold">Solver Status</h2>
             <div class="flex items-center gap-2 mt-2">
-              <span 
+            <span 
                 class="w-4 h-4 rounded-full"
                 [ngClass]="{
-                  'bg-gray-400': status?.state === 'NOT_SOLVING',
+                  'bg-gray-400': status?.state === 'NOT_SOLVING' || status?.state === 'IDLE',
                   'bg-green-500 animate-pulse': status?.state === 'SOLVING_ACTIVE' || status?.state === 'SOLVING',
                   'bg-red-500': status?.state === 'ERROR'
                 }">
@@ -38,7 +55,19 @@ import {
               <span *ngIf="isSolving" class="text-sm text-secondary-500">(polling every 3s)</span>
             </div>
             
-            <!-- Standard Score Display -->
+            <!-- CP-SAT Info -->
+            <!-- Hybrid Solver Info -->
+            <p *ngIf="status?.profile === 'HYBRID' || selectedEngine === 'HYBRID'" class="text-purple-600 font-medium mt-1">
+              ⚡ Hybrid Solver: CP-SAT (hard) + Timefold (soft)
+            </p>
+            <p *ngIf="status?.stage" class="text-purple-600 font-medium mt-1">
+              📍 Phase: {{ status?.stage }}
+            </p>
+            <div *ngIf="status?.stageOneDurationMs != null" class="text-xs text-secondary-500 mt-1">
+              ⏱️ Phase 1 (CP-SAT): {{ formatDuration(status?.stageOneDurationMs ?? 0) }}
+              <span *ngIf="status?.stageTwoDurationMs != null">| Phase 2 (Timefold): {{ formatDuration(status?.stageTwoDurationMs ?? 0) }}</span>
+            </div>
+            
             <p *ngIf="status?.state !== 'ERROR'" class="text-secondary-500 mt-1">Score: {{ status?.score || 'N/A' }}</p>
             <p *ngIf="status?.profile" class="text-secondary-500 mt-1">Profile: {{ status?.profile }}</p>
             <p *ngIf="status?.durationMs != null" class="text-secondary-500 mt-1">
@@ -65,9 +94,11 @@ import {
                 <span class="font-medium ml-1">{{ status.persistenceCount ?? 0 }}</span>
                 <span class="text-secondary-500 ml-1" *ngIf="status.avgPersistenceMs != null">(avg {{ formatDuration(status.avgPersistenceMs) }})</span>
               </div>
-              <div class="p-2 rounded bg-secondary-100 dark:bg-secondary-700">
-                <span class="text-secondary-500">Current hard score:</span>
-                <span class="font-medium ml-1">{{ status.bestHardScore ?? 'N/A' }}</span>
+              <div class="p-2 rounded bg-secondary-100 dark:bg-secondary-700" *ngIf="status?.feasible != null">
+                <span class="text-secondary-500">Hard constraints satisfied:</span>
+                <span class="font-medium ml-1" [ngClass]="{'text-green-600': status.feasible, 'text-red-600': !status.feasible}">
+                  {{ status.feasible ? '✓ Yes' : '✗ No' }}
+                </span>
               </div>
               <div class="p-2 rounded bg-secondary-100 dark:bg-secondary-700">
                 <span class="text-secondary-500">Current soft score:</span>
@@ -119,6 +150,30 @@ import {
           </div>
           <div class="flex flex-col gap-3 items-end">
             <div class="flex items-center gap-2 text-sm">
+              <span class="text-secondary-500">Engine:</span>
+              <button
+                (click)="selectedEngine='TIMEFOLD'"
+                class="px-2 py-1 rounded border text-xs"
+                [ngClass]="selectedEngine === 'TIMEFOLD' ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-secondary-700 border-secondary-300'"
+                title="Timefold Solver (OptaPlanner successor) - Local search optimization">
+                Timefold
+              </button>
+              <button
+                (click)="selectedEngine='CPSAT'"
+                class="px-2 py-1 rounded border text-xs"
+                [ngClass]="selectedEngine === 'CPSAT' ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-secondary-700 border-secondary-300'"
+                title="Google OR-Tools CP-SAT - Constraint programming, often faster for large problems">
+                CP-SAT
+              </button>
+              <button
+                (click)="selectedEngine='HYBRID'"
+                class="px-2 py-1 rounded border text-xs"
+                [ngClass]="selectedEngine === 'HYBRID' ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-secondary-700 border-secondary-300'"
+                title="Hybrid: CP-SAT for hard constraints + Timefold for soft optimization - Best of both worlds">
+                Hybrid ⚡
+              </button>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
               <span class="text-secondary-500">Profile:</span>
               <button
                 (click)="selectedProfile='BALANCED'"
@@ -153,8 +208,9 @@ import {
               <button 
                 (click)="terminateSolver()"
                 [disabled]="!isSolving"
-                class="btn btn-danger disabled:opacity-50">
-                Stop
+                class="btn btn-danger disabled:opacity-50"
+                title="Stop solver and save current best solution">
+                Stop & Save 💾
               </button>
               <button
                 (click)="resumeSolver()"
@@ -260,12 +316,91 @@ import {
             {{ feasibility.lessonCount }} lessons, {{ feasibility.roomCount }} rooms, {{ feasibility.timeslotCount }} slots
           </span>
         </div>
-        <div *ngFor="let issue of feasibility.issues" class="p-3 mb-2 rounded-lg bg-secondary-100 dark:bg-secondary-700">
-          <div class="flex items-center gap-2">
-            <span class="badge" [ngClass]="issue.severity === 'BLOCKING' ? 'badge-error' : 'badge-warning'">{{ issue.type }}</span>
+
+        <!-- Severity Summary -->
+        <div *ngIf="!feasibility.feasible" class="grid grid-cols-4 gap-3 mb-4">
+          <div *ngIf="feasibility.criticalCount > 0" class="p-3 bg-red-100 dark:bg-red-900/40 rounded-lg border border-red-300 dark:border-red-700">
+            <p class="text-xs text-red-600 dark:text-red-400 font-medium">CRITICAL</p>
+            <p class="text-xl font-bold text-red-700 dark:text-red-300">{{ feasibility.criticalCount }}</p>
           </div>
-          <p class="text-sm mt-1">{{ issue.description }}</p>
-          <p class="text-xs text-secondary-500 mt-1">{{ issue.recommendation }}</p>
+          <div *ngIf="feasibility.highCount > 0" class="p-3 bg-orange-100 dark:bg-orange-900/40 rounded-lg border border-orange-300 dark:border-orange-700">
+            <p class="text-xs text-orange-600 dark:text-orange-400 font-medium">HIGH RISK</p>
+            <p class="text-xl font-bold text-orange-700 dark:text-orange-300">{{ feasibility.highCount }}</p>
+          </div>
+          <div *ngIf="feasibility.mediumCount > 0" class="p-3 bg-yellow-100 dark:bg-yellow-900/40 rounded-lg border border-yellow-300 dark:border-yellow-700">
+            <p class="text-xs text-yellow-600 dark:text-yellow-400 font-medium">MEDIUM</p>
+            <p class="text-xl font-bold text-yellow-700 dark:text-yellow-300">{{ feasibility.mediumCount }}</p>
+          </div>
+          <div *ngIf="feasibility.lowCount > 0" class="p-3 bg-blue-100 dark:bg-blue-900/40 rounded-lg border border-blue-300 dark:border-blue-700">
+            <p class="text-xs text-blue-600 dark:text-blue-400 font-medium">LOW</p>
+            <p class="text-xl font-bold text-blue-700 dark:text-blue-300">{{ feasibility.lowCount }}</p>
+          </div>
+        </div>
+
+        <!-- Analysis Text (detailed breakdown) -->
+        <div *ngIf="feasibility.analysisText" class="mb-4 p-4 bg-secondary-50 dark:bg-secondary-800/50 rounded-lg">
+          <pre class="text-xs text-secondary-700 dark:text-secondary-300 whitespace-pre-wrap font-mono">{{ feasibility.analysisText }}</pre>
+        </div>
+        
+        <!-- Issues grouped by severity -->
+        <div *ngFor="let issue of feasibility.issues" class="mb-4 border rounded-lg overflow-hidden">
+          <!-- Issue Header with severity-based coloring -->
+          <div class="px-4 py-3 border-b" 
+               [ngClass]="{
+                 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800': issue.severity === 'CRITICAL',
+                 'bg-orange-50 dark:bg-orange-900/30 border-orange-200 dark:border-orange-800': issue.severity === 'HIGH',
+                 'bg-yellow-50 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-800': issue.severity === 'MEDIUM',
+                 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800': issue.severity === 'LOW'
+               }">
+            <div class="flex items-center gap-2">
+              <span class="badge" [ngClass]="{
+                'badge-error': issue.severity === 'CRITICAL',
+                'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300': issue.severity === 'HIGH',
+                'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300': issue.severity === 'MEDIUM',
+                'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300': issue.severity === 'LOW'
+              }">{{ issue.severity }}</span>
+              <span class="text-xs text-secondary-500">{{ issue.type }}</span>
+            </div>
+            <p class="text-sm font-medium mt-2 text-secondary-800 dark:text-secondary-200">{{ issue.description }}</p>
+          </div>
+          
+          <!-- Structured Recommendation -->
+          <div class="px-4 py-3 bg-secondary-50 dark:bg-secondary-800/50">
+            <div class="whitespace-pre-line text-sm">
+              <ng-container *ngFor="let section of parseRecommendation(issue.recommendation); let i = index">
+                <!-- Section Header -->
+                <div *ngIf="section.isHeader" class="font-semibold text-secondary-900 dark:text-white mt-3 mb-2 pb-1 border-b border-secondary-200 dark:border-secondary-600">
+                  {{ section.text }}
+                </div>
+                <!-- Action Item -->
+                <div *ngIf="section.isAction" class="flex items-start gap-2 py-1">
+                  <span class="text-green-600 dark:text-green-400 font-bold shrink-0">→</span>
+                  <span class="text-secondary-700 dark:text-secondary-300">{{ section.text }}</span>
+                </div>
+                <!-- Bullet Point -->
+                <div *ngIf="section.isBullet" class="flex items-start gap-2 py-0.5">
+                  <span class="text-secondary-400 dark:text-secondary-500 shrink-0">•</span>
+                  <span class="text-secondary-600 dark:text-secondary-400">
+                    <ng-container *ngFor="let part of parseBulletParts(section.text); let j = index">
+                      <span *ngIf="part.isClickable" 
+                            class="text-primary-600 dark:text-primary-400 cursor-pointer hover:underline font-medium"
+                            (click)="onLessonClick(part)">
+                        {{ part.text }}
+                      </span>
+                      <span *ngIf="!part.isClickable">{{ part.text }}</span>
+                    </ng-container>
+                  </span>
+                </div>
+                <!-- Problem -->
+                <div *ngIf="section.isProblem" class="flex items-start gap-2 py-1 bg-red-100 dark:bg-red-900/20 -mx-2 px-2 rounded">
+                  <span class="text-red-600 dark:text-red-400 font-bold shrink-0">❌</span>
+                  <span class="text-red-700 dark:text-red-300">{{ section.text }}</span>
+                </div>
+                <!-- Plain text -->
+                <p *ngIf="!section.isHeader && !section.isAction && !section.isBullet && !section.isProblem" class="text-secondary-600 dark:text-secondary-400">{{ section.text }}</p>
+              </ng-container>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -296,6 +431,62 @@ import {
         </div>
       </div>
     </div>
+
+    <!-- Lesson Breakdown Popup Modal -->
+    <div *ngIf="showBreakdownPopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" (click)="closeBreakdownPopup()">
+      <div class="bg-white dark:bg-secondary-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[80vh] overflow-hidden" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-secondary-200 dark:border-secondary-700 flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-semibold">
+              {{ (lessonBreakdown?.zoneName ?? lessonBreakdown?.featureName) + (lessonBreakdown?.zoneName ? ' Zone' : ' Feature') }} - Lesson Breakdown
+            </h3>
+            <p class="text-sm text-secondary-500">
+              {{ lessonBreakdown?.totalLessons }} lessons • {{ lessonBreakdown?.totalHours }} hours • {{ lessonBreakdown?.roomsAvailable }} rooms • {{ lessonBreakdown?.utilization?.toFixed(0) }}% utilization
+            </p>
+          </div>
+          <button (click)="closeBreakdownPopup()" class="text-secondary-400 hover:text-secondary-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Content -->
+        <div class="p-6 overflow-y-auto max-h-[60vh]">
+          <div *ngIf="breakdownLoading" class="flex items-center justify-center py-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          </div>
+          
+          <table *ngIf="!breakdownLoading && lessonBreakdown?.lessons" class="min-w-full divide-y divide-secondary-200 dark:divide-secondary-700">
+            <thead class="bg-secondary-50 dark:bg-secondary-900">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase">Course</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase">Name</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase">Hours/Week</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase">Student Groups</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase">Lecturer</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-secondary-500 uppercase">Students</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-secondary-200 dark:divide-secondary-700">
+              <tr *ngFor="let lesson of lessonBreakdown?.lessons" class="hover:bg-secondary-50 dark:hover:bg-secondary-700">
+                <td class="px-4 py-3 text-sm font-medium">{{ lesson.courseCode }}</td>
+                <td class="px-4 py-3 text-sm">{{ lesson.courseName }}</td>
+                <td class="px-4 py-3 text-sm">{{ lesson.weeklyHours }}</td>
+                <td class="px-4 py-3 text-sm">
+                  <span *ngFor="let group of lesson.studentGroups; let last = last" class="inline-flex items-center">
+                    {{ group }}{{ !last ? ', ' : '' }}
+                  </span>
+                </td>
+                <td class="px-4 py-3 text-sm">{{ lesson.lecturerName }}</td>
+                <td class="px-4 py-3 text-sm">{{ lesson.studentCount }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   `
 })
 export class SolverComponent implements OnInit, OnDestroy {
@@ -306,11 +497,17 @@ export class SolverComponent implements OnInit, OnDestroy {
   feasibility: FeasibilityCheck | null = null;
   runtime: SolverRuntimeDiagnostics | null = null;
   selectedProfile: 'BALANCED' | 'QUALITY' = 'BALANCED';
+  selectedEngine: SolverEngine = 'TIMEFOLD';
   skipFeasibility = false;
   courseDiagnostics: CourseFeasibilityDiagnostics | null = null;
   featureDiagnostics: FeatureScarcityDiagnostics | null = null;
   lecturerDiagnostics: LecturerLoadDiagnostics | null = null;
   pollInterval: any = null;
+  
+  // Lesson breakdown popup
+  showBreakdownPopup = false;
+  lessonBreakdown: LessonBreakdown | null = null;
+  breakdownLoading = false;
 
   get isSolving() { return this.status?.state === 'SOLVING_ACTIVE' || this.status?.state === 'SOLVING'; }
 
@@ -363,7 +560,7 @@ export class SolverComponent implements OnInit, OnDestroy {
     // Clear any previous feasibility results
     this.feasibility = null;
 
-    this.api.startSolver({ mode, profile: this.selectedProfile, skipFeasibility: this.skipFeasibility }).subscribe({
+    this.api.startSolver({ mode, profile: this.selectedProfile, skipFeasibility: this.skipFeasibility, engine: this.selectedEngine }).subscribe({
       next: (s) => {
         this.status = s;
         this.startPolling();
@@ -377,8 +574,10 @@ export class SolverComponent implements OnInit, OnDestroy {
             lessonCount: 0,
             roomCount: 0,
             timeslotCount: 0,
-            blockingCount: err.error.blockingCount,
-            warningCount: 0,
+            criticalCount: 0,
+            highCount: err.error.blockingCount || 0,
+            mediumCount: 0,
+            lowCount: 0,
             availableRoomSlots: 0,
             issues: err.error.issues || []
           };
@@ -524,5 +723,167 @@ export class SolverComponent implements OnInit, OnDestroy {
       return `${seconds}.${Math.floor(millis / 100)}s`;
     }
     return `${durationMs}ms`;
+  }
+
+  /**
+   * Parse recommendation text into structured sections for better display
+   */
+  parseRecommendation(text: string): ParsedSection[] {
+    const lines = text.split('\n');
+    const sections: ParsedSection[] = [];
+    
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      
+      // Check for section headers (ALL CAPS or ending with :)
+      if (trimmed === trimmed.toUpperCase() && trimmed.includes(':')) {
+        sections.push({ text: trimmed, isHeader: true });
+      }
+      // Check for numbered action items (e.g., "1. ADD", "2. REDUCE")
+      else if (/^\d+\.\s+(ADD|REDUCE|REMOVE|CREATE|UPDATE)/i.test(trimmed)) {
+        sections.push({ text: trimmed, isAction: true });
+      }
+      // Check for arrow action items (→)
+      else if (trimmed.startsWith('→')) {
+        sections.push({ text: trimmed.substring(1).trim(), isAction: true });
+      }
+      // Check for problem indicators (❌)
+      else if (trimmed.includes('❌')) {
+        sections.push({ text: trimmed.replace('❌', '').trim(), isProblem: true });
+      }
+      // Check for bullet points
+      else if (trimmed.startsWith('•')) {
+        sections.push({ text: trimmed.substring(1).trim(), isBullet: true });
+      }
+      // Regular text
+      else {
+        sections.push({ text: trimmed });
+      }
+    }
+    
+    return sections;
+  }
+
+  // Lesson breakdown popup methods
+  showZoneBreakdown(zoneName: string) {
+    // Find zone ID from the recommendation text or stored data
+    // For now, we'll need to parse zone names from the recommendation
+    this.breakdownLoading = true;
+    this.showBreakdownPopup = true;
+    
+    // Extract zone ID from a map we'll need to build
+    // For simplicity, we'll call the API with zone name matching
+    this.api.getLessonBreakdown(undefined, undefined).subscribe({
+      next: () => {
+        // We need zone ID - let's fetch all zones first
+        this.loadZoneBreakdown(zoneName);
+      },
+      error: () => {
+        this.breakdownLoading = false;
+      }
+    });
+  }
+
+  private loadZoneBreakdown(zoneName: string) {
+    // Get all zones and find the ID
+    this.api.getZones().subscribe({
+      next: (zones) => {
+        const zone = zones.find(z => z.name === zoneName);
+        if (zone) {
+          this.api.getLessonBreakdown(zone.id, undefined).subscribe({
+            next: (breakdown) => {
+              this.lessonBreakdown = breakdown;
+              this.breakdownLoading = false;
+            },
+            error: () => {
+              this.breakdownLoading = false;
+            }
+          });
+        } else {
+          this.breakdownLoading = false;
+        }
+      },
+      error: () => {
+        this.breakdownLoading = false;
+      }
+    });
+  }
+
+  showFeatureBreakdown(featureName: string) {
+    this.breakdownLoading = true;
+    this.showBreakdownPopup = true;
+    
+    this.api.getFeatures().subscribe({
+      next: (features) => {
+        const feature = features.find(f => f.name === featureName);
+        if (feature) {
+          this.api.getLessonBreakdown(undefined, feature.id).subscribe({
+            next: (breakdown) => {
+              this.lessonBreakdown = breakdown;
+              this.breakdownLoading = false;
+            },
+            error: () => {
+              this.breakdownLoading = false;
+            }
+          });
+        } else {
+          this.breakdownLoading = false;
+        }
+      },
+      error: () => {
+        this.breakdownLoading = false;
+      }
+    });
+  }
+
+  closeBreakdownPopup() {
+    this.showBreakdownPopup = false;
+    this.lessonBreakdown = null;
+  }
+
+  // Parse bullet text to identify clickable lesson counts
+  parseBulletParts(text: string): BulletPart[] {
+    const parts: BulletPart[] = [];
+    
+    // Pattern: "ZONE_NAME: ~N lessons (X hours) can use this zone"
+    // or: "FEATURE_NAME: N lessons need this, X rooms have it"
+    const zonePattern = /^([^:]+):\s*[~]?(\d+)\s+lessons?\s*\((\d+)\s+hours?\)/;
+    const featurePattern = /^([^:]+):\s*(\d+)\s+lessons?\s+need\s+this/;
+    
+    let match = text.match(zonePattern);
+    if (match) {
+      const [, zoneName, lessonCount, hours] = match;
+      parts.push({ text: zoneName + ': ', isClickable: false });
+      parts.push({ text: `~${lessonCount} lessons`, isClickable: true, zoneName: zoneName.trim() });
+      parts.push({ text: ` (${hours} hours)`, isClickable: false });
+      // Add remaining text
+      const remaining = text.substring(match[0].length);
+      if (remaining) parts.push({ text: remaining, isClickable: false });
+      return parts;
+    }
+    
+    match = text.match(featurePattern);
+    if (match) {
+      const [, featureName, lessonCount] = match;
+      parts.push({ text: featureName + ': ', isClickable: false });
+      parts.push({ text: `${lessonCount} lessons`, isClickable: true, featureName: featureName.trim() });
+      // Add remaining text
+      const remaining = text.substring(match[0].length);
+      if (remaining) parts.push({ text: remaining, isClickable: false });
+      return parts;
+    }
+    
+    // No special pattern, return whole text
+    parts.push({ text, isClickable: false });
+    return parts;
+  }
+
+  onLessonClick(part: BulletPart) {
+    if (part.zoneName) {
+      this.showZoneBreakdown(part.zoneName);
+    } else if (part.featureName) {
+      this.showFeatureBreakdown(part.featureName);
+    }
   }
 }

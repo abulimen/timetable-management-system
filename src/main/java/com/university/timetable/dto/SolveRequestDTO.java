@@ -17,6 +17,7 @@ public class SolveRequestDTO {
     private Boolean skipFeasibility = false;
     private SolveScopeDTO scope;
     private Boolean allowLargeScope = false;
+    private String engine; // "TIMEFOLD" (default) or "CPSAT"
 
     @Data
     @NoArgsConstructor

@@ -20,6 +20,7 @@
         <java.version>21</java.version>
         <timefold.version>1.31.0</timefold.version>
         <poi.version>5.2.5</poi.version>
+        <ortools.version>9.12.4544</ortools.version>
     </properties>
 
     <dependencies>
@@ -57,6 +58,13 @@
             <groupId>ai.timefold.solver</groupId>
             <artifactId>timefold-solver-spring-boot-starter</artifactId>
             <version>${timefold.version}</version>
+        </dependency>
+
+        <!-- Google OR-Tools CP-SAT Solver -->
+        <dependency>
+            <groupId>com.google.ortools</groupId>
+            <artifactId>ortools-java</artifactId>
+            <version>${ortools.version}</version>
         </dependency>
 
         <!-- Apache POI (Excel Parsing) -->

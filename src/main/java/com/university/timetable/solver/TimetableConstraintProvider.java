@@ -1,5 +1,6 @@
 package com.university.timetable.solver;
 
+import com.university.timetable.domain.Course;
 import com.university.timetable.domain.Lesson;
 import com.university.timetable.domain.SpecialEvent;
 import com.university.timetable.domain.StudentGroup;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -38,6 +40,8 @@ public class TimetableConstraintProvider implements ConstraintProvider {
     private int cachedWeightLecturerTransition;
     private int cachedWeightStudentFatigue;
     private int cachedWeightEarlyMorning;
+    private int cachedWeightLecturerFatigue;
+    private int cachedWeightLateAfternoon;
     private int cachedMaxLecturerConsecutiveHours;
     private boolean cachedUnavailabilitySystemEnabled;
 
@@ -74,6 +78,8 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 cachedWeightLecturerTransition = svc.getWeightLecturerTransition();
                 cachedWeightStudentFatigue = svc.getWeightStudentFatigue();
                 cachedWeightEarlyMorning = svc.getInt("weight_early_morning", 3);
+                cachedWeightLecturerFatigue = svc.getInt("weight_lecturer_fatigue", 1);
+                cachedWeightLateAfternoon = svc.getInt("weight_late_afternoon", 3);
                 cachedMaxLecturerConsecutiveHours = svc.getMaxLecturerConsecutiveHours();
                 loadedFromDb = true;
                 log.info(
@@ -96,6 +102,8 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 cachedWeightLecturerTransition = 5;
                 cachedWeightStudentFatigue = 1;
                 cachedWeightEarlyMorning = 3;
+                cachedWeightLecturerFatigue = 1;
+                cachedWeightLateAfternoon = 3;
                 cachedMaxLecturerConsecutiveHours = 4;
                 settingsInitialized = true;
             }
@@ -293,7 +301,6 @@ public class TimetableConstraintProvider implements ConstraintProvider {
     }
 
     private boolean isUnavailabilitySystemEnabled() {
-        initializeSettings();
         return cachedUnavailabilitySystemEnabled;
     }
 
@@ -324,18 +331,33 @@ public class TimetableConstraintProvider implements ConstraintProvider {
 
     /**
      * CONFIGURABLE: Same Course on Same Day
+     * Lessons of the same course FOR THE SAME GROUP must be on different days.
+     * Different groups can have the same course on the same day.
      */
     private Constraint sameCourseOnSameDay(ConstraintFactory factory) {
         return factory.forEach(Lesson.class)
                 .filter(lesson -> !isSameCourseSameDayAllowed() &&
                         lesson.getCourse() != null &&
-                        lesson.getTimeslot() != null)
-                .groupBy(Lesson::getCourse, this::lessonDay, ConstraintCollectors.count())
-                .filter((course, day, lessonCount) -> lessonCount > 1)
-                .penalize(HardSoftScore.ONE_HARD,
-                        (course, day, lessonCount) -> pairCount(lessonCount))
-                .asConstraint("Same course on same day");
+                        lesson.getTimeslot() != null &&
+                        lesson.getStudentGroups() != null &&
+                        !lesson.getStudentGroups().isEmpty())
+                // Flatten to (course, group, day) tuples
+                .flattenLast(lesson -> {
+                    Set<LessonGroupDay> tuples = new HashSet<>();
+                    DayOfWeek day = lessonDay(lesson);
+                    for (StudentGroup group : lesson.getStudentGroups()) {
+                        tuples.add(new LessonGroupDay(lesson.getCourse(), group, day));
+                    }
+                    return tuples;
+                })
+                .groupBy(LessonGroupDay::course, LessonGroupDay::group, LessonGroupDay::day, ConstraintCollectors.count())
+                .filter((course, group, day, count) -> count > 1)
+                .penalize(HardSoftScore.ONE_HARD, (course, group, day, count) -> pairCount(count))
+                .asConstraint("Same course on same day for same group");
     }
+    
+    // Helper record for grouping lessons by course+group+day
+    private record LessonGroupDay(Course course, StudentGroup group, DayOfWeek day) {}
 
     /**
      * HARD CONSTRAINT: Lesson Exceeds End Time
@@ -435,7 +457,8 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                             // Penalize rooms that are too large (wasted capacity)
                             int diff = lesson.getRoom().getCapacity() - lesson.getTotalStudentCount();
                             int weight = getWeightRoomCapacity();
-                            return Math.max(0, (diff / 10) * weight);
+                            // Use ceiling division so even 1 wasted seat incurs penalty
+                            return diff > 0 ? (int) Math.ceil(diff / 10.0) * weight : 0;
                         })
                 .asConstraint("Room capacity efficiency");
     }
@@ -487,23 +510,33 @@ public class TimetableConstraintProvider implements ConstraintProvider {
 
     /**
      * SOFT: Day balance for student groups.
-     * Fixed for combined classes: uses conflict group ID overlap to detect
-     * when two lessons share ANY student group (direct or parent/child).
-     * This ensures combined classes (e.g., Groups A+D+E) are balanced fairly.
+     * Properly handles combined classes: each lesson is counted toward ALL
+     * participating student groups. For example, a combined "English ADE"
+     * lesson counts toward groups A, D, and E independently.
      */
     private Constraint dayBalanceForStudentGroup(ConstraintFactory factory) {
         return factory.forEach(Lesson.class)
                 .filter(lesson -> isDayBalanceEnforced() &&
                         lesson.getTimeslot() != null &&
-                        !lesson.getConflictGroupIds().isEmpty())
-                // Use the optimized getter instead of creating an iterator on every evaluation
-                .groupBy(Lesson::getPrimaryConflictGroupId,
-                        this::lessonDay, ConstraintCollectors.count())
+                        lesson.getStudentGroups() != null &&
+                        !lesson.getStudentGroups().isEmpty())
+                .flattenLast(lesson -> {
+                    Set<GroupDay> tuples = new HashSet<>();
+                    DayOfWeek day = lessonDay(lesson);
+                    for (StudentGroup group : lesson.getStudentGroups()) {
+                        tuples.add(new GroupDay(group.getId(), day));
+                    }
+                    return tuples;
+                })
+                .groupBy(GroupDay::groupId, GroupDay::day, ConstraintCollectors.count())
                 .filter((groupId, day, lessonCount) -> lessonCount > 1)
                 .penalize(HardSoftScore.ofSoft(getWeightDayBalance()),
                         (groupId, day, lessonCount) -> pairCount(lessonCount))
                 .asConstraint("Day balance for student group");
     }
+
+    // Helper record for day balance grouping by (studentGroupId, day)
+    private record GroupDay(Long groupId, DayOfWeek day) {}
 
     /**
      * SOFT CONSTRAINT: Graduated Early Morning Penalty
@@ -539,7 +572,7 @@ public class TimetableConstraintProvider implements ConstraintProvider {
      * Mirrors the early morning penalty to encourage a balanced daily schedule.
      */
     private Constraint lateAfternoonPenalty(ConstraintFactory factory) {
-        int weight = getWeightEarlyMorning(); // Reuse early morning weight
+        int weight = cachedWeightLateAfternoon;
         return factory.forEach(Lesson.class)
                 .filter(lesson -> lesson.getTimeslot() != null &&
                         !lesson.getTimeslot().getStartTime().isBefore(LocalTime.of(17, 0)))
@@ -567,7 +600,7 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                         Joiners.equal(this::lessonDay, this::lessonDay),
                         Joiners.equal(Lesson::getEndTime, this::lessonStart))
                 .filter((earlier, later) -> !crossesLunchBoundary(earlier, later))
-                .penalize(HardSoftScore.ofSoft(getWeightStudentFatigue())) // Reuse student fatigue weight
+                .penalize(HardSoftScore.ofSoft(cachedWeightLecturerFatigue))
                 .asConstraint("Lecturer fatigue");
     }
 
@@ -587,11 +620,6 @@ public class TimetableConstraintProvider implements ConstraintProvider {
      * so 1 hard penalty is applied.
      */
     private Constraint maxLecturerConsecutiveHoursConstraint(ConstraintFactory factory) {
-        // With O(1) pairwise penalty:
-        // A pair of back-to-back lessons is 1 penalty.
-        // A block of 3 continuous lessons is 2 pairs (2 penalties).
-        // This is extremely fast because it evaluates purely linearly.
-        // The weight represents a configurable hard threshold limit.
         int maxHours = getMaxLecturerConsecutiveHours();
         if (maxHours <= 0) {
             return factory.forEach(Lesson.class)
@@ -599,7 +627,9 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                     .penalize(HardSoftScore.ONE_HARD)
                     .asConstraint("Max lecturer consecutive hours");
         }
-
+        // Consecutive hours limit K means at most (K-1) back-to-back pairs
+        // in a single daily chain. Penalize only the excess pairs.
+        int allowedConsecutivePairs = Math.max(0, maxHours - 1);
         return factory.forEach(Lesson.class)
                 .filter(lesson -> lesson.getTimeslot() != null && lesson.getLecturer() != null)
                 .join(Lesson.class,
@@ -607,7 +637,10 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                         Joiners.equal(this::lessonDay, this::lessonDay),
                         Joiners.equal(Lesson::getEndTime, this::lessonStart))
                 .filter((a, b) -> !crossesLunchBoundary(a, b))
-                .penalize(HardSoftScore.ONE_HARD)
+                .groupBy((a, b) -> a.getLecturer(), (a, b) -> lessonDay(a), ConstraintCollectors.countBi())
+                .filter((lecturer, day, consecutivePairCount) -> consecutivePairCount > allowedConsecutivePairs)
+                .penalize(HardSoftScore.ONE_HARD,
+                        (lecturer, day, consecutivePairCount) -> consecutivePairCount - allowedConsecutivePairs)
                 .asConstraint("Max lecturer consecutive hours");
     }
 

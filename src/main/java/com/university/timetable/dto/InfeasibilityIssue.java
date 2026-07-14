@@ -13,12 +13,16 @@ import lombok.NoArgsConstructor;
 public class InfeasibilityIssue {
     
     /**
-     * Type of issue: CAPACITY, TIMESLOTS, LECTURER_HOURS, FEATURE_MISMATCH, ZONE_CONFLICT
+     * Type of issue: CAPACITY, TIMESLOTS, LECTURER_HOURS, FEATURE_MISMATCH, ZONE_CONFLICT, SAME_COURSE_SAME_DAY, ROOM_CONSTRAINT
      */
     private String type;
     
     /**
-     * Severity: BLOCKING (solver will definitely fail) or WARNING (may succeed but unlikely)
+     * Severity levels:
+     * - CRITICAL: Definitely blocks solving (no valid rooms, no valid timeslots)
+     * - HIGH: Very likely to cause infeasibility (1-2 valid rooms for many lessons)
+     * - MEDIUM: May cause issues (tight constraints, limited alternatives)
+     * - LOW: Warning only (utilization high but manageable)
      */
     private String severity;
     
@@ -32,11 +36,28 @@ public class InfeasibilityIssue {
      */
     private String recommendation;
     
+    public static InfeasibilityIssue critical(String type, String description, String recommendation) {
+        return new InfeasibilityIssue(type, "CRITICAL", description, recommendation);
+    }
+    
+    public static InfeasibilityIssue high(String type, String description, String recommendation) {
+        return new InfeasibilityIssue(type, "HIGH", description, recommendation);
+    }
+    
+    public static InfeasibilityIssue medium(String type, String description, String recommendation) {
+        return new InfeasibilityIssue(type, "MEDIUM", description, recommendation);
+    }
+    
+    public static InfeasibilityIssue low(String type, String description, String recommendation) {
+        return new InfeasibilityIssue(type, "LOW", description, recommendation);
+    }
+    
+    // Legacy methods for backward compatibility
     public static InfeasibilityIssue blocking(String type, String description, String recommendation) {
-        return new InfeasibilityIssue(type, "BLOCKING", description, recommendation);
+        return critical(type, description, recommendation);
     }
     
     public static InfeasibilityIssue warning(String type, String description, String recommendation) {
-        return new InfeasibilityIssue(type, "WARNING", description, recommendation);
+        return medium(type, description, recommendation);
     }
 }

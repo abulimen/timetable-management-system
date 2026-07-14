@@ -3,7 +3,10 @@ package com.university.timetable.controller;
 import com.university.timetable.dto.*;
 import com.university.timetable.service.AuditLogService;
 import com.university.timetable.service.ConstraintJustificationService;
-import com.university.timetable.service.InfeasibilityChecker;
+import com.university.timetable.service.CpSatDiagnosticsService;
+import com.university.timetable.service.CpSatFeasibilityChecker;
+import com.university.timetable.service.CpSatSolverService;
+import com.university.timetable.service.HybridCpSatSolverService;
 import com.university.timetable.service.SolverRunMetricsService;
 import com.university.timetable.service.SolverBenchmarkService;
 import com.university.timetable.service.SolverService;
@@ -19,6 +22,10 @@ import java.util.Map;
 /**
  * SolverController - manages solver operations.
  * 
+ * Supports two solver engines:
+ * - TIMEFOLD: Default, uses Timefold Solver (OptaPlanner successor)
+ * - CPSAT: Google OR-Tools CP-SAT solver (often faster for large problems)
+ * 
  * Based on design.md API Specification:
  * POST /api/v1/solver/solve - Start solver
  * GET /api/v1/solver/status - Get status
@@ -33,7 +40,10 @@ import java.util.Map;
 public class SolverController {
 
     private final SolverService solverService;
-    private final InfeasibilityChecker infeasibilityChecker;
+    private final CpSatSolverService cpSatSolverService;
+    private final HybridCpSatSolverService hybridCpSatSolverService;
+    private final CpSatFeasibilityChecker cpSatFeasibilityChecker;
+    private final CpSatDiagnosticsService cpSatDiagnosticsService;
     private final ConstraintJustificationService justificationService;
     private final AuditLogService auditLogService;
     private final SolverRunMetricsService solverRunMetricsService;
@@ -43,6 +53,9 @@ public class SolverController {
 
     @Value("${solver.feasibility.run-on-dirty-only:false}")
     private boolean runFeasibilityOnDirtyOnly;
+
+    @Value("${solver.engine:TIMEFOLD}")
+    private String solverEngine;
 
     /**
      * POST /api/v1/solver/solve
@@ -75,24 +88,25 @@ public class SolverController {
         if (shouldRunFeasibility) {
             // STEP 1: Run feasibility check (this also ensures timeslots align with settings)
             long feasibilityStart = System.nanoTime();
-            InfeasibilityReport feasibilityReport = infeasibilityChecker.checkFeasibility();
+            InfeasibilityReport feasibilityReport = cpSatFeasibilityChecker.checkFeasibility();
             long feasibilityMs = elapsedMs(feasibilityStart);
             log.info("Feasibility check request duration: {} ms", feasibilityMs);
 
             timeslotCountForAudit = feasibilityReport.getTimeslotCount();
 
-            // STEP 2: Check for blocking issues
+            // STEP 2: Check for blocking issues (CRITICAL or HIGH severity)
             if (!feasibilityReport.isFeasible()) {
-                log.warn("Solver NOT started - {} blocking issues found", feasibilityReport.getBlockingCount());
+                int blockingCount = feasibilityReport.getCriticalCount() + feasibilityReport.getHighCount();
+                log.warn("Solver NOT started - {} blocking issues found", blockingCount);
                 return ResponseEntity.badRequest().body(java.util.Map.of(
                         "error", "FEASIBILITY_FAILED",
                         "message", "Cannot start solver - blocking issues found. Fix the issues and try again.",
-                        "blockingCount", feasibilityReport.getBlockingCount(),
+                        "blockingCount", blockingCount,
                         "issues", feasibilityReport.getIssues()));
             }
 
             log.info("Feasibility check passed ({} slots, {} warnings). Starting solver...",
-                    feasibilityReport.getTimeslotCount(), feasibilityReport.getWarningCount());
+                    feasibilityReport.getTimeslotCount(), feasibilityReport.getMediumCount() + feasibilityReport.getLowCount());
         } else {
             log.info("Skipping feasibility check before solve (skipFeasibility={}, runOnDirtyOnly={}, pendingChanges={})",
                     skipFeasibilityRequested, runFeasibilityOnDirtyOnly, hasPendingChanges);
@@ -101,7 +115,23 @@ public class SolverController {
         // STEP 3: Start solver
         try {
             long solveStart = System.nanoTime();
-            SolverStatusDTO status = solverService.startSolving(request);
+            
+            // Determine which solver engine to use
+            SolverStatusDTO status;
+            String effectiveEngine = request != null && request.getEngine() != null 
+                    ? request.getEngine() : solverEngine;
+            
+            if ("CPSAT".equalsIgnoreCase(effectiveEngine)) {
+                log.info("Using CP-SAT solver engine");
+                status = cpSatSolverService.startSolving(request);
+            } else if ("HYBRID".equalsIgnoreCase(effectiveEngine)) {
+                log.info("Using Hybrid CP-SAT + Timefold solver engine");
+                status = hybridCpSatSolverService.startSolving(request);
+            } else {
+                log.info("Using Timefold solver engine");
+                status = solverService.startSolving(request);
+            }
+            
             status.setProfile(profile.name());
             log.info("Solver start API call completed in {} ms (total request {} ms)",
                     elapsedMs(solveStart), elapsedMs(requestStart));
@@ -128,6 +158,18 @@ public class SolverController {
     @GetMapping("/status")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<SolverStatusDTO> getStatus() {
+        // Check Hybrid CP-SAT first
+        SolverStatusDTO hybridStatus = hybridCpSatSolverService.getStatus();
+        if ("SOLVING".equals(hybridStatus.getState()) || "SOLVED".equals(hybridStatus.getState())) {
+            return ResponseEntity.ok(hybridStatus);
+        }
+        
+        // Check CP-SAT second
+        SolverStatusDTO cpSatStatus = cpSatSolverService.getStatus();
+        if ("SOLVING".equals(cpSatStatus.getState()) || "SOLVED".equals(cpSatStatus.getState())) {
+            return ResponseEntity.ok(cpSatStatus);
+        }
+        // Fall back to Timefold status
         SolverStatusDTO status = solverService.getStatus();
         return ResponseEntity.ok(status);
     }
@@ -170,6 +212,31 @@ public class SolverController {
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'COORDINATOR')")
     public ResponseEntity<SolverStatusDTO> terminate() {
         log.info("Termination requested");
+        
+        // Check if Hybrid CP-SAT is running
+        SolverStatusDTO hybridStatus = hybridCpSatSolverService.getStatus();
+        if ("SOLVING".equals(hybridStatus.getState())) {
+            log.info("Terminating Hybrid CP-SAT solver");
+            hybridCpSatSolverService.terminateSolving();
+            SolverStatusDTO status = hybridCpSatSolverService.getStatus();
+            auditLogService.logSchedulerAction(
+                    "Hybrid solver manually terminated. Final score: " + (status.getScore() != null ? status.getScore() : "N/A"),
+                    true);
+            return ResponseEntity.ok(status);
+        }
+        
+        // Check if CP-SAT is running
+        SolverStatusDTO cpSatStatus = cpSatSolverService.getStatus();
+        if ("SOLVING".equals(cpSatStatus.getState())) {
+            log.info("Terminating CP-SAT solver");
+            SolverStatusDTO status = cpSatSolverService.terminate();
+            auditLogService.logSchedulerAction(
+                    "CP-SAT solver manually terminated. Final score: " + (status.getScore() != null ? status.getScore() : "N/A"),
+                    true);
+            return ResponseEntity.ok(status);
+        }
+        
+        // Fall back to Timefold termination
         SolverStatusDTO status = solverService.terminate();
 
         // Audit logging
@@ -233,20 +300,33 @@ public class SolverController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<InfeasibilityReport> checkFeasibility() {
         log.info("Running pre-solve feasibility check");
-        InfeasibilityReport report = infeasibilityChecker.checkFeasibility();
+        InfeasibilityReport report = cpSatFeasibilityChecker.checkFeasibility();
         return ResponseEntity.ok(report);
     }
 
     /**
+     * GET /api/v1/solver/feasibility/breakdown
+     * Get lesson breakdown for a specific zone or feature.
+     */
+    @GetMapping("/feasibility/breakdown")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<LessonBreakdownDTO> getLessonBreakdown(
+            @RequestParam(required = false) Long zoneId,
+            @RequestParam(required = false) Long featureId) {
+        LessonBreakdownDTO breakdown = cpSatFeasibilityChecker.getLessonBreakdown(zoneId, featureId);
+        return ResponseEntity.ok(breakdown);
+    }
+
+    /**
      * GET /api/v1/solver/analysis
-     * Analyze current solution and show constraint violations.
-     * Run this AFTER solving to understand why score is not 0hard.
+     * Analyze current solution and show constraint violations in plain English.
+     * Run this AFTER solving to understand what problems exist.
      */
     @GetMapping("/analysis")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ScoreAnalysisDTO> getScoreAnalysis() {
-        log.info("Analyzing current solution for constraint violations");
-        ScoreAnalysisDTO analysis = justificationService.analyzeCurrentSolution();
+    public ResponseEntity<DiagnosticsReportDTO> getScoreAnalysis() {
+        log.info("Analyzing current timetable for problems");
+        DiagnosticsReportDTO analysis = cpSatDiagnosticsService.analyzeTimetable();
         return ResponseEntity.ok(analysis);
     }
 

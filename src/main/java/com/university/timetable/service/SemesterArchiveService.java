@@ -178,12 +178,13 @@ public class SemesterArchiveService {
 
         jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 0");
         try {
+            // Use DELETE instead of TRUNCATE - TRUNCATE causes implicit commit breaking transaction rollback
             for (String table : targetTables) {
-                jdbcTemplate.execute("TRUNCATE TABLE " + quoteIdentifier(table));
+                jdbcTemplate.execute("DELETE FROM " + quoteIdentifier(table));
             }
             for (String table : targetTables) {
                 String archiveTable = prefix + "_" + table;
-                jdbcTemplate.execute("INSERT INTO " + quoteIdentifier(table) + " SELECT * FROM " + quoteIdentifier(archiveTable));
+                restoreTableWithColumnMatching(table, archiveTable);
             }
         } finally {
             jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
@@ -668,6 +669,45 @@ public class SemesterArchiveService {
             return n.intValue() != 0;
         }
         return value != null && Boolean.parseBoolean(String.valueOf(value));
+    }
+
+    /**
+     * Restore table data with column matching to handle schema differences.
+     * Uses explicit column lists instead of SELECT * to handle cases where
+     * the archive table has fewer columns than the current schema (migrations added columns).
+     */
+    private void restoreTableWithColumnMatching(String targetTable, String archiveTable) {
+        // Get columns from both tables
+        List<String> targetColumns = getTableColumns(targetTable);
+        List<String> archiveColumns = getTableColumns(archiveTable);
+        
+        // Find common columns (intersection)
+        List<String> commonColumns = targetColumns.stream()
+                .filter(archiveColumns::contains)
+                .toList();
+        
+        if (commonColumns.isEmpty()) {
+            log.warn("No common columns between {} and {}, skipping restore", targetTable, archiveTable);
+            return;
+        }
+        
+        String columnList = commonColumns.stream()
+                .map(this::quoteIdentifier)
+                .collect(Collectors.joining(", "));
+        
+        String sql = String.format("INSERT INTO %s (%s) SELECT %s FROM %s",
+                quoteIdentifier(targetTable), columnList, columnList, quoteIdentifier(archiveTable));
+        
+        jdbcTemplate.execute(sql);
+        log.info("Restored table {} with {} common columns from {}", targetTable, commonColumns.size(), archiveTable);
+    }
+    
+    /**
+     * Get column names for a table from information_schema.
+     */
+    private List<String> getTableColumns(String tableName) {
+        String sql = "SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? ORDER BY ORDINAL_POSITION";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getString("COLUMN_NAME"), tableName);
     }
 
     private String quoteIdentifier(String identifier) {

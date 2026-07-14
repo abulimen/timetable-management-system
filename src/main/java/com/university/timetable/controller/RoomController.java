@@ -54,12 +54,8 @@ public class RoomController {
             zoneRepository.findById(dto.zoneId).ifPresent(room::setZone);
         }
 
-        if (dto.featureIds != null && !dto.featureIds.isEmpty()) {
-            Set<Feature> features = dto.featureIds.stream()
-                    .map(featureRepository::findById)
-                    .filter(java.util.Optional::isPresent)
-                    .map(java.util.Optional::get)
-                    .collect(Collectors.toSet());
+        Set<Feature> features = resolveFeatures(dto.featureIds, dto.featureNames);
+        if (!features.isEmpty()) {
             room.setFeatures(features);
         }
 
@@ -84,14 +80,8 @@ public class RoomController {
                         zoneRepository.findById(dto.zoneId).ifPresent(room::setZone);
                     }
 
-                    if (dto.featureIds != null) {
-                        Set<Feature> features = dto.featureIds.stream()
-                                .map(featureRepository::findById)
-                                .filter(java.util.Optional::isPresent)
-                                .map(java.util.Optional::get)
-                                .collect(Collectors.toSet());
-                        room.setFeatures(features);
-                    }
+                    Set<Feature> features = resolveFeatures(dto.featureIds, dto.featureNames);
+                    room.setFeatures(features);
 
                     Room updated = roomRepository.save(room);
 
@@ -135,6 +125,26 @@ public class RoomController {
         return dto;
     }
 
+    private Set<Feature> resolveFeatures(List<Long> featureIds, List<String> featureNames) {
+        Set<Feature> features = new java.util.HashSet<>();
+        
+        // Resolve by IDs
+        if (featureIds != null && !featureIds.isEmpty()) {
+            for (Long id : featureIds) {
+                featureRepository.findById(id).ifPresent(features::add);
+            }
+        }
+        
+        // Resolve by names
+        if (featureNames != null && !featureNames.isEmpty()) {
+            for (String name : featureNames) {
+                featureRepository.findByName(name).ifPresent(features::add);
+            }
+        }
+        
+        return features;
+    }
+
     public static class RoomDTO {
         public Long id;
         public String name;
@@ -150,5 +160,6 @@ public class RoomController {
         public Integer capacity;
         public Long zoneId;
         public List<Long> featureIds;
+        public List<String> featureNames;
     }
 }

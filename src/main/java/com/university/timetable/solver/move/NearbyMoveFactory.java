@@ -31,38 +31,55 @@ public class NearbyMoveFactory implements MoveListFactory<TimeTable> {
     static final int SWAP_NEARBY_LIMIT = 4;
 
     /**
-     * Hard cap for lessons considered in one step.
-     * Keeps move-list creation bounded on very large datasets.
+     * Time budget (ms) for move list creation.
+     * Replaces the old fixed lesson cap — processes ALL lessons but stops
+     * when time budget is exceeded. Ensures hard lessons always get moves.
      */
-    static final int MAX_LESSONS_PER_STEP = 320;
+    static final long MAX_MOVE_CREATION_MS = 200;
 
     /** Maximum anchor lessons used for swap generation. */
-    static final int SWAP_ANCHOR_LIMIT = 180;
+    static final int SWAP_ANCHOR_LIMIT = 400;
 
     private final TimeslotNearbyDistanceMeter timeslotDistanceMeter = new TimeslotNearbyDistanceMeter();
     private final RoomNearbyDistanceMeter roomDistanceMeter = new RoomNearbyDistanceMeter();
 
     @Override
     public List<? extends Move<TimeTable>> createMoveList(TimeTable solution) {
-        List<Lesson> movableLessons = solution.getLessons().stream()
+        List<Lesson> allMovable = solution.getLessons().stream()
                 .filter(lesson -> !lesson.isPinned())
                 .toList();
 
-        if (movableLessons.isEmpty()) {
+        if (allMovable.isEmpty()) {
             return List.of();
         }
 
-        if (movableLessons.size() > MAX_LESSONS_PER_STEP) {
-            List<Lesson> sampled = new ArrayList<>(movableLessons);
-            Collections.shuffle(sampled);
-            movableLessons = sampled.subList(0, MAX_LESSONS_PER_STEP);
-        }
+        // Sort by conflict count (descending) so hardest/most-problematic lessons
+        // always get moves first. Remaining lessons processed if time allows.
+        List<Lesson> sortedLessons = new ArrayList<>(allMovable);
+        Map<Long, Integer> conflictCounts = computeConflictCounts(allMovable);
+        sortedLessons.sort((a, b) -> {
+            int conflictA = conflictCounts.getOrDefault(a.getId(), 0);
+            int conflictB = conflictCounts.getOrDefault(b.getId(), 0);
+            if (conflictA != conflictB) return Integer.compare(conflictB, conflictA);
+            // Tiebreak: harder lessons (more students, more features) first
+            return Integer.compare(b.getTotalStudentCount(), a.getTotalStudentCount());
+        });
 
         List<Timeslot> allTimeslots = solution.getTimeslots();
         List<Room> allRooms = solution.getRooms();
         List<Move<TimeTable>> moves = new ArrayList<>();
+        long startMs = System.currentTimeMillis();
+        int processedCount = 0;
 
-        for (Lesson lesson : movableLessons) {
+        for (Lesson lesson : sortedLessons) {
+            // Check time budget every 50 lessons to avoid overhead
+            if (processedCount > 0 && processedCount % 50 == 0) {
+                if (System.currentTimeMillis() - startMs > MAX_MOVE_CREATION_MS) {
+                    break;
+                }
+            }
+            processedCount++;
+
             // 1. Nearby timeslot change moves
             addNearbyTimeslotMoves(lesson, allTimeslots, moves);
 
@@ -70,13 +87,63 @@ public class NearbyMoveFactory implements MoveListFactory<TimeTable> {
             addNearbyRoomMoves(lesson, allRooms, moves);
         }
 
-        // 3. Swap moves (sampled and filtered for large-scale performance)
-        addNearbySwapMoves(movableLessons, moves);
+        // 3. Swap moves (always generated from processed lessons for diversity)
+        addNearbySwapMoves(sortedLessons.subList(0, Math.min(processedCount, sortedLessons.size())), moves);
 
         // Shuffle to ensure fair distribution across entities
         Collections.shuffle(moves);
 
         return moves;
+    }
+
+    /**
+     * Quick O(n²) conflict counter: counts hard-constraint violations per lesson.
+     * Checks: room conflicts, lecturer conflicts, student group overlaps.
+     * Only counts among currently-assigned lessons (timeslot != null).
+     */
+    private Map<Long, Integer> computeConflictCounts(List<Lesson> lessons) {
+        Map<Long, Integer> counts = new HashMap<>();
+        for (int i = 0; i < lessons.size(); i++) {
+            Lesson a = lessons.get(i);
+            if (a.getTimeslot() == null || a.getId() == null) continue;
+            int count = 0;
+            for (int j = 0; j < lessons.size(); j++) {
+                if (i == j) continue;
+                Lesson b = lessons.get(j);
+                if (b.getTimeslot() == null) continue;
+                if (!Objects.equals(a.getTimeslot().getDayOfWeek(), b.getTimeslot().getDayOfWeek())) continue;
+                // Check time overlap
+                if (!overlaps(a, b)) continue;
+                // Room conflict
+                if (!a.isOnline() && !b.isOnline() && a.getRoom() != null && b.getRoom() != null
+                        && a.getRoom().getId().equals(b.getRoom().getId())) {
+                    count++;
+                }
+                // Lecturer conflict
+                if (a.getLecturer() != null && b.getLecturer() != null
+                        && a.getLecturer().getId().equals(b.getLecturer().getId())) {
+                    count++;
+                }
+                // Student group conflict (quick check via conflict group IDs)
+                if (!a.getConflictGroupIds().isEmpty() && !b.getConflictGroupIds().isEmpty()) {
+                    for (Long id : a.getConflictGroupIds()) {
+                        if (b.getConflictGroupIds().contains(id)) {
+                            count++;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (count > 0) {
+                counts.put(a.getId(), count);
+            }
+        }
+        return counts;
+    }
+
+    private boolean overlaps(Lesson a, Lesson b) {
+        return a.getTimeslot().getStartTime().isBefore(b.getEndTime())
+                && b.getTimeslot().getStartTime().isBefore(a.getEndTime());
     }
 
     /**

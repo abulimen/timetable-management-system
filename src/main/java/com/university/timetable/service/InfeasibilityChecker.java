@@ -69,8 +69,10 @@ public class InfeasibilityChecker {
         checkZoneCompatibility(report, courses, rooms);
         log.debug("Feasibility check 'zoneCompatibility' completed in {} ms", elapsedMs(checkStart));
 
-        log.info("Feasibility check complete in {} ms: feasible={}, blocking={}, warnings={}",
-                elapsedMs(startNanos), report.isFeasible(), report.getBlockingCount(), report.getWarningCount());
+        log.info("Feasibility check complete in {} ms: feasible={}, critical={}, high={}, medium={}, low={}",
+                elapsedMs(startNanos), report.isFeasible(), 
+                report.getCriticalCount(), report.getHighCount(), 
+                report.getMediumCount(), report.getLowCount());
 
         return report;
     }
