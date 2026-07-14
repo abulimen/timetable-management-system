@@ -34,11 +34,12 @@ public class NearbyMoveFactory implements MoveListFactory<TimeTable> {
      * Time budget (ms) for move list creation.
      * Replaces the old fixed lesson cap — processes ALL lessons but stops
      * when time budget is exceeded. Ensures hard lessons always get moves.
+     * Reduced to 150ms to generate fewer but better quality moves.
      */
-    static final long MAX_MOVE_CREATION_MS = 200;
+    static final long MAX_MOVE_CREATION_MS = 150;
 
     /** Maximum anchor lessons used for swap generation. */
-    static final int SWAP_ANCHOR_LIMIT = 400;
+    static final int SWAP_ANCHOR_LIMIT = 600;
 
     private final TimeslotNearbyDistanceMeter timeslotDistanceMeter = new TimeslotNearbyDistanceMeter();
     private final RoomNearbyDistanceMeter roomDistanceMeter = new RoomNearbyDistanceMeter();

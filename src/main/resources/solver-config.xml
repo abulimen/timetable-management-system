@@ -21,10 +21,10 @@
 
     <!-- Multi-termination: Stop when ANY condition is met -->
     <termination>
-        <!-- Maximum time limit (failsafe) - increased for large datasets -->
-        <minutesSpentLimit>30</minutesSpentLimit>
-        <!-- Stop if no improvement for 60 seconds -->
-        <unimprovedSecondsSpentLimit>60</unimprovedSecondsSpentLimit>
+        <!-- Maximum time limit (failsafe) - increased for 1832-lesson dataset -->
+        <minutesSpentLimit>45</minutesSpentLimit>
+        <!-- Stop if no improvement for 120 seconds -->
+        <unimprovedSecondsSpentLimit>120</unimprovedSecondsSpentLimit>
     </termination>
 
     <!-- FIRST_FIT_DECREASING: Fast initialization by picking the first feasible slot for hardest lessons -->
@@ -70,13 +70,13 @@
         <!-- Enhanced acceptors to prevent cycling and escape local optima -->
         <acceptor>
             <!-- Tabu: Avoid revisiting recent moves - scaled for 1832 lessons -->
-            <entityTabuSize>45</entityTabuSize>
-            <!-- Late Acceptance: Compare against solution from 800 steps ago -->
-            <lateAcceptanceSize>800</lateAcceptanceSize>
+            <entityTabuSize>120</entityTabuSize>
+            <!-- Late Acceptance: Compare against solution from 1200 steps ago -->
+            <lateAcceptanceSize>1200</lateAcceptanceSize>
         </acceptor>
 
         <forager>
-            <acceptedCountLimit>4</acceptedCountLimit>
+            <acceptedCountLimit>8</acceptedCountLimit>
         </forager>
     </localSearch>
 </solver>
