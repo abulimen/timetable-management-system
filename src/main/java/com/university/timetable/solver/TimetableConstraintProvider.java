@@ -465,20 +465,19 @@ public class TimetableConstraintProvider implements ConstraintProvider {
 
     /**
      * SOFT: Student fatigue — penalizes consecutive teaching chains.
-     * Instead of penalizing each pair independently, counts the total
-     * number of consecutive lesson pairs per student group per day.
-     * This makes longer chains penalized more heavily (e.g., 4 consecutive
-     * hours = 3 pairs = 3× penalty, encouraging the solver to break up
-     * long blocks rather than just shortening them by one).
+     * FIXED: uses hasStudentGroupOverlap() for combined classes (Groups A+D+E).
+     * Previously used getStudentGroup() (singular) — only tracked primary group.
      */
     private Constraint studentFatigue(ConstraintFactory factory) {
         return factory.forEach(Lesson.class)
-                .filter(lesson -> lesson.getTimeslot() != null && lesson.getStudentGroup() != null)
+                .filter(lesson -> lesson.getTimeslot() != null
+                        && !lesson.getConflictGroupIds().isEmpty())
                 .join(Lesson.class,
-                        Joiners.equal(Lesson::getStudentGroup),
+                        Joiners.lessThan(Lesson::getId),
                         Joiners.equal(this::lessonDay, this::lessonDay),
                         Joiners.equal(Lesson::getEndTime, this::lessonStart))
-                .filter((earlier, later) -> !crossesLunchBoundary(earlier, later))
+                .filter((earlier, later) -> hasStudentGroupOverlap(earlier, later)
+                        && !crossesLunchBoundary(earlier, later))
                 .penalize(HardSoftScore.ofSoft(getWeightStudentFatigue()))
                 .asConstraint("Student fatigue");
     }

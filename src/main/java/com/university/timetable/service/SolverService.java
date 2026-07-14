@@ -876,7 +876,7 @@ public class SolverService {
      */
     @Transactional(readOnly = true)
     public TimeTable loadProblem() {
-        List<Lesson> lessons = lessonRepository.findAll();
+        List<Lesson> lessons = lessonRepository.findAllWithCourseAndLecturer();
         List<Timeslot> timeslots = timeslotRepository.findAll();
         List<Room> rooms = roomRepository.findAll();
         List<Lecturer> lecturers = lecturerRepository.findAll();
