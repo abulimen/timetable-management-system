@@ -1,14 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Timefold Solver Configuration - OPTIMIZED FOR LARGE SCALE
-     Performance optimizations applied:
-     1. Combined acceptors (Tabu + Late Acceptance)
-     2. FIRST_FIT_DECREASING construction (with difficulty comparator)
-     3. Custom nearby-biased moves with time-based budget
-     4. Course pillar moves for structural search
-     5. Built-in swap moves for atomic exchanges
-     6. Aggressive ruin-and-recreate with lower thresholds
-     7. Increased tabu size for 1832-lesson dataset
--->
+<!-- Timefold Solver Configuration -->
 <solver xmlns="https://timefold.ai/xsd/solver">
     <solutionClass>com.university.timetable.domain.TimeTable</solutionClass>
     <entityClass>com.university.timetable.domain.Lesson</entityClass>
@@ -19,59 +10,36 @@
         </constraintProviderClass>
     </scoreDirectorFactory>
 
-    <!-- Multi-termination: Stop when ANY condition is met -->
     <termination>
-        <!-- Maximum time limit (failsafe) - increased for 1832-lesson dataset -->
         <minutesSpentLimit>45</minutesSpentLimit>
-        <!-- Stop if no improvement for 120 seconds -->
         <unimprovedSecondsSpentLimit>120</unimprovedSecondsSpentLimit>
     </termination>
 
-    <!-- FIRST_FIT_DECREASING: Fast initialization by picking the first feasible slot for hardest lessons -->
     <constructionHeuristic>
         <constructionHeuristicType>FIRST_FIT_DECREASING</constructionHeuristicType>
     </constructionHeuristic>
 
-    <!-- Local Search with OPTIMIZATIONS -->
     <localSearch>
         <unionMoveSelector>
-            <!-- Custom nearby-biased moves (primary: timeslot/room changes + swaps) -->
-            <!-- Time-based budget (200ms) replaces old 320-lesson cap -->
-            <!-- Conflict-priority ordering ensures hardest lessons always get moves -->
             <moveListFactory>
                 <moveListFactoryClass>com.university.timetable.solver.move.NearbyMoveFactory</moveListFactoryClass>
             </moveListFactory>
-
-            <!-- Course pillar moves: shift entire course to new timeslot together -->
-            <!-- Escapes local optima where individual lesson moves fail -->
             <moveListFactory>
                 <moveListFactoryClass>com.university.timetable.solver.move.CoursePillarMoveFactory</moveListFactoryClass>
             </moveListFactory>
-
-            <!-- Intelligent ruin-and-recreate for escaping deep deadlocks -->
-            <!-- Reduced cooldown (2 min) and stagnation threshold (100) -->
-            <!-- Larger clusters (up to 50) for large datasets -->
             <moveListFactory>
                 <moveListFactoryClass>com.university.timetable.solver.move.RuinAndRecreateMoveFactory</moveListFactoryClass>
             </moveListFactory>
-
-            <!-- Built-in swap move selector for atomic timeslot+room exchanges -->
-            <!-- Complements custom LessonSwapMove with different pair generation -->
             <swapMoveSelector>
                 <cacheType>PHASE</cacheType>
             </swapMoveSelector>
-
-            <!-- Standard random change selector as fallback for diversity/escape -->
             <changeMoveSelector>
                 <cacheType>PHASE</cacheType>
             </changeMoveSelector>
         </unionMoveSelector>
 
-        <!-- Enhanced acceptors to prevent cycling and escape local optima -->
         <acceptor>
-            <!-- Tabu: Avoid revisiting recent moves - scaled for 1832 lessons -->
             <entityTabuSize>120</entityTabuSize>
-            <!-- Late Acceptance: Compare against solution from 1200 steps ago -->
             <lateAcceptanceSize>1200</lateAcceptanceSize>
         </acceptor>
 

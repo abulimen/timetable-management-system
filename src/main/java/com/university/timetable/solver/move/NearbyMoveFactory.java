@@ -3,6 +3,7 @@ package com.university.timetable.solver.move;
 import ai.timefold.solver.core.impl.heuristic.move.Move;
 import ai.timefold.solver.core.impl.heuristic.selector.move.factory.MoveListFactory;
 import com.university.timetable.domain.*;
+import com.university.timetable.solver.AdaptiveSolverListener;
 import com.university.timetable.solver.RoomNearbyDistanceMeter;
 import com.university.timetable.solver.TimeslotNearbyDistanceMeter;
 
@@ -72,10 +73,15 @@ public class NearbyMoveFactory implements MoveListFactory<TimeTable> {
         long startMs = System.currentTimeMillis();
         int processedCount = 0;
 
+        // Adaptive time budget: when hard violations are high, reduce nearby moves
+        // to focus on structural moves (pillar, ruin-recreate)
+        double softMultiplier = AdaptiveSolverListener.SOFT_WEIGHT_MULTIPLIER.get();
+        long adaptiveTimeBudget = (long) (MAX_MOVE_CREATION_MS * softMultiplier);
+
         for (Lesson lesson : sortedLessons) {
             // Check time budget every 50 lessons to avoid overhead
             if (processedCount > 0 && processedCount % 50 == 0) {
-                if (System.currentTimeMillis() - startMs > MAX_MOVE_CREATION_MS) {
+                if (System.currentTimeMillis() - startMs > adaptiveTimeBudget) {
                     break;
                 }
             }

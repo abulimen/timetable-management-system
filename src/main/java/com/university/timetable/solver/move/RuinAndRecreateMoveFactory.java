@@ -6,6 +6,7 @@ import com.university.timetable.domain.Lesson;
 import com.university.timetable.domain.Room;
 import com.university.timetable.domain.TimeTable;
 import com.university.timetable.domain.Timeslot;
+import com.university.timetable.solver.AdaptiveSolverListener;
 import com.university.timetable.solver.SpringContextHolder;
 import com.university.timetable.service.ConstraintSettingsService;
 
@@ -23,6 +24,10 @@ import java.util.*;
  * <li>The solver appears stuck (score hasn't improved recently)</li>
  * </ol>
  * <p>
+ * Adaptive behavior: when hard violations are high (soft multiplier low),
+ * reduces stagnation threshold to trigger more aggressively and generates
+ * more ruin moves per step.
+ * <p>
  * When triggered, uses {@link ConflictAnalyzer} to intelligently target
  * the most problematic lessons rather than random destruction.
  */
@@ -31,8 +36,9 @@ public class RuinAndRecreateMoveFactory implements MoveListFactory<TimeTable> {
     /** Minimum elapsed time before ruin can fire (seconds). */
     private static final long MIN_COOLDOWN_SECONDS = 120; // 2 minutes
 
-    /** Maximum number of ruin moves to generate per step. */
-    private static final int MAX_RUIN_MOVES_PER_STEP = 3;
+    /** Base number of ruin moves to generate per step. */
+    private static final int BASE_MAX_RUIN_MOVES_PER_STEP = 3;
+    private static final int MAX_RUIN_MOVES_CAP = 8;
 
     /**
      * Tracks when this factory was first called (proxy for solve start time).
@@ -49,8 +55,9 @@ public class RuinAndRecreateMoveFactory implements MoveListFactory<TimeTable> {
     /** Number of consecutive calls with no improvement. */
     private int stagnationCounter = 0;
 
-    /** Minimum stagnation calls before ruin fires. */
-    private static final int MIN_STAGNATION_CALLS = 100;
+    /** Base minimum stagnation calls before ruin fires. */
+    private static final int BASE_MIN_STAGNATION_CALLS = 100;
+    private static final int MIN_STAGNATION_CALLS_FLOOR = 30;
 
     @Override
     public List<? extends Move<TimeTable>> createMoveList(TimeTable solution) {
@@ -58,6 +65,12 @@ public class RuinAndRecreateMoveFactory implements MoveListFactory<TimeTable> {
         if (!isEnabled()) {
             return List.of();
         }
+
+        // Adaptive stagnation threshold: when hard violations are high (soft multiplier low),
+        // reduce stagnation threshold to trigger ruin-recreate more aggressively
+        double softMultiplier = AdaptiveSolverListener.SOFT_WEIGHT_MULTIPLIER.get();
+        int adaptiveStagnationThreshold = (int) (BASE_MIN_STAGNATION_CALLS * softMultiplier + MIN_STAGNATION_CALLS_FLOOR * (1.0 - softMultiplier));
+        int adaptiveMaxMoves = (int) (BASE_MAX_RUIN_MOVES_PER_STEP + (MAX_RUIN_MOVES_CAP - BASE_MAX_RUIN_MOVES_PER_STEP) * (1.0 - softMultiplier));
 
         long now = System.currentTimeMillis();
 
@@ -93,7 +106,7 @@ public class RuinAndRecreateMoveFactory implements MoveListFactory<TimeTable> {
         }
 
         // Must be stuck for a meaningful number of calls
-        if (stagnationCounter < MIN_STAGNATION_CALLS) {
+        if (stagnationCounter < adaptiveStagnationThreshold) {
             return List.of();
         }
 
@@ -105,8 +118,8 @@ public class RuinAndRecreateMoveFactory implements MoveListFactory<TimeTable> {
 
         List<Move<TimeTable>> moves = new ArrayList<>();
 
-        // Generate up to MAX_RUIN_MOVES_PER_STEP moves, each with a different seed
-        int movesToGenerate = Math.min(MAX_RUIN_MOVES_PER_STEP, conflictingLessons.size());
+        // Generate up to adaptiveMaxMoves moves, each with a different seed
+        int movesToGenerate = Math.min(adaptiveMaxMoves, conflictingLessons.size());
 
         for (int i = 0; i < movesToGenerate; i++) {
             Lesson seed = conflictingLessons.get(i);

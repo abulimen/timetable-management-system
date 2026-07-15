@@ -75,7 +75,7 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 cachedUnavailabilitySystemEnabled = svc.isUnavailabilitySystemEnabled();
                 cachedWeightRoomCapacity = svc.getWeightRoomCapacity();
                 cachedWeightDayBalance = svc.getWeightDayBalance();
-                cachedWeightLecturerTransition = svc.getWeightLecturerTransition();
+                cachedWeightLecturerTransition = 1; // Reduced from 5 per user request
                 cachedWeightStudentFatigue = svc.getWeightStudentFatigue();
                 cachedWeightEarlyMorning = svc.getInt("weight_early_morning", 3);
                 cachedWeightLecturerFatigue = svc.getInt("weight_lecturer_fatigue", 1);
@@ -152,6 +152,19 @@ public class TimetableConstraintProvider implements ConstraintProvider {
         return cachedWeightEarlyMorning;
     }
 
+    /**
+     * Get the adaptive soft weight multiplier from the AdaptiveSolverListener.
+     * When hard violations are high, soft weights are reduced (focus on hard).
+     * When hard violations approach zero, soft weights are strengthened (focus on quality).
+     * 
+     * @param baseWeight the base weight from configuration
+     * @return the adjusted weight after applying the adaptive multiplier
+     */
+    private int getAdaptiveSoftWeight(int baseWeight) {
+        double multiplier = AdaptiveSolverListener.SOFT_WEIGHT_MULTIPLIER.get();
+        return Math.max(1, (int) Math.round(baseWeight * multiplier));
+    }
+
     private LocalTime getLatestEndTime() {
         return cachedLatestEndTime;
     }
@@ -185,9 +198,7 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 studentFatigue(factory),
                 lecturerRoomTransition(factory),
                 dayBalanceForStudentGroup(factory),
-                earlyMorningPenalty(factory),
-                lateAfternoonPenalty(factory),
-                lecturerFatigue(factory)
+                earlyMorningPenalty(factory)
         };
     }
 
@@ -456,7 +467,7 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                         lesson -> {
                             // Penalize rooms that are too large (wasted capacity)
                             int diff = lesson.getRoom().getCapacity() - lesson.getTotalStudentCount();
-                            int weight = getWeightRoomCapacity();
+                            int weight = getAdaptiveSoftWeight(getWeightRoomCapacity());
                             // Use ceiling division so even 1 wasted seat incurs penalty
                             return diff > 0 ? (int) Math.ceil(diff / 10.0) * weight : 0;
                         })
@@ -478,7 +489,7 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                         Joiners.equal(Lesson::getEndTime, this::lessonStart))
                 .filter((earlier, later) -> hasStudentGroupOverlap(earlier, later)
                         && !crossesLunchBoundary(earlier, later))
-                .penalize(HardSoftScore.ofSoft(getWeightStudentFatigue()))
+                .penalize(HardSoftScore.ofSoft(getAdaptiveSoftWeight(getWeightStudentFatigue())))
                 .asConstraint("Student fatigue");
     }
 
@@ -494,7 +505,7 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 .filter((earlier, later) -> later.getRoom() != null &&
                         !crossesLunchBoundary(earlier, later) &&
                         !Objects.equals(earlier.getRoom().getId(), later.getRoom().getId()))
-                .penalize(HardSoftScore.ofSoft(getWeightLecturerTransition()),
+                .penalize(HardSoftScore.ofSoft(getAdaptiveSoftWeight(getWeightLecturerTransition())),
                         (earlier, later) -> {
                             if (earlier.getRoom().getZone() != null &&
                                     later.getRoom().getZone() != null &&
@@ -529,7 +540,7 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 })
                 .groupBy(GroupDay::groupId, GroupDay::day, ConstraintCollectors.count())
                 .filter((groupId, day, lessonCount) -> lessonCount > 1)
-                .penalize(HardSoftScore.ofSoft(getWeightDayBalance()),
+                .penalize(HardSoftScore.ofSoft(getAdaptiveSoftWeight(getWeightDayBalance())),
                         (groupId, day, lessonCount) -> pairCount(lessonCount))
                 .asConstraint("Day balance for student group");
     }
@@ -547,7 +558,7 @@ public class TimetableConstraintProvider implements ConstraintProvider {
      * allowing 8am lessons when needed.
      */
     private Constraint earlyMorningPenalty(ConstraintFactory factory) {
-        int weight = getWeightEarlyMorning();
+        int weight = getAdaptiveSoftWeight(getWeightEarlyMorning());
         return factory.forEach(Lesson.class)
                 .filter(lesson -> lesson.getTimeslot() != null &&
                         lesson.getTimeslot().getStartTime().isBefore(LocalTime.of(9, 0)))
@@ -571,7 +582,7 @@ public class TimetableConstraintProvider implements ConstraintProvider {
      * Mirrors the early morning penalty to encourage a balanced daily schedule.
      */
     private Constraint lateAfternoonPenalty(ConstraintFactory factory) {
-        int weight = cachedWeightLateAfternoon;
+        int weight = getAdaptiveSoftWeight(cachedWeightLateAfternoon);
         return factory.forEach(Lesson.class)
                 .filter(lesson -> lesson.getTimeslot() != null &&
                         !lesson.getTimeslot().getStartTime().isBefore(LocalTime.of(17, 0)))
@@ -599,7 +610,7 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                         Joiners.equal(this::lessonDay, this::lessonDay),
                         Joiners.equal(Lesson::getEndTime, this::lessonStart))
                 .filter((earlier, later) -> !crossesLunchBoundary(earlier, later))
-                .penalize(HardSoftScore.ofSoft(cachedWeightLecturerFatigue))
+                .penalize(HardSoftScore.ofSoft(getAdaptiveSoftWeight(cachedWeightLecturerFatigue)))
                 .asConstraint("Lecturer fatigue");
     }
 

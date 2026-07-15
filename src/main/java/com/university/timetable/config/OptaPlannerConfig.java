@@ -15,6 +15,7 @@ import ai.timefold.solver.core.config.solver.EnvironmentMode;
 import ai.timefold.solver.core.config.solver.SolverConfig;
 import ai.timefold.solver.core.config.solver.SolverManagerConfig;
 import ai.timefold.solver.core.config.localsearch.LocalSearchPhaseConfig;
+import ai.timefold.solver.core.config.localsearch.decider.acceptor.LocalSearchAcceptorConfig;
 import ai.timefold.solver.core.config.localsearch.decider.forager.LocalSearchForagerConfig;
 import ai.timefold.solver.core.config.phase.PhaseConfig;
 import ai.timefold.solver.core.config.solver.termination.TerminationConfig;
@@ -64,7 +65,31 @@ public class OptaPlannerConfig {
         // ~2x faster.
         config.setEnvironmentMode(EnvironmentMode.valueOf(resolveEnvironmentMode()));
         applyDynamicTuning(config);
+        // Add simulated annealing programmatically (not supported in XML for Community Edition)
+        addSimulatedAnnealing(config);
         return SolverFactory.create(config);
+    }
+
+    /**
+     * Add simulated annealing to the local search acceptor.
+     * Timefold Community Edition 1.31.0 doesn't support this in XML,
+     * but the Java API fully supports it.
+     */
+    private void addSimulatedAnnealing(SolverConfig config) {
+        if (config.getPhaseConfigList() == null) return;
+        for (PhaseConfig phase : config.getPhaseConfigList()) {
+            if (phase instanceof LocalSearchPhaseConfig localSearchPhase) {
+                LocalSearchAcceptorConfig acceptorConfig = localSearchPhase.getAcceptorConfig();
+                if (acceptorConfig == null) {
+                    acceptorConfig = new LocalSearchAcceptorConfig();
+                    localSearchPhase.setAcceptorConfig(acceptorConfig);
+                }
+                // Simulated annealing helps escape local optima by accepting
+                // worse moves with decreasing probability (temperature cooling)
+                acceptorConfig.setSimulatedAnnealingStartingTemperature("4hard/1000soft");
+                log.info("Added simulated annealing (starting temp: 4hard/1000soft) to local search phase");
+            }
+        }
     }
 
     /**

@@ -739,6 +739,10 @@ public class HybridCpSatSolverService {
 
         Solver<TimeTable> solver = solverFactory.buildSolver();
         
+        // Add adaptive multi-objective weighting listener
+        // Dynamically adjusts soft constraint weights based on hard violation count
+        solver.addEventListener(new com.university.timetable.solver.AdaptiveSolverListener());
+
         // Add listener to save best solution as it improves
         solver.addEventListener(event -> {
             TimeTable newBest = event.getNewBestSolution();

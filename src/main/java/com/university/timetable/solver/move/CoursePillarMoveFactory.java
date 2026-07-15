@@ -3,6 +3,7 @@ package com.university.timetable.solver.move;
 import ai.timefold.solver.core.impl.heuristic.move.Move;
 import ai.timefold.solver.core.impl.heuristic.selector.move.factory.MoveListFactory;
 import com.university.timetable.domain.*;
+import com.university.timetable.solver.AdaptiveSolverListener;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,22 +18,34 @@ import java.util.stream.Collectors;
  * constraint violation or a poor soft assignment. This avoids generating
  * thousands of useless pillar moves for well-placed courses.
  * <p>
+ * Adaptive behavior: when hard violations are high (soft multiplier low),
+ * generates MORE pillar moves to focus on structural fixes. When hard
+ * violations approach zero, generates FEWER pillar moves.
+ * <p>
  * Limits:
  * <ul>
- * <li>Max 20 courses considered per step (most problematic first)</li>
- * <li>Max 4 target timeslots per course (nearest to current)</li>
+ * <li>Base: Max 20 courses per step (adaptive up to 50)</li>
+ * <li>Base: Max 4 target timeslots per course (adaptive up to 8)</li>
  * </ul>
  */
 public class CoursePillarMoveFactory implements MoveListFactory<TimeTable> {
 
-    static final int MAX_COURSES_PER_STEP = 20;
-    static final int MAX_TARGET_TIMESLOTS = 4;
+    static final int BASE_MAX_COURSES_PER_STEP = 20;
+    static final int MAX_COURSES_PER_STEP_CAP = 50;
+    static final int BASE_MAX_TARGET_TIMESLOTS = 4;
+    static final int MAX_TARGET_TIMESLOTS_CAP = 8;
 
     @Override
     public List<? extends Move<TimeTable>> createMoveList(TimeTable solution) {
         List<Lesson> allLessons = solution.getLessons();
         List<Timeslot> allTimeslots = solution.getTimeslots();
         List<Room> allRooms = solution.getRooms();
+
+        // Adaptive limits: when hard violations are high (soft multiplier low),
+        // increase pillar move generation to focus on structural fixes
+        double softMultiplier = AdaptiveSolverListener.SOFT_WEIGHT_MULTIPLIER.get();
+        int adaptiveCoursesLimit = (int) (BASE_MAX_COURSES_PER_STEP + (MAX_COURSES_PER_STEP_CAP - BASE_MAX_COURSES_PER_STEP) * (1.0 - softMultiplier));
+        int adaptiveTimeslotLimit = (int) (BASE_MAX_TARGET_TIMESLOTS + (MAX_TARGET_TIMESLOTS_CAP - BASE_MAX_TARGET_TIMESLOTS) * (1.0 - softMultiplier));
 
         // Group lessons by course
         Map<Long, List<Lesson>> courseLessons = new LinkedHashMap<>();
@@ -55,7 +68,7 @@ public class CoursePillarMoveFactory implements MoveListFactory<TimeTable> {
                     return lessons.stream().anyMatch(l -> l.getTimeslot() == null || hasConflict(l, allLessons));
                 })
                 .sorted((a, b) -> Integer.compare(b.getValue().size(), a.getValue().size()))
-                .limit(MAX_COURSES_PER_STEP)
+                .limit(adaptiveCoursesLimit)
                 .toList();
 
         List<Move<TimeTable>> moves = new ArrayList<>();
@@ -68,7 +81,7 @@ public class CoursePillarMoveFactory implements MoveListFactory<TimeTable> {
             Timeslot currentTimeslot = pillar.get(0).getTimeslot();
             if (currentTimeslot == null) {
                 // Unassigned pillar — generate moves to any timeslot
-                int limit = Math.min(MAX_TARGET_TIMESLOTS, allTimeslots.size());
+                int limit = Math.min(adaptiveTimeslotLimit, allTimeslots.size());
                 for (int i = 0; i < limit; i++) {
                     moves.add(new CoursePillarMove(pillar, allTimeslots.get(i), allRooms));
                 }
@@ -79,7 +92,7 @@ public class CoursePillarMoveFactory implements MoveListFactory<TimeTable> {
             List<Timeslot> sortedTimeslots = allTimeslots.stream()
                     .filter(ts -> !ts.equals(currentTimeslot))
                     .sorted(Comparator.comparingInt(ts -> timeslotDistance(currentTimeslot, ts)))
-                    .limit(MAX_TARGET_TIMESLOTS)
+                    .limit(adaptiveTimeslotLimit)
                     .toList();
 
             for (Timeslot target : sortedTimeslots) {
