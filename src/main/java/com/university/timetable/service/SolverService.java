@@ -381,6 +381,14 @@ public class SolverService {
         if (score != null) {
             currentBestHardScore = score.hardScore();
             currentBestSoftScore = score.softScore();
+
+            // Update adaptive soft weight multiplier based on hard violation count
+            // This makes the adaptive weighting system actually functional
+            int hardViolations = Math.abs(score.hardScore());
+            double ratio = Math.min(1.0, (double) hardViolations / 1000.0);
+            double multiplier = 0.3 + (1.0 - ratio) * 0.7;
+            com.university.timetable.solver.AdaptiveSolverListener.SOFT_WEIGHT_MULTIPLIER.set(multiplier);
+
             if (score.hardScore() >= 0) {
                 feasibleBestCount.incrementAndGet();
                 if (firstFeasibleAtMs.get() == 0L) {

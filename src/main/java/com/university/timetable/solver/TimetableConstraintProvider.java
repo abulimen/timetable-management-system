@@ -191,14 +191,14 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 lessonExceedsEndTime(factory),
                 roomCapacityOverflow(factory),
                 specialEventConflict(factory),
-                maxLecturerConsecutiveHoursConstraint(factory),
 
                 // Soft Constraints
                 roomCapacityEfficiency(factory),
                 studentFatigue(factory),
                 lecturerRoomTransition(factory),
                 dayBalanceForStudentGroup(factory),
-                earlyMorningPenalty(factory)
+                earlyMorningPenalty(factory),
+                maxLecturerConsecutiveHoursConstraint(factory)
         };
     }
 
@@ -489,7 +489,8 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                         Joiners.equal(Lesson::getEndTime, this::lessonStart))
                 .filter((earlier, later) -> hasStudentGroupOverlap(earlier, later)
                         && !crossesLunchBoundary(earlier, later))
-                .penalize(HardSoftScore.ofSoft(getAdaptiveSoftWeight(getWeightStudentFatigue())))
+                .penalize(HardSoftScore.ONE_SOFT,
+                        (earlier, later) -> getAdaptiveSoftWeight(getWeightStudentFatigue()))
                 .asConstraint("Student fatigue");
     }
 
@@ -505,15 +506,16 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 .filter((earlier, later) -> later.getRoom() != null &&
                         !crossesLunchBoundary(earlier, later) &&
                         !Objects.equals(earlier.getRoom().getId(), later.getRoom().getId()))
-                .penalize(HardSoftScore.ofSoft(getAdaptiveSoftWeight(getWeightLecturerTransition())),
+                .penalize(HardSoftScore.ONE_SOFT,
                         (earlier, later) -> {
+                            int baseWeight = getAdaptiveSoftWeight(getWeightLecturerTransition());
                             if (earlier.getRoom().getZone() != null &&
                                     later.getRoom().getZone() != null &&
                                     !Objects.equals(earlier.getRoom().getZone().getId(),
                                             later.getRoom().getZone().getId())) {
-                                return 3;
+                                return baseWeight * 3;
                             }
-                            return 1;
+                            return baseWeight;
                         })
                 .asConstraint("Lecturer room transition");
     }
@@ -540,8 +542,8 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 })
                 .groupBy(GroupDay::groupId, GroupDay::day, ConstraintCollectors.count())
                 .filter((groupId, day, lessonCount) -> lessonCount > 1)
-                .penalize(HardSoftScore.ofSoft(getAdaptiveSoftWeight(getWeightDayBalance())),
-                        (groupId, day, lessonCount) -> pairCount(lessonCount))
+                .penalize(HardSoftScore.ONE_SOFT,
+                        (groupId, day, lessonCount) -> pairCount(lessonCount) * getAdaptiveSoftWeight(getWeightDayBalance()))
                 .asConstraint("Day balance for student group");
     }
 
@@ -558,12 +560,12 @@ public class TimetableConstraintProvider implements ConstraintProvider {
      * allowing 8am lessons when needed.
      */
     private Constraint earlyMorningPenalty(ConstraintFactory factory) {
-        int weight = getAdaptiveSoftWeight(getWeightEarlyMorning());
         return factory.forEach(Lesson.class)
                 .filter(lesson -> lesson.getTimeslot() != null &&
                         lesson.getTimeslot().getStartTime().isBefore(LocalTime.of(9, 0)))
                 .penalize(HardSoftScore.ONE_SOFT,
                         lesson -> {
+                            int weight = getAdaptiveSoftWeight(getWeightEarlyMorning());
                             LocalTime start = lesson.getTimeslot().getStartTime();
                             if (start.equals(LocalTime.of(7, 0))) {
                                 return weight * 3; // Heavy penalty for 7am
@@ -619,26 +621,23 @@ public class TimetableConstraintProvider implements ConstraintProvider {
     }
 
     /**
-     * HARD CONSTRAINT: Maximum Lecturer Consecutive Hours
-     * Penalizes (hard) when a lecturer teaches more consecutive hours than allowed.
-     * Uses a chain-counting approach: counts pairs of back-to-back lessons per
-     * lecturer per day. If the number of consecutive pairs exceeds the limit,
-     * each excess pair incurs a hard penalty.
+     * SOFT CONSTRAINT: Maximum Lecturer Consecutive Hours
+     * Penalizes when a lecturer teaches more consecutive hours than allowed.
+     * Converted from hard to soft — allows the solver to find feasible schedules
+     * with a penalty for over-limit chains, rather than blocking them entirely.
      *
      * Example: If limit is 4 hours and a lecturer has 5 consecutive 1-hour lessons,
      * that's 4 consecutive pairs, which exceeds the limit of 3 pairs (limit-1),
-     * so 1 hard penalty is applied.
+     * so 1 soft penalty (weighted) is applied.
      */
     private Constraint maxLecturerConsecutiveHoursConstraint(ConstraintFactory factory) {
         int maxHours = getMaxLecturerConsecutiveHours();
         if (maxHours <= 0) {
             return factory.forEach(Lesson.class)
                     .filter(l -> false)
-                    .penalize(HardSoftScore.ONE_HARD)
+                    .penalize(HardSoftScore.ONE_SOFT)
                     .asConstraint("Max lecturer consecutive hours");
         }
-        // Consecutive hours limit K means at most (K-1) back-to-back pairs
-        // in a single daily chain. Penalize only the excess pairs.
         int allowedConsecutivePairs = Math.max(0, maxHours - 1);
         return factory.forEach(Lesson.class)
                 .filter(lesson -> lesson.getTimeslot() != null && lesson.getLecturer() != null)
@@ -649,8 +648,9 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 .filter((a, b) -> !crossesLunchBoundary(a, b))
                 .groupBy((a, b) -> a.getLecturer(), (a, b) -> lessonDay(a), ConstraintCollectors.countBi())
                 .filter((lecturer, day, consecutivePairCount) -> consecutivePairCount > allowedConsecutivePairs)
-                .penalize(HardSoftScore.ONE_HARD,
-                        (lecturer, day, consecutivePairCount) -> consecutivePairCount - allowedConsecutivePairs)
+                .penalize(HardSoftScore.ONE_SOFT,
+                        (lecturer, day, consecutivePairCount) -> 
+                            (consecutivePairCount - allowedConsecutivePairs) * getAdaptiveSoftWeight(5))
                 .asConstraint("Max lecturer consecutive hours");
     }
 

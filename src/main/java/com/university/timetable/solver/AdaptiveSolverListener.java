@@ -12,15 +12,14 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * Listens for solver events and updates the adaptive soft constraint multiplier.
  * 
- * <p>When the hard score improves (fewer violations), soft constraints are 
+ * When the hard score improves (fewer violations), soft constraints are 
  * strengthened to focus more on quality. When hard violations are high, soft
  * constraints are weakened to focus on feasibility.
  * 
- * <p>The multiplier is stored in a static AtomicReference that the
+ * The multiplier is stored in a static AtomicReference that the
  * TimetableConstraintProvider reads during constraint evaluation.
  * 
- * <p>The multiplier ranges from 0.3 (hard violations at max) to 1.0 (zero hard violations).
- * This creates a smooth transition from "fix hard constraints" to "optimize quality".
+ * The multiplier ranges from 0.3 (hard violations at max) to 1.0 (zero hard violations).
  */
 public class AdaptiveSolverListener implements SolverEventListener<TimeTable> {
 
@@ -32,7 +31,7 @@ public class AdaptiveSolverListener implements SolverEventListener<TimeTable> {
 
     private static final double MULTIPLIER_MIN = 0.3;
     private static final double MULTIPLIER_MAX = 1.0;
-    private static final int MAX_POSSIBLE_VIOLATIONS = 1832 * 5; // Estimate
+    private static final int MAX_POSSIBLE_VIOLATIONS = 1000;
 
     private int lastHardScore = Integer.MIN_VALUE;
     private int updateCount = 0;
@@ -59,8 +58,8 @@ public class AdaptiveSolverListener implements SolverEventListener<TimeTable> {
             updateCount++;
 
             if (updateCount % 10 == 0) {
-                log.info("Adaptive multiplier updated: hard={}, multiplier={:.2f}", 
-                        hardScore, multiplier);
+                log.info("Adaptive multiplier updated: hard={}, multiplier={}", 
+                        hardScore, String.format("%.2f", multiplier));
             }
         }
     }

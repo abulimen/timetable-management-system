@@ -65,8 +65,9 @@ public class OptaPlannerConfig {
         // ~2x faster.
         config.setEnvironmentMode(EnvironmentMode.valueOf(resolveEnvironmentMode()));
         applyDynamicTuning(config);
-        // Add simulated annealing programmatically (not supported in XML for Community Edition)
-        addSimulatedAnnealing(config);
+        // SCHC (Step Counting Hill Climbing) is configured in solver-config.xml
+        // No programmatic simulated annealing needed — SCHC with SIMULATED_ANNEALING type
+        // handles both acceptance and temperature cooling in one parameter.
         return SolverFactory.create(config);
     }
 

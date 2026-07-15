@@ -157,10 +157,12 @@ public class RuinAndRecreateMoveFactory implements MoveListFactory<TimeTable> {
     private boolean isEnabled() {
         try {
             ConstraintSettingsService css = SpringContextHolder.getBean(ConstraintSettingsService.class);
-            return css != null && css.isSolverRuinRecreateEnabled();
-        } catch (Exception e) {
-            return false; // Disabled by default if settings unavailable
+            if (css != null) {
+                return css.isSolverRuinRecreateEnabled();
+            }
+        } catch (Exception ignored) {
         }
+        return true; // Enabled by default — critical for escaping stuck hard violations
     }
 
     private int getClusterSize() {
