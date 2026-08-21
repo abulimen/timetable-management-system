@@ -72,3 +72,7 @@ backups/
 # YoYo AI version control directory
 .yoyo/
 .agents/
+
+# Docs markdown documentation
+docs/**/*.md
+docs/*.md

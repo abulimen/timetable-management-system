@@ -43,6 +43,58 @@ The system follows a 5-step workflow from raw university data to a published tim
 
 ---
 
+## Demo & Sample Output
+
+### 📄 Sample Timetable Export (PDF)
+
+Download the generated sample schedule: 👉 [**`timetable_2026-08-21.pdf`**](docs/timetable_2026-08-21.pdf)
+
+![Sample Timetable PDF Export](docs/images/timetable-pdf-view.png)
+
+---
+
+### 🎥 Interface Walkthroughs
+
+<details open>
+<summary><b>📅 Timetable Matrix View</b></summary>
+
+[▶ Open Video (`timetable-page.mp4`)](docs/videos/timetable-page.mp4)
+
+<video src="docs/videos/timetable-page.mp4" controls width="100%"></video>
+</details>
+
+<br/>
+
+<details>
+<summary><b>📚 Courses & Curriculum Management</b></summary>
+
+[▶ Open Video (`courses-page.mp4`)](docs/videos/courses-page.mp4)
+
+<video src="docs/videos/courses-page.mp4" controls width="100%"></video>
+</details>
+
+<br/>
+
+<details>
+<summary><b>🏛️ Rooms & Capacity Management</b></summary>
+
+[▶ Open Video (`rooms-page.mp4`)](docs/videos/rooms-page.mp4)
+
+<video src="docs/videos/rooms-page.mp4" controls width="100%"></video>
+</details>
+
+<br/>
+
+<details>
+<summary><b>⚙️ Scheduling Rules & Weight Settings</b></summary>
+
+[▶ Open Video (`settings-page.mp4`)](docs/videos/settings-page.mp4)
+
+<video src="docs/videos/settings-page.mp4" controls width="100%"></video>
+</details>
+
+---
+
 ## What I built
 
 ### Timetable Generation & Optimization
