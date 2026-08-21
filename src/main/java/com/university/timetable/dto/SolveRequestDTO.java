@@ -18,6 +18,7 @@ public class SolveRequestDTO {
     private SolveScopeDTO scope;
     private Boolean allowLargeScope = false;
     private String engine; // "TIMEFOLD" (default) or "CPSAT"
+    private Boolean skipSoftConstraints = false; // Hard-only mode: skip all soft constraints
 
     @Data
     @NoArgsConstructor

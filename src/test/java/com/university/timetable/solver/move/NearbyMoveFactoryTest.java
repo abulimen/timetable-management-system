@@ -230,6 +230,7 @@ class NearbyMoveFactoryTest {
         lesson.setTimeslot(timeslot);
         lesson.setRoom(room);
         lesson.setPinned(pinned);
+        lesson.setDurationHours(1);
         return lesson;
     }
 

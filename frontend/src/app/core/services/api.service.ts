@@ -710,6 +710,7 @@ export interface SolveRequest {
     profile?: 'BALANCED' | 'QUALITY';
     skipFeasibility?: boolean;
     engine?: SolverEngine;
+    skipSoftConstraints?: boolean;
 }
 
 export interface SolverRuntimeDiagnostics {

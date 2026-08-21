@@ -1,247 +1,196 @@
-# University Timetable Scheduling Engine
+# University Auto-Timetabling System
 
-Enterprise-grade automated timetable scheduling system using **OptaPlanner** constraint solver.
+An automated university timetable scheduling system built with Spring Boot, Timefold Solver, and Angular that generates conflict-free, balanced academic schedules.
 
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/abulimen/timetable-management-system)
 [![Java](https://img.shields.io/badge/Java-17-blue.svg)](https://openjdk.org/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.5-green.svg)](https://spring.io/projects/spring-boot)
-[![OptaPlanner](https://img.shields.io/badge/OptaPlanner-9.44.0-orange.svg)](https://www.optaplanner.org/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5-green.svg)](https://spring.io/projects/spring-boot)
+[![Timefold](https://img.shields.io/badge/Timefold%20Solver-1.31-purple.svg)](https://timefold.ai/)
 [![Angular](https://img.shields.io/badge/Angular-17-red.svg)](https://angular.io/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-blue.svg)](https://www.mysql.com/)
 
 ---
 
-## 🎯 What It Does
+## What is this?
 
-Automatically schedules university lessons into timeslots and rooms while respecting:
+Universities have to schedule hundreds of course lectures across available rooms, lecturers, student cohorts, and timeslots without creating double-bookings or unworkable schedules.
 
-- **Hard Constraints** (must be satisfied):
-  - No room double-booking
-  - No lecturer conflicts
-  - No student group overlaps
-  - Room capacity must fit all students
-  - Room must have required features (projector, lab equipment, etc.)
-  - Zone restrictions (course can only be in certain buildings)
-  - Lunch break protection
-  - Working hours limits
+Doing this manually is tedious and prone to errors. A single change—such as a lecturer becoming unavailable on Mondays—can break dozens of previously working classes.
 
-- **Soft Constraints** (optimized):
-  - Prefer rooms that match group size (avoid waste)
-  - Balance lessons across days
-  - Minimize lecturer room transitions
-  - Avoid early morning (7am) classes
-  - Reduce consecutive teaching hours (lecturer fatigue)
+This system automates the entire process. It takes course requirements, room capacities, lecturer availability, and campus policies, then uses an intelligent optimization engine to generate conflict-free, balanced timetables in seconds.
 
 ---
 
-## ✨ Key Features
+## Why I built it
 
-| Feature | Description |
-|---------|-------------|
-| **🌐 Online Classes** | Courses can be marked as online (no room needed, unlimited capacity) |
-| **📦 Bulk Import** | Multi-step guided import from CSV files |
-| **⚙️ Dynamic Settings** | Configure constraints via UI, regenerate timeslots on the fly |
-| **📊 Feasibility Check** | Pre-solve validation detects impossible constraints |
-| **🔍 Constraint Analysis** | Explains exactly what's violated and why |
-| **📅 Semester Archives** | Archive and restore historical timetables |
-| **📌 Lesson Pinning** | Lock specific lessons in place |
+In most academic institutions, creating a semester timetable takes weeks of spreadsheet juggling and trial-and-error. When room renovations, lecturer schedule changes, or new course sections are introduced, administrators often have to start over.
+
+I built this system to replace manual spreadsheet scheduling with an automated optimization engine. The goal was to build a tool that guarantees zero hard rule violations (like double-booked rooms or lecturer clashes) while giving administrators full control to inspect, adjust, and lock individual classes in place.
 
 ---
 
-## 🚀 Quick Start
+## How it works
+
+The system follows a 5-step workflow from raw university data to a published timetable:
+
+1. **Data Ingestion & Setup**: Administrators import or configure courses, lecturers, student groups, rooms with equipment tags, campus zones, and working timeslots.
+2. **Pre-Solve Feasibility Check**: The system validates whether total required course hours can physically fit into available room capacity and schedules before running the optimization engine.
+3. **Timefold Constraint Optimization**: The engine evaluates thousands of schedule arrangements, guaranteeing zero hard rule conflicts while actively tuning soft preferences like balanced daily loads and minimal room changes.
+4. **Interactive Grid & Lesson Pinning**: Administrators view the generated timetable filtered by Student Group, Lecturer, or Room. Approved classes can be "pinned" to lock them in place, and manual changes highlight instant conflicts.
+5. **Publishing & Export**: Once finalized, timetables are exported to print-ready PDF schedules, Excel matrices, or saved to a semester archive for historical audit.
+
+![Timetable Generation and Optimization Workflow](docs/images/scheduling-workflow.drawio.png)
+
+---
+
+## What I built
+
+### Timetable Generation & Optimization
+* **Timefold Optimization Engine**: Automated scheduling that assigns timeslots and rooms to classes based on configurable rules.
+* **Pre-Solve Feasibility Validation**: Checks capacity limits, equipment availability, and hour totals to catch impossible schedules before solving.
+* **Lesson Pinning & Partial Solving**: Lock specific approved lessons into place while allowing the solver to freely optimize the remaining unlocked classes.
+* **Online Class Support**: Seamlessly schedule online courses without consuming physical room capacity.
+
+### University Resource Management
+* **Course & Curriculum Management**: Track lecture, tutorial, and lab hours, required room features (e.g. projectors, lab benches), and allowed campus zones.
+* **Lecturer Availability & Blackouts**: Define specific days/hours when lecturers cannot teach, plus campus-wide blackout periods for university events.
+* **Combined Multi-Group Lectures**: Support courses attended by multiple student groups simultaneously without duplicate resource bookings.
+* **Room & Zone Management**: Organize rooms by capacity, physical features, and campus zones to prevent cross-campus transit friction.
+
+### Data Ingestion & Drafting
+* **Guided CSV Bulk Import**: Multi-step import wizard for courses, lecturers, rooms, and student cohorts with downloadable templates.
+* **Inline Error & Draft Editor**: Interactive table editor to fix formatting errors or missing references before committing data to the database.
+* **Conflict Resolution**: Highlights duplicate records and unmapped foreign references during data import.
+
+### Visualization & Export
+* **Multi-View Timetable Matrix**: Interactive grid with filtering by Student Group, Lecturer, or Room.
+* **Export Engine**: Export publication-ready PDF documents (via OpenPDF) and structured Excel matrices (via Apache POI).
+* **Semester Archives**: Snapshot and restore semester timetables with full audit logging of administrative changes.
+
+---
+
+## The interesting engineering problem
+
+Creating a university timetable is like solving a massive puzzle with thousands of moving pieces.
+
+With hundreds of classes, dozens of rooms, and thousands of students, the number of possible ways to arrange the schedule is practically endless.
+
+The main difficulty is that **every decision affects another**:
+* Moving one class to avoid a room clash can push a lecturer into a conflict elsewhere.
+* Avoiding a lecturer conflict might give a student group four classes in a row without a lunch break.
+* Combined classes (e.g. three engineering cohorts attending one shared physics lecture) must fit into a room large enough for all of them, avoid conflicts with every group's individual timetable, and count as a single teaching session for the lecturer.
+
+### How Timefold solves this
+
+Rather than guessing randomly or giving up on the first collision, **Timefold Solver** uses an intelligent search process that continuously tests and refines possible timetable arrangements.
+
+The system evaluates every candidate timetable against two categories of rules:
+
+#### Hard Constraints (Rules that must NEVER be broken)
+* **Room Conflict**: No room can host two physical classes at the same time.
+* **Lecturer Conflict**: No lecturer can teach two classes at the same time.
+* **Student Group Conflict**: No student group can have two classes at the same time.
+* **Room Capacity**: Student attendance must never exceed the room's seating capacity.
+* **Room Equipment**: Courses requiring specific equipment (such as computer labs) are only placed in rooms that have them.
+* **Zone Restrictions**: Classes are kept within allowed campus areas or buildings.
+* **Lecturer Unavailability**: Classes are not scheduled when a lecturer is marked unavailable.
+* **Lunch Break Protection**: Classes do not overlap the university's lunch hour.
+* **Same Course Daily Limit**: A student group cannot have the same subject multiple times on the same day.
+* **Operating Hours**: Classes must end within official daily university hours.
+* **Special Events**: University-wide events block out affected rooms, lecturers, and student groups.
+
+#### Soft Constraints (Preferences to improve schedule quality)
+* **Room Capacity Fit**: Avoids placing small classes in giant auditoriums to prevent wasted space.
+* **Student Fatigue**: Discourages long, unbroken chains of back-to-back lectures for students.
+* **Lecturer Room Stability**: Minimizes how often lecturers have to switch rooms or buildings during the day.
+* **Daily Load Balance**: Spreads a student group's classes evenly across the week instead of cramming them into one or two days.
+* **Early Morning & Late Hours**: Discourages 7:00 AM and late evening classes when other times are available.
+* **Lecturer Workload Limits**: Discourages exceeding maximum consecutive teaching hours for faculty members.
+
+---
+
+## Architecture
+
+![University Timetable Management System Architecture](docs/images/architecture.drawio.png)
+
+* **Frontend (Angular 17)**: A single-page web interface providing interactive timetable grids, CSV data import tools, and live solver progress monitoring.
+* **Backend Application (Spring Boot 3.5 & Java 17)**: Manages REST APIs, user authentication, data validation, and asynchronous solver execution.
+* **Optimization Engine (Timefold Solver)**: Runs in-process to evaluate scheduling rules and search for the best timetable arrangement.
+* **Data & Storage (MySQL 8 & Flyway)**: Stores institutional data, audit logs, and semester archives with automated database migrations.
+
+---
+
+## Technology
+
+| Technology | What it does |
+|------------|--------------|
+| **Java 17** | Core backend programming language |
+| **Spring Boot 3.5** | REST API framework, security, and application management |
+| **Timefold Solver 1.31** | Optimization engine for generating conflict-free timetables |
+| **Angular 17** | Web frontend interface with interactive timetable views |
+| **MySQL 8.0** | Relational database for storing schedules and system data |
+| **Flyway** | Version-controlled database schema migrations |
+| **Apache POI & OpenPDF** | Generation of formatted Excel matrices and print-ready PDF schedules |
+
+---
+
+## Challenges and lessons
+
+* **Handling Combined Classes**: Some large courses combine students from several departments into one lecture hall. The system had to check schedule conflicts for every student group involved while booking only a single room and a single lecturer.
+* **Prioritizing Must-Have Rules Over Nice-to-Haves**: A schedule with zero double-bookings is much more important than a schedule with ideal break times. Structuring the rules so the engine eliminates all conflicts first before polishing preferences was key to finding workable timetables quickly.
+* **Letting Humans Make Adjustments**: Automatic scheduling shouldn't lock out administrators. Building a system where users can "pin" approved classes in place and let the system arrange the rest required careful state management so manual changes are never overwritten.
+
+---
+
+## Current limitations
+
+* **Fixed Timeslot Grid**: The system operates on predefined hourly blocks (e.g. 1-hour or 2-hour slots) rather than arbitrary start times.
+* **Single-User Solver Runs**: Timetable editing is locked while a schedule generation is actively running to prevent conflicting edits.
+* **Impossible Schedules (Over-Constrained Data)**: If an institution requests more class hours than there are available rooms and time slots, the system cannot produce a conflict-free timetable. In those cases, administrators must add rooms/times or adjust their requirements.
+
+---
+
+## Running the project
 
 ### Prerequisites
-- Java 17+
-- Maven 3.8+
-- Node.js 18+ (for frontend)
-- MySQL 8.0+
+* Java 17 or higher
+* Maven 3.8+
+* Node.js 18+ and npm
+* MySQL 8.0+
 
-### 1. Clone & Configure
+### 1. Database Setup
+Create the MySQL database:
 ```bash
-git clone <repository-url>
-cd BUTMS
-
-# Create database
-mysql -u root -e "CREATE DATABASE timetable_db;"
-
-# Configure (edit if needed)
-# src/main/resources/application.yml
+mysql -u root -p -e "CREATE DATABASE timetable_db;"
 ```
 
-### 2. Run Backend
+### 2. Backend Configuration & Start
+Configure database credentials in `src/main/resources/application.yml` (or via environment variables), then start the backend:
 ```bash
-mvn spring-boot:run
+./mvnw spring-boot:run
 ```
+The backend API will start at `http://localhost:8080/api/v1`.
 
-### 3. Run Frontend
+### 3. Frontend Start
+Install dependencies and run the Angular development server:
 ```bash
 cd frontend
 npm install
 npm start
 ```
-
-### 4. Open Application
-- **Frontend:** http://localhost:4200
-- **Backend API:** http://localhost:8080/api/v1
-
-### 5. Production Configuration
-
-Backend (`SPRING_PROFILES_ACTIVE=prod`) required environment variables:
-
-- `DB_URL`
-- `DB_USERNAME`
-- `DB_PASSWORD`
-- `JWT_SECRET`
-- `BREVO_API_KEY`
-- `BREVO_SENDER_EMAIL`
-- `APP_LOGIN_URL`
-- `APP_CORS_ALLOWED_ORIGINS` (comma-separated, e.g. `https://app.example.com,https://admin.example.com`)
-
-Frontend runtime API base URL:
-
-- Set `window.__BUTMS_CONFIG__.apiBaseUrl` in `frontend/src/assets/runtime-config.js`
-- Example value: `https://api.example.com`
-- This avoids rebuilding Angular for each environment.
+Open `http://localhost:4200` in your browser.
 
 ---
 
-## 📚 Documentation
+## Project status
 
-| Document | Description |
-|----------|-------------|
-| [User Guide](docs/USER_GUIDE.md) | Step-by-step usage instructions |
-| [API Reference](docs/API_REFERENCE.md) | Complete REST API documentation |
-| [Architecture](docs/ARCHITECTURE.md) | System design and components |
-| [Setup Guide](docs/SETUP_GUIDE.md) | Installation and configuration |
-| [System Inputs](docs/SYSTEM_INPUTS.md) | Data models and entity schemas |
-| [Constraints](docs/CONSTRAINTS.md) | Hard and soft constraint catalog |
-| [Performance](docs/PERFORMANCE_OPTIMIZATION.md) | Scaling and optimization guide |
-| [Changelog](CHANGELOG.md) | Version history |
+Built as a functional university timetable automation system with a complete Spring Boot REST API, Timefold optimization engine, and Angular management interface. Available for demonstration and further development.
 
 ---
 
-## 🔌 API Overview
+## About
 
-### Solver Operations
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/v1/solver/solve` | Start solver |
-| `GET` | `/api/v1/solver/status` | Check solver status |
-| `POST` | `/api/v1/solver/terminate` | Stop solver early |
-| `GET` | `/api/v1/solver/feasibility` | Pre-solve validation |
-| `GET` | `/api/v1/solver/analysis` | Constraint violations |
+Built by **Jonathan**, a Software Engineering student focused on building practical, scalable systems that solve complex real-world operational problems.
 
-### Data Management
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/v1/timetable` | Get generated timetable |
-| `PATCH` | `/api/v1/lessons/{id}` | Update/pin lesson |
-| `POST` | `/api/v1/bulk/{entity}/import` | Bulk import from CSV |
-| `GET` | `/api/v1/bulk/{entity}/template` | Download CSV template |
-
-### Settings & System
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/v1/settings` | Get constraint settings |
-| `PUT` | `/api/v1/settings/{key}` | Update setting |
-| `POST` | `/api/v1/settings/regenerate-timeslots` | Regenerate timeslots |
-| `POST` | `/api/v1/semesters/archive` | Archive current semester |
-| `DELETE` | `/api/v1/bulk/wipe` | System-wide data wipe |
-
----
-
-## 🏗️ Tech Stack
-
-| Component | Technology |
-|-----------|------------|
-| **Backend** | Spring Boot 3.2.5 |
-| **Solver** | OptaPlanner 9.44.0 |
-| **Frontend** | Angular 17 |
-| **Database** | MySQL 8.0 |
-| **Migrations** | Flyway |
-| **Build** | Maven + npm |
-| **Java** | 17 |
-
----
-
-## 📊 Project Structure
-
-```
-BUTMS/
-├── src/main/java/com/university/timetable/
-│   ├── config/          # OptaPlanner configuration
-│   ├── controller/      # REST API endpoints
-│   ├── domain/          # JPA entities + OptaPlanner model
-│   ├── dto/             # Request/Response DTOs
-│   ├── exception/       # Global error handling
-│   ├── repository/      # Spring Data JPA repositories
-│   ├── service/         # Business logic
-│   └── solver/          # OptaPlanner constraint provider
-├── src/main/resources/
-│   ├── db/migration/    # Flyway SQL migrations (V1-V20)
-│   ├── application.yml  # Spring configuration
-│   └── solver-config.xml # OptaPlanner solver config
-├── frontend/            # Angular 17 application
-│   ├── src/app/
-│   │   ├── features/    # Page components
-│   │   ├── core/        # Services and shared code
-│   │   └── layout/      # Sidebar, header
-│   └── package.json
-└── docs/                # Documentation
-```
-
----
-
-## 🖥️ Frontend Pages
-
-| Page | Route | Description |
-|------|-------|-------------|
-| Dashboard | `/dashboard` | Overview statistics |
-| Zones | `/zones` | Building/area management |
-| Rooms | `/rooms` | Physical spaces |
-| Features | `/features` | Room capabilities |
-| Lecturers | `/lecturers` | Teaching staff |
-| Student Groups | `/student-groups` | Classes/cohorts |
-| Courses | `/courses` | Academic subjects |
-| Lessons | `/lessons` | Generated lesson slots |
-| Solver | `/solver` | Run the scheduler |
-| Timetable | `/timetable` | View generated schedule |
-| Semesters | `/semesters` | Archive management |
-| Bulk Import | `/import` | CSV import wizard |
-| Settings | `/settings` | System configuration |
-
----
-
-## 🔧 Configuration
-
-### Constraint Settings (Database)
-
-These can be modified via API or the Settings page:
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `lunch_break_start` | 12:00 | Start of lunch period |
-| `lunch_break_end` | 13:00 | End of lunch period |
-| `latest_end_time` | 18:00 | Latest lesson end (Mon-Thu) |
-| `friday_latest_end_time` | 12:00 | Latest lesson end (Friday) |
-| `max_lecturer_consecutive_hours` | 4 | Max teaching hours without break |
-| `weight_early_morning` | 3 | Penalty for 7am classes |
-
----
-
-## 📝 License
-
-[MIT License](LICENSE)
-
----
-
-## 🤝 Contributing
-
-Contributions welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
----
-
-## 📋 Version
-
-Current version: **1.2.0**
-
-See [CHANGELOG.md](CHANGELOG.md) for release history.
+* **GitHub**: [github.com/abulimen](https://github.com/abulimen)
+* **Project Repository**: [github.com/abulimen/timetable-management-system](https://github.com/abulimen/timetable-management-system)

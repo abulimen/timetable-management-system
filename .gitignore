@@ -71,3 +71,4 @@ backups/
 
 # YoYo AI version control directory
 .yoyo/
+.agents/

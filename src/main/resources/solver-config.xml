@@ -25,16 +25,8 @@
         <unimprovedSecondsSpentLimit>120</unimprovedSecondsSpentLimit>
     </termination>
 
-    <!-- Sequential variable assignment: timeslot first, then room -->
-    <!-- This reduces CH evaluations from 5002 to 163 per lesson (30x faster) -->
     <constructionHeuristic>
         <constructionHeuristicType>FIRST_FIT_DECREASING</constructionHeuristicType>
-        <changeMoveSelector>
-            <valueSelector variableName="timeslot"/>
-        </changeMoveSelector>
-        <changeMoveSelector>
-            <valueSelector variableName="room"/>
-        </changeMoveSelector>
     </constructionHeuristic>
 
     <localSearch>
@@ -60,7 +52,7 @@
         <!-- ITC-2011 winning technique. Single parameter, no tuning needed. -->
         <acceptor>
             <entityTabuRatio>0.02</entityTabuRatio>
-            <stepCountingHillClimbingSize>400</stepCountingHillClimbingSize>
+            <stepCountingHillClimbingSize>800</stepCountingHillClimbingSize>
             <stepCountingHillClimbingType>STEP</stepCountingHillClimbingType>
         </acceptor>
 

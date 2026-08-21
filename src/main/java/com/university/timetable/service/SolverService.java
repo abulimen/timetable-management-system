@@ -70,6 +70,7 @@ public class SolverService {
     private final TimetableChangeTrackerService timetableChangeTrackerService;
     private final AuditLogService auditLogService;
     private final SolverRuntimeDiagnosticsDTO runtimeDiagnostics;
+    private final ForwardCheckingConstructionService forwardCheckingConstructionService;
 
     @Value("${solver.persistence.checkpoint-enabled:false}")
     private boolean checkpointEnabledDefault;
@@ -211,6 +212,13 @@ public class SolverService {
             finalizeRunIfNeeded("INTERRUPTED", "New solve run started before previous run finalized.");
         }
 
+        // Set hard-only mode flag before solver is built
+        boolean skipSoft = request != null && Boolean.TRUE.equals(request.getSkipSoftConstraints());
+        com.university.timetable.solver.TimetableConstraintProvider.HARD_ONLY_MODE = skipSoft;
+        if (skipSoft) {
+            log.info("HARD-ONLY MODE: Soft constraints will be skipped");
+        }
+
         // Ensure timeslots exist.
         if (!timeslotService.hasTimeslots()) {
             long timeslotStart = System.nanoTime();
@@ -234,6 +242,14 @@ public class SolverService {
                 currentLessonsCount, currentTimeslotsCount, currentRoomsCount);
         log.info("Solver pre-flight completed in {} ms (problem load: {} ms)",
                 elapsedMs(startNanos), loadMs);
+
+        // Run forward-checking construction to produce a better initial solution
+        // This gives Timefold a head start instead of starting from scratch
+        long fcStart = System.nanoTime();
+        problem = forwardCheckingConstructionService.construct(
+                problem.getLessons(), problem.getTimeslots(), problem.getRooms());
+        long fcMs = elapsedMs(fcStart);
+        log.info("Forward-checking construction completed in {} ms", fcMs);
 
         if (problem.getLessons().isEmpty()) {
             throw new IllegalStateException("No lessons to schedule. Import data first.");

@@ -192,6 +192,10 @@ interface BulletPart {
               <input type="checkbox" [checked]="skipFeasibility" (change)="skipFeasibility = !skipFeasibility" />
               Skip feasibility pre-check
             </label>
+            <label class="flex items-center gap-2 text-xs text-red-600 font-medium">
+              <input type="checkbox" [checked]="hardOnly" (change)="hardOnly = !hardOnly" />
+              Hard constraints only (skip soft constraints)
+            </label>
             <div class="flex gap-3">
               <button 
                 (click)="startSolver('FULL_REPLAN')"
@@ -499,6 +503,7 @@ export class SolverComponent implements OnInit, OnDestroy {
   selectedProfile: 'BALANCED' | 'QUALITY' = 'BALANCED';
   selectedEngine: SolverEngine = 'TIMEFOLD';
   skipFeasibility = false;
+  hardOnly = false;
   courseDiagnostics: CourseFeasibilityDiagnostics | null = null;
   featureDiagnostics: FeatureScarcityDiagnostics | null = null;
   lecturerDiagnostics: LecturerLoadDiagnostics | null = null;
@@ -560,7 +565,7 @@ export class SolverComponent implements OnInit, OnDestroy {
     // Clear any previous feasibility results
     this.feasibility = null;
 
-    this.api.startSolver({ mode, profile: this.selectedProfile, skipFeasibility: this.skipFeasibility, engine: this.selectedEngine }).subscribe({
+    this.api.startSolver({ mode, profile: this.selectedProfile, skipFeasibility: this.skipFeasibility, engine: this.selectedEngine, skipSoftConstraints: this.hardOnly }).subscribe({
       next: (s) => {
         this.status = s;
         this.startPolling();

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="drawio" version="26.0.0">
+  <diagram name="SchedulingWorkflow">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1150" pageHeight="850" background="#ffffff">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="wf_title" value="&lt;b style=&quot;font-size: 18px;&quot;&gt;Timetable Generation and Optimization Workflow&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#1e293b;" vertex="1" parent="1">
+          <mxGeometry x="275" y="15" width="600" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Top Row: Steps 1, 2, 3 -->
+
+        <!-- Step 1 -->
+        <mxCell id="step1" value="&lt;b style=&quot;font-size:13px;color:#1e3a8a;&quot;&gt;1. Data Ingestion &amp;amp; Setup&lt;/b&gt;&lt;br/&gt;&lt;hr style=&quot;margin:4px 0;&quot;/&gt;&lt;div style=&quot;text-align:left;font-size:11px;color:#334155;line-height:1.4;&quot;&gt;• Import Courses, Lecturers, Rooms &amp;amp; Student Groups via CSV or Web UI&lt;br/&gt;• Define room features (labs, projectors) &amp;amp; campus zones&lt;br/&gt;• Set lecturer unavailabilities &amp;amp; university blackout events&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;arcSize=8;align=center;verticalAlign=top;spacingTop=8;spacingLeft=8;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="40" y="70" width="310" height="135" as="geometry" />
+        </mxCell>
+
+        <!-- Step 2 -->
+        <mxCell id="step2" value="&lt;b style=&quot;font-size:13px;color:#854d0e;&quot;&gt;2. Pre-Solve Feasibility Check&lt;/b&gt;&lt;br/&gt;&lt;hr style=&quot;margin:4px 0;&quot;/&gt;&lt;div style=&quot;text-align:left;font-size:11px;color:#334155;line-height:1.4;&quot;&gt;• Verify total required hours vs. available room-hours&lt;br/&gt;• Validate required room features &amp;amp; zone allocations&lt;br/&gt;• Catch impossible schedule rules before solver begins&lt;br/&gt;• Separate online courses from physical room scheduling&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;arcSize=8;align=center;verticalAlign=top;spacingTop=8;spacingLeft=8;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="420" y="70" width="310" height="135" as="geometry" />
+        </mxCell>
+
+        <!-- Step 3 -->
+        <mxCell id="step3" value="&lt;b style=&quot;font-size:13px;color:#581c87;&quot;&gt;3. Timefold Constraint Optimization&lt;/b&gt;&lt;br/&gt;&lt;hr style=&quot;margin:4px 0;&quot;/&gt;&lt;div style=&quot;text-align:left;font-size:11px;color:#334155;line-height:1.4;&quot;&gt;&lt;b style=&quot;color:#991b1b;&quot;&gt;Hard Rules (Must satisfy 100%):&lt;/b&gt;&lt;br/&gt;• Zero room double-booking &amp;amp; zero lecturer clashes&lt;br/&gt;• Zero student cohort overlap &amp;amp; strict capacity limits&lt;br/&gt;• Enforce lunch breaks &amp;amp; campus zone boundaries&lt;br/&gt;&lt;b style=&quot;color:#166534;&quot;&gt;Soft Preferences (Continuous Quality Tuning):&lt;/b&gt;&lt;br/&gt;• Minimize student fatigue &amp;amp; lecturer room transitions&lt;br/&gt;• Avoid 7:00 AM slots &amp;amp; balance load across weekdays&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;arcSize=8;align=center;verticalAlign=top;spacingTop=8;spacingLeft=8;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="800" y="70" width="310" height="185" as="geometry" />
+        </mxCell>
+
+        <!-- Bottom Row: Steps 4, 5 -->
+
+        <!-- Step 4 -->
+        <mxCell id="step4" value="&lt;b style=&quot;font-size:13px;color:#9a3412;&quot;&gt;4. Interactive Grid &amp;amp; Lesson Pinning&lt;/b&gt;&lt;br/&gt;&lt;hr style=&quot;margin:4px 0;&quot;/&gt;&lt;div style=&quot;text-align:left;font-size:11px;color:#334155;line-height:1.4;&quot;&gt;• Review timetable filtered by Student Group, Lecturer, or Room&lt;br/&gt;• Pin approved lessons to lock their timeslot and room in place&lt;br/&gt;• Make manual tweaks with real-time conflict detection&lt;br/&gt;• Re-run solver to optimize remaining unlocked lessons&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;arcSize=8;align=center;verticalAlign=top;spacingTop=8;spacingLeft=8;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="420" y="295" width="310" height="135" as="geometry" />
+        </mxCell>
+
+        <!-- Step 5 -->
+        <mxCell id="step5" value="&lt;b style=&quot;font-size:13px;color:#14532d;&quot;&gt;5. Final Publishing &amp;amp; Export&lt;/b&gt;&lt;br/&gt;&lt;hr style=&quot;margin:4px 0;&quot;/&gt;&lt;div style=&quot;text-align:left;font-size:11px;color:#334155;line-height:1.4;&quot;&gt;• Generate clean, print-ready PDF schedules &amp;amp; Excel matrices&lt;br/&gt;• Export personalized views for lecturers and student departments&lt;br/&gt;• Snapshot semester archive for historical audit and rollback&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;arcSize=8;align=center;verticalAlign=top;spacingTop=8;spacingLeft=8;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="40" y="295" width="310" height="135" as="geometry" />
+        </mxCell>
+
+        <!-- Connectors -->
+        <!-- Step 1 -> Step 2 -->
+        <mxCell id="e_1_2" value="Validated Data" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;fontSize=11;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="step1" target="step2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Step 2 -> Step 3 -->
+        <mxCell id="e_2_3" value="Feasible Problem" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;fontSize=11;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.35;entryDx=0;entryDy=0;" edge="1" parent="1" source="step2" target="step3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Step 3 -> Step 4 -->
+        <mxCell id="e_3_4" value="Optimal Schedule" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;fontSize=11;labelBackgroundColor=#ffffff;exitX=0;exitY=0.8;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="step3" target="step4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Step 4 -> Step 5 -->
+        <mxCell id="e_4_5" value="Finalized Plan" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=2;fontSize=11;labelBackgroundColor=#ffffff;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="step4" target="step5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Step 4 -> Step 3 (Pin & Re-solve loop) -->
+        <mxCell id="e_4_3" value="Re-solve Unlocked Lessons" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#d97706;strokeWidth=2;dashed=1;fontSize=11;labelBackgroundColor=#ffffff;exitX=0.8;exitY=0;exitDx=0;exitDy=0;entryX=0.2;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="step4" target="step3">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="668" y="270" />
+              <mxPoint x="862" y="270" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

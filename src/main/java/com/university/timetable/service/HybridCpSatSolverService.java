@@ -239,11 +239,15 @@ public class HybridCpSatSolverService {
         if (timeslotSolution == null) {
             log.warn("Phase 1 (CP-SAT) returned INFEASIBLE with pre-assigned rooms. "
                     + "Pre-assigned rooms are too constrained for exact solver. "
-                    + "Skipping CP-SAT, running Timefold directly from pre-assigned rooms.");
-            // CP-SAT proved the pre-assigned room configuration is infeasible for exact
-            // timeslot assignment. But Timefold's local search can handle this by
-            // swapping rooms and timeslots during optimization.
-            // Go directly to Phase 2 with the pre-assigned rooms.
+                    + "Clearing room assignments and letting Timefold start fresh.");
+            // CP-SAT proved the pre-assigned room configuration is infeasible.
+            // Clear all room assignments and let Timefold's construction heuristic
+            // handle both timeslot and room assignment from scratch.
+            // This produces a much better score than forcing infeasible rooms.
+            for (Lesson lesson : lessons) {
+                lesson.setRoom(null);
+                lesson.setTimeslot(null);
+            }
         }
 
         phaseOneCompleteAtMs.set(System.currentTimeMillis());

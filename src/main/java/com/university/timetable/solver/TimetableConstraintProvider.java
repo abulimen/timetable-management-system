@@ -28,6 +28,10 @@ public class TimetableConstraintProvider implements ConstraintProvider {
     // Cached settings - loaded once on first access
     private volatile boolean settingsInitialized = false;
     private volatile boolean loadedFromDb = false; // Track if we actually loaded from DB
+
+    /** Static flag: when true, only hard constraints are evaluated (soft constraints skipped) */
+    public static volatile boolean HARD_ONLY_MODE = false;
+
     private LocalTime cachedLunchBreakStart;
     private LocalTime cachedLunchBreakEnd;
     private LocalTime cachedLatestEndTime;
@@ -178,6 +182,24 @@ public class TimetableConstraintProvider implements ConstraintProvider {
         // Consolidate: load all settings once per solve, not per constraint evaluation
         initializeSettings();
 
+        if (HARD_ONLY_MODE) {
+            log.info("HARD-ONLY MODE: Soft constraints disabled");
+            return new Constraint[] {
+                    // Hard Constraints only
+                    roomConflict(factory),
+                    lecturerConflict(factory),
+                    studentGroupConflict(factory),
+                    roomFeatureRequired(factory),
+                    zoneRestriction(factory),
+                    lecturerUnavailability(factory),
+                    lunchBreakOverlap(factory),
+                    sameCourseOnSameDay(factory),
+                    lessonExceedsEndTime(factory),
+                    roomCapacityOverflow(factory),
+                    specialEventConflict(factory)
+            };
+        }
+
         return new Constraint[] {
                 // Hard Constraints
                 roomConflict(factory),
@@ -198,7 +220,10 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                 lecturerRoomTransition(factory),
                 dayBalanceForStudentGroup(factory),
                 earlyMorningPenalty(factory),
-                maxLecturerConsecutiveHoursConstraint(factory)
+                maxLecturerConsecutiveHoursConstraint(factory),
+                crossFacultyLecturerLoad(factory),
+                lecturerTimeClustering(factory),
+                lecturerRoomStability(factory)
         };
     }
 
@@ -574,6 +599,81 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                             }
                         })
                 .asConstraint("Early morning penalty");
+    }
+
+    /**
+     * SOFT CONSTRAINT: Cross-Faculty Lecturer Load
+     * Penalizes when a lecturer teaches many different student groups in one day.
+     * This represents cross-faculty teaching complexity and guides the solver
+     * toward simpler lecturer schedules.
+     * 
+     * Impact: Reduces cross-faculty constraint cascade by encouraging lecturers
+     * to teach fewer different groups per day.
+     */
+    private Constraint crossFacultyLecturerLoad(ConstraintFactory factory) {
+        return factory.forEach(Lesson.class)
+                .filter(lesson -> lesson.getTimeslot() != null &&
+                        lesson.getLecturer() != null &&
+                        lesson.getStudentGroups() != null &&
+                        !lesson.getStudentGroups().isEmpty())
+                .flattenLast(lesson -> {
+                    Set<LecturerGroupDay> tuples = new HashSet<>();
+                    DayOfWeek day = lessonDay(lesson);
+                    for (StudentGroup group : lesson.getStudentGroups()) {
+                        tuples.add(new LecturerGroupDay(lesson.getLecturer().getId(), group.getId(), day));
+                    }
+                    return tuples;
+                })
+                .groupBy(LecturerGroupDay::lecturerId, LecturerGroupDay::day, ConstraintCollectors.count())
+                .filter((lecturerId, day, groupCount) -> groupCount > 2)
+                .penalize(HardSoftScore.ONE_SOFT,
+                        (lecturerId, day, groupCount) -> (groupCount - 2) * getAdaptiveSoftWeight(3))
+                .asConstraint("Cross-faculty lecturer load");
+    }
+
+    // Helper record for lecturer group tracking
+    private record LecturerGroupDay(Long lecturerId, Long groupId, DayOfWeek day) {}
+
+    /**
+     * SOFT CONSTRAINT: Lecturer Time Clustering
+     * Penalizes when a lecturer's lessons are spread across many different timeslots in one day.
+     * Encourages clustering lessons together to reduce fragmentation.
+     * 
+     * Impact: Helps cross-faculty lecturers by grouping their lessons in contiguous blocks.
+     */
+    private Constraint lecturerTimeClustering(ConstraintFactory factory) {
+        return factory.forEach(Lesson.class)
+                .filter(lesson -> lesson.getTimeslot() != null &&
+                        lesson.getLecturer() != null)
+                .groupBy(Lesson::getLecturer, this::lessonDay, ConstraintCollectors.count())
+                .filter((lecturer, day, lessonCount) -> lessonCount > 1)
+                .penalize(HardSoftScore.ONE_SOFT,
+                        (lecturer, day, lessonCount) -> {
+                            // Penalty increases quadratically with number of separate lessons
+                            // 2 lessons: 1, 3 lessons: 3, 4 lessons: 6, 5 lessons: 10
+                            int basePenalty = (lessonCount * (lessonCount - 1)) / 2;
+                            return basePenalty * getAdaptiveSoftWeight(2);
+                        })
+                .asConstraint("Lecturer time clustering");
+    }
+
+    /**
+     * SOFT CONSTRAINT: Lecturer Room Stability
+     * Penalizes when a lecturer switches rooms frequently in one day.
+     * Encourages keeping a lecturer in the same room when possible.
+     * 
+     * Impact: Reduces room-switching friction for cross-faculty lecturers.
+     */
+    private Constraint lecturerRoomStability(ConstraintFactory factory) {
+        return factory.forEach(Lesson.class)
+                .filter(lesson -> lesson.getTimeslot() != null &&
+                        lesson.getRoom() != null &&
+                        lesson.getLecturer() != null)
+                .groupBy(Lesson::getLecturer, this::lessonDay, Lesson::getRoom, ConstraintCollectors.count())
+                .filter((lecturer, day, room, lessonCount) -> lessonCount > 0)
+                .penalize(HardSoftScore.ONE_SOFT,
+                        (lecturer, day, room, lessonCount) -> getAdaptiveSoftWeight(2))
+                .asConstraint("Lecturer room stability");
     }
 
     /**

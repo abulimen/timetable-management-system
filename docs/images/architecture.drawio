@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="drawio" version="26.0.0">
+  <diagram name="Architecture">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="#ffffff">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="&lt;b style=&quot;font-size: 18px;&quot;&gt;University Timetable Management System Architecture&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;strokeColor=none;fillColor=none;fontColor=#1e293b;" vertex="1" parent="1">
+          <mxGeometry x="250" y="15" width="600" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Container 1: Frontend Tier -->
+        <mxCell id="c_frontend" value="Frontend Layer (Angular 17 SPA)" style="swimlane;startSize=30;html=1;fillColor=#f8fafc;strokeColor=#cbd5e1;fontColor=#0f172a;fontStyle=1;rounded=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="40" y="60" width="1020" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="fe_grid" value="&lt;b&gt;Timetable Matrix View&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:11px;color:#475569;&quot;&gt;Room, Lecturer &amp;amp; Group grids, Drag &amp;amp; Pin&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#1e293b;" vertex="1" parent="c_frontend">
+          <mxGeometry x="25" y="45" width="225" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="fe_import" value="&lt;b&gt;Data Import &amp;amp; Drafting&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:11px;color:#475569;&quot;&gt;CSV batch import &amp;amp; inline error editor&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#1e293b;" vertex="1" parent="c_frontend">
+          <mxGeometry x="275" y="45" width="225" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="fe_solver_ctrl" value="&lt;b&gt;Solver Control Console&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:11px;color:#475569;&quot;&gt;Live solve progress, score &amp;amp; diagnostics&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#1e293b;" vertex="1" parent="c_frontend">
+          <mxGeometry x="525" y="45" width="225" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="fe_admin" value="&lt;b&gt;System Admin &amp;amp; Settings&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:11px;color:#475569;&quot;&gt;Rule weighting, timeslots, user roles&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#1e293b;" vertex="1" parent="c_frontend">
+          <mxGeometry x="775" y="45" width="220" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Container 2: Backend API Tier -->
+        <mxCell id="c_backend" value="Backend Application Layer (Spring Boot 3.5 and Java 17)" style="swimlane;startSize=30;html=1;fillColor=#f8fafc;strokeColor=#cbd5e1;fontColor=#0f172a;fontStyle=1;rounded=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="40" y="240" width="1020" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="be_api" value="&lt;b&gt;REST Controllers &amp;amp; Auth&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:11px;color:#475569;&quot;&gt;JWT Security, CORS, DTO validation&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontColor=#1e293b;" vertex="1" parent="c_backend">
+          <mxGeometry x="25" y="45" width="225" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="be_services" value="&lt;b&gt;Domain Services&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:11px;color:#475569;&quot;&gt;Course, Room, Lecturer &amp;amp; Lesson logic&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontColor=#1e293b;" vertex="1" parent="c_backend">
+          <mxGeometry x="275" y="45" width="225" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="be_solver_svc" value="&lt;b&gt;Solver Orchestrator&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:11px;color:#475569;&quot;&gt;Async SolverManager, profile policies&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontColor=#1e293b;" vertex="1" parent="c_backend">
+          <mxGeometry x="525" y="45" width="225" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="be_export" value="&lt;b&gt;Export &amp;amp; Archive Engine&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:11px;color:#475569;&quot;&gt;Excel (POI), PDF (OpenPDF), Semester snapshot&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontColor=#1e293b;" vertex="1" parent="c_backend">
+          <mxGeometry x="775" y="45" width="220" height="65" as="geometry" />
+        </mxCell>
+
+        <!-- Container 3: Timefold Engine Tier -->
+        <mxCell id="c_timefold" value="Optimization Engine Layer (Timefold Solver)" style="swimlane;startSize=30;html=1;fillColor=#f8fafc;strokeColor=#cbd5e1;fontColor=#0f172a;fontStyle=1;rounded=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="40" y="440" width="600" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="tf_model" value="&lt;b&gt;Planning Model&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:11px;color:#475569;&quot;&gt;@PlanningSolution (TimeTable)&lt;br/&gt;@PlanningEntity (Lesson)&lt;br/&gt;@PlanningVariable (Timeslot, Room)&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#1e293b;" vertex="1" parent="c_timefold">
+          <mxGeometry x="25" y="45" width="250" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="tf_constraints" value="&lt;b&gt;Constraint Streams Provider&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:11px;color:#475569;&quot;&gt;&lt;b&gt;Hard:&lt;/b&gt; 0 Conflicts (Room, Lecturer, Cohort)&lt;br/&gt;&lt;b&gt;Soft:&lt;/b&gt; Day balance, fatigue, room stability&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#1e293b;" vertex="1" parent="c_timefold">
+          <mxGeometry x="300" y="45" width="275" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="tf_search" value="&lt;b&gt;Search &amp;amp; Move Algorithms&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:11px;color:#475569;&quot;&gt;Construction Heuristics + Local Search (Nearby Selection, Course Pillars, Ruin &amp;amp; Recreate)&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#1e293b;" vertex="1" parent="c_timefold">
+          <mxGeometry x="25" y="145" width="550" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Container 4: Data & Persistence Tier -->
+        <mxCell id="c_data" value="Data and Persistence Layer" style="swimlane;startSize=30;html=1;fillColor=#f8fafc;strokeColor=#cbd5e1;fontColor=#0f172a;fontStyle=1;rounded=1;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="680" y="440" width="380" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="db_mysql" value="&lt;b&gt;MySQL 8.0 Database&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:11px;color:#475569;&quot;&gt;Relational persistence, Flyway schema migrations, transactional integrity&lt;/span&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#1e293b;boundedLbl=1;backgroundOutline=1;" vertex="1" parent="c_data">
+          <mxGeometry x="40" y="45" width="300" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="db_audit" value="&lt;b&gt;Audit &amp;amp; History Logs&lt;/b&gt;&lt;br/&gt;&lt;span style=&quot;font-size:11px;color:#475569;&quot;&gt;Change tracking, solver metrics, semester archive snapshots&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#1e293b;" vertex="1" parent="c_data">
+          <mxGeometry x="40" y="150" width="300" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Connectors -->
+        <!-- Frontend to Backend -->
+        <mxCell id="edge_fe_be" value="HTTPS / JSON REST API" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748b;strokeWidth=2;fontColor=#334155;fontSize=11;labelBackgroundColor=#ffffff;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="c_frontend" target="c_backend">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Backend to Timefold -->
+        <mxCell id="edge_be_tf" value="Planning Problem Dataset" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748b;strokeWidth=2;fontColor=#334155;fontSize=11;labelBackgroundColor=#ffffff;exitX=0.3;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="c_backend" target="c_timefold">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Backend to Database -->
+        <mxCell id="edge_be_db" value="Spring Data JPA / Hibernate" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748b;strokeWidth=2;fontColor=#334155;fontSize=11;labelBackgroundColor=#ffffff;exitX=0.82;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="c_backend" target="c_data">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Timefold to Backend (Solution Callback) -->
+        <mxCell id="edge_tf_be" value="Optimal Feasible Solution" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#82b366;strokeWidth=2;dashed=1;fontColor=#2e7d32;fontSize=11;labelBackgroundColor=#ffffff;exitX=0.8;exitY=0;exitDx=0;exitDy=0;entryX=0.6;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="c_timefold" target="c_backend">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Legend -->
+        <mxCell id="legend" value="Architecture Layers" style="swimlane;startSize=24;html=1;fillColor=#ffffff;strokeColor=#94a3b8;fontColor=#334155;fontStyle=1;fontSize=11;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="695" width="600" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="leg1" value="" style="rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="legend">
+          <mxGeometry x="15" y="38" width="20" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="leg1t" value="Angular Frontend" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#334155;" vertex="1" parent="legend">
+          <mxGeometry x="40" y="36" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg2" value="" style="rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="legend">
+          <mxGeometry x="150" y="38" width="20" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="leg2t" value="Spring Boot Services" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#334155;" vertex="1" parent="legend">
+          <mxGeometry x="175" y="36" width="115" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3" value="" style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="legend">
+          <mxGeometry x="300" y="38" width="20" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3t" value="Timefold Optimization" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#334155;" vertex="1" parent="legend">
+          <mxGeometry x="325" y="36" width="120" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="leg4" value="" style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="legend">
+          <mxGeometry x="455" y="38" width="20" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="leg4t" value="MySQL Persistence" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#334155;" vertex="1" parent="legend">
+          <mxGeometry x="480" y="36" width="110" height="20" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
