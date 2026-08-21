@@ -55,43 +55,17 @@ Download the generated sample schedule: 👉 [**`timetable_2026-08-21.pdf`**](do
 
 ### 🎥 Interface Walkthroughs
 
-<details open>
-<summary><b>📅 Timetable Matrix View</b></summary>
+#### 📅 Timetable Matrix View
+![Timetable Matrix View](docs/videos/timetable-page.gif)
 
-[▶ Open Video (`timetable-page.mp4`)](docs/videos/timetable-page.mp4)
+#### 📚 Courses & Curriculum Management
+![Courses & Curriculum Management](docs/videos/courses-page.gif)
 
-<video src="docs/videos/timetable-page.mp4" controls width="100%"></video>
-</details>
+#### 🏛️ Rooms & Capacity Management
+![Rooms & Capacity Management](docs/videos/rooms-page.gif)
 
-<br/>
-
-<details>
-<summary><b>📚 Courses & Curriculum Management</b></summary>
-
-[▶ Open Video (`courses-page.mp4`)](docs/videos/courses-page.mp4)
-
-<video src="docs/videos/courses-page.mp4" controls width="100%"></video>
-</details>
-
-<br/>
-
-<details>
-<summary><b>🏛️ Rooms & Capacity Management</b></summary>
-
-[▶ Open Video (`rooms-page.mp4`)](docs/videos/rooms-page.mp4)
-
-<video src="docs/videos/rooms-page.mp4" controls width="100%"></video>
-</details>
-
-<br/>
-
-<details>
-<summary><b>⚙️ Scheduling Rules & Weight Settings</b></summary>
-
-[▶ Open Video (`settings-page.mp4`)](docs/videos/settings-page.mp4)
-
-<video src="docs/videos/settings-page.mp4" controls width="100%"></video>
-</details>
+#### ⚙️ Scheduling Rules & Weight Settings
+![Scheduling Rules & Weight Settings](docs/videos/settings-page.gif)
 
 ---
 
