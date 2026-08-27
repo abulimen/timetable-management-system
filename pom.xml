@@ -14,7 +14,7 @@
     <artifactId>timetable-engine</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <name>University Timetable Scheduling Engine</name>
-    <description>Enterprise-grade automated timetable scheduling using OptaPlanner</description>
+    <description>Automated university timetable scheduling engine using Timefold Solver and Google OR-Tools CP-SAT</description>
 
     <properties>
         <java.version>21</java.version>

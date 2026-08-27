@@ -59,6 +59,14 @@ public class ForwardCheckingConstructionService {
         LocalTime lunchEnd = constraintSettingsService.getLunchBreakEnd();
         boolean lunchEnforced = constraintSettingsService.isLunchBreakEnforced();
 
+        // 0. Index lessons by ID for fast lookup
+        Map<Long, Lesson> lessonsById = new HashMap<>();
+        for (Lesson l : lessons) {
+            if (l.getId() != null) {
+                lessonsById.put(l.getId(), l);
+            }
+        }
+
         // 1. Build conflict graph
         Map<Long, Set<Long>> conflictGraph = buildConflictGraph(lessons);
         log.info("Conflict graph built: {} nodes, avg degree = {:.1f}",
@@ -158,7 +166,7 @@ public class ForwardCheckingConstructionService {
                     // Score this assignment: prioritize timeslots that leave most options for future lessons
                     int score = scoreAssignment(lesson, ts, room, tsIndex, conflictGraph,
                             lecturerTimeslotUsage, groupTimeslotUsage, roomTimeslotUsage,
-                            validTimeslots, timeslots);
+                            validTimeslots, lessonsById, timeslots);
 
                     if (score > bestScore) {
                         bestScore = score;
@@ -201,7 +209,7 @@ public class ForwardCheckingConstructionService {
         // Group by lecturer
         Map<Long, List<Lesson>> byLecturer = new HashMap<>();
         for (Lesson lesson : lessons) {
-            if (lesson.getLecturer() != null) {
+            if (lesson.getLecturer() != null && lesson.getLecturer().getId() != null) {
                 byLecturer.computeIfAbsent(lesson.getLecturer().getId(), k -> new ArrayList<>())
                         .add(lesson);
             }
@@ -237,6 +245,7 @@ public class ForwardCheckingConstructionService {
     }
 
     private void addEdge(Map<Long, Set<Long>> graph, Long a, Long b) {
+        if (a == null || b == null) return;
         graph.computeIfAbsent(a, k -> new HashSet<>()).add(b);
         graph.computeIfAbsent(b, k -> new HashSet<>()).add(a);
     }
@@ -252,7 +261,7 @@ public class ForwardCheckingConstructionService {
         if (lesson.getTimeslot() == null) return;
         int tsIndex = timeslots.indexOf(lesson.getTimeslot());
 
-        if (lesson.getLecturer() != null) {
+        if (lesson.getLecturer() != null && lesson.getLecturer().getId() != null) {
             lecturerUsage.computeIfAbsent(lesson.getLecturer().getId(), k -> new HashSet<>())
                     .add(tsIndex);
         }
@@ -261,7 +270,7 @@ public class ForwardCheckingConstructionService {
             groupUsage.computeIfAbsent(groupId, k -> new HashSet<>()).add(tsIndex);
         }
 
-        if (lesson.getRoom() != null && !lesson.isOnline()) {
+        if (lesson.getRoom() != null && !lesson.isOnline() && lesson.getRoom().getId() != null) {
             roomUsage.computeIfAbsent(lesson.getRoom().getId(), k -> new HashSet<>())
                     .add(tsIndex);
         }
@@ -277,6 +286,7 @@ public class ForwardCheckingConstructionService {
                                   Map<Long, Set<Integer>> groupUsage,
                                   Map<Long, Set<Integer>> roomUsage,
                                   Map<Long, List<Timeslot>> validTimeslots,
+                                  Map<Long, Lesson> lessonsById,
                                   List<Timeslot> timeslots) {
         int score = 0;
 
@@ -285,12 +295,13 @@ public class ForwardCheckingConstructionService {
         for (Long conflictId : conflicts) {
             List<Timeslot> conflictTimeslots = validTimeslots.get(conflictId);
             if (conflictTimeslots == null) continue;
+            Lesson conflictLesson = lessonsById.get(conflictId);
 
             int available = 0;
             for (Timeslot cTs : conflictTimeslots) {
                 int cTsIndex = timeslots.indexOf(cTs);
                 // Check if this timeslot is still available for the conflicting lesson
-                if (!isTimeslotBlocked(cTsIndex, conflictId, lesson, lecturerUsage, groupUsage)) {
+                if (!isTimeslotBlocked(cTsIndex, conflictLesson, tsIndex, lesson, lecturerUsage, groupUsage)) {
                     available++;
                 }
             }
@@ -310,11 +321,52 @@ public class ForwardCheckingConstructionService {
         return score;
     }
 
-    private boolean isTimeslotBlocked(int tsIndex, Long lessonId, Lesson assigningLesson,
-                                       Map<Long, Set<Integer>> lecturerUsage,
-                                       Map<Long, Set<Integer>> groupUsage) {
-        // This is a simplified check - the actual conflict checking is done
-        // during the main assignment loop
+    /**
+     * Determine if timeslot index cTsIndex is blocked for conflictLesson when assigning lesson at tsIndex.
+     */
+    public boolean isTimeslotBlocked(int cTsIndex, Lesson conflictLesson, int assigningTsIndex, Lesson assigningLesson,
+                                      Map<Long, Set<Integer>> lecturerUsage,
+                                      Map<Long, Set<Integer>> groupUsage) {
+        // 1. Direct collision with assigningLesson placed at assigningTsIndex
+        if (cTsIndex == assigningTsIndex && sharesResource(conflictLesson, assigningLesson)) {
+            return true;
+        }
+
+        // 2. ConflictLesson's lecturer is already assigned at cTsIndex
+        if (conflictLesson != null && conflictLesson.getLecturer() != null && conflictLesson.getLecturer().getId() != null) {
+            Set<Integer> lecturerSlots = lecturerUsage.get(conflictLesson.getLecturer().getId());
+            if (lecturerSlots != null && lecturerSlots.contains(cTsIndex)) {
+                return true;
+            }
+        }
+
+        // 3. Any of conflictLesson's student groups is already assigned at cTsIndex
+        if (conflictLesson != null && conflictLesson.getConflictGroupIds() != null) {
+            for (Long groupId : conflictLesson.getConflictGroupIds()) {
+                Set<Integer> groupSlots = groupUsage.get(groupId);
+                if (groupSlots != null && groupSlots.contains(cTsIndex)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private boolean sharesResource(Lesson a, Lesson b) {
+        if (a == null || b == null) return false;
+        if (a.getLecturer() != null && b.getLecturer() != null &&
+                a.getLecturer().getId() != null && b.getLecturer().getId() != null &&
+                Objects.equals(a.getLecturer().getId(), b.getLecturer().getId())) {
+            return true;
+        }
+        if (a.getConflictGroupIds() != null && b.getConflictGroupIds() != null) {
+            for (Long gIdA : a.getConflictGroupIds()) {
+                if (b.getConflictGroupIds().contains(gIdA)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 

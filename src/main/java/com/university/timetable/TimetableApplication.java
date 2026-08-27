@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 /**
  * University Timetable Scheduling Engine
  * 
- * An enterprise-grade automated scheduling system using OptaPlanner
+ * An automated scheduling system using Timefold Solver and Google OR-Tools CP-SAT
  * for constraint-based optimization of university course timetables.
  */
 @SpringBootApplication

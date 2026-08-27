@@ -27,12 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Configuration for OptaPlanner beans.
+ * Configuration for Timefold Solver beans.
  */
 @Configuration
 @Slf4j
 @RequiredArgsConstructor
-public class OptaPlannerConfig {
+public class TimefoldSolverConfig {
 
     private final ConstraintSettingsService settingsService;
 
@@ -60,37 +60,9 @@ public class OptaPlannerConfig {
     @Bean
     public SolverFactory<TimeTable> solverFactory() {
         SolverConfig config = SolverConfig.createFromXmlResource("solver-config.xml");
-        // Note: moveThreadCount (multi-threaded solving) requires Timefold Enterprise.
-        // Community edition uses single-threaded solving, but the Timefold engine is
-        // ~2x faster.
         config.setEnvironmentMode(EnvironmentMode.valueOf(resolveEnvironmentMode()));
         applyDynamicTuning(config);
-        // SCHC (Step Counting Hill Climbing) is configured in solver-config.xml
-        // No programmatic simulated annealing needed — SCHC with SIMULATED_ANNEALING type
-        // handles both acceptance and temperature cooling in one parameter.
         return SolverFactory.create(config);
-    }
-
-    /**
-     * Add simulated annealing to the local search acceptor.
-     * Timefold Community Edition 1.31.0 doesn't support this in XML,
-     * but the Java API fully supports it.
-     */
-    private void addSimulatedAnnealing(SolverConfig config) {
-        if (config.getPhaseConfigList() == null) return;
-        for (PhaseConfig phase : config.getPhaseConfigList()) {
-            if (phase instanceof LocalSearchPhaseConfig localSearchPhase) {
-                LocalSearchAcceptorConfig acceptorConfig = localSearchPhase.getAcceptorConfig();
-                if (acceptorConfig == null) {
-                    acceptorConfig = new LocalSearchAcceptorConfig();
-                    localSearchPhase.setAcceptorConfig(acceptorConfig);
-                }
-                // Simulated annealing helps escape local optima by accepting
-                // worse moves with decreasing probability (temperature cooling)
-                acceptorConfig.setSimulatedAnnealingStartingTemperature("4hard/1000soft");
-                log.info("Added simulated annealing (starting temp: 4hard/1000soft) to local search phase");
-            }
-        }
     }
 
     /**

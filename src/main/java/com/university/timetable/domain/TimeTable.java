@@ -15,12 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TimeTable - the Planning Solution for OptaPlanner.
+ * TimeTable - the Planning Solution for Timefold Solver.
  * 
  * This is the container that holds all planning entities (lessons)
  * and problem facts (timeslots, rooms, lecturers, student groups).
  * 
- * Based on design.md TimeTable specification:
+ * Based on TimeTable specification:
  * - @PlanningSolution annotation
  * - @ValueRangeProvider for timeslots and rooms
  * - @ProblemFactCollectionProperty for lecturers and student groups
@@ -32,7 +32,7 @@ import java.util.List;
 public class TimeTable {
 
     /**
-     * Planning entities - the lessons that OptaPlanner will schedule.
+     * Planning entities - the lessons that Timefold will schedule.
      */
     @PlanningEntityCollectionProperty
     private List<Lesson> lessons = new ArrayList<>();
@@ -66,7 +66,7 @@ public class TimeTable {
     private List<StudentGroup> studentGroups = new ArrayList<>();
 
     /**
-     * The score calculated by OptaPlanner based on constraints.
+     * The score calculated by Timefold based on constraints.
      */
     @PlanningScore
     private HardSoftScore score;

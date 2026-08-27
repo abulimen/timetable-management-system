@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 /**
- * Service that uses OptaPlanner's SolutionManager to explain constraint
+ * Service that uses Timefold's SolutionManager to explain constraint
  * violations.
  * Provides detailed breakdown of why a solution has violations.
  */

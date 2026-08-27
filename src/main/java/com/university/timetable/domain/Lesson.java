@@ -17,13 +17,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Lesson entity - the core Planning Entity for OptaPlanner.
+ * Lesson entity - the core Planning Entity for Timefold Solver.
  * 
  * A Lesson is a split part of a Course (e.g., MTH101-Part1, MTH101-Part2).
- * OptaPlanner assigns each Lesson to a Timeslot and Room.
+ * Timefold assigns each Lesson to a Timeslot and Room.
  * 
- * Based on design.md Lesson Entity specification:
- * - @PlanningEntity for OptaPlanner
+ * Based on Lesson Entity specification:
+ * - @PlanningEntity for Timefold Solver
  * - @PlanningVariable for timeslot and room
  * - @PlanningPin for admin override pinning
  */
@@ -70,7 +70,7 @@ public class Lesson {
 
     /**
      * Planning Variable: The assigned timeslot.
-     * OptaPlanner will determine this value.
+     * Timefold will determine this value.
      * strengthComparatorClass enables WEAKEST_FIT/STRONGEST_FIT heuristics.
      */
     @PlanningVariable(valueRangeProviderRefs = "timeslotRange", strengthComparatorClass = com.university.timetable.solver.TimeslotStrengthComparator.class)
@@ -80,7 +80,7 @@ public class Lesson {
 
     /**
      * Planning Variable: The assigned room.
-     * OptaPlanner will determine this value.
+     * Timefold will determine this value.
      * strengthComparatorClass enables WEAKEST_FIT/STRONGEST_FIT heuristics.
      */
     @PlanningVariable(valueRangeProviderRefs = "roomRange", strengthComparatorClass = com.university.timetable.solver.RoomStrengthComparator.class)
@@ -102,8 +102,8 @@ public class Lesson {
     }
 
     /**
-     * Return pinned status for OptaPlanner's @PlanningPin.
-     * When pinned is true, OptaPlanner will not modify this lesson.
+     * Return pinned status for Timefold's @PlanningPin.
+     * When pinned is true, Timefold will not modify this lesson.
      */
     @PlanningPin
     public boolean isPinned() {

@@ -16,8 +16,8 @@ spring:
   flyway:
     enabled: false
 
-# Disable OptaPlanner auto-config for tests
-optaplanner:
+# Timefold solver test config
+timefold:
   solver-config-xml: solver-config.xml
 
 logging:

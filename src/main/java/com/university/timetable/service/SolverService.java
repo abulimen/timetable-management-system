@@ -46,7 +46,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * SolverService - manages asynchronous solving with OptaPlanner's
+ * SolverService - manages asynchronous solving with Timefold's
  * SolverManager.
  */
 @Service

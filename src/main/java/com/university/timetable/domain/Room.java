@@ -63,7 +63,7 @@ public class Room {
 
     /**
      * Check if room has all required features.
-     * Used for room suitability constraint in OptaPlanner.
+     * Used for room suitability constraint in Timefold Solver.
      */
     public boolean hasAllFeatures(Set<Feature> requiredFeatures) {
         if (requiredFeatures == null || requiredFeatures.isEmpty()) {
