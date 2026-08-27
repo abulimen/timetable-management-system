@@ -49,6 +49,8 @@ The system follows a 5 step workflow from raw university data to a published tim
 
 Download the generated sample schedule: 👉 [**`timetable_2026-08-21.pdf`**](docs/timetable_2026-08-21.pdf)
 
+> This is an actual output produced by the timetable solver for a representative dataset. Runtime varies considerably with the number of entities, constraints and optimization requirements, so the solver is not designed as an instant UI operation.
+
 ![Sample Timetable PDF Export](docs/images/timetable-pdf-view.png)
 
 ---
